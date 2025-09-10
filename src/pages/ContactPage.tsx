@@ -136,8 +136,7 @@ const ContactPage = () => {
                   <Phone className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
                   <div>
                     <p className="font-medium">Phone Support</p>
-                    <p className="text-gray-600">1-800-PARTS-RUN</p>
-                    <p className="text-sm text-gray-500">(1-800-727-8778)</p>
+                    <p className="text-gray-600">502-812-2456</p>
                   </div>
                 </div>
 
@@ -171,20 +170,12 @@ const ContactPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Monday - Friday</span>
-                  <span>6:00 AM - 10:00 PM</span>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-600">24/7</p>
+                  <p className="text-gray-600">Available around the clock</p>
                 </div>
-                <div className="flex justify-between">
-                  <span>Saturday</span>
-                  <span>8:00 AM - 8:00 PM</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Sunday</span>
-                  <span>10:00 AM - 6:00 PM</span>
-                </div>
-                <p className="text-sm text-gray-500 mt-4">
-                  All times are Eastern Time (ET)
+                <p className="text-sm text-gray-500 mt-4 text-center">
+                  We're here whenever you need us
                 </p>
               </CardContent>
             </Card>
