@@ -129,7 +129,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
       if (applicationError) throw applicationError;
 
       // Show success message and navigate to driver dashboard
-      alert('Congratulations! You are now approved as a driver. You can start taking deliveries immediately!');
+      alert('Congratulations! You are now approved as a driver. You are automatically set to ONLINE and ready to accept deliveries!');
       onComplete();
       navigate('/driver-dashboard');
     } catch (error) {
@@ -366,7 +366,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
               disabled={loading || !formData.hasCommercialInsurance || !formData.hasCleanRecord || !formData.agreeToTerms}
               className="ml-auto bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
             >
-              {loading ? 'Approving...' : 'Start Driving Now!'}
+              {loading ? 'Approving...' : 'Go Online & Start Driving!'}
             </Button>
           )}
         </div>

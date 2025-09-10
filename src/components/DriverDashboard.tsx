@@ -33,6 +33,8 @@ const DriverDashboard: React.FC = () => {
       fetchDriverOrders();
       fetchAvailableOrders();
       fetchEarnings();
+      // Automatically set driver to online when they first access the dashboard
+      setIsOnline(true);
     }
   }, [user]);
 
