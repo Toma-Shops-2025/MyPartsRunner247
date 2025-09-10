@@ -60,9 +60,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li><button onClick={() => handleNavigation('/about')} className="text-gray-400 hover:text-white transition-colors text-left">About Us</button></li>
               <li><button onClick={() => handleNavigation('/driver-application')} className="text-gray-400 hover:text-white transition-colors text-left">Drive with Us</button></li>
-              <li><a href="#merchants" className="text-gray-400 hover:text-white transition-colors">Partner with Us</a></li>
               <li><button onClick={() => handleNavigation('/careers')} className="text-gray-400 hover:text-white transition-colors text-left">Careers</button></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Press</a></li>
             </ul>
           </div>
 
@@ -70,7 +68,6 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-6">Support</h3>
             <ul className="space-y-3">
               <li><button onClick={() => handleNavigation('/faq')} className="text-gray-400 hover:text-white transition-colors text-left">Help Center</button></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Safety</a></li>
               <li><button onClick={() => handleNavigation('/terms')} className="text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button></li>
               <li><button onClick={() => handleNavigation('/privacy')} className="text-gray-400 hover:text-white transition-colors text-left">Privacy Policy</button></li>
               <li><button onClick={() => handleNavigation('/contact')} className="text-gray-400 hover:text-white transition-colors text-left">Contact Us</button></li>
