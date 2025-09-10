@@ -110,10 +110,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          user_type: 'driver',
-          full_name: formData.fullName,
-          phone: formData.phone,
-          status: 'active' // Automatically approve
+          full_name: formData.fullName
         })
         .eq('id', user.id);
 
@@ -126,8 +123,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
       const { error: applicationError } = await supabase
         .from('driver_applications')
         .insert([{
-          user_id: user.id,
-          status: 'approved' // Automatically approved
+          user_id: user.id
         }]);
 
       if (applicationError) {
