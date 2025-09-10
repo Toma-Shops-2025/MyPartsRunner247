@@ -16,10 +16,44 @@ interface DriverRegistrationProps {
 }
 
 const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // Show loading while checking authentication
+  if (authLoading) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show sign-in prompt if not authenticated
+  if (!user) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="text-center py-12">
+          <h3 className="text-xl font-semibold mb-4">Sign In Required</h3>
+          <p className="text-gray-600 mb-6">
+            Please sign in to your account to submit a driver application.
+          </p>
+          <Button 
+            onClick={() => navigate('/')}
+            className="bg-teal-600 hover:bg-teal-700"
+          >
+            Go to Homepage to Sign In
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -64,7 +98,11 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
       agreeToTerms: formData.agreeToTerms
     });
     
-    if (!user) return;
+    if (!user) {
+      alert('Please sign in to submit your driver application.');
+      navigate('/');
+      return;
+    }
     
     setLoading(true);
     try {
