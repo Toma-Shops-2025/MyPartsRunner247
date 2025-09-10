@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ServicesSection: React.FC = () => {
+  const navigate = useNavigate();
   const services = [
     {
       title: "Personal Pickups",
@@ -60,7 +62,10 @@ const ServicesSection: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg">
+          <button 
+            onClick={() => navigate('/services')}
+            className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
+          >
             Start Your Delivery
           </button>
         </div>

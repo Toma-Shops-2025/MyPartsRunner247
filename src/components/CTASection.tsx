@@ -1,7 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Smartphone, Truck } from 'lucide-react';
 
 const CTASection: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section className="py-20 bg-gradient-to-r from-teal-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +41,10 @@ const CTASection: React.FC = () => {
                 24/7 availability
               </li>
             </ul>
-            <button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white py-4 rounded-full font-semibold hover:from-teal-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg">
+            <button 
+              onClick={() => navigate('/services')}
+              className="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white py-4 rounded-full font-semibold hover:from-teal-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg"
+            >
               Request Pickup Now
             </button>
           </div>
@@ -68,7 +73,10 @@ const CTASection: React.FC = () => {
                 Weekly payouts
               </li>
             </ul>
-            <button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg">
+            <button 
+              onClick={() => navigate('/driver-application')}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
+            >
               Become a Driver
             </button>
           </div>

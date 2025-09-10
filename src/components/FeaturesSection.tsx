@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const FeaturesSection: React.FC = () => {
+  const navigate = useNavigate();
   const features = [
     {
       title: "Real-Time Tracking",
@@ -94,7 +96,10 @@ const FeaturesSection: React.FC = () => {
               </div>
             </div>
 
-            <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg">
+            <button 
+              onClick={() => navigate('/services')}
+              className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
+            >
               Experience the Difference
             </button>
           </div>

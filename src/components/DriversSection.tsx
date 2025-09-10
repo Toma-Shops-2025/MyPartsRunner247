@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface DriversSectionProps {
   onBecomeDriver?: () => void;
 }
 
 const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
+  const navigate = useNavigate();
   const driverImages = [
     "https://d64gsuwffb70l.cloudfront.net/68c0e29a764640203ce73338_1757471447192_9e91b7b0.webp",
     "https://d64gsuwffb70l.cloudfront.net/68c0e29a764640203ce73338_1757471448911_23ea40bf.webp",
@@ -46,7 +48,7 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
 
             <div className="space-y-4">
               <button 
-                onClick={onBecomeDriver}
+                onClick={() => navigate('/driver-application')}
                 className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
               >
                 Apply to Drive
@@ -79,6 +81,12 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
             Join thousands of drivers already earning with MyPartsRunner. 
             Quick onboarding, instant payments, and the freedom to work on your schedule.
           </p>
+          <button 
+            onClick={() => navigate('/driver-application')}
+            className="bg-white text-teal-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-teal-50 transform hover:scale-105 transition-all shadow-lg mb-6"
+          >
+            Start Earning Today
+          </button>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
               <div className="font-bold text-xl">$25+</div>

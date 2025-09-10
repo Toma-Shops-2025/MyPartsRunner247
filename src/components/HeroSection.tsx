@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroSectionProps {
   onRequestPickup?: () => void;
@@ -6,6 +7,7 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriver }) => {
+  const navigate = useNavigate();
   return (
     <section className="relative bg-gradient-to-br from-teal-50 to-blue-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -23,13 +25,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
               <button 
-                onClick={onRequestPickup}
+                onClick={onRequestPickup || (() => {})}
                 className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
               >
                 Request Pickup Now
               </button>
               <button 
-                onClick={onBecomeDriver}
+                onClick={() => navigate('/driver-application')}
                 className="border-2 border-teal-500 text-teal-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-teal-50 transition-all"
               >
                 Become a Driver
