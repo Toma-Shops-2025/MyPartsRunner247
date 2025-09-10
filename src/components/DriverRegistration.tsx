@@ -147,7 +147,10 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
         })
         .eq('id', user.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
 
       // Create driver application record for tracking
       const { error: applicationError } = await supabase
@@ -191,7 +194,10 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
           status: 'approved' // Automatically approved
         }]);
 
-      if (applicationError) throw applicationError;
+      if (applicationError) {
+        console.error('Application insert error:', applicationError);
+        throw applicationError;
+      }
 
       // Show success message and navigate to driver dashboard
       alert('Congratulations! You are now approved as a driver. You are automatically set to ONLINE and ready to accept deliveries!');
