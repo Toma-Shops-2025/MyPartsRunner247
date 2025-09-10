@@ -113,37 +113,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
           user_type: 'driver',
           full_name: formData.fullName,
           phone: formData.phone,
-          status: 'active', // Automatically approve
-          date_of_birth: formData.dateOfBirth,
-          ssn_last_four: formData.ssn,
-          driver_license: formData.driversLicense,
-          driver_license_exp: formData.driversLicenseExp,
-          vehicle_info: {
-            type: formData.vehicleType,
-            make: formData.vehicleMake,
-            model: formData.vehicleModel,
-            year: formData.vehicleYear,
-            color: formData.vehicleColor,
-            license_plate: formData.licensePlate
-          },
-          insurance_info: {
-            company: formData.insuranceCompany,
-            policy_number: formData.insurancePolicy
-          },
-          banking_info: {
-            account_number: formData.bankAccount,
-            routing_number: formData.routingNumber
-          },
-          address: {
-            street: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zip_code: formData.zipCode
-          },
-          emergency_contact: {
-            name: formData.emergencyContact,
-            phone: formData.emergencyPhone
-          }
+          status: 'active' // Automatically approve
         })
         .eq('id', user.id);
 
@@ -157,40 +127,6 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
         .from('driver_applications')
         .insert([{
           user_id: user.id,
-          personal_info: {
-            full_name: formData.fullName,
-            phone: formData.phone,
-            address: formData.address,
-            city: formData.city,
-            state: formData.state,
-            zip_code: formData.zipCode,
-            date_of_birth: formData.dateOfBirth,
-            ssn_last_four: formData.ssn,
-            emergency_contact: formData.emergencyContact,
-            emergency_phone: formData.emergencyPhone
-          },
-          vehicle_info: {
-            type: formData.vehicleType,
-            make: formData.vehicleMake,
-            model: formData.vehicleModel,
-            year: formData.vehicleYear,
-            color: formData.vehicleColor,
-            license_plate: formData.licensePlate
-          },
-          documents: {
-            drivers_license: formData.driversLicense,
-            drivers_license_exp: formData.driversLicenseExp,
-            insurance_company: formData.insuranceCompany,
-            insurance_policy: formData.insurancePolicy
-          },
-          banking_info: {
-            account_number: formData.bankAccount,
-            routing_number: formData.routingNumber
-          },
-          certifications: {
-            commercial_insurance: formData.hasCommercialInsurance,
-            clean_record: formData.hasCleanRecord
-          },
           status: 'approved' // Automatically approved
         }]);
 
