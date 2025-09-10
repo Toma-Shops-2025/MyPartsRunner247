@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Clock, MapPin, Shield, Truck } from 'lucide-react';
+import { Package, Clock, MapPin, Shield } from 'lucide-react';
 import RequestPickupModal from '@/components/RequestPickupModal';
 
 const ServicesPage: React.FC = () => {
@@ -17,12 +17,6 @@ const ServicesPage: React.FC = () => {
       title: 'Personal Pickups',
       description: 'Forgot something at home? Need something from a store? We\'ll pick it up and deliver it to you.',
       features: ['Any item, any location', 'Real-time tracking', 'Photo confirmation']
-    },
-    {
-      icon: Truck,
-      title: 'Merchant Delivery',
-      description: 'Partner with local businesses to offer delivery services to their customers.',
-      features: ['Business partnerships', 'Bulk deliveries', 'Scheduled pickups']
     },
     {
       icon: Clock,

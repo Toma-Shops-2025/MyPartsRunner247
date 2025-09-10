@@ -7,11 +7,9 @@ import ServicesSection from './ServicesSection';
 import HowItWorksSection from './HowItWorksSection';
 import FeaturesSection from './FeaturesSection';
 import DriversSection from './DriversSection';
-import MerchantsSection from './MerchantsSection';
 import TestimonialsSection from './TestimonialsSection';
 import StatsSection from './StatsSection';
 import CTASection from './CTASection';
-import PricingSection from './PricingSection';
 import Footer from './Footer';
 import RequestPickupModal from './RequestPickupModal';
 import OrderTracker from './OrderTracker';
@@ -56,8 +54,6 @@ const AppLayout: React.FC = () => {
             <FeaturesSection />
             <StatsSection />
             <DriversSection />
-            <MerchantsSection />
-            <PricingSection />
             <TestimonialsSection />
             <CTASection />
           </>
