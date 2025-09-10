@@ -57,6 +57,13 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
   };
 
   const handleSubmit = async () => {
+    console.log('Submit button clicked!', { 
+      user: !!user, 
+      hasCommercialInsurance: formData.hasCommercialInsurance,
+      hasCleanRecord: formData.hasCleanRecord,
+      agreeToTerms: formData.agreeToTerms
+    });
+    
     if (!user) return;
     
     setLoading(true);
@@ -253,25 +260,6 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="driversLicense">Driver's License # *</Label>
-                <Input
-                  id="driversLicense"
-                  value={formData.driversLicense}
-                  onChange={(e) => setFormData({...formData, driversLicense: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="driversLicenseExp">License Expiration Date *</Label>
-                <Input
-                  id="driversLicenseExp"
-                  type="date"
-                  value={formData.driversLicenseExp}
-                  onChange={(e) => setFormData({...formData, driversLicenseExp: e.target.value})}
-                />
-              </div>
-            </div>
           </div>
         )}
 
@@ -337,6 +325,34 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
             </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Documents & Banking
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="driversLicense">Driver's License Number *</Label>
+                <Input
+                  id="driversLicense"
+                  value={formData.driversLicense}
+                  onChange={(e) => setFormData({...formData, driversLicense: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="driversLicenseExp">License Expiration Date *</Label>
+                <Input
+                  id="driversLicenseExp"
+                  type="date"
+                  value={formData.driversLicenseExp}
+                  onChange={(e) => setFormData({...formData, driversLicenseExp: e.target.value})}
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="insuranceCompany">Insurance Company Name *</Label>
@@ -354,31 +370,6 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                   onChange={(e) => setFormData({...formData, insurancePolicy: e.target.value})}
                 />
               </div>
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Documents & Banking
-            </h3>
-            <div>
-              <Label htmlFor="driversLicense">Driver's License Number</Label>
-              <Input
-                id="driversLicense"
-                value={formData.driversLicense}
-                onChange={(e) => setFormData({...formData, driversLicense: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="insurance">Insurance Policy Number</Label>
-              <Input
-                id="insurance"
-                value={formData.insurance}
-                onChange={(e) => setFormData({...formData, insurance: e.target.value})}
-              />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
