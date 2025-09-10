@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MapPin, CreditCard, Headphones, Zap, Camera, Calendar, Clock, Users, Star } from 'lucide-react';
 
 const FeaturesSection: React.FC = () => {
   const navigate = useNavigate();
@@ -7,37 +8,37 @@ const FeaturesSection: React.FC = () => {
     {
       title: "Real-Time Tracking",
       description: "Follow your delivery with live GPS tracking powered by Mapbox",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475046071_2c01cb3a.webp",
+      icon: MapPin,
       color: "from-teal-500 to-blue-600"
     },
     {
       title: "Instant Payments",
       description: "Secure payments with Stripe, automatic driver payouts",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475047807_7f462474.webp",
+      icon: CreditCard,
       color: "from-blue-500 to-purple-600"
     },
     {
       title: "24/7 Support",
       description: "Round-the-clock customer service and driver assistance",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475049536_104aec8e.webp",
+      icon: Headphones,
       color: "from-purple-500 to-pink-600"
     },
     {
       title: "Smart Matching",
       description: "AI-powered driver matching for fastest delivery times",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475051260_0e21cb04.webp",
+      icon: Zap,
       color: "from-green-500 to-teal-600"
     },
     {
       title: "Photo Confirmation",
       description: "Visual proof of pickup and delivery for peace of mind",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475052973_6c9d49d4.webp",
+      icon: Camera,
       color: "from-orange-500 to-red-600"
     },
     {
       title: "Flexible Scheduling",
       description: "Schedule deliveries for now or later, your choice",
-      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475054677_898dde29.webp",
+      icon: Calendar,
       color: "from-indigo-500 to-blue-600"
     }
   ];
@@ -59,8 +60,8 @@ const FeaturesSection: React.FC = () => {
           {features.map((feature, index) => (
             <div key={index} className="group relative">
               <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent group-hover:scale-105">
-                <div className="w-16 h-16 rounded-2xl overflow-hidden mb-6 group-hover:scale-110 transition-transform">
-                  <img src={feature.image} alt={feature.title} className="w-full h-full object-cover" />
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
