@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ interface DriverRegistrationProps {
 
 const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,20 +56,42 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
     
     setLoading(true);
     try {
-      // Update user profile to driver
+      // Update user profile to driver and automatically approve
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
           user_type: 'driver',
           full_name: formData.fullName,
           phone: formData.phone,
-          status: 'pending_approval'
+          status: 'active', // Automatically approve
+          driver_license: formData.driversLicense,
+          vehicle_info: {
+            type: formData.vehicleType,
+            make: formData.vehicleMake,
+            model: formData.vehicleModel,
+            year: formData.vehicleYear,
+            license_plate: formData.licensePlate
+          },
+          banking_info: {
+            account_number: formData.bankAccount,
+            routing_number: formData.routingNumber
+          },
+          address: {
+            street: formData.address,
+            city: formData.city,
+            state: formData.state,
+            zip_code: formData.zipCode
+          },
+          emergency_contact: {
+            name: formData.emergencyContact,
+            phone: formData.emergencyPhone
+          }
         })
         .eq('id', user.id);
 
       if (profileError) throw profileError;
 
-      // Create driver application record
+      // Create driver application record for tracking
       const { error: applicationError } = await supabase
         .from('driver_applications')
         .insert([{
@@ -99,12 +123,15 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
             commercial_insurance: formData.hasCommercialInsurance,
             clean_record: formData.hasCleanRecord
           },
-          status: 'pending'
+          status: 'approved' // Automatically approved
         }]);
 
       if (applicationError) throw applicationError;
 
+      // Show success message and navigate to driver dashboard
+      alert('Congratulations! You are now approved as a driver. You can start taking deliveries immediately!');
       onComplete();
+      navigate('/driver-dashboard');
     } catch (error) {
       console.error('Error submitting driver application:', error);
       alert('Error submitting application. Please try again.');
@@ -301,7 +328,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                   checked={formData.hasCommercialInsurance}
                   onCheckedChange={(checked) => setFormData({...formData, hasCommercialInsurance: checked as boolean})}
                 />
-                <Label htmlFor="hasCommercialInsurance">I have commercial vehicle insurance</Label>
+                <Label htmlFor="hasCommercialInsurance">I have vehicle insurance</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox 
@@ -320,19 +347,6 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 <Label htmlFor="agreeToTerms">I agree to the Terms of Service and Privacy Policy</Label>
               </div>
             </div>
-            
-            <div className="bg-teal-50 p-4 rounded-lg">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle className="w-5 h-5 text-teal-600" />
-                <span className="font-medium">What happens next?</span>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Background check (1-2 business days)</li>
-                <li>• Vehicle inspection scheduling</li>
-                <li>• Account approval notification</li>
-                <li>• Start earning immediately after approval</li>
-              </ul>
-            </div>
           </div>
         )}
 
@@ -349,10 +363,10 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
           ) : (
             <Button 
               onClick={handleSubmit} 
-              disabled={loading || !formData.agreeToTerms}
-              className="ml-auto"
+              disabled={loading || !formData.hasCommercialInsurance || !formData.hasCleanRecord || !formData.agreeToTerms}
+              className="ml-auto bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
             >
-              {loading ? 'Submitting...' : 'Submit Application'}
+              {loading ? 'Approving...' : 'Start Driving Now!'}
             </Button>
           )}
         </div>
