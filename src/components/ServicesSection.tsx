@@ -11,12 +11,6 @@ const ServicesSection: React.FC = () => {
       examples: ["Forgotten items", "Lunch delivery", "Key pickup", "Personal errands"]
     },
     {
-      title: "Merchant Delivery",
-      description: "Help businesses deliver when they can't or don't usually offer it.",
-      icon: "🏪",
-      examples: ["Restaurant orders", "Retail pickup", "Pharmacy runs", "Auto parts"]
-    },
-    {
       title: "Emergency Runs",
       description: "Urgent deliveries when you need something fast.",
       icon: "🚨",
