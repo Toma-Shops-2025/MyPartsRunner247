@@ -4,7 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Clock, MapPin, Shield, Truck, Smartphone } from 'lucide-react';
+import { Package, Clock, MapPin, Shield, Truck } from 'lucide-react';
 import RequestPickupModal from '@/components/RequestPickupModal';
 
 const ServicesPage: React.FC = () => {
@@ -41,12 +41,6 @@ const ServicesPage: React.FC = () => {
       title: 'Secure Transport',
       description: 'Important documents or valuable items delivered with extra security measures.',
       features: ['ID verification', 'Signature required', 'Insurance coverage']
-    },
-    {
-      icon: Smartphone,
-      title: 'Business Solutions',
-      description: 'Custom delivery solutions for businesses of all sizes.',
-      features: ['API integration', 'Volume discounts', 'Dedicated support']
     }
   ];
 
