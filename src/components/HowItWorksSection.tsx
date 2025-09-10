@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HowItWorksSection: React.FC = () => {
+  const navigate = useNavigate();
+  
   const steps = [
     {
       step: "1",
@@ -68,7 +71,10 @@ const HowItWorksSection: React.FC = () => {
           <div className="bg-white p-8 rounded-2xl shadow-lg inline-block">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to get started?</h3>
             <p className="text-gray-600 mb-6">Join thousands of satisfied customers nationwide.</p>
-            <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg">
+            <button 
+              onClick={() => navigate('/services')}
+              className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
+            >
               Request Your First Pickup
             </button>
           </div>
