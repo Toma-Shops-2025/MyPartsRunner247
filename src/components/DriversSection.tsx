@@ -38,17 +38,6 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
           ))}
         </div>
 
-        <div className="text-center mb-16">
-          <button 
-            onClick={() => navigate('/driver-application')}
-            className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg mb-4"
-          >
-            Apply to Drive
-          </button>
-          <div className="text-sm text-gray-500">
-            Background check required. Must be 18+ with valid license.
-          </div>
-        </div>
 
         <div className="mt-16 bg-gradient-to-r from-teal-500 to-blue-600 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">Start Earning Today</h3>
