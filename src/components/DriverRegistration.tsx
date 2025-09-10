@@ -20,6 +20,33 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    dateOfBirth: '',
+    ssn: '',
+    driversLicense: '',
+    driversLicenseExp: '',
+    vehicleType: '',
+    vehicleMake: '',
+    vehicleModel: '',
+    vehicleYear: '',
+    vehicleColor: '',
+    licensePlate: '',
+    insuranceCompany: '',
+    insurancePolicy: '',
+    bankAccount: '',
+    routingNumber: '',
+    emergencyContact: '',
+    emergencyPhone: '',
+    hasCommercialInsurance: false,
+    hasCleanRecord: false,
+    agreeToTerms: false
+  });
 
   // Show loading while checking authentication
   if (authLoading) {
@@ -54,33 +81,6 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
       </Card>
     );
   }
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    dateOfBirth: '',
-    ssn: '',
-    driversLicense: '',
-    driversLicenseExp: '',
-    vehicleType: '',
-    vehicleMake: '',
-    vehicleModel: '',
-    vehicleYear: '',
-    vehicleColor: '',
-    licensePlate: '',
-    insuranceCompany: '',
-    insurancePolicy: '',
-    bankAccount: '',
-    routingNumber: '',
-    emergencyContact: '',
-    emergencyPhone: '',
-    hasCommercialInsurance: false,
-    hasCleanRecord: false,
-    agreeToTerms: false
-  });
 
   const handleNext = () => {
     if (step < 4) setStep(step + 1);
