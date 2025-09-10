@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyPartsRunner - Anything, Anytime, Anywhere</title>
+    <meta name="description" content="The only delivery service that picks up from absolutely anywhere. Available 24/7 nationwide. Anything, Anytime, Anywhere." />
+    <link rel="icon" type="image/png" href="https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#4ECDC4" />
+
+    <meta property="og:title" content="MyPartsRunner - Anything, Anytime, Anywhere" />
+    <meta property="og:description" content="The only delivery service that picks up from absolutely anywhere. Available 24/7 nationwide." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png" />
+    <meta property="og:url" content="https://mypartsrunner.com" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MyPartsRunner - Anything, Anytime, Anywhere" />
+    <meta name="twitter:description" content="The only delivery service that picks up from absolutely anywhere. Available 24/7 nationwide." />
+    <meta name="twitter:image" content="https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png" />
+    
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="MyPartsRunner" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/src/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>

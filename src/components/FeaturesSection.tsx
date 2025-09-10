@@ -1,0 +1,107 @@
+import React from 'react';
+
+const FeaturesSection: React.FC = () => {
+  const features = [
+    {
+      title: "Real-Time Tracking",
+      description: "Follow your delivery with live GPS tracking powered by Mapbox",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475046071_2c01cb3a.webp",
+      color: "from-teal-500 to-blue-600"
+    },
+    {
+      title: "Instant Payments",
+      description: "Secure payments with Stripe, automatic driver payouts",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475047807_7f462474.webp",
+      color: "from-blue-500 to-purple-600"
+    },
+    {
+      title: "24/7 Support",
+      description: "Round-the-clock customer service and driver assistance",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475049536_104aec8e.webp",
+      color: "from-purple-500 to-pink-600"
+    },
+    {
+      title: "Smart Matching",
+      description: "AI-powered driver matching for fastest delivery times",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475051260_0e21cb04.webp",
+      color: "from-green-500 to-teal-600"
+    },
+    {
+      title: "Photo Confirmation",
+      description: "Visual proof of pickup and delivery for peace of mind",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475052973_6c9d49d4.webp",
+      color: "from-orange-500 to-red-600"
+    },
+    {
+      title: "Flexible Scheduling",
+      description: "Schedule deliveries for now or later, your choice",
+      image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475054677_898dde29.webp",
+      color: "from-indigo-500 to-blue-600"
+    }
+  ];
+
+  return (
+    <section className="py-20 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            Why Choose <span className="text-teal-600">MyPartsRunner</span>?
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            We've built the most advanced delivery platform with features 
+            that make getting your items simple, fast, and reliable.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <div key={index} className="group relative">
+              <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent group-hover:scale-105">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden mb-6 group-hover:scale-110 transition-transform">
+                  <img src={feature.image} alt={feature.title} className="w-full h-full object-cover" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </div>
+              
+              <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-16 text-center">
+          <div className="bg-gradient-to-r from-teal-50 to-blue-50 rounded-2xl p-8 lg:p-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              The Future of Delivery is Here
+            </h3>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Join the revolution in on-demand delivery. With cutting-edge technology 
+              and a nationwide network, we're changing how America gets things delivered.
+            </p>
+            
+            <div className="grid sm:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-teal-600 mb-2">99.9%</div>
+                <div className="text-gray-600">Uptime</div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-blue-600 mb-2">&lt;30min</div>
+                <div className="text-gray-600">Avg Response</div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-teal-600 mb-2">4.9★</div>
+                <div className="text-gray-600">User Rating</div>
+              </div>
+            </div>
+
+            <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-10 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg">
+              Experience the Difference
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default FeaturesSection;
