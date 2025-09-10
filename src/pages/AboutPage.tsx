@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Users, Target, Award, Heart } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
+  const navigate = useNavigate();
+  
   const values = [
     {
       icon: Target,
@@ -127,12 +130,13 @@ const AboutPage: React.FC = () => {
             Whether you need something delivered or want to earn money driving, 
             we'd love to have you as part of our community.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-gradient-to-r from-teal-500 to-blue-600">
+          <div className="flex justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => navigate('/services')}
+              className="bg-gradient-to-r from-teal-500 to-blue-600 px-8 py-4 text-lg font-semibold"
+            >
               Start Delivering
-            </Button>
-            <Button size="lg" variant="outline">
-              Become a Driver
             </Button>
           </div>
         </div>
