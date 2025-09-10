@@ -44,18 +44,6 @@ const Header: React.FC = () => {
               </nav>
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2"
-              >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </Button>
-            </div>
-
             <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
               {loading ? (
                 <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
@@ -146,32 +134,16 @@ const Header: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile sign-in button */}
+            {/* Mobile menu button - moved to right side */}
             <div className="md:hidden">
-              {loading ? (
-                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
-              ) : user ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => navigate('/profile')}
-                  className="p-2"
-                >
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback className="text-xs">
-                      {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              ) : (
-                <Button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  size="sm"
-                  className="h-8 px-3 text-xs font-medium bg-teal-600 hover:bg-teal-700 text-white"
-                >
-                  Sign In
-                </Button>
-              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2"
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
             </div>
           </div>
 
