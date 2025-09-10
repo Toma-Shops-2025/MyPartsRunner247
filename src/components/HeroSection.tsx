@@ -55,34 +55,32 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           </div>
 
           <div className="relative">
-            <div className="w-full h-96 bg-gradient-to-br from-teal-100 to-blue-100 rounded-2xl shadow-2xl flex items-center justify-center relative overflow-hidden">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <svg width="100%" height="100%" viewBox="0 0 100 100" fill="none">
-                  <defs>
-                    <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-                      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" strokeWidth="0.5"/>
-                    </pattern>
-                  </defs>
-                  <rect width="100%" height="100%" fill="url(#grid)" />
-                </svg>
-              </div>
+            {/* Main Hero Image - Driver with packages */}
+            <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden">
+              <img 
+                src="/Screenshot_20250605-093441_Chrome.png"
+                alt="MyPartsRunner Delivery Driver with packages"
+                className="w-full h-full object-cover"
+              />
+              {/* Overlay for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-900/60 to-blue-900/40"></div>
               
-              {/* Delivery Truck Illustration */}
-              <div className="relative z-10 text-center">
-                <div className="w-32 h-32 mx-auto mb-4 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center">
-                  <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM17 12h-3V8h3l2 4h-2z"/>
-                  </svg>
+              {/* Brand Text Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <h3 className="text-3xl font-bold mb-2">MyPartsRunner</h3>
+                  <p className="text-lg opacity-90">Delivery Service</p>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">MyPartsRunner</h3>
-                <p className="text-gray-600">Delivery Service</p>
               </div>
-              
-              {/* Floating Elements */}
-              <div className="absolute top-4 left-4 w-8 h-8 bg-teal-400 rounded-full animate-bounce"></div>
-              <div className="absolute bottom-4 right-4 w-6 h-6 bg-blue-400 rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 right-8 w-4 h-4 bg-teal-300 rounded-full animate-ping"></div>
+            </div>
+            
+            {/* Secondary Image - Driver in vehicle */}
+            <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-xl shadow-lg overflow-hidden border-4 border-white">
+              <img 
+                src="/Screenshot_20250605-093407_Chrome.png"
+                alt="MyPartsRunner Driver in vehicle"
+                className="w-full h-full object-cover"
+              />
             </div>
             
             <div className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-lg">
