@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Calculator, MapPin, Clock, Package, Zap } from 'lucide-react';
 
 interface PricingCalculatorProps {
@@ -170,9 +169,9 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
 
         {/* Price Guarantee */}
         <div className="text-center">
-          <Badge variant="outline" className="text-xs">
+          <div className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-700 border">
             💰 Price Guarantee - No hidden fees
-          </Badge>
+          </div>
         </div>
       </CardContent>
     </Card>
