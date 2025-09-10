@@ -23,7 +23,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
 }) => {
   const [distance, setDistance] = useState<number>(0);
   const [estimatedTime, setEstimatedTime] = useState<string>('');
-  const [basePrice, setBasePrice] = useState<number>(8.99);
+  const [basePrice, setBasePrice] = useState<number>(4.99);
   const [distancePrice, setDistancePrice] = useState<number>(0);
   const [urgencyMultiplier, setUrgencyMultiplier] = useState<number>(1);
   const [sizeMultiplier, setSizeMultiplier] = useState<number>(1);
@@ -35,7 +35,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       // Mock distance calculation - replace with actual API call
       const mockDistance = Math.random() * 20 + 1; // 1-21 miles
       setDistance(mockDistance);
-      setDistancePrice(mockDistance * 1.25); // $1.25 per mile
+      setDistancePrice(mockDistance * 0.75); // $0.75 per mile (reduced from $1.25)
     }
   }, [pickupAddress, deliveryAddress]);
 
@@ -43,7 +43,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   useEffect(() => {
     switch (urgency) {
       case 'urgent':
-        setUrgencyMultiplier(1.5);
+        setUrgencyMultiplier(1.3); // Reduced from 1.5 to 1.3
         setEstimatedTime('30-60 minutes');
         break;
       case 'standard':
@@ -67,13 +67,13 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         setSizeMultiplier(1);
         break;
       case 'medium':
-        setSizeMultiplier(1.2);
+        setSizeMultiplier(1.1); // Reduced from 1.2 to 1.1
         break;
       case 'large':
-        setSizeMultiplier(1.5);
+        setSizeMultiplier(1.25); // Reduced from 1.5 to 1.25
         break;
       case 'extra_large':
-        setSizeMultiplier(2);
+        setSizeMultiplier(1.5); // Reduced from 2 to 1.5
         break;
       default:
         setSizeMultiplier(1);
@@ -120,7 +120,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           </div>
           <div className="text-right">
             <div className="font-semibold">${formatPrice(basePrice)}</div>
-            <div className="text-sm text-gray-600">Standard pickup</div>
+            <div className="text-sm text-gray-600">Base delivery fee</div>
           </div>
         </div>
 
