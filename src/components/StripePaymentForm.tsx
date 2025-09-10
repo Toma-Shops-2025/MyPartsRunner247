@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CreditCard, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 
 // Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
 
 interface StripePaymentFormProps {
   amount: number;
@@ -170,6 +170,102 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   onSuccess,
   onError
 }) => {
+  // Check if Stripe is properly configured
+  const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  
+  if (!stripeKey || stripeKey === 'pk_test_placeholder') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5" />
+            Payment Details
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-50 p-4 rounded-lg mb-6">
+            <h3 className="font-semibold mb-2">Order Summary</h3>
+            <div className="text-sm space-y-1">
+              <div><strong>From:</strong> {orderDetails.pickupAddress}</div>
+              <div><strong>To:</strong> {orderDetails.deliveryAddress}</div>
+              <div><strong>Item:</strong> {orderDetails.itemDescription}</div>
+              <div><strong>Urgency:</strong> {orderDetails.urgency}</div>
+            </div>
+            <div className="border-t mt-2 pt-2">
+              <div className="flex justify-between font-bold text-lg">
+                <span>Total:</span>
+                <span>${amount.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Stripe payment integration is not configured. For demo purposes, click below to simulate payment.
+              </AlertDescription>
+            </Alert>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                <input 
+                  type="text" 
+                  placeholder="1234 5678 9012 3456"
+                  className="w-full p-3 border border-gray-300 rounded-md"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                  <input 
+                    type="text" 
+                    placeholder="MM/YY"
+                    className="w-full p-3 border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                  <input 
+                    type="text" 
+                    placeholder="123"
+                    className="w-full p-3 border border-gray-300 rounded-md"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                <input 
+                  type="text" 
+                  placeholder="John Doe"
+                  className="w-full p-3 border border-gray-300 rounded-md"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Lock className="w-4 h-4" />
+              <span>Your payment information is secure and encrypted</span>
+            </div>
+
+            <Button 
+              onClick={() => {
+                // Simulate successful payment
+                setTimeout(() => {
+                  onSuccess('demo-order-' + Date.now());
+                }, 1000);
+              }}
+              className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
+            >
+              Pay ${amount.toFixed(2)} (Demo)
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Elements stripe={stripePromise}>
       <Card>

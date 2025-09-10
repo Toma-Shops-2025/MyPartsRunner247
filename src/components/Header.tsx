@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AuthModal from './AuthModal';
-import { User, LogOut, Package, Car, BarChart3, Settings, Home } from 'lucide-react';
+import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const { user, profile, signOut, loading } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
@@ -43,15 +44,30 @@ const Header: React.FC = () => {
               </nav>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2"
+              >
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
+
+            <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
               {loading ? (
                 <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
               ) : user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback>
+                    <Button 
+                      variant="ghost" 
+                      className="relative h-10 w-10 sm:h-8 sm:w-8 rounded-full p-0 hover:bg-gray-100"
+                    >
+                      <Avatar className="h-8 w-8 sm:h-8 sm:w-8">
+                        <AvatarFallback className="text-sm">
                           {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
                         </AvatarFallback>
                       </Avatar>
@@ -121,12 +137,120 @@ const Header: React.FC = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button onClick={() => setIsAuthModalOpen(true)}>
+                <Button 
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className="h-10 px-4 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white"
+                >
+                  Sign In
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile sign-in button */}
+            <div className="md:hidden">
+              {loading ? (
+                <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
+              ) : user ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                  className="p-2"
+                >
+                  <Avatar className="h-6 w-6">
+                    <AvatarFallback className="text-xs">
+                      {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              ) : (
+                <Button 
+                  onClick={() => setIsAuthModalOpen(true)}
+                  size="sm"
+                  className="h-8 px-3 text-xs font-medium bg-teal-600 hover:bg-teal-700 text-white"
+                >
                   Sign In
                 </Button>
               )}
             </div>
           </div>
+
+          {/* Mobile menu */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden border-t bg-white">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                <button 
+                  onClick={() => { handleNavigation('/services'); setIsMobileMenuOpen(false); }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                >
+                  Services
+                </button>
+                <a 
+                  href="#how-it-works" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                >
+                  How It Works
+                </a>
+                <button 
+                  onClick={() => { handleNavigation('/driver-application'); setIsMobileMenuOpen(false); }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                >
+                  Become a Driver
+                </button>
+                <button 
+                  onClick={() => { handleNavigation('/about'); setIsMobileMenuOpen(false); }}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                >
+                  About
+                </button>
+                
+                {user && (
+                  <>
+                    <hr className="my-2" />
+                    {profile?.user_type === 'driver' && (
+                      <>
+                        <button 
+                          onClick={() => { handleNavigation('/driver-dashboard'); setIsMobileMenuOpen(false); }}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                        >
+                          Driver Dashboard
+                        </button>
+                        <button 
+                          onClick={() => { handleNavigation('/earnings'); setIsMobileMenuOpen(false); }}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                        >
+                          Earnings
+                        </button>
+                      </>
+                    )}
+                    {profile?.user_type === 'customer' && (
+                      <>
+                        <button 
+                          onClick={() => { handleNavigation('/my-orders'); setIsMobileMenuOpen(false); }}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                        >
+                          My Orders
+                        </button>
+                      </>
+                    )}
+                    <button 
+                      onClick={() => { handleNavigation('/profile'); setIsMobileMenuOpen(false); }}
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                    >
+                      Profile
+                    </button>
+                    <button 
+                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
