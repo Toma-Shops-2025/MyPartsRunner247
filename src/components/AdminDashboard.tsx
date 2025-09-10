@@ -234,7 +234,7 @@ const AdminDashboard: React.FC = () => {
         <TabsContent value="drivers" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Driver Management</CardTitle>
+              <CardTitle>Driver Management & Approval</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -246,28 +246,68 @@ const AdminDashboard: React.FC = () => {
                       <div className="text-sm">
                         {driver.total_deliveries || 0} deliveries • {driver.rating || 0} ⭐
                       </div>
+                      {driver.status === 'pending' && (
+                        <div className="text-xs text-orange-600 font-medium">
+                          ⏳ Awaiting Approval
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={
                         driver.status === 'active' ? 'bg-green-100 text-green-800' :
                         driver.status === 'inactive' ? 'bg-red-100 text-red-800' :
-                        'bg-yellow-100 text-yellow-800'
+                        driver.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
                       }>
                         {driver.status?.toUpperCase() || 'PENDING'}
                       </Badge>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => updateDriverStatus(
-                          driver.id, 
-                          driver.status === 'active' ? 'inactive' : 'active'
-                        )}
-                      >
-                        {driver.status === 'active' ? 'Deactivate' : 'Activate'}
-                      </Button>
+                      
+                      {driver.status === 'pending' && (
+                        <>
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateDriverStatus(driver.id, 'active')}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            ✓ Approve
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => updateDriverStatus(driver.id, 'rejected')}
+                          >
+                            ✗ Reject
+                          </Button>
+                        </>
+                      )}
+                      
+                      {driver.status === 'active' && (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => updateDriverStatus(driver.id, 'inactive')}
+                        >
+                          Deactivate
+                        </Button>
+                      )}
+                      
+                      {driver.status === 'inactive' && (
+                        <Button 
+                          size="sm" 
+                          onClick={() => updateDriverStatus(driver.id, 'active')}
+                        >
+                          Reactivate
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))}
+                
+                {drivers.filter(d => d.status === 'pending').length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    No pending driver applications
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
