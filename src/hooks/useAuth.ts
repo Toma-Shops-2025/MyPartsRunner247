@@ -56,14 +56,37 @@ export const useAuth = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      if (data) {
+        console.error('Profile fetch error:', error);
+        // Create a basic profile if none exists
+        setProfile({
+          id: userId,
+          email: '',
+          full_name: '',
+          phone: '',
+          user_type: 'customer'
+        });
+      } else if (data) {
         setProfile(data);
+      } else {
+        // Create a basic profile if no data returned
+        setProfile({
+          id: userId,
+          email: '',
+          full_name: '',
+          phone: '',
+          user_type: 'customer'
+        });
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      // Create a basic profile on error
+      setProfile({
+        id: userId,
+        email: '',
+        full_name: '',
+        phone: '',
+        user_type: 'customer'
+      });
     } finally {
       setLoading(false);
     }
