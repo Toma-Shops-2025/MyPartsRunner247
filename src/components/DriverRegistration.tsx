@@ -27,13 +27,18 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
     city: '',
     state: '',
     zipCode: '',
+    dateOfBirth: '',
+    ssn: '',
+    driversLicense: '',
+    driversLicenseExp: '',
     vehicleType: '',
     vehicleMake: '',
     vehicleModel: '',
     vehicleYear: '',
+    vehicleColor: '',
     licensePlate: '',
-    driversLicense: '',
-    insurance: '',
+    insuranceCompany: '',
+    insurancePolicy: '',
     bankAccount: '',
     routingNumber: '',
     emergencyContact: '',
@@ -64,13 +69,21 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
           full_name: formData.fullName,
           phone: formData.phone,
           status: 'active', // Automatically approve
+          date_of_birth: formData.dateOfBirth,
+          ssn_last_four: formData.ssn,
           driver_license: formData.driversLicense,
+          driver_license_exp: formData.driversLicenseExp,
           vehicle_info: {
             type: formData.vehicleType,
             make: formData.vehicleMake,
             model: formData.vehicleModel,
             year: formData.vehicleYear,
+            color: formData.vehicleColor,
             license_plate: formData.licensePlate
+          },
+          insurance_info: {
+            company: formData.insuranceCompany,
+            policy_number: formData.insurancePolicy
           },
           banking_info: {
             account_number: formData.bankAccount,
@@ -97,10 +110,14 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
         .insert([{
           user_id: user.id,
           personal_info: {
+            full_name: formData.fullName,
+            phone: formData.phone,
             address: formData.address,
             city: formData.city,
             state: formData.state,
             zip_code: formData.zipCode,
+            date_of_birth: formData.dateOfBirth,
+            ssn_last_four: formData.ssn,
             emergency_contact: formData.emergencyContact,
             emergency_phone: formData.emergencyPhone
           },
@@ -109,11 +126,14 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
             make: formData.vehicleMake,
             model: formData.vehicleModel,
             year: formData.vehicleYear,
+            color: formData.vehicleColor,
             license_plate: formData.licensePlate
           },
           documents: {
             drivers_license: formData.driversLicense,
-            insurance: formData.insurance
+            drivers_license_exp: formData.driversLicenseExp,
+            insurance_company: formData.insuranceCompany,
+            insurance_policy: formData.insurancePolicy
           },
           banking_info: {
             account_number: formData.bankAccount,
@@ -163,7 +183,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
             <h3 className="text-lg font-semibold">Personal Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Full Name *</Label>
                 <Input
                   id="fullName"
                   value={formData.fullName}
@@ -171,7 +191,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Phone Number</Label>
+                <Label htmlFor="phone">Phone Number *</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -180,7 +200,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
               </div>
             </div>
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">Address *</Label>
               <Input
                 id="address"
                 value={formData.address}
@@ -189,7 +209,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">City *</Label>
                 <Input
                   id="city"
                   value={formData.city}
@@ -197,7 +217,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
               <div>
-                <Label htmlFor="state">State</Label>
+                <Label htmlFor="state">State *</Label>
                 <Input
                   id="state"
                   value={formData.state}
@@ -205,11 +225,50 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
               <div>
-                <Label htmlFor="zipCode">ZIP Code</Label>
+                <Label htmlFor="zipCode">ZIP Code *</Label>
                 <Input
                   id="zipCode"
                   value={formData.zipCode}
                   onChange={(e) => setFormData({...formData, zipCode: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="dateOfBirth">Date of Birth *</Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="ssn">Last 4 digits of SSN *</Label>
+                <Input
+                  id="ssn"
+                  maxLength={4}
+                  value={formData.ssn}
+                  onChange={(e) => setFormData({...formData, ssn: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="driversLicense">Driver's License # *</Label>
+                <Input
+                  id="driversLicense"
+                  value={formData.driversLicense}
+                  onChange={(e) => setFormData({...formData, driversLicense: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="driversLicenseExp">License Expiration Date *</Label>
+                <Input
+                  id="driversLicenseExp"
+                  type="date"
+                  value={formData.driversLicenseExp}
+                  onChange={(e) => setFormData({...formData, driversLicenseExp: e.target.value})}
                 />
               </div>
             </div>
@@ -220,7 +279,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Vehicle Information</h3>
             <div>
-              <Label htmlFor="vehicleType">Vehicle Type</Label>
+              <Label htmlFor="vehicleType">Vehicle Type *</Label>
               <Select onValueChange={(value) => setFormData({...formData, vehicleType: value})}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select vehicle type" />
@@ -236,7 +295,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <Label htmlFor="vehicleMake">Make</Label>
+                <Label htmlFor="vehicleMake">Make *</Label>
                 <Input
                   id="vehicleMake"
                   value={formData.vehicleMake}
@@ -244,7 +303,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
               <div>
-                <Label htmlFor="vehicleModel">Model</Label>
+                <Label htmlFor="vehicleModel">Model *</Label>
                 <Input
                   id="vehicleModel"
                   value={formData.vehicleModel}
@@ -252,7 +311,7 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
               <div>
-                <Label htmlFor="vehicleYear">Year</Label>
+                <Label htmlFor="vehicleYear">Year *</Label>
                 <Input
                   id="vehicleYear"
                   value={formData.vehicleYear}
@@ -260,13 +319,41 @@ const DriverRegistration: React.FC<DriverRegistrationProps> = ({ onComplete }) =
                 />
               </div>
             </div>
-            <div>
-              <Label htmlFor="licensePlate">License Plate</Label>
-              <Input
-                id="licensePlate"
-                value={formData.licensePlate}
-                onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="vehicleColor">Vehicle Color *</Label>
+                <Input
+                  id="vehicleColor"
+                  value={formData.vehicleColor}
+                  onChange={(e) => setFormData({...formData, vehicleColor: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="licensePlate">License Plate *</Label>
+                <Input
+                  id="licensePlate"
+                  value={formData.licensePlate}
+                  onChange={(e) => setFormData({...formData, licensePlate: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="insuranceCompany">Insurance Company Name *</Label>
+                <Input
+                  id="insuranceCompany"
+                  value={formData.insuranceCompany}
+                  onChange={(e) => setFormData({...formData, insuranceCompany: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="insurancePolicy">Insurance Policy # *</Label>
+                <Input
+                  id="insurancePolicy"
+                  value={formData.insurancePolicy}
+                  onChange={(e) => setFormData({...formData, insurancePolicy: e.target.value})}
+                />
+              </div>
             </div>
           </div>
         )}
