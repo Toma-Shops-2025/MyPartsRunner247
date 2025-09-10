@@ -7,6 +7,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Package, Clock, DollarSign } from 'lucide-react';
+import StripePaymentForm from './StripePaymentForm';
+import PricingCalculator from './PricingCalculator';
 
 interface RequestPickupModalProps {
   isOpen: boolean;
@@ -17,11 +19,14 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
   const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [calculatedPrice, setCalculatedPrice] = useState(0);
   const [formData, setFormData] = useState({
     pickupAddress: '',
     deliveryAddress: '',
     itemDescription: '',
     urgency: 'standard',
+    itemSize: 'small',
     scheduledTime: '',
     specialInstructions: '',
     contactPhone: ''
@@ -84,7 +89,12 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
   };
 
   const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+    if (step < 3) {
+      setStep(step + 1);
+    } else if (step === 3) {
+      setShowPayment(true);
+      setStep(4);
+    }
   };
 
   const handleBack = () => {
@@ -106,7 +116,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
 
           <div className="mb-6">
             <div className="flex items-center space-x-2">
-              {[1, 2, 3].map((num) => (
+              {[1, 2, 3, 4].map((num) => (
                 <div key={num} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                   step >= num ? 'bg-teal-500 text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
@@ -155,21 +165,39 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
                 onChange={(e) => setFormData({...formData, itemDescription: e.target.value})}
                 className="h-24"
               />
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Urgency
-                </label>
-                <Select value={formData.urgency} onValueChange={(value) => setFormData({...formData, urgency: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="standard">Standard (1-2 hours)</SelectItem>
-                    <SelectItem value="urgent">Urgent (30-60 minutes) +$5</SelectItem>
-                    <SelectItem value="scheduled">Schedule for later</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Urgency
+                  </label>
+                  <Select value={formData.urgency} onValueChange={(value) => setFormData({...formData, urgency: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard (1-2 hours)</SelectItem>
+                      <SelectItem value="urgent">Urgent (30-60 minutes) +$5</SelectItem>
+                      <SelectItem value="scheduled">Schedule for later</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Item Size
+                  </label>
+                  <Select value={formData.itemSize} onValueChange={(value) => setFormData({...formData, itemSize: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="small">Small (envelope, small package)</SelectItem>
+                      <SelectItem value="medium">Medium (shoebox, small bag)</SelectItem>
+                      <SelectItem value="large">Large (backpack, large bag)</SelectItem>
+                      <SelectItem value="extra_large">Extra Large (suitcase, large box)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           )}
@@ -183,18 +211,37 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
                 onChange={(e) => setFormData({...formData, specialInstructions: e.target.value})}
                 className="h-20"
               />
-              <Card className="bg-teal-50 border-teal-200">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                    <DollarSign className="w-4 h-4" />
-                    Estimated cost:
-                  </div>
-                  <div className="text-2xl font-bold text-teal-600">
-                    ${calculateEstimatedCost().toFixed(2)}
-                  </div>
-                  <div className="text-xs text-gray-500">Base fee + distance + urgency</div>
-                </CardContent>
-              </Card>
+              
+              {/* Pricing Calculator */}
+              <PricingCalculator
+                pickupAddress={formData.pickupAddress}
+                deliveryAddress={formData.deliveryAddress}
+                urgency={formData.urgency}
+                itemSize={formData.itemSize}
+                onPriceChange={setCalculatedPrice}
+              />
+            </div>
+          )}
+
+          {step === 4 && showPayment && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Payment</h3>
+              <StripePaymentForm
+                amount={calculatedPrice}
+                orderDetails={{
+                  pickupAddress: formData.pickupAddress,
+                  deliveryAddress: formData.deliveryAddress,
+                  itemDescription: formData.itemDescription,
+                  urgency: formData.urgency
+                }}
+                onSuccess={(orderId) => {
+                  alert('Order placed successfully!');
+                  onClose();
+                }}
+                onError={(error) => {
+                  alert(`Payment failed: ${error}`);
+                }}
+              />
             </div>
           )}
 
@@ -208,14 +255,14 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
               <Button onClick={handleNext} className="ml-auto">
                 Next
               </Button>
-            ) : (
-              <Button 
-                onClick={handleSubmit} 
-                disabled={loading}
-                className="ml-auto bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
-              >
-                {loading ? 'Submitting...' : 'Request Pickup'}
+            ) : step === 3 ? (
+              <Button onClick={handleNext} className="ml-auto">
+                Continue to Payment
               </Button>
+            ) : (
+              <div className="text-sm text-gray-600 text-center">
+                Complete payment above to place your order
+              </div>
             )}
           </div>
         </div>
