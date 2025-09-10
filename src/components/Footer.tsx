@@ -1,18 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Mail, CheckCircle } from 'lucide-react';
 
 const Footer: React.FC = () => {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleNavigation = (path: string) => {
     navigate(path);
   };
 
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setIsLoading(true);
+    try {
+      // TODO: Integrate with your email service (Mailchimp, ConvertKit, etc.)
+      console.log('Email subscription:', email);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsSubscribed(true);
+      setEmail('');
+      
+      // Reset success message after 3 seconds
+      setTimeout(() => setIsSubscribed(false), 3000);
+    } catch (error) {
+      console.error('Error subscribing email:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-1">
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-2">
             <div 
               className="cursor-pointer" 
               onClick={() => handleNavigation('/')}
@@ -25,6 +55,46 @@ const Footer: React.FC = () => {
               The only delivery service that picks up from absolutely anywhere. 
               Available 24/7 nationwide.
             </p>
+            
+            {/* Email Signup Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3 text-white">Stay Updated</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Get the latest updates on new features, delivery tips, and exclusive offers.
+              </p>
+              <form onSubmit={handleEmailSubmit} className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-teal-500"
+                    required
+                  />
+                </div>
+                <Button 
+                  type="submit" 
+                  disabled={isLoading || isSubscribed}
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-6"
+                >
+                  {isLoading ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : isSubscribed ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Mail className="w-4 h-4" />
+                  )}
+                </Button>
+              </form>
+              {isSubscribed && (
+                <p className="text-teal-400 text-sm mt-2 flex items-center gap-1">
+                  <CheckCircle className="w-4 h-4" />
+                  Successfully subscribed!
+                </p>
+              )}
+            </div>
+
             <div className="flex space-x-4">
               <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-teal-400 transition-colors">
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
