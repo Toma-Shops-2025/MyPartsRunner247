@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Package, Clock, MapPin, Shield, Truck, Smartphone } from 'lucide-react';
+import RequestPickupModal from '@/components/RequestPickupModal';
 
 const ServicesPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
+  
   const services = [
     {
       icon: Package,
@@ -102,18 +107,24 @@ const ServicesPage: React.FC = () => {
           <p className="text-xl text-teal-100 mb-8">
             Join thousands of satisfied customers who trust MyPartsRunner for their delivery needs.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-teal-600 hover:bg-gray-100">
+          <div className="flex justify-center">
+            <Button 
+              size="lg" 
+              onClick={() => setIsPickupModalOpen(true)}
+              className="bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
+            >
               Request Pickup Now
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-teal-600">
-              Learn More
             </Button>
           </div>
         </div>
       </section>
 
       <Footer />
+      
+      <RequestPickupModal 
+        isOpen={isPickupModalOpen} 
+        onClose={() => setIsPickupModalOpen(false)} 
+      />
     </div>
   );
 };
