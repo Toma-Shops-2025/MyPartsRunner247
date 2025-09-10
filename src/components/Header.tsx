@@ -118,7 +118,10 @@ const Header: React.FC = () => {
                       <User className="mr-2 h-4 w-4" />
                       Profile
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={signOut}>
+                    <DropdownMenuItem onClick={async () => {
+                      await signOut();
+                      navigate('/');
+                    }}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </DropdownMenuItem>
@@ -213,7 +216,11 @@ const Header: React.FC = () => {
                       Profile
                     </button>
                     <button 
-                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                      onClick={async () => { 
+                        await signOut(); 
+                        setIsMobileMenuOpen(false);
+                        navigate('/');
+                      }}
                       className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
                     >
                       Sign Out
