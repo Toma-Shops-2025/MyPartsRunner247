@@ -60,7 +60,7 @@ const DriverNotifications: React.FC = () => {
     if (Notification.permission === 'granted') {
       new Notification('New Delivery Offer!', {
         body: 'A new delivery request is available',
-        icon: '/logo.png'
+        icon: '/favicon-32x32.png'
       });
     }
   };
