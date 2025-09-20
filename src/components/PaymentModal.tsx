@@ -36,19 +36,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   if (!isOpen) return null;
 
   const handlePayment = async () => {
-    if (!user) return;
+    if (!user) {
+      alert('Please log in to complete payment.');
+      return;
+    }
+    
+    // Validate payment form
+    if (!paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv || !paymentData.cardholderName) {
+      alert('Please fill in all payment details.');
+      return;
+    }
     
     setLoading(true);
     try {
-      // Create payment intent using Stripe
-      const { data: paymentIntent, error: paymentError } = await supabase.functions
-        .invoke('create-payment-intent', {
-          body: { amount: Math.round(amount * 100) } // Convert to cents
-        });
-
-      if (paymentError) throw paymentError;
-
-      // Create order in database
+      // Create order in database directly (simplified for demo)
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -58,29 +59,36 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           itemdescription: orderDetails.itemDescription,
           total: amount,
           status: 'pending',
-          paymentintentid: paymentIntent.id
+          paymentintentid: `demo_${Date.now()}` // Demo payment ID
         }])
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        throw new Error('Failed to create order. Please try again.');
+      }
 
-      // In a real app, you would integrate with Stripe Elements here
-      // For demo purposes, we'll simulate successful payment
+      // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Update order status to confirmed
-      await supabase
+      const { error: updateError } = await supabase
         .from('orders')
         .update({ status: 'confirmed' })
         .eq('id', order.id);
+
+      if (updateError) {
+        console.error('Order update error:', updateError);
+        throw new Error('Payment processed but failed to confirm order.');
+      }
 
       alert('Payment successful! Your order has been placed.');
       onClose();
       
     } catch (error) {
       console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
+      alert(`Payment failed: ${error.message || 'Please try again.'}`);
     } finally {
       setLoading(false);
     }
