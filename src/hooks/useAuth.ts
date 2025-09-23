@@ -79,14 +79,17 @@ export const useAuth = () => {
       const { data: userData } = await supabase.auth.getUser();
       const userEmail = userData.user?.email || '';
       
+      // Check if user signed up as driver by looking at auth metadata
+      const userType = userData.user?.user_metadata?.user_type || 'customer';
+      
       const { data, error } = await supabase
         .from('profiles')
         .insert({
           id: userId,
           email: userEmail,
-          full_name: '',
-          phone: '',
-          user_type: 'customer'
+          full_name: userData.user?.user_metadata?.full_name || '',
+          phone: userData.user?.user_metadata?.phone || '',
+          user_type: userType
         })
         .select()
         .single();
@@ -97,9 +100,9 @@ export const useAuth = () => {
         setProfile({
           id: userId,
           email: userEmail,
-          full_name: '',
-          phone: '',
-          user_type: 'customer'
+          full_name: userData.user?.user_metadata?.full_name || '',
+          phone: userData.user?.user_metadata?.phone || '',
+          user_type: userType
         });
       } else {
         setProfile(data);
@@ -114,6 +117,26 @@ export const useAuth = () => {
         phone: '',
         user_type: 'customer'
       });
+    }
+  };
+
+  const updateUserType = async (newUserType: 'customer' | 'driver' | 'merchant') => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ user_type: newUserType })
+        .eq('id', user.id);
+      
+      if (error) {
+        console.error('Error updating user type:', error);
+      } else {
+        // Refresh profile data
+        await fetchProfile(user.id);
+      }
+    } catch (error) {
+      console.error('Error updating user type:', error);
     }
   };
 
@@ -140,6 +163,7 @@ export const useAuth = () => {
     session,
     loading,
     signOut,
+    updateUserType,
     isAuthenticated: !!user,
   };
 };

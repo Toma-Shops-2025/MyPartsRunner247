@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, updateUserType } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
@@ -131,32 +131,53 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-end space-x-4">
-              {isEditing ? (
-                <>
+            <div className="flex justify-between items-center">
+              <div>
+                {profile?.user_type === 'customer' && (
                   <Button 
-                    variant="outline" 
-                    onClick={() => setIsEditing(false)}
-                    className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    onClick={() => updateUserType('driver')}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Cancel
+                    Switch to Driver Mode
                   </Button>
+                )}
+                {profile?.user_type === 'driver' && (
                   <Button 
-                    onClick={handleSave}
+                    onClick={() => updateUserType('customer')}
+                    className="bg-gray-600 hover:bg-gray-700 text-white"
+                  >
+                    Switch to Customer Mode
+                  </Button>
+                )}
+              </div>
+              
+              <div className="flex space-x-4">
+                {isEditing ? (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsEditing(false)}
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      onClick={handleSave}
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Changes
+                    </Button>
+                  </>
+                ) : (
+                  <Button 
+                    onClick={() => setIsEditing(true)}
                     className="bg-teal-600 hover:bg-teal-700 text-white"
                   >
-                    <Save className="mr-2 h-4 w-4" />
-                    Save Changes
+                    Edit Profile
                   </Button>
-                </>
-              ) : (
-                <Button 
-                  onClick={() => setIsEditing(true)}
-                  className="bg-teal-600 hover:bg-teal-700 text-white"
-                >
-                  Edit Profile
-                </Button>
-              )}
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>

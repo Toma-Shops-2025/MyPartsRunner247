@@ -24,15 +24,19 @@ const AuthCallbackPage: React.FC = () => {
             .eq('id', data.session.user.id)
             .single();
 
-          if (profileError) {
+          // Check if user signed up as driver from auth metadata
+          const userType = data.session.user?.user_metadata?.user_type;
+          
+          if (profileError && !userType) {
             console.error('Profile fetch error:', profileError);
-            // If we can't get profile, redirect to home
+            // If we can't get profile and no metadata, redirect to home
             navigate('/');
             return;
           }
 
-          // Redirect based on user type
-          if (profile?.user_type === 'driver') {
+          // Redirect based on user type (from profile or metadata)
+          const finalUserType = profile?.user_type || userType;
+          if (finalUserType === 'driver') {
             navigate('/driver-dashboard');
           } else {
             navigate('/');
