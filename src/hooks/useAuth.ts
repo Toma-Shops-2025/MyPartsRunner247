@@ -57,18 +57,17 @@ export const useAuth = () => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
-        // Create a basic profile if none exists
-        await createProfile(userId);
+        // Don't auto-create profile, just set loading to false
+        setProfile(null);
       } else if (data) {
         setProfile(data);
       } else {
-        // Create a basic profile if no data returned
-        await createProfile(userId);
+        // No profile found, don't auto-create
+        setProfile(null);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      // Create a basic profile on error
-      await createProfile(userId);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
@@ -143,6 +142,43 @@ export const useAuth = () => {
     }
   };
 
+  const createProfileManually = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const userEmail = userData.user?.email || '';
+      
+      // Get user type from metadata
+      const userType = userData.user?.user_metadata?.user_type || 
+                      userData.user?.user_metadata?.role || 
+                      'customer';
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: userEmail,
+          full_name: userData.user?.user_metadata?.name || userData.user?.user_metadata?.firstName + ' ' + userData.user?.user_metadata?.lastName || '',
+          phone: userData.user?.user_metadata?.phone || '',
+          user_type: userType
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating profile:', error);
+        throw error;
+      } else {
+        setProfile(data);
+        return data;
+      }
+    } catch (error) {
+      console.error('Error creating profile:', error);
+      throw error;
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -167,6 +203,7 @@ export const useAuth = () => {
     loading,
     signOut,
     updateUserType,
+    createProfileManually,
     isAuthenticated: !!user,
   };
 };

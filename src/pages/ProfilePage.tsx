@@ -11,7 +11,7 @@ import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const ProfilePage: React.FC = () => {
-  const { user, profile, loading, updateUserType } = useAuth();
+  const { user, profile, loading, updateUserType, createProfileManually } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
@@ -78,34 +78,12 @@ const ProfilePage: React.FC = () => {
     if (!user) return;
     
     try {
-      // Get user metadata to determine user type
-      const userType = user.user_metadata?.user_type || 
-                      user.user_metadata?.role || 
-                      'customer';
-      
-      // Create the missing profile
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: user.id,
-          email: user.email || '',
-          full_name: user.user_metadata?.name || user.user_metadata?.firstName + ' ' + user.user_metadata?.lastName || '',
-          phone: user.user_metadata?.phone || '',
-          user_type: userType
-        })
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating profile:', error);
-        alert('Error creating profile: ' + error.message);
-      } else {
-        alert('Profile created successfully! Please refresh the page.');
-        window.location.reload();
-      }
+      await createProfileManually();
+      alert('Profile created successfully! Please refresh the page.');
+      window.location.reload();
     } catch (error) {
       console.error('Error:', error);
-      alert('Error: ' + error);
+      alert('Error creating profile: ' + error);
     }
   };
 
