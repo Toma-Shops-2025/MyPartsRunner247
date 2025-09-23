@@ -98,7 +98,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full h-full max-w-none max-h-none p-0 overflow-hidden bg-transparent border-none shadow-none m-0 rounded-none">
+      <DialogContent 
+        className="w-full h-full max-w-none max-h-none p-0 overflow-hidden bg-transparent border-none shadow-none m-0 rounded-none"
+        aria-describedby="auth-modal-description"
+      >
         {/* Full Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -117,6 +120,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
         <div className="relative z-10 p-8 bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg mx-auto my-auto max-w-md w-full">
           <DialogHeader>
             <DialogTitle className="text-white text-2xl font-bold text-center mb-6">Welcome to MyPartsRunner</DialogTitle>
+            <div id="auth-modal-description" className="sr-only">
+              Sign in or create an account to access MyPartsRunner services
+            </div>
           </DialogHeader>
           
           <Tabs defaultValue="signin" className="w-full">

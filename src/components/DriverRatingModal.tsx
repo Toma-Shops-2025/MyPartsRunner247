@@ -63,9 +63,15 @@ const DriverRatingModal: React.FC<DriverRatingModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent 
+        className="sm:max-w-md"
+        aria-describedby="rating-modal-description"
+      >
         <DialogHeader>
           <DialogTitle>Rate Your Driver</DialogTitle>
+          <div id="rating-modal-description" className="sr-only">
+            Rate your driver experience and provide optional feedback
+          </div>
         </DialogHeader>
         
         <div className="space-y-6">
