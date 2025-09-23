@@ -8,13 +8,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 
-interface NewAuthModalProps {
+interface TestAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const TestAuthModal: React.FC<TestAuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { createProfileManually } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -28,40 +28,41 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
     setLoading(true);
 
     try {
+      // Try the simplest possible signup without any options
       const { data, error } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone,
-            user_type: userType
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
-        }
+        password
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase signup error:', error);
+        throw new Error(`Signup failed: ${error.message}`);
+      }
 
-      // Check if email confirmation is required
-      if (data.user && !data.user.email_confirmed_at) {
-        toast({
-          title: "Account created!",
-          description: "Please check your email for a verification link from 'Supabase Auth'. Click the link to confirm your account before signing in.",
-        });
-      } else {
-        toast({
-          title: "Account created!",
-          description: `Welcome! You've been registered as a ${userType}.`,
-        });
+      if (data.user) {
+        // Try to create profile manually
+        try {
+          await createProfileManually();
+          toast({
+            title: "Account created!",
+            description: `Welcome! You've been registered as a ${userType}.`,
+          });
+        } catch (profileError) {
+          console.error('Profile creation error:', profileError);
+          toast({
+            title: "Account created!",
+            description: "Account created, but profile setup failed. You may need to complete setup later.",
+          });
+        }
       }
       
       onSuccess?.();
       onClose();
     } catch (error: any) {
+      console.error('Full signup error:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to create account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -79,7 +80,10 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase signin error:', error);
+        throw new Error(`Sign in failed: ${error.message}`);
+      }
 
       toast({
         title: "Welcome back!",
@@ -89,9 +93,10 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
       onSuccess?.();
       onClose();
     } catch (error: any) {
+      console.error('Full signin error:', error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to sign in. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -103,7 +108,7 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">Welcome to MyPartsRunner</DialogTitle>
+          <DialogTitle className="text-2xl font-bold text-center">Test Authentication</DialogTitle>
         </DialogHeader>
         
         <Tabs defaultValue="signin" className="w-full">
@@ -222,4 +227,4 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
   );
 };
 
-export default NewAuthModal;
+export default TestAuthModal;

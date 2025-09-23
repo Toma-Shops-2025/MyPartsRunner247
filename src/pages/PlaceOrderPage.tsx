@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,10 +42,31 @@ const PlaceOrderPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate order creation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create real order in database
+      const { data, error } = await supabase
+        .from('orders')
+        .insert([
+          {
+            customer_id: user.id,
+            pickup_address: orderData.pickupAddress,
+            delivery_address: orderData.deliveryAddress,
+            item_description: orderData.itemDescription,
+            total: calculateEstimatedCost(),
+            status: 'pending',
+            special_instructions: orderData.specialInstructions,
+            contact_phone: orderData.contactPhone,
+            created_at: new Date().toISOString()
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Order creation error:', error);
+        throw new Error('Failed to create order. Please try again.');
+      }
       
-      alert('Order placed successfully! A driver will be assigned soon.');
+      alert(`Order #${data.id} placed successfully! A driver will be assigned soon.`);
       
       // Reset form
       setOrderData({

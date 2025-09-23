@@ -25,46 +25,16 @@ const NewDriverDashboardPage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Mock data - in real app, this would come from API
+  // Real data - will be empty initially
   const driverStats = {
-    totalEarnings: 245.50,
-    completedDeliveries: 12,
-    activeDeliveries: 1,
-    rating: 4.8
+    totalEarnings: 0.00,
+    completedDeliveries: 0,
+    activeDeliveries: 0,
+    rating: 0.0
   };
 
-  const availableOrders = [
-    {
-      id: 1,
-      pickup: "123 Main St, Downtown",
-      delivery: "456 Oak Ave, Uptown",
-      item: "Documents",
-      distance: "2.3 miles",
-      fee: "$12.50",
-      time: "15 min ago"
-    },
-    {
-      id: 2,
-      pickup: "789 Pine St, Midtown",
-      delivery: "321 Elm St, Suburbs",
-      item: "Package",
-      distance: "5.1 miles",
-      fee: "$18.75",
-      time: "8 min ago"
-    }
-  ];
-
-  const activeOrders = [
-    {
-      id: 3,
-      pickup: "555 Broadway, City Center",
-      delivery: "777 Park Ave, Residential",
-      item: "Food delivery",
-      status: "Picked up",
-      customer: "John D.",
-      phone: "(555) 123-4567"
-    }
-  ];
+  const availableOrders: any[] = [];
+  const activeOrders: any[] = [];
 
   return (
     <div className="min-h-screen bg-gray-900">

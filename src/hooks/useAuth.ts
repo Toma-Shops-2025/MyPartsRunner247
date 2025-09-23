@@ -119,7 +119,7 @@ export const useAuth = () => {
         .insert({
           id: user.id,
           email: userEmail,
-          full_name: userData.user?.user_metadata?.name || userData.user?.user_metadata?.firstName + ' ' + userData.user?.user_metadata?.lastName || '',
+          full_name: userData.user?.user_metadata?.full_name || userData.user?.user_metadata?.name || '',
           phone: userData.user?.user_metadata?.phone || '',
           user_type: userType
         })
