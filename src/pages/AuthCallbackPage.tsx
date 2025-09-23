@@ -17,8 +17,26 @@ const AuthCallbackPage: React.FC = () => {
         }
 
         if (data.session) {
-          // User is authenticated, redirect to home
-          navigate('/');
+          // User is authenticated, check their profile to determine redirect
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('id', data.session.user.id)
+            .single();
+
+          if (profileError) {
+            console.error('Profile fetch error:', profileError);
+            // If we can't get profile, redirect to home
+            navigate('/');
+            return;
+          }
+
+          // Redirect based on user type
+          if (profile?.user_type === 'driver') {
+            navigate('/driver-dashboard');
+          } else {
+            navigate('/');
+          }
         } else {
           // No session, redirect to home
           navigate('/');
@@ -36,7 +54,7 @@ const AuthCallbackPage: React.FC = () => {
     <div className="min-h-screen bg-gray-900 flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400 mx-auto mb-4"></div>
-        <p className="text-white">Verifying your account...</p>
+        <p className="text-white">Verifying your account and redirecting...</p>
       </div>
     </div>
   );
