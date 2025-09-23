@@ -7,29 +7,29 @@ const TermsPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 text-white hover:bg-gray-800"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
 
         <div className="text-center mb-8">
-          <FileText className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <FileText className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-white mb-2">
             Terms of Service
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Last updated: January 1, 2024
           </p>
         </div>
 
-        <Card>
-          <CardContent className="prose max-w-none p-8">
+        <Card className="bg-gray-800 border-gray-600">
+          <CardContent className="prose max-w-none p-8 text-gray-300">
             <h2>1. Acceptance of Terms</h2>
             <p>
               By accessing and using MyPartsRunner's services, you accept and agree to be bound by the terms and provision of this agreement.

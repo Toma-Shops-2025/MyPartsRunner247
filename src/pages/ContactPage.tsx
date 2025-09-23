@@ -26,22 +26,22 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Contact Us
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Get in touch with our support team
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card>
+            <Card className="bg-gray-800 border-gray-600">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <MessageSquare className="w-5 h-5 mr-2" />
                   Send us a Message
                 </CardTitle>
@@ -127,32 +127,32 @@ const ContactPage = () => {
           </div>
 
           <div className="space-y-6">
-            <Card>
+            <Card className="bg-gray-800 border-gray-600">
               <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
+                <CardTitle className="text-white">Contact Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-start">
-                  <Phone className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                  <Phone className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
                   <div>
-                    <p className="font-medium">Phone Support</p>
-                    <p className="text-gray-600">502-812-2456</p>
+                    <p className="font-medium text-white">Phone Support</p>
+                    <p className="text-gray-300">502-812-2456</p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <Mail className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                  <Mail className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
                   <div>
-                    <p className="font-medium">Email Support</p>
-                    <p className="text-gray-600">support@mypartsrunner.com</p>
+                    <p className="font-medium text-white">Email Support</p>
+                    <p className="text-gray-300">support@mypartsrunner.com</p>
                   </div>
                 </div>
 
                 <div className="flex items-start">
-                  <MapPin className="w-5 h-5 text-blue-600 mr-3 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
                   <div>
-                    <p className="font-medium">Headquarters</p>
-                    <p className="text-gray-600">
+                    <p className="font-medium text-white">Headquarters</p>
+                    <p className="text-gray-300">
                       123 Auto Parts Blvd<br />
                       Suite 100<br />
                       Detroit, MI 48201
@@ -162,39 +162,39 @@ const ContactPage = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800 border-gray-600">
               <CardHeader>
-                <CardTitle className="flex items-center">
+                <CardTitle className="flex items-center text-white">
                   <Clock className="w-5 h-5 mr-2" />
                   Support Hours
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-green-600">24/7</p>
-                  <p className="text-gray-600">Available around the clock</p>
+                  <p className="text-2xl font-bold text-green-400">24/7</p>
+                  <p className="text-gray-300">Available around the clock</p>
                 </div>
-                <p className="text-sm text-gray-500 mt-4 text-center">
+                <p className="text-sm text-gray-400 mt-4 text-center">
                   We're here whenever you need us
                 </p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gray-800 border-gray-600">
               <CardHeader>
-                <CardTitle>Quick Links</CardTitle>
+                <CardTitle className="text-white">Quick Links</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/faq')}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-gray-700" onClick={() => navigate('/faq')}>
                   Frequently Asked Questions
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/driver-application')}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-gray-700" onClick={() => navigate('/driver-application')}>
                   Become a Driver
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/services')}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-gray-700" onClick={() => navigate('/services')}>
                   Our Services
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/about')}>
+                <Button variant="ghost" className="w-full justify-start text-white hover:bg-gray-700" onClick={() => navigate('/about')}>
                   About Us
                 </Button>
               </CardContent>

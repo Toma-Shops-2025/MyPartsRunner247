@@ -7,29 +7,29 @@ const PrivacyPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 text-white hover:bg-gray-800"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
 
         <div className="text-center mb-8">
-          <Shield className="w-12 h-12 text-green-600 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <Shield className="w-12 h-12 text-green-400 mx-auto mb-4" />
+          <h1 className="text-3xl font-bold text-white mb-2">
             Privacy Policy
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Last updated: January 1, 2024
           </p>
         </div>
 
-        <Card>
-          <CardContent className="prose max-w-none p-8">
+        <Card className="bg-gray-800 border-gray-600">
+          <CardContent className="prose max-w-none p-8 text-gray-300">
             <h2>1. Information We Collect</h2>
             <p>
               We collect information you provide directly to us, such as when you create an account, request a delivery, or contact us for support.

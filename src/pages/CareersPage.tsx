@@ -54,16 +54,16 @@ const CareersPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-teal-50 to-blue-50 py-20">
+      <section className="bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Join Our <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">Team</span>
+          <h1 className="text-5xl font-bold text-white mb-6">
+            Join Our <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">Team</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Help us revolutionize delivery and build the future of logistics. 
             We're looking for passionate people who want to make a real impact.
           </p>
@@ -73,13 +73,13 @@ const CareersPage: React.FC = () => {
       {/* Benefits Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Why Work With Us?</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Why Work With Us?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => (
-              <Card key={index}>
+              <Card key={index} className="bg-gray-800 border-gray-600">
                 <CardContent className="p-6 text-center">
                   <div className="w-2 h-2 bg-teal-500 rounded-full mx-auto mb-3"></div>
-                  <p className="text-gray-700">{benefit}</p>
+                  <p className="text-gray-300">{benefit}</p>
                 </CardContent>
               </Card>
             ))}
@@ -88,17 +88,17 @@ const CareersPage: React.FC = () => {
       </section>
 
       {/* Open Positions */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Open Positions</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">Open Positions</h2>
           <div className="space-y-6">
             {jobs.map((job, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={index} className="hover:shadow-2xl transition-shadow bg-gray-700 border-gray-600">
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div>
-                      <CardTitle className="text-xl mb-2">{job.title}</CardTitle>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <CardTitle className="text-xl mb-2 text-white">{job.title}</CardTitle>
+                      <div className="flex items-center space-x-4 text-sm text-gray-300">
                         <div className="flex items-center">
                           <Users className="w-4 h-4 mr-1" />
                           {job.department}
@@ -117,12 +117,12 @@ const CareersPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <Badge variant="secondary">{job.department}</Badge>
+                    <Badge variant="secondary" className="bg-teal-100 text-teal-800">{job.department}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-4">{job.description}</p>
-                  <Button>Apply Now</Button>
+                  <p className="text-gray-300 mb-4">{job.description}</p>
+                  <Button className="bg-teal-600 hover:bg-teal-700">Apply Now</Button>
                 </CardContent>
               </Card>
             ))}

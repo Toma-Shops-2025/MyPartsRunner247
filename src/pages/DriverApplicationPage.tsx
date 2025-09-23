@@ -13,22 +13,22 @@ const DriverApplicationPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-6 text-white hover:bg-gray-800"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Become a MyPartsRunner Driver
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Join our team and start earning money delivering auto parts
           </p>
         </div>

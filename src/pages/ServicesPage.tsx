@@ -39,16 +39,16 @@ const ServicesPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-teal-50 to-blue-50 py-20">
+      <section className="bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Our <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">Services</span>
+          <h1 className="text-5xl font-bold text-white mb-6">
+            Our <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">Services</span>
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             From personal errands to business solutions, MyPartsRunner provides reliable delivery services 
             that adapt to your needs. Available 24/7 nationwide.
           </p>
@@ -60,20 +60,20 @@ const ServicesPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
+              <Card key={index} className="hover:shadow-2xl transition-shadow bg-gray-800 border-gray-600">
                 <CardHeader>
                   <div className="flex items-center space-x-4">
                     <div className="bg-teal-100 p-3 rounded-full">
                       <service.icon className="w-6 h-6 text-teal-600" />
                     </div>
-                    <CardTitle className="text-xl">{service.title}</CardTitle>
+                    <CardTitle className="text-xl text-white">{service.title}</CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-4">{service.description}</p>
+                  <p className="text-gray-300 mb-4">{service.description}</p>
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center text-sm text-gray-700">
+                      <li key={idx} className="flex items-center text-sm text-gray-300">
                         <div className="w-2 h-2 bg-teal-500 rounded-full mr-3"></div>
                         {feature}
                       </li>

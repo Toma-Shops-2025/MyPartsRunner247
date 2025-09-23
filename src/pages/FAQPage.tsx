@@ -91,18 +91,18 @@ const FAQPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-900 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Frequently Asked Questions
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Find answers to common questions about MyPartsRunner
           </p>
         </div>
 
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 border-gray-600">
           <CardContent className="pt-6">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -110,7 +110,7 @@ const FAQPage = () => {
                 placeholder="Search frequently asked questions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-gray-700 border-gray-600 text-white"
               />
             </div>
           </CardContent>
@@ -133,9 +133,9 @@ const FAQPage = () => {
           })}
         </div>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-600">
           <CardHeader>
-            <CardTitle>
+            <CardTitle className="text-white">
               {selectedCategory === 'all' ? 'All Questions' : 
                categories.find(c => c.id === selectedCategory)?.name}
             </CardTitle>
@@ -144,10 +144,10 @@ const FAQPage = () => {
             <Accordion type="single" collapsible className="w-full">
               {filteredFAQs.map((faq) => (
                 <AccordionItem key={faq.id} value={`item-${faq.id}`}>
-                  <AccordionTrigger className="text-left">
+                  <AccordionTrigger className="text-left text-white">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-300">
                     {faq.answer}
                   </AccordionContent>
                 </AccordionItem>
@@ -157,10 +157,10 @@ const FAQPage = () => {
             {filteredFAQs.length === 0 && (
               <div className="text-center py-8">
                 <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <h3 className="text-lg font-medium text-white mb-2">
                   No questions found
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-300">
                   Try adjusting your search or browse different categories
                 </p>
               </div>
@@ -168,12 +168,12 @@ const FAQPage = () => {
           </CardContent>
         </Card>
 
-        <Card className="mt-8">
+        <Card className="mt-8 bg-gray-800 border-gray-600">
           <CardContent className="text-center py-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-white mb-2">
               Still have questions?
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-300 mb-4">
               Can't find what you're looking for? Our support team is here to help.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -185,7 +185,7 @@ const FAQPage = () => {
               </button>
               <button
                 onClick={() => navigate('/driver-application')}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-6 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Become a Driver
               </button>

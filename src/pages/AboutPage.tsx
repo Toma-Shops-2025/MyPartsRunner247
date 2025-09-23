@@ -40,17 +40,17 @@ const AboutPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <Header />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-teal-50 to-blue-50 py-20">
+      <section className="bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              About <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">MyPartsRunner</span>
+            <h1 className="text-5xl font-bold text-white mb-6">
+              About <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">MyPartsRunner</span>
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Founded on the simple belief that distance shouldn't be a barrier to getting what you need, 
               when you need it. We're revolutionizing delivery by making it truly universal.
             </p>
@@ -62,8 +62,8 @@ const AboutPage: React.FC = () => {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Our Story</h2>
-            <div className="text-gray-600 space-y-6">
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Our Story</h2>
+            <div className="text-gray-300 space-y-6">
               <p>
                 MyPartsRunner was born from a simple frustration: the inability to get something delivered 
                 from anywhere other than traditional retailers. Whether you forgot your laptop at home, 
@@ -86,18 +86,18 @@ const AboutPage: React.FC = () => {
       </section>
 
       {/* Values Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">What Drives Us</h2>
+          <h2 className="text-3xl font-bold text-white text-center mb-12">What Drives Us</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <Card key={index} className="text-center">
+              <Card key={index} className="text-center bg-gray-700 border-gray-600">
                 <CardContent className="p-6">
                   <div className="bg-teal-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
                     <value.icon className="w-8 h-8 text-teal-600" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{value.title}</h3>
-                  <p className="text-gray-600">{value.description}</p>
+                  <h3 className="text-xl font-semibold text-white mb-3">{value.title}</h3>
+                  <p className="text-gray-300">{value.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -123,10 +123,10 @@ const AboutPage: React.FC = () => {
       {/* CTA Section */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl font-bold text-white mb-6">
             Join the MyPartsRunner Family
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-300 mb-8">
             Whether you need something delivered or want to earn money driving, 
             we'd love to have you as part of our community.
           </p>
