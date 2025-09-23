@@ -75,14 +75,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
               <div className="text-2xl font-bold text-teal-600">1,247</div>
             </div>
             
-            {/* Additional visual elements */}
-            <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <h3 className="text-3xl font-bold mb-2">MyPartsRunner</h3>
-                  <p className="text-lg opacity-90">Delivery Service</p>
-                </div>
-              </div>
+            {/* Hero Logo */}
+            <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
+              <img 
+                src="/hero-logo.png"
+                alt="MyPartsRunner Logo"
+                className="max-w-full max-h-full object-contain"
+              />
             </div>
           </div>
         </div>
