@@ -28,6 +28,7 @@ import FAQPage from "./pages/FAQPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
+import DebugProfile from "./components/DebugProfile";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <DebugProfile />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<DriverDashboardPage />} />

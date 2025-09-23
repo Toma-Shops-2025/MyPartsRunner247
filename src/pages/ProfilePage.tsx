@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading, updateUserType } = useAuth();
@@ -48,6 +49,29 @@ const ProfilePage: React.FC = () => {
   const handleSave = () => {
     // TODO: Implement profile update
     setIsEditing(false);
+  };
+
+  const handleForceDriverUpdate = async () => {
+    if (!user) return;
+    
+    try {
+      // Directly update the profile in the database
+      const { error } = await supabase
+        .from('profiles')
+        .update({ user_type: 'driver' })
+        .eq('id', user.id);
+      
+      if (error) {
+        console.error('Error updating profile:', error);
+        alert('Error updating profile: ' + error.message);
+      } else {
+        alert('Profile updated to driver! Please refresh the page.');
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error);
+    }
   };
 
   return (
@@ -132,7 +156,7 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center">
-              <div>
+              <div className="flex space-x-2">
                 {profile?.user_type === 'customer' && (
                   <Button 
                     onClick={() => updateUserType('driver')}
@@ -149,6 +173,12 @@ const ProfilePage: React.FC = () => {
                     Switch to Customer Mode
                   </Button>
                 )}
+                <Button 
+                  onClick={handleForceDriverUpdate}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
+                  Force Driver Update
+                </Button>
               </div>
               
               <div className="flex space-x-4">
