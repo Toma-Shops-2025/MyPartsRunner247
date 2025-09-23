@@ -16,13 +16,13 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
   ];
 
   return (
-    <section id="drivers" className="py-20 bg-white">
+    <section id="drivers" className="py-20 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-6">
-            Drive with <span className="text-teal-600">MyPartsRunner</span>
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Drive with <span className="text-teal-400">MyPartsRunner</span>
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
             Join our nationwide network of drivers and start earning today. 
             With instant payouts and flexible scheduling, driving has never been better.
           </p>
@@ -30,10 +30,10 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {benefits.map((benefit, index) => (
-            <div key={index} className="text-center p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-100">
+            <div key={index} className="text-center p-6 bg-gradient-to-br from-gray-700 to-gray-600 rounded-2xl shadow-lg hover:shadow-2xl transition-all border border-gray-600 hover:border-teal-400">
               <div className="text-4xl mb-4">{benefit.icon}</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit.title}</h3>
-              <p className="text-gray-600 text-sm">{benefit.description}</p>
+              <h3 className="text-lg font-semibold text-white mb-2">{benefit.title}</h3>
+              <p className="text-gray-300 text-sm">{benefit.description}</p>
             </div>
           ))}
         </div>

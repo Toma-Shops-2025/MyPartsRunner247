@@ -32,13 +32,13 @@ const HowItWorksSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-gradient-to-br from-teal-50 to-blue-50">
+    <section className="py-20 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            How It <span className="text-blue-600">Works</span>
+          <h2 className="text-4xl font-bold text-white mb-4">
+            How It <span className="text-blue-400">Works</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Getting your items delivered is simple and fast. 
             Our streamlined process gets you connected with drivers in minutes.
           </p>
@@ -47,13 +47,13 @@ const HowItWorksSection: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {steps.map((step, index) => (
             <div key={index} className="text-center relative">
-              <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all border-2 border-transparent hover:border-teal-200">
+              <div className="bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all border-2 border-transparent hover:border-teal-400 hover:bg-gray-600">
                 <div className="text-5xl mb-4">{step.icon}</div>
                 <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
                   {step.step}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-3">{step.title}</h3>
+                <p className="text-gray-300">{step.description}</p>
               </div>
               
               {index < steps.length - 1 && (
@@ -68,9 +68,9 @@ const HowItWorksSection: React.FC = () => {
         </div>
 
         <div className="text-center mt-16">
-          <div className="bg-white p-8 rounded-2xl shadow-lg inline-block">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to get started?</h3>
-            <p className="text-gray-600 mb-6">Join thousands of satisfied customers nationwide.</p>
+          <div className="bg-gray-700 p-8 rounded-2xl shadow-lg inline-block">
+            <h3 className="text-2xl font-bold text-white mb-4">Ready to get started?</h3>
+            <p className="text-gray-300 mb-6">Join thousands of satisfied customers nationwide.</p>
             <button 
               onClick={() => navigate('/services')}
               className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"

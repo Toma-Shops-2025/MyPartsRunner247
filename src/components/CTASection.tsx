@@ -5,29 +5,29 @@ import { ArrowRight, Smartphone, Truck } from 'lucide-react';
 const CTASection: React.FC = () => {
   const navigate = useNavigate();
   return (
-    <section className="py-20 bg-gradient-to-r from-teal-50 to-blue-50">
+    <section className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Join the MyPartsRunner community today. Whether you need something delivered or want to earn money driving, we've got you covered.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-teal-100">
+          <div className="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-600">
             <div className="flex items-center mb-6">
               <div className="bg-teal-100 p-3 rounded-full mr-4">
                 <Smartphone className="w-8 h-8 text-teal-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">For Customers</h3>
-                <p className="text-gray-600">Need something delivered?</p>
+                <h3 className="text-2xl font-bold text-white">For Customers</h3>
+                <p className="text-gray-300">Need something delivered?</p>
               </div>
             </div>
-            <ul className="space-y-3 mb-8 text-gray-700">
+            <ul className="space-y-3 mb-8 text-gray-300">
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-teal-500 mr-3" />
                 Request pickup from anywhere
@@ -49,17 +49,17 @@ const CTASection: React.FC = () => {
             </button>
           </div>
 
-          <div className="bg-white p-8 rounded-2xl shadow-xl border border-blue-100">
+          <div className="bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-600">
             <div className="flex items-center mb-6">
               <div className="bg-blue-100 p-3 rounded-full mr-4">
                 <Truck className="w-8 h-8 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">For Drivers</h3>
-                <p className="text-gray-600">Want to earn money?</p>
+                <h3 className="text-2xl font-bold text-white">For Drivers</h3>
+                <p className="text-gray-300">Want to earn money?</p>
               </div>
             </div>
-            <ul className="space-y-3 mb-8 text-gray-700">
+            <ul className="space-y-3 mb-8 text-gray-300">
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
                 Flexible schedule

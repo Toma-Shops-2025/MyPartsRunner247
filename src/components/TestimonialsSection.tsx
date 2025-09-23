@@ -34,20 +34,20 @@ const testimonials = [
 
 const TestimonialsSection: React.FC = () => {
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-white mb-4">
             What Our Customers Say
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             Join thousands of satisfied customers who trust MyPartsRunner for their delivery needs
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {testimonials.map((testimonial, index) => (
-            <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+            <div key={index} className="bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-shadow border border-gray-600">
               <div className="flex items-center mb-4">
                 <img 
                   src={testimonial.image} 
@@ -55,8 +55,8 @@ const TestimonialsSection: React.FC = () => {
                   className="w-12 h-12 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-600">{testimonial.role}</p>
+                  <h4 className="font-semibold text-white">{testimonial.name}</h4>
+                  <p className="text-sm text-gray-300">{testimonial.role}</p>
                 </div>
               </div>
               
@@ -66,7 +66,7 @@ const TestimonialsSection: React.FC = () => {
                 ))}
               </div>
               
-              <p className="text-gray-700 italic">"{testimonial.content}"</p>
+              <p className="text-gray-300 italic">"{testimonial.content}"</p>
             </div>
           ))}
         </div>

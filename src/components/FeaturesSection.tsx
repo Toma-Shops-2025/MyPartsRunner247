@@ -44,13 +44,13 @@ const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Why Choose <span className="text-teal-600">MyPartsRunner</span>?
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Why Choose <span className="text-teal-400">MyPartsRunner</span>?
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             We've built the most advanced delivery platform with features 
             that make getting your items simple, fast, and reliable.
           </p>
@@ -59,12 +59,12 @@ const FeaturesSection: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div key={index} className="group relative">
-              <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-transparent group-hover:scale-105">
+              <div className="bg-gradient-to-br from-gray-800 to-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-600 hover:border-teal-400 group-hover:scale-105">
                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-white mb-3">{feature.title}</h3>
+                <p className="text-gray-300">{feature.description}</p>
               </div>
               
               <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
@@ -73,27 +73,27 @@ const FeaturesSection: React.FC = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-teal-50 to-blue-50 rounded-2xl p-8 lg:p-12">
-            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+          <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl p-8 lg:p-12">
+            <h3 className="text-3xl font-bold text-white mb-4">
               The Future of Delivery is Here
             </h3>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
               Join the revolution in on-demand delivery. With cutting-edge technology 
               and a nationwide network, we're changing how America gets things delivered.
             </p>
             
             <div className="grid sm:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="text-3xl font-bold text-teal-600 mb-2">99.9%</div>
-                <div className="text-gray-600">Uptime</div>
+              <div className="bg-gray-600 p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-teal-400 mb-2">99.9%</div>
+                <div className="text-gray-300">Uptime</div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="text-3xl font-bold text-blue-600 mb-2">&lt;30min</div>
-                <div className="text-gray-600">Avg Response</div>
+              <div className="bg-gray-600 p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-blue-400 mb-2">&lt;30min</div>
+                <div className="text-gray-300">Avg Response</div>
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm">
-                <div className="text-3xl font-bold text-teal-600 mb-2">4.9★</div>
-                <div className="text-gray-600">User Rating</div>
+              <div className="bg-gray-600 p-6 rounded-xl shadow-sm">
+                <div className="text-3xl font-bold text-teal-400 mb-2">4.9★</div>
+                <div className="text-gray-300">User Rating</div>
               </div>
             </div>
 

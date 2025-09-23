@@ -26,7 +26,7 @@ const AppLayout: React.FC = () => {
 
   // For the main landing page, show the full homepage regardless of user type
   return (
-     <div className="min-h-screen bg-white">
+     <div className="min-h-screen bg-gray-900">
       <Header />
       <main>
         {user && showOrderTracker ? (
