@@ -9,16 +9,30 @@ interface HeroSectionProps {
 const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriver }) => {
   const navigate = useNavigate();
   return (
-    <section className="relative bg-gradient-to-br from-teal-50 to-blue-50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <section className="relative min-h-screen overflow-hidden">
+      {/* Delivery Car Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: 'url("/delivery-car-background.jpg")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
+      
+      {/* Dark overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40"></div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="text-center lg:text-left">
-            <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              <span className="bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
+              <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
                 Anything, Anytime, Anywhere
               </span>
             </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-xl text-gray-200 mb-8 leading-relaxed">
               The only delivery service that picks up from absolutely anywhere. 
               Forgot something? Need it delivered? We've got you covered 24/7 nationwide.
             </p>
@@ -32,7 +46,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
               </button>
               <button 
                 onClick={() => navigate('/driver-application')}
-                className="border-2 border-teal-500 text-teal-600 px-8 py-4 rounded-full text-lg font-semibold hover:bg-teal-50 transition-all"
+                className="border-2 border-white text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition-all backdrop-blur-sm"
               >
                 Become a Driver
               </button>
@@ -40,52 +54,35 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
 
             <div className="grid grid-cols-3 gap-8 text-center">
               <div>
-                <div className="text-3xl font-bold text-teal-600">24/7</div>
-                <div className="text-gray-600">Available</div>
+                <div className="text-3xl font-bold text-teal-300">24/7</div>
+                <div className="text-gray-200">Available</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-600">50+</div>
-                <div className="text-gray-600">States</div>
+                <div className="text-3xl font-bold text-blue-300">50+</div>
+                <div className="text-gray-200">States</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-teal-600">∞</div>
-                <div className="text-gray-600">Possibilities</div>
+                <div className="text-3xl font-bold text-teal-300">∞</div>
+                <div className="text-gray-200">Possibilities</div>
               </div>
             </div>
           </div>
 
           <div className="relative">
-            {/* Main Hero Image - Driver with packages */}
-            <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden">
-              <img 
-                src="/Screenshot_20250605-093441_Chrome.png"
-                alt="MyPartsRunner Delivery Driver with packages"
-                className="w-full h-full object-cover"
-              />
-              {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-900/60 to-blue-900/40"></div>
-              
-              {/* Brand Text Overlay */}
+            {/* Live Orders Card */}
+            <div className="absolute -top-4 -right-4 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg">
+              <div className="text-sm text-gray-600">Live Orders</div>
+              <div className="text-2xl font-bold text-teal-600">1,247</div>
+            </div>
+            
+            {/* Additional visual elements */}
+            <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center text-white">
                   <h3 className="text-3xl font-bold mb-2">MyPartsRunner</h3>
                   <p className="text-lg opacity-90">Delivery Service</p>
                 </div>
               </div>
-            </div>
-            
-            {/* Secondary Image - Driver in vehicle */}
-            <div className="absolute -bottom-8 -right-8 w-32 h-32 rounded-xl shadow-lg overflow-hidden border-4 border-white">
-              <img 
-                src="/Screenshot_20250605-093407_Chrome.png"
-                alt="MyPartsRunner Driver in vehicle"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-lg">
-              <div className="text-sm text-gray-600">Live Orders</div>
-              <div className="text-2xl font-bold text-teal-600">1,247</div>
             </div>
           </div>
         </div>
