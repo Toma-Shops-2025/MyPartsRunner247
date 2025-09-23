@@ -101,9 +101,9 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
   }
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-white">
           <MapPin className="w-5 h-5" />
           Location Status
         </CardTitle>
@@ -112,11 +112,11 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {profile?.is_online ? (
-              <Wifi className="w-4 h-4 text-green-500" />
+              <Wifi className="w-4 h-4 text-green-400" />
             ) : (
               <WifiOff className="w-4 h-4 text-gray-400" />
             )}
-            <span className={profile?.is_online ? 'text-green-600' : 'text-gray-600'}>
+            <span className={profile?.is_online ? 'text-green-400' : 'text-gray-300'}>
               {profile?.is_online ? 'Online' : 'Offline'}
             </span>
           </div>
@@ -124,27 +124,28 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
             variant={profile?.is_online ? "destructive" : "default"}
             onClick={toggleOnlineStatus}
             size="sm"
+            className={profile?.is_online ? "bg-red-600 hover:bg-red-700 text-white" : "bg-teal-600 hover:bg-teal-700 text-white"}
           >
             {profile?.is_online ? 'Go Offline' : 'Go Online'}
           </Button>
         </div>
 
         {location && (
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-300">
             <div>Lat: {location.lat.toFixed(6)}</div>
             <div>Lng: {location.lng.toFixed(6)}</div>
           </div>
         )}
 
         {error && (
-          <div className="text-sm text-red-600">
+          <div className="text-sm text-red-400">
             {error}
           </div>
         )}
 
         {isTracking && (
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <div className="flex items-center gap-2 text-sm text-green-400">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             Location tracking active
           </div>
         )}

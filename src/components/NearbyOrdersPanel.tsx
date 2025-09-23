@@ -83,31 +83,31 @@ const NearbyOrdersPanel: React.FC = () => {
   }
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-white">
           <span>Nearby Orders</span>
           {loading && (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-600"></div>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-400"></div>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {nearbyOrders.length === 0 ? (
-          <p className="text-gray-600 text-center py-4">
+          <p className="text-gray-300 text-center py-4">
             {driverLocation ? 'No nearby orders available' : 'Enable location to see nearby orders'}
           </p>
         ) : (
           <div className="space-y-4">
             {nearbyOrders.slice(0, 5).map((order) => (
-              <div key={order.id} className="border rounded-lg p-4 hover:bg-gray-50">
+              <div key={order.id} className="border border-gray-600 rounded-lg p-4 hover:bg-gray-700 bg-gray-700">
                 <div className="flex justify-between items-start mb-2">
-                  <div className="text-sm font-medium">#{order.id.slice(0, 8)}</div>
+                  <div className="text-sm font-medium text-white">#{order.id.slice(0, 8)}</div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-xs">
+                    <Badge variant="outline" className="text-xs border-gray-500 text-gray-300">
                       {order.distance.toFixed(1)}km away
                     </Badge>
-                    <div className="text-lg font-bold text-green-600">
+                    <div className="text-lg font-bold text-green-400">
                       ${order.total.toFixed(2)}
                     </div>
                   </div>
@@ -116,13 +116,13 @@ const NearbyOrdersPanel: React.FC = () => {
                 {order.profiles?.rating && (
                   <div className="flex items-center gap-1 mb-2">
                     <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-300">
                       Customer: {order.profiles.rating.toFixed(1)}
                     </span>
                   </div>
                 )}
 
-                <div className="space-y-1 text-sm text-gray-600 mb-3">
+                <div className="space-y-1 text-sm text-gray-300 mb-3">
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     From: {order.pickupaddress}
@@ -136,7 +136,7 @@ const NearbyOrdersPanel: React.FC = () => {
 
                 <Button 
                   onClick={() => acceptOrder(order.id)}
-                  className="w-full"
+                  className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                   size="sm"
                 >
                   Accept Order

@@ -135,11 +135,12 @@ const DriverDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Driver Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white">Driver Dashboard</h1>
         <div className="flex items-center space-x-4">
           <Button
             variant={isOnline ? "destructive" : "default"}
             onClick={() => setIsOnline(!isOnline)}
+            className={isOnline ? "bg-red-600 hover:bg-red-700 text-white" : "bg-teal-600 hover:bg-teal-700 text-white"}
           >
             {isOnline ? 'Go Offline' : 'Go Online'}
           </Button>
@@ -147,43 +148,43 @@ const DriverDashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <DollarSign className="w-5 h-5" />
               Today's Earnings
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">
+            <div className="text-2xl font-bold text-green-400">
               ${earnings.toFixed(2)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <Package className="w-5 h-5" />
               Active Orders
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-400">
               {orders.filter(o => ['accepted', 'picked_up', 'in_transit'].includes(o.status)).length}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-white">
               <CheckCircle className="w-5 h-5" />
               Completed Today
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-teal-600">
+            <div className="text-2xl font-bold text-teal-400">
               {orders.filter(o => o.status === 'delivered').length}
             </div>
           </CardContent>
@@ -200,19 +201,19 @@ const DriverDashboard: React.FC = () => {
 
       <NearbyOrdersPanel />
       {isOnline && availableOrders.length > 0 && (
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle>Available Orders</CardTitle>
+            <CardTitle className="text-white">Available Orders</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {availableOrders.slice(0, 3).map((order) => (
-                <div key={order.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                <div key={order.id} className="border border-gray-600 rounded-lg p-4 hover:bg-gray-700 bg-gray-700">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="text-sm font-medium">#{order.id.slice(0, 8)}</div>
-                    <div className="text-lg font-bold text-green-600">${order.total.toFixed(2)}</div>
+                    <div className="text-sm font-medium text-white">#{order.id.slice(0, 8)}</div>
+                    <div className="text-lg font-bold text-green-400">${order.total.toFixed(2)}</div>
                   </div>
-                  <div className="space-y-1 text-sm text-gray-600 mb-3">
+                  <div className="space-y-1 text-sm text-gray-300 mb-3">
                     <div className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       From: {order.pickupaddress}
@@ -225,7 +226,7 @@ const DriverDashboard: React.FC = () => {
                   </div>
                   <Button 
                     onClick={() => acceptOrder(order.id)}
-                    className="w-full"
+                    className="w-full bg-teal-600 hover:bg-teal-700 text-white"
                   >
                     Accept Order
                   </Button>
@@ -236,46 +237,55 @@ const DriverDashboard: React.FC = () => {
         </Card>
       )}
 
-      <Card>
+      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle>My Orders</CardTitle>
+          <CardTitle className="text-white">My Orders</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {orders.length === 0 ? (
-              <p className="text-gray-600 text-center py-4">No orders yet</p>
+              <p className="text-gray-300 text-center py-4">No orders yet</p>
             ) : (
               orders.map((order) => (
-                <div key={order.id} className="border rounded-lg p-4">
+                <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                   <div className="flex justify-between items-start mb-2">
-                    <div className="text-sm font-medium">#{order.id.slice(0, 8)}</div>
+                    <div className="text-sm font-medium text-white">#{order.id.slice(0, 8)}</div>
                     <Badge className={
-                      order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                      order.status === 'in_transit' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
+                      order.status === 'delivered' ? 'bg-green-600 text-white' :
+                      order.status === 'in_transit' ? 'bg-blue-600 text-white' :
+                      'bg-yellow-600 text-white'
                     }>
                       {order.status.replace('_', ' ').toUpperCase()}
                     </Badge>
                   </div>
-                  <div className="space-y-1 text-sm text-gray-600 mb-3">
+                  <div className="space-y-1 text-sm text-gray-300 mb-3">
                     <div>From: {order.pickupaddress}</div>
                     <div>To: {order.deliveryaddress}</div>
                     <div>Item: {order.itemdescription}</div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <div className="text-lg font-bold">${order.total.toFixed(2)}</div>
+                    <div className="text-lg font-bold text-white">${order.total.toFixed(2)}</div>
                     {order.status === 'accepted' && (
-                      <Button onClick={() => updateOrderStatus(order.id, 'picked_up')}>
+                      <Button 
+                        onClick={() => updateOrderStatus(order.id, 'picked_up')}
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                      >
                         Mark Picked Up
                       </Button>
                     )}
                     {order.status === 'picked_up' && (
-                      <Button onClick={() => updateOrderStatus(order.id, 'in_transit')}>
+                      <Button 
+                        onClick={() => updateOrderStatus(order.id, 'in_transit')}
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                      >
                         Start Delivery
                       </Button>
                     )}
                     {order.status === 'in_transit' && (
-                      <Button onClick={() => updateOrderStatus(order.id, 'delivered')}>
+                      <Button 
+                        onClick={() => updateOrderStatus(order.id, 'delivered')}
+                        className="bg-teal-600 hover:bg-teal-700 text-white"
+                      >
                         Mark Delivered
                       </Button>
                     )}

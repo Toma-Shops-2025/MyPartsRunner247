@@ -97,9 +97,9 @@ const DriverNotifications: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+        <CardTitle className="flex items-center justify-between text-white">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5" />
             Delivery Offers
@@ -107,6 +107,7 @@ const DriverNotifications: React.FC = () => {
           <Button
             variant={isOnline ? "destructive" : "default"}
             onClick={toggleOnlineStatus}
+            className={isOnline ? "bg-red-600 hover:bg-red-700 text-white" : "bg-teal-600 hover:bg-teal-700 text-white"}
           >
             {isOnline ? 'Go Offline' : 'Go Online'}
           </Button>
@@ -114,36 +115,36 @@ const DriverNotifications: React.FC = () => {
       </CardHeader>
       <CardContent>
         {!isOnline ? (
-          <p className="text-center text-gray-500 py-4">
+          <p className="text-center text-gray-300 py-4">
             Go online to receive delivery offers
           </p>
         ) : offers.length === 0 ? (
-          <p className="text-center text-gray-500 py-4">
+          <p className="text-center text-gray-300 py-4">
             No offers available right now
           </p>
         ) : (
           <div className="space-y-4">
             {offers.map((offer) => (
-              <div key={offer.id} className="border rounded-lg p-4 hover:bg-gray-50">
+              <div key={offer.id} className="border border-gray-600 rounded-lg p-4 hover:bg-gray-700 bg-gray-700">
                 <div className="flex justify-between items-start mb-2">
-                  <Badge className="bg-green-100 text-green-800">New Offer</Badge>
-                  <div className="text-xl font-bold text-green-600">
+                  <Badge className="bg-green-600 text-white">New Offer</Badge>
+                  <div className="text-xl font-bold text-green-400">
                     ${offer.total.toFixed(2)}
                   </div>
                 </div>
                 <div className="space-y-2 mb-3">
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
                     <MapPin className="w-4 h-4" />
                     <span className="font-medium">From:</span> {offer.pickupaddress}
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
                     <MapPin className="w-4 h-4" />
                     <span className="font-medium">To:</span> {offer.deliveryaddress}
                   </div>
-                  <div className="text-sm">
+                  <div className="text-sm text-gray-300">
                     <span className="font-medium">Item:</span> {offer.itemdescription}
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Clock className="w-4 h-4" />
                     {new Date(offer.createdat).toLocaleTimeString()}
                   </div>
@@ -151,11 +152,11 @@ const DriverNotifications: React.FC = () => {
                 <div className="flex gap-2">
                   <Button 
                     onClick={() => acceptOffer(offer.id)}
-                    className="flex-1"
+                    className="flex-1 bg-teal-600 hover:bg-teal-700 text-white"
                   >
                     Accept Offer
                   </Button>
-                  <Button variant="outline" className="flex-1">
+                  <Button variant="outline" className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700">
                     View Details
                   </Button>
                 </div>
