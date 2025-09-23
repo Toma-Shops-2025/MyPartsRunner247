@@ -89,8 +89,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
-        {/* Background Image */}
+      <DialogContent className="sm:max-w-lg p-0 overflow-hidden bg-transparent border-none shadow-none">
+        {/* Full Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
@@ -101,17 +101,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
           }}
         />
         
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black/60"></div>
+        {/* Dark Overlay for better text readability */}
+        <div className="absolute inset-0 bg-black/50"></div>
         
-        {/* Content */}
-        <div className="relative z-10 p-6">
+        {/* Dark Sign-in/Sign-up Box */}
+        <div className="relative z-10 p-8 bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg mx-4 my-8">
           <DialogHeader>
-            <DialogTitle className="text-white text-2xl font-bold">Welcome to MyPartsRunner</DialogTitle>
+            <DialogTitle className="text-white text-2xl font-bold text-center mb-6">Welcome to MyPartsRunner</DialogTitle>
           </DialogHeader>
           
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-gray-600">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-gray-600 mb-6">
               <TabsTrigger value="signin" className="text-white data-[state=active]:bg-teal-600 data-[state=active]:text-white">Sign In</TabsTrigger>
               <TabsTrigger value="signup" className="text-white data-[state=active]:bg-teal-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
             </TabsList>
@@ -140,7 +140,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                   className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
-              <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold" disabled={loading}>
+              <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg shadow-lg" disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
@@ -191,7 +191,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
                   className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
-              <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold" disabled={loading}>
+              <Button type="submit" className="w-full bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white font-semibold py-3 rounded-lg shadow-lg" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
