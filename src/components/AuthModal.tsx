@@ -25,7 +25,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -33,16 +33,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
             full_name: fullName,
             phone,
             user_type: 'customer'
-          }
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
         }
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Account created!",
-        description: "Check your email to verify your account.",
-      });
+      // Check if email confirmation is required
+      if (data.user && !data.user.email_confirmed_at) {
+        toast({
+          title: "Account created!",
+          description: "Please check your email to verify your account before signing in.",
+        });
+      } else {
+        toast({
+          title: "Account created!",
+          description: "Your account has been created successfully. You can now sign in.",
+        });
+      }
       
       onSuccess?.();
       onClose();
