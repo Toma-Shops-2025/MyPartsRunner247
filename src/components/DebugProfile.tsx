@@ -14,6 +14,7 @@ const DebugProfile: React.FC = () => {
         <div>Email: {user.email}</div>
         <div>Loading: {loading ? 'Yes' : 'No'}</div>
         <div>Profile: {profile ? 'Exists' : 'Missing'}</div>
+        {loading && <div className="text-yellow-400">⏳ Loading profile...</div>}
         {profile && (
           <>
             <div>User Type: {profile.user_type}</div>

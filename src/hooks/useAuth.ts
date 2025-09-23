@@ -29,6 +29,13 @@ export const useAuth = () => {
       }
     });
 
+    // Set a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 10000); // 10 second timeout
+
+    return () => clearTimeout(timeout);
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -36,6 +43,7 @@ export const useAuth = () => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          setLoading(true);
           await fetchProfile(session.user.id);
         } else {
           setProfile(null);
@@ -73,54 +81,6 @@ export const useAuth = () => {
     }
   };
 
-  const createProfile = async (userId: string) => {
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      const userEmail = userData.user?.email || '';
-      
-      // Check if user signed up as driver by looking at auth metadata
-      // Handle both 'user_type' and 'role' fields from different signup methods
-      const userType = userData.user?.user_metadata?.user_type || 
-                      userData.user?.user_metadata?.role || 
-                      'customer';
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: userId,
-          email: userEmail,
-          full_name: userData.user?.user_metadata?.full_name || '',
-          phone: userData.user?.user_metadata?.phone || '',
-          user_type: userType
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating profile:', error);
-        // Set a basic profile even if creation fails
-        setProfile({
-          id: userId,
-          email: userEmail,
-          full_name: userData.user?.user_metadata?.full_name || '',
-          phone: userData.user?.user_metadata?.phone || '',
-          user_type: userType
-        });
-      } else {
-        setProfile(data);
-      }
-    } catch (error) {
-      console.error('Error creating profile:', error);
-      // Set a basic profile on error
-      setProfile({
-        id: userId,
-        email: '',
-        full_name: '',
-        phone: '',
-        user_type: 'customer'
-      });
-    }
-  };
 
   const updateUserType = async (newUserType: 'customer' | 'driver' | 'merchant') => {
     if (!user) return;
