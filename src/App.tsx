@@ -7,22 +7,14 @@ import { ThemeProvider } from "@/components/theme-provider";
 import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import DriverDashboardPage from "./pages/DriverDashboardPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
+import NewDriverDashboardPage from "./pages/NewDriverDashboardPage";
+import PlaceOrderPage from "./pages/PlaceOrderPage";
 import ProfilePage from "./pages/ProfilePage";
 import EarningsPage from "./pages/EarningsPage";
 import VehicleSettingsPage from "./pages/VehicleSettingsPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
-import AddressesPage from "./pages/AddressesPage";
-import SystemSettingsPage from "./pages/SystemSettingsPage";
 import ServicesPage from "./pages/ServicesPage";
 import AboutPage from "./pages/AboutPage";
-import CareersPage from "./pages/CareersPage";
-import DriverApplicationPage from "./pages/DriverApplicationPage";
-import DriverOnboardingPage from "./pages/DriverOnboardingPage";
-import DriverDocumentsPage from "./pages/DriverDocumentsPage";
-import DriverSchedulePage from "./pages/DriverSchedulePage";
-import DriverTrainingPage from "./pages/DriverTrainingPage";
 import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
 import TermsPage from "./pages/TermsPage";
@@ -44,22 +36,14 @@ const App = () => (
           <DebugProfile />
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/driver-dashboard" element={<DriverDashboardPage />} />
-            <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
+            <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
+            <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/earnings" element={<EarningsPage />} />
             <Route path="/vehicle-settings" element={<VehicleSettingsPage />} />
             <Route path="/my-orders" element={<MyOrdersPage />} />
-            <Route path="/addresses" element={<AddressesPage />} />
-            <Route path="/system-settings" element={<SystemSettingsPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/careers" element={<CareersPage />} />
-            <Route path="/driver-application" element={<DriverApplicationPage />} />
-            <Route path="/driver-onboarding" element={<DriverOnboardingPage />} />
-            <Route path="/driver-documents" element={<DriverDocumentsPage />} />
-            <Route path="/driver-schedule" element={<DriverSchedulePage />} />
-            <Route path="/driver-training" element={<DriverTrainingPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/terms" element={<TermsPage />} />

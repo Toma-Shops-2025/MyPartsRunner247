@@ -1,0 +1,221 @@
+import React, { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { Navigate } from 'react-router-dom';
+import NewHeader from '@/components/NewHeader';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, Package, Clock, DollarSign } from 'lucide-react';
+
+const PlaceOrderPage: React.FC = () => {
+  const { user, profile, loading } = useAuth();
+  const [orderData, setOrderData] = useState({
+    pickupAddress: '',
+    deliveryAddress: '',
+    itemDescription: '',
+    specialInstructions: '',
+    contactPhone: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400"></div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (profile?.user_type !== 'customer') {
+    return <Navigate to="/" replace />;
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Simulate order creation
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      alert('Order placed successfully! A driver will be assigned soon.');
+      
+      // Reset form
+      setOrderData({
+        pickupAddress: '',
+        deliveryAddress: '',
+        itemDescription: '',
+        specialInstructions: '',
+        contactPhone: ''
+      });
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Error placing order. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const calculateEstimate = () => {
+    // Simple calculation - in real app, this would use distance API
+    const baseFee = 8.00;
+    const distanceFee = 2.50;
+    return baseFee + distanceFee;
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900">
+      <NewHeader />
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-4">Place Your Order</h1>
+          <p className="text-gray-300">Get anything delivered from anywhere, anytime</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Order Form */}
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Package className="w-5 h-5" />
+                Order Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <Label htmlFor="pickup" className="text-white">Pickup Address</Label>
+                  <Input
+                    id="pickup"
+                    value={orderData.pickupAddress}
+                    onChange={(e) => setOrderData({...orderData, pickupAddress: e.target.value})}
+                    placeholder="Where should we pick up from?"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="delivery" className="text-white">Delivery Address</Label>
+                  <Input
+                    id="delivery"
+                    value={orderData.deliveryAddress}
+                    onChange={(e) => setOrderData({...orderData, deliveryAddress: e.target.value})}
+                    placeholder="Where should we deliver to?"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="item" className="text-white">Item Description</Label>
+                  <Textarea
+                    id="item"
+                    value={orderData.itemDescription}
+                    onChange={(e) => setOrderData({...orderData, itemDescription: e.target.value})}
+                    placeholder="Describe what needs to be picked up..."
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="phone" className="text-white">Contact Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={orderData.contactPhone}
+                    onChange={(e) => setOrderData({...orderData, contactPhone: e.target.value})}
+                    placeholder="Your phone number"
+                    required
+                    className="bg-gray-700 border-gray-600 text-white"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="instructions" className="text-white">Special Instructions (Optional)</Label>
+                  <Textarea
+                    id="instructions"
+                    value={orderData.specialInstructions}
+                    onChange={(e) => setOrderData({...orderData, specialInstructions: e.target.value})}
+                    placeholder="Any special instructions for pickup or delivery..."
+                    className="bg-gray-700 border-gray-600 text-white"
+                    rows={2}
+                  />
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-teal-600 hover:bg-teal-700"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Placing Order...' : 'Place Order'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Order Summary */}
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <DollarSign className="w-5 h-5" />
+                Order Summary
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-gray-300">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">From: {orderData.pickupAddress || 'Enter pickup address'}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm">To: {orderData.deliveryAddress || 'Enter delivery address'}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-300">
+                  <Package className="w-4 h-4" />
+                  <span className="text-sm">Item: {orderData.itemDescription || 'Describe your item'}</span>
+                </div>
+              </div>
+
+              <hr className="border-gray-600" />
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-gray-300">
+                  <span>Base Fee</span>
+                  <span>$8.00</span>
+                </div>
+                <div className="flex justify-between text-gray-300">
+                  <span>Distance Fee</span>
+                  <span>$2.50</span>
+                </div>
+                <hr className="border-gray-600" />
+                <div className="flex justify-between text-white font-bold text-lg">
+                  <span>Total</span>
+                  <span>${calculateEstimate().toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="bg-teal-900/20 border border-teal-600/30 rounded-lg p-4">
+                <div className="flex items-center gap-2 text-teal-300 text-sm">
+                  <Clock className="w-4 h-4" />
+                  <span>Estimated delivery: 1-2 hours</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default PlaceOrderPage;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import Header from './Header';
+import NewHeader from './NewHeader';
 import HeroSection from './HeroSection';
 import ServicesSection from './ServicesSection';
 import HowItWorksSection from './HowItWorksSection';
@@ -27,7 +27,7 @@ const AppLayout: React.FC = () => {
   // For the main landing page, show the full homepage regardless of user type
   return (
      <div className="min-h-screen bg-gray-900">
-      <Header />
+      <NewHeader />
       <main>
         {user && showOrderTracker ? (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
