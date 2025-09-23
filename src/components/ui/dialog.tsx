@@ -40,6 +40,7 @@ const DialogContent = React.forwardRef<
         className
       )}
       aria-describedby={props["aria-describedby"] || "dialog-description"}
+      aria-label="Dialog"
       {...props}
     >
       <div id="dialog-description" className="sr-only">
