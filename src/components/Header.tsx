@@ -35,9 +35,15 @@ const Header: React.FC = () => {
                 <a href="#how-it-works" className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   How It Works
                 </a>
-                <button onClick={() => handleNavigation('/driver-application')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
-                  Become a Driver
-                </button>
+                {user && profile?.user_type === 'driver' ? (
+                  <button onClick={() => handleNavigation('/driver-dashboard')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
+                    Driver Dashboard
+                  </button>
+                ) : (
+                  <button onClick={() => handleNavigation('/driver-application')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
+                    Become a Driver
+                  </button>
+                )}
                 <button onClick={() => handleNavigation('/about')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   About
                 </button>
@@ -189,13 +195,25 @@ const Header: React.FC = () => {
                           onClick={() => { handleNavigation('/driver-dashboard'); setIsMobileMenuOpen(false); }}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
-                          Driver Dashboard
+                          🚗 Driver Dashboard
                         </button>
                         <button 
                           onClick={() => { handleNavigation('/earnings'); setIsMobileMenuOpen(false); }}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
-                          Earnings
+                          💰 Earnings
+                        </button>
+                        <button 
+                          onClick={() => { handleNavigation('/vehicle-settings'); setIsMobileMenuOpen(false); }}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
+                        >
+                          🚙 Vehicle Settings
+                        </button>
+                        <button 
+                          onClick={() => { handleNavigation('/driver-schedule'); setIsMobileMenuOpen(false); }}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
+                        >
+                          📅 Schedule
                         </button>
                       </>
                     )}
