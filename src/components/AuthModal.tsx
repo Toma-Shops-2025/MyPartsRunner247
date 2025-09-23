@@ -89,40 +89,58 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Welcome to MyPartsRunner</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url("/sign-in-background.webp")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
         
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-          </TabsList>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/60"></div>
+        
+        {/* Content */}
+        <div className="relative z-10 p-6">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl font-bold">Welcome to MyPartsRunner</DialogTitle>
+          </DialogHeader>
+          
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-gray-800 border-gray-600">
+              <TabsTrigger value="signin" className="text-white data-[state=active]:bg-teal-600 data-[state=active]:text-white">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="text-white data-[state=active]:bg-teal-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
+            </TabsList>
           
           <TabsContent value="signin">
             <form onSubmit={handleSignIn} className="space-y-4">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white font-medium">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white font-medium">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold" disabled={loading}>
                 {loading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
@@ -131,45 +149,49 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => 
           <TabsContent value="signup">
             <form onSubmit={handleSignUp} className="space-y-4">
               <div>
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName" className="text-white font-medium">Full Name</Label>
                 <Input
                   id="fullName"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white font-medium">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
               <div>
-                <Label htmlFor="phone">Phone</Label>
+                <Label htmlFor="phone" className="text-white font-medium">Phone</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-white font-medium">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className="bg-gray-800 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold" disabled={loading}>
                 {loading ? 'Creating Account...' : 'Create Account'}
               </Button>
             </form>
