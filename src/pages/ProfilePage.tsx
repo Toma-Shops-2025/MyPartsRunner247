@@ -74,6 +74,41 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleCreateMissingProfile = async () => {
+    if (!user) return;
+    
+    try {
+      // Get user metadata to determine user type
+      const userType = user.user_metadata?.user_type || 
+                      user.user_metadata?.role || 
+                      'customer';
+      
+      // Create the missing profile
+      const { data, error } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email || '',
+          full_name: user.user_metadata?.name || user.user_metadata?.firstName + ' ' + user.user_metadata?.lastName || '',
+          phone: user.user_metadata?.phone || '',
+          user_type: userType
+        })
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error creating profile:', error);
+        alert('Error creating profile: ' + error.message);
+      } else {
+        alert('Profile created successfully! Please refresh the page.');
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-900">
       <Header />
@@ -178,6 +213,12 @@ const ProfilePage: React.FC = () => {
                   className="bg-red-600 hover:bg-red-700 text-white"
                 >
                   Force Driver Update
+                </Button>
+                <Button 
+                  onClick={handleCreateMissingProfile}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Create Missing Profile
                 </Button>
               </div>
               

@@ -25,7 +25,9 @@ const AuthCallbackPage: React.FC = () => {
             .single();
 
           // Check if user signed up as driver from auth metadata
-          const userType = data.session.user?.user_metadata?.user_type;
+          // Handle both 'user_type' and 'role' fields from different signup methods
+          const userType = data.session.user?.user_metadata?.user_type || 
+                          data.session.user?.user_metadata?.role;
           
           if (profileError && !userType) {
             console.error('Profile fetch error:', profileError);

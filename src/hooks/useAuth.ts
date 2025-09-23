@@ -80,7 +80,10 @@ export const useAuth = () => {
       const userEmail = userData.user?.email || '';
       
       // Check if user signed up as driver by looking at auth metadata
-      const userType = userData.user?.user_metadata?.user_type || 'customer';
+      // Handle both 'user_type' and 'role' fields from different signup methods
+      const userType = userData.user?.user_metadata?.user_type || 
+                      userData.user?.user_metadata?.role || 
+                      'customer';
       
       const { data, error } = await supabase
         .from('profiles')
