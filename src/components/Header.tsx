@@ -143,9 +143,9 @@ const Header: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2"
+                className="p-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 hover:border-teal-400"
               >
-                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMobileMenuOpen ? <X className="h-6 w-6 text-white" /> : <Menu className="h-6 w-6 text-white" />}
               </Button>
             </div>
           </div>
