@@ -19,26 +19,26 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className="bg-gray-900 shadow-sm border-b border-gray-700 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
                   MyPartsRunner
                 </h1>
               </div>
               <nav className="hidden md:ml-8 md:flex md:space-x-8">
-                <button onClick={() => handleNavigation('/services')} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+                <button onClick={() => handleNavigation('/services')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   Services
                 </button>
-                <a href="#how-it-works" className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+                <a href="#how-it-works" className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   How It Works
                 </a>
-                <button onClick={() => handleNavigation('/driver-application')} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+                <button onClick={() => handleNavigation('/driver-application')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   Become a Driver
                 </button>
-                <button onClick={() => handleNavigation('/about')} className="text-gray-700 hover:text-teal-600 px-3 py-2 text-sm font-medium">
+                <button onClick={() => handleNavigation('/about')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   About
                 </button>
               </nav>
@@ -152,48 +152,48 @@ const Header: React.FC = () => {
 
           {/* Mobile menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden border-t bg-white">
+            <div className="md:hidden border-t border-gray-700 bg-gray-800">
               <div className="px-2 pt-2 pb-3 space-y-1">
                 <button 
                   onClick={() => { handleNavigation('/services'); setIsMobileMenuOpen(false); }}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                 >
                   Services
                 </button>
                 <a 
                   href="#how-it-works" 
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                  className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                 >
                   How It Works
                 </a>
                 <button 
                   onClick={() => { handleNavigation('/driver-application'); setIsMobileMenuOpen(false); }}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                 >
                   Become a Driver
                 </button>
                 <button 
                   onClick={() => { handleNavigation('/about'); setIsMobileMenuOpen(false); }}
-                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                 >
                   About
                 </button>
                 
-                {user && (
+                {user ? (
                   <>
-                    <hr className="my-2" />
+                    <hr className="my-2 border-gray-600" />
                     {profile?.user_type === 'driver' && (
                       <>
                         <button 
                           onClick={() => { handleNavigation('/driver-dashboard'); setIsMobileMenuOpen(false); }}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
                           Driver Dashboard
                         </button>
                         <button 
                           onClick={() => { handleNavigation('/earnings'); setIsMobileMenuOpen(false); }}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
                           Earnings
                         </button>
@@ -203,7 +203,7 @@ const Header: React.FC = () => {
                       <>
                         <button 
                           onClick={() => { handleNavigation('/my-orders'); setIsMobileMenuOpen(false); }}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
                           My Orders
                         </button>
@@ -211,7 +211,7 @@ const Header: React.FC = () => {
                     )}
                     <button 
                       onClick={() => { handleNavigation('/profile'); setIsMobileMenuOpen(false); }}
-                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                     >
                       Profile
                     </button>
@@ -221,9 +221,19 @@ const Header: React.FC = () => {
                         setIsMobileMenuOpen(false);
                         navigate('/');
                       }}
-                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md"
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                     >
                       Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <hr className="my-2 border-gray-600" />
+                    <button 
+                      onClick={() => { setIsAuthModalOpen(true); setIsMobileMenuOpen(false); }}
+                      className="block w-full text-left px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md"
+                    >
+                      Sign In
                     </button>
                   </>
                 )}
