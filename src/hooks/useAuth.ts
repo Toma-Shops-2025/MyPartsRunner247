@@ -113,10 +113,17 @@ export const useAuth = () => {
       const { data: userData } = await supabase.auth.getUser();
       const userEmail = userData.user?.email || '';
       
-      // Get user type from metadata
-      const userType = userData.user?.user_metadata?.user_type || 
-                      userData.user?.user_metadata?.role || 
-                      'customer';
+      // Determine user type based on email or metadata
+      let userType = 'customer';
+      if (userEmail.includes('driver') || userEmail.includes('taxi')) {
+        userType = 'driver';
+      } else {
+        userType = userData.user?.user_metadata?.user_type || 
+                  userData.user?.user_metadata?.role || 
+                  'customer';
+      }
+      
+      console.log('Creating profile with user type:', userType, 'for email:', userEmail);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -134,6 +141,7 @@ export const useAuth = () => {
         console.error('Error creating profile:', error);
         throw error;
       } else {
+        console.log('Profile created successfully:', data);
         setProfile(data);
         return data;
       }

@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Mail, Phone, MapPin, Save } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Save, Car } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading, updateUserType, createProfileManually } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
@@ -46,27 +47,78 @@ const ProfilePage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  const handleSave = () => {
-    // TODO: Implement profile update
-    setIsEditing(false);
-  };
-
-  const handleForceDriverUpdate = async () => {
-    if (!user) return;
+  const handleSave = async () => {
+    if (!user || !profile) return;
     
     try {
-      // Directly update the profile in the database
       const { error } = await supabase
         .from('profiles')
-        .update({ user_type: 'driver' })
+        .update({
+          full_name: formData.full_name,
+          phone: formData.phone,
+          address: formData.address
+        })
         .eq('id', user.id);
       
       if (error) {
         console.error('Error updating profile:', error);
         alert('Error updating profile: ' + error.message);
       } else {
-        alert('Profile updated to driver! Please refresh the page.');
+        alert('Profile updated successfully!');
+        setIsEditing(false);
+        // Refresh the page to show updated data
         window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error: ' + error);
+    }
+  };
+
+  const handleForceDriverUpdate = async () => {
+    if (!user) return;
+    
+    try {
+      // First check if profile exists
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (existingProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update({ user_type: 'driver' })
+          .eq('id', user.id);
+        
+        if (error) {
+          console.error('Error updating profile:', error);
+          alert('Error updating profile: ' + error.message);
+        } else {
+          alert('Profile updated to driver! Please refresh the page.');
+          window.location.reload();
+        }
+      } else {
+        // Create new profile as driver
+        const { error } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email || '',
+            full_name: '',
+            phone: '',
+            user_type: 'driver'
+          });
+        
+        if (error) {
+          console.error('Error creating driver profile:', error);
+          alert('Error creating profile: ' + error.message);
+        } else {
+          alert('Driver profile created! Please refresh the page.');
+          window.location.reload();
+        }
       }
     } catch (error) {
       console.error('Error:', error);
@@ -169,7 +221,16 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div className="flex justify-between items-center">
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 flex-wrap">
+                {profile?.user_type === 'driver' && (
+                  <Button 
+                    onClick={() => navigate('/driver-dashboard')}
+                    className="bg-teal-600 hover:bg-teal-700 text-white"
+                  >
+                    <Car className="mr-2 h-4 w-4" />
+                    Go to Driver Dashboard
+                  </Button>
+                )}
                 {profile?.user_type === 'customer' && (
                   <Button 
                     onClick={() => updateUserType('driver')}
