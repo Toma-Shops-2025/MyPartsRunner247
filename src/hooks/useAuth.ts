@@ -16,13 +16,17 @@ export const useAuth = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastProcessedUserId, setLastProcessedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    let isProcessing = false;
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
+      if (!mounted || isProcessing) return;
+      isProcessing = true;
+      
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -30,6 +34,8 @@ export const useAuth = () => {
       } else {
         setLoading(false);
       }
+      
+      setTimeout(() => { isProcessing = false; }, 100);
     });
 
     // Set a timeout to prevent infinite loading
@@ -42,7 +48,9 @@ export const useAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted) return;
+        if (!mounted || isProcessing) return;
+        isProcessing = true;
+        
         console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
@@ -54,6 +62,8 @@ export const useAuth = () => {
           setProfile(null);
           setLoading(false);
         }
+        
+        setTimeout(() => { isProcessing = false; }, 100);
       }
     );
 
@@ -65,6 +75,14 @@ export const useAuth = () => {
   }, []);
 
   const fetchProfile = async (userId: string) => {
+    // Prevent duplicate fetches for the same user
+    if (lastProcessedUserId === userId) {
+      console.log('Skipping duplicate profile fetch for user:', userId);
+      return;
+    }
+    
+    setLastProcessedUserId(userId);
+    
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
@@ -77,18 +95,20 @@ export const useAuth = () => {
         console.error('Profile fetch error:', error);
         // Don't auto-create profile, just set loading to false
         setProfile(null);
+        setLoading(false);
       } else if (data) {
         console.log('Profile found:', data);
         setProfile(data);
+        setLoading(false);
       } else {
         console.log('No profile found for user:', userId);
         // No profile found, don't auto-create
         setProfile(null);
+        setLoading(false);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
       setProfile(null);
-    } finally {
       setLoading(false);
     }
   };
