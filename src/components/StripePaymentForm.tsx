@@ -71,15 +71,27 @@ const PaymentForm: React.FC<{
     if (!currentUser) {
       console.log('User not available, attempting to get user from auth...');
       // Try to get user from auth state
-      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      console.log('Auth getUser result:', { authUser: !!authUser, authError, userEmail: authUser?.email });
+      
       if (!authUser) {
-        console.log('No user found in auth state');
-        setError('Please sign in to continue with payment.');
-        setLoading(false);
-        return;
+        console.log('No user found in auth state, trying session...');
+        // Try to get user from session as fallback
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log('Auth getSession result:', { session: !!session, sessionError, userEmail: session?.user?.email });
+        
+        if (!session?.user) {
+          console.log('No user found in session either, sessionError:', sessionError);
+          setError('Please sign in to continue with payment.');
+          setLoading(false);
+          return;
+        }
+        console.log('Found user in session:', session.user.email);
+        currentUser = session.user;
+      } else {
+        console.log('Found user in auth state:', authUser.email);
+        currentUser = authUser;
       }
-      console.log('Found user in auth state:', authUser.email);
-      currentUser = authUser;
     }
 
     setLoading(true);
