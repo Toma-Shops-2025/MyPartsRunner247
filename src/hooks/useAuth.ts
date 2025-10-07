@@ -112,8 +112,10 @@ export const useAuth = () => {
       if (error) {
         console.error('Error updating user type:', error);
       } else {
+        console.log('User type updated successfully to:', newUserType);
         // Refresh profile data
         await fetchProfile(user.id);
+        console.log('Profile refreshed after user type update');
       }
     } catch (error) {
       console.error('Error updating user type:', error);

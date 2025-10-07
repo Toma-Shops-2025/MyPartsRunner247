@@ -28,7 +28,8 @@ const NewHeader: React.FC = () => {
     try {
       await updateUserType('driver');
       alert('Switched to Driver Mode! You can now access driver features.');
-      navigate('/driver-dashboard');
+      // Force a page refresh to update the UI
+      window.location.reload();
     } catch (error) {
       console.error('Error switching to driver mode:', error);
       alert('Error switching to driver mode. Please try again.');
@@ -39,7 +40,8 @@ const NewHeader: React.FC = () => {
     try {
       await updateUserType('customer');
       alert('Switched to Customer Mode! You can now place orders.');
-      navigate('/place-order');
+      // Force a page refresh to update the UI
+      window.location.reload();
     } catch (error) {
       console.error('Error switching to customer mode:', error);
       alert('Error switching to customer mode. Please try again.');
@@ -92,6 +94,10 @@ const NewHeader: React.FC = () => {
                       <div className="font-medium">{profile?.full_name || 'User'}</div>
                       <div className="text-xs text-gray-500">
                         {user.email} • {profile?.user_type || 'customer'}
+                      </div>
+                      {/* Debug info - remove in production */}
+                      <div className="text-xs text-gray-400 mt-1">
+                        Debug: {JSON.stringify({ user_type: profile?.user_type, is_approved: profile?.is_approved, is_online: profile?.is_online })}
                       </div>
                     </DropdownMenuItem>
                     
