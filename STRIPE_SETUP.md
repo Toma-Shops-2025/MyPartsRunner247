@@ -9,6 +9,11 @@ Add these to your `.env` file:
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
 STRIPE_SECRET_KEY=sk_test_your_secret_key_here
 
+# Supabase Configuration
+VITE_SUPABASE_URL=your_supabase_url_here
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
 # Mapbox Configuration (for location features)
 VITE_MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
 ```
@@ -74,3 +79,12 @@ When ready for production:
 - `STRIPE_SECRET_KEY` - **NEVER** expose to client
 - `STRIPE_WEBHOOK_SECRET` - **NEVER** expose to client
 - `SUPABASE_SERVICE_ROLE_KEY` - **NEVER** expose to client
+
+## Getting Your Supabase Service Role Key
+
+1. **Go to Supabase Dashboard**: Navigate to your project
+2. **Settings → API**: Click on the API section
+3. **Copy Service Role Key**: Look for the `service_role` key (starts with `eyJ...`)
+4. **Add to Environment**: Add as `SUPABASE_SERVICE_ROLE_KEY` in Netlify
+
+⚠️ **Important**: The service role key has full database access and bypasses Row Level Security (RLS). Keep it secure and never expose it to client-side code.

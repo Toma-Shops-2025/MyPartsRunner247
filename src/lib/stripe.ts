@@ -52,3 +52,20 @@ export const createPaymentIntent = async (amount: number, metadata: any) => {
     throw error;
   }
 };
+
+// Create Supabase client with service role key for server-side operations
+export const createServiceRoleClient = () => {
+  const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!serviceRoleKey) {
+    throw new Error('Supabase service role key not configured');
+  }
+
+  // This would be used for server-side operations
+  // For now, we'll use the regular client but this shows the pattern
+  return {
+    serviceRoleKey,
+    // In a real server-side implementation, you'd create a Supabase client here
+    // with the service role key for elevated permissions
+  };
+};
