@@ -28,9 +28,17 @@ const PaymentForm: React.FC<{
 }> = ({ amount, orderDetails, onSuccess, onError }) => {
   const stripe = useStripe();
   const elements = useElements();
-  const { user } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  console.log('PaymentForm auth state:', {
+    user: !!user,
+    userEmail: user?.email,
+    profile: !!profile,
+    authLoading,
+    userId: user?.id
+  });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -49,9 +57,18 @@ const PaymentForm: React.FC<{
         user: !!user,
         stripeType: typeof stripe,
         elementsType: typeof elements,
-        userType: typeof user
+        userType: typeof user,
+        authLoading,
+        userEmail: user?.email
       });
       setError('Payment system not ready. Please try again.');
+      setLoading(false);
+      return;
+    }
+    
+    if (authLoading) {
+      console.log('Authentication still loading, please wait...');
+      setError('Please wait for authentication to complete.');
       setLoading(false);
       return;
     }
@@ -184,6 +201,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   onError
 }) => {
   const [stripePromise, setStripePromise] = useState<any>(null);
+  const { user, profile, loading: authLoading } = useAuth();
 
   // Initialize Stripe
   React.useEffect(() => {
@@ -384,6 +402,17 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
         <CardContent className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
           <p>Loading payment system...</p>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (authLoading) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p>Loading user authentication...</p>
         </CardContent>
       </Card>
     );
