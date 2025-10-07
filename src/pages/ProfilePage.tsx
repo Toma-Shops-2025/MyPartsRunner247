@@ -16,8 +16,7 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
-    phone: profile?.phone || '',
-    address: (typeof profile?.address === 'object' && profile?.address?.street) || ''
+    phone: profile?.phone || ''
   });
 
   // Update form data when profile changes
@@ -25,8 +24,7 @@ const ProfilePage: React.FC = () => {
     if (profile) {
       setFormData({
         full_name: profile.full_name || '',
-        phone: profile.phone || '',
-        address: (typeof profile.address === 'object' && profile.address?.street) || ''
+        phone: profile.phone || ''
       });
     }
   }, [profile]);
@@ -82,64 +80,6 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleForceDriverUpdate = async () => {
-    if (!user) return;
-    
-    try {
-      // First check if profile exists
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      if (existingProfile) {
-        // Update existing profile to driver with auto-approval
-        const { error } = await supabase
-          .from('profiles')
-          .update({ 
-            user_type: 'driver',
-            status: 'active',
-            is_online: true,
-            is_approved: true
-          })
-          .eq('id', user.id);
-        
-        if (error) {
-          console.error('Error updating profile:', error);
-          alert('Error updating profile: ' + error.message);
-        } else {
-          alert('Profile updated to driver! Please refresh the page.');
-          window.location.reload();
-        }
-      } else {
-        // Create new profile as driver with auto-approval
-        const { error } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            email: user.email || '',
-            full_name: '',
-            phone: '',
-            user_type: 'driver',
-            status: 'active',
-            is_online: true,
-            is_approved: true
-          });
-        
-        if (error) {
-          console.error('Error creating driver profile:', error);
-          alert('Error creating profile: ' + error.message);
-        } else {
-          alert('Driver profile created! Please refresh the page.');
-          window.location.reload();
-        }
-      }
-    } catch (error: any) {
-      console.error('Error:', error);
-      alert('Error: ' + (error.message || error));
-    }
-  };
 
 
   return (
@@ -208,19 +148,6 @@ const ProfilePage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="address" className="text-white">Address</Label>
-                <div className="flex items-center space-x-2">
-                  <MapPin className="h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="address" 
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    disabled={!isEditing}
-                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
-                  />
-                </div>
-              </div>
             </div>
 
             <div className="flex justify-between items-center">
@@ -250,12 +177,6 @@ const ProfilePage: React.FC = () => {
                     Switch to Customer Mode
                   </Button>
                 )}
-                <Button 
-                  onClick={handleForceDriverUpdate}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                >
-                  Force Driver Update
-                </Button>
               </div>
               
               <div className="flex space-x-4">
