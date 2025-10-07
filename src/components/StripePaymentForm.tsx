@@ -50,16 +50,10 @@ const PaymentForm: React.FC<{
       amount
     });
 
-    if (!stripe || !elements || !user) {
-      console.log('Missing required dependencies:', {
+    if (!stripe || !elements) {
+      console.log('Missing Stripe dependencies:', {
         stripe: !!stripe,
-        elements: !!elements,
-        user: !!user,
-        stripeType: typeof stripe,
-        elementsType: typeof elements,
-        userType: typeof user,
-        authLoading,
-        userEmail: user?.email
+        elements: !!elements
       });
       setError('Payment system not ready. Please try again.');
       setLoading(false);
@@ -72,6 +66,21 @@ const PaymentForm: React.FC<{
       setLoading(false);
       return;
     }
+    
+    let currentUser = user;
+    if (!currentUser) {
+      console.log('User not available, attempting to get user from auth...');
+      // Try to get user from auth state
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        console.log('No user found in auth state');
+        setError('Please sign in to continue with payment.');
+        setLoading(false);
+        return;
+      }
+      console.log('Found user in auth state:', authUser.email);
+      currentUser = authUser;
+    }
 
     setLoading(true);
     setError(null);
@@ -79,7 +88,7 @@ const PaymentForm: React.FC<{
     try {
       // Create payment intent with Stripe
       const paymentIntent = await createPaymentIntent(amount, {
-        customer_id: user.id,
+        customer_id: currentUser.id,
         pickup_address: orderDetails.pickupAddress,
         delivery_address: orderDetails.deliveryAddress,
         item_description: orderDetails.itemDescription,
@@ -93,8 +102,8 @@ const PaymentForm: React.FC<{
           payment_method: {
             card: elements.getElement(CardElement)!,
             billing_details: {
-              name: user.email || 'Customer',
-              email: user.email,
+              name: currentUser.email || 'Customer',
+              email: currentUser.email,
             },
           }
         }
@@ -109,7 +118,7 @@ const PaymentForm: React.FC<{
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert([{
-            customer_id: user.id,
+            customer_id: currentUser.id,
             pickup_address: orderDetails.pickupAddress,
             delivery_address: orderDetails.deliveryAddress,
             item_description: orderDetails.itemDescription,
