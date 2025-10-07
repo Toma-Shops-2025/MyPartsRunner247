@@ -74,21 +74,29 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
+      console.log('Sign in successful:', data.user?.email);
+      
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
       
+      // Force a page refresh to ensure auth state updates
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
       onSuccess?.();
       onClose();
     } catch (error: any) {
+      console.error('Sign in error:', error);
       toast({
         title: "Error",
         description: error.message,

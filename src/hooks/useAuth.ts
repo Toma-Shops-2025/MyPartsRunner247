@@ -39,6 +39,7 @@ export const useAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -57,6 +58,7 @@ export const useAuth = () => {
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -68,8 +70,10 @@ export const useAuth = () => {
         // Don't auto-create profile, just set loading to false
         setProfile(null);
       } else if (data) {
+        console.log('Profile found:', data);
         setProfile(data);
       } else {
+        console.log('No profile found for user:', userId);
         // No profile found, don't auto-create
         setProfile(null);
       }
