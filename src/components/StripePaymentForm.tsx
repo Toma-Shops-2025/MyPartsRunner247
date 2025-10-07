@@ -184,6 +184,11 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   const altStripeKey = import.meta.env.STRIPE_PUBLISHABLE_KEY;
   const altSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
   
+  // More robust check - only show demo mode if keys are truly missing or placeholder
+  // Use primary keys if available, otherwise try alternative keys
+  const finalStripeKey = stripeKey || altStripeKey;
+  const finalSecretKey = stripeSecretKey || altSecretKey;
+  
   // Debug: Log the keys to see what's being loaded
   console.log('Stripe Configuration Check:', {
     stripeKey: stripeKey ? `${stripeKey.substring(0, 12)}...` : 'undefined',
@@ -202,11 +207,6 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     finalStripeKey: finalStripeKey ? `${finalStripeKey.substring(0, 12)}...` : 'undefined',
     isStripeConfigured: 'will be calculated below'
   });
-  
-  // More robust check - only show demo mode if keys are truly missing or placeholder
-  // Use primary keys if available, otherwise try alternative keys
-  const finalStripeKey = stripeKey || altStripeKey;
-  const finalSecretKey = stripeSecretKey || altSecretKey;
   
   // Only check for publishable key on client-side (secret key is server-side only)
   const isStripeConfigured = finalStripeKey && 
