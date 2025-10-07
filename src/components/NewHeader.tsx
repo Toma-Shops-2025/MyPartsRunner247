@@ -129,11 +129,6 @@ const NewHeader: React.FC = () => {
                           <Package className="mr-2 h-4 w-4" />
                           My Orders
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSwitchToDriver}>
-                          <Switch className="mr-2 h-4 w-4" />
-                          Switch to Driver Mode
-                        </DropdownMenuItem>
                       </>
                     )}
                     
@@ -239,13 +234,6 @@ const NewHeader: React.FC = () => {
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
                           📋 My Orders
-                        </button>
-                        <hr className="my-2 border-gray-600" />
-                        <button 
-                          onClick={handleSwitchToDriver}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
-                        >
-                          🔄 Switch to Driver Mode
                         </button>
                       </>
                     )}

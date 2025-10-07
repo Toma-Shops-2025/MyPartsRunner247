@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Save, Upload } from 'lucide-react';
+import { Car, Save, Upload, CheckCircle, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const VehicleSettingsPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -20,6 +21,17 @@ const VehicleSettingsPage: React.FC = () => {
     insurance_number: 'INS-789456',
     vehicle_type: 'sedan'
   });
+  const [uploadedFiles, setUploadedFiles] = useState({
+    registration: null as File | null,
+    insurance: null as File | null
+  });
+  const [uploadStatus, setUploadStatus] = useState({
+    registration: 'pending' as 'pending' | 'uploading' | 'success' | 'error',
+    insurance: 'pending' as 'pending' | 'uploading' | 'success' | 'error'
+  });
+  const [saving, setSaving] = useState(false);
+  const registrationInputRef = useRef<HTMLInputElement>(null);
+  const insuranceInputRef = useRef<HTMLInputElement>(null);
 
   if (loading) {
     return (
@@ -33,9 +45,79 @@ const VehicleSettingsPage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  const handleSave = () => {
-    // TODO: Implement vehicle settings update
-    console.log('Saving vehicle settings:', vehicleData);
+  const handleFileUpload = async (type: 'registration' | 'insurance', file: File) => {
+    setUploadStatus(prev => ({ ...prev, [type]: 'uploading' }));
+    
+    try {
+      // Create a unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}_${type}_${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('vehicle-documents')
+        .upload(fileName, file);
+      
+      if (error) throw error;
+      
+      // Update state
+      setUploadedFiles(prev => ({ ...prev, [type]: file }));
+      setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
+      
+      console.log(`${type} uploaded successfully:`, data);
+    } catch (error) {
+      console.error(`Error uploading ${type}:`, error);
+      setUploadStatus(prev => ({ ...prev, [type]: 'error' }));
+    }
+  };
+
+  const handleFileSelect = (type: 'registration' | 'insurance') => {
+    const input = type === 'registration' ? registrationInputRef.current : insuranceInputRef.current;
+    if (input) {
+      input.click();
+    }
+  };
+
+  const handleFileChange = (type: 'registration' | 'insurance', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleFileUpload(type, file);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    
+    try {
+      // Update vehicle info in profile
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          vehicle_info: {
+            make: vehicleData.make,
+            model: vehicleData.model,
+            year: vehicleData.year,
+            color: vehicleData.color,
+            license_plate: vehicleData.license_plate,
+            insurance_number: vehicleData.insurance_number,
+            vehicle_type: vehicleData.vehicle_type,
+            registration_uploaded: uploadStatus.registration === 'success',
+            insurance_uploaded: uploadStatus.insurance === 'success'
+          }
+        })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      alert('Vehicle settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving vehicle settings:', error);
+      alert('Error saving vehicle settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -138,21 +220,83 @@ const VehicleSettingsPage: React.FC = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
+                  uploadStatus.registration === 'success' ? 'border-green-300 bg-green-50' :
+                  uploadStatus.registration === 'error' ? 'border-red-300 bg-red-50' :
+                  uploadStatus.registration === 'uploading' ? 'border-blue-300 bg-blue-50' :
+                  'border-gray-300'
+                }`}>
+                  {uploadStatus.registration === 'success' ? (
+                    <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
+                  ) : uploadStatus.registration === 'error' ? (
+                    <X className="mx-auto h-12 w-12 text-red-500 mb-4" />
+                  ) : uploadStatus.registration === 'uploading' ? (
+                    <div className="mx-auto h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  ) : (
+                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  )}
                   <p className="text-sm font-medium">Vehicle Registration</p>
-                  <p className="text-xs text-gray-500">Upload your vehicle registration document</p>
-                  <Button variant="outline" size="sm" className="mt-2">
-                    Upload File
+                  <p className="text-xs text-gray-500">
+                    {uploadStatus.registration === 'success' ? 'File uploaded successfully!' :
+                     uploadStatus.registration === 'error' ? 'Upload failed. Please try again.' :
+                     uploadStatus.registration === 'uploading' ? 'Uploading...' :
+                     'Upload your vehicle registration document'}
+                  </p>
+                  <input
+                    ref={registrationInputRef}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => handleFileChange('registration', e)}
+                    className="hidden"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => handleFileSelect('registration')}
+                    disabled={uploadStatus.registration === 'uploading'}
+                  >
+                    {uploadStatus.registration === 'uploading' ? 'Uploading...' : 'Upload File'}
                   </Button>
                 </div>
 
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
+                  uploadStatus.insurance === 'success' ? 'border-green-300 bg-green-50' :
+                  uploadStatus.insurance === 'error' ? 'border-red-300 bg-red-50' :
+                  uploadStatus.insurance === 'uploading' ? 'border-blue-300 bg-blue-50' :
+                  'border-gray-300'
+                }`}>
+                  {uploadStatus.insurance === 'success' ? (
+                    <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
+                  ) : uploadStatus.insurance === 'error' ? (
+                    <X className="mx-auto h-12 w-12 text-red-500 mb-4" />
+                  ) : uploadStatus.insurance === 'uploading' ? (
+                    <div className="mx-auto h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                  ) : (
+                    <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  )}
                   <p className="text-sm font-medium">Insurance Certificate</p>
-                  <p className="text-xs text-gray-500">Upload your insurance certificate</p>
-                  <Button variant="outline" size="sm" className="mt-2">
-                    Upload File
+                  <p className="text-xs text-gray-500">
+                    {uploadStatus.insurance === 'success' ? 'File uploaded successfully!' :
+                     uploadStatus.insurance === 'error' ? 'Upload failed. Please try again.' :
+                     uploadStatus.insurance === 'uploading' ? 'Uploading...' :
+                     'Upload your insurance certificate'}
+                  </p>
+                  <input
+                    ref={insuranceInputRef}
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => handleFileChange('insurance', e)}
+                    className="hidden"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => handleFileSelect('insurance')}
+                    disabled={uploadStatus.insurance === 'uploading'}
+                  >
+                    {uploadStatus.insurance === 'uploading' ? 'Uploading...' : 'Upload File'}
                   </Button>
                 </div>
               </div>
@@ -160,9 +304,22 @@ const VehicleSettingsPage: React.FC = () => {
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={handleSave} className="w-full md:w-auto">
-              <Save className="mr-2 h-4 w-4" />
-              Save Vehicle Settings
+            <Button 
+              onClick={handleSave} 
+              className="w-full md:w-auto"
+              disabled={saving}
+            >
+              {saving ? (
+                <>
+                  <div className="mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Vehicle Settings
+                </>
+              )}
             </Button>
           </div>
         </div>

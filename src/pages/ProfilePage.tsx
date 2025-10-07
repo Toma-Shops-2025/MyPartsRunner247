@@ -140,18 +140,6 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleCreateMissingProfile = async () => {
-    if (!user) return;
-    
-    try {
-      await createProfileManually();
-      alert('Profile created successfully! Please refresh the page.');
-      window.location.reload();
-    } catch (error: any) {
-      console.error('Error:', error);
-      alert('Error creating profile: ' + (error.message || error));
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -266,12 +254,6 @@ const ProfilePage: React.FC = () => {
                   className="bg-red-600 hover:bg-red-700 text-white"
                 >
                   Force Driver Update
-                </Button>
-                <Button 
-                  onClick={handleCreateMissingProfile}
-                  className="bg-green-600 hover:bg-green-700 text-white"
-                >
-                  Create Missing Profile
                 </Button>
               </div>
               
