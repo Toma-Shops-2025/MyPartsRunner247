@@ -34,8 +34,20 @@ const PaymentForm: React.FC<{
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    console.log('Payment form submitted!', {
+      stripe: !!stripe,
+      elements: !!elements,
+      user: !!user,
+      amount
+    });
 
     if (!stripe || !elements || !user) {
+      console.log('Missing required dependencies:', {
+        stripe: !!stripe,
+        elements: !!elements,
+        user: !!user
+      });
       return;
     }
 
@@ -152,6 +164,7 @@ const PaymentForm: React.FC<{
         type="submit" 
         disabled={!stripe || loading}
         className="w-full"
+        onClick={() => console.log('Payment button clicked!', { stripe: !!stripe, loading, amount })}
       >
         {loading ? 'Processing Payment...' : `Pay $${amount.toFixed(2)}`}
       </Button>
@@ -170,8 +183,14 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   // Initialize Stripe
   React.useEffect(() => {
     const initStripe = async () => {
-      const stripe = await getStripe();
-      setStripePromise(stripe);
+      console.log('Initializing Stripe...');
+      try {
+        const stripe = await getStripe();
+        console.log('Stripe initialized:', !!stripe);
+        setStripePromise(stripe);
+      } catch (error) {
+        console.error('Stripe initialization error:', error);
+      }
     };
     initStripe();
   }, []);
@@ -217,7 +236,15 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   console.log('Final Stripe Configuration Result:', {
     isStripeConfigured,
     finalStripeKey: finalStripeKey ? `${finalStripeKey.substring(0, 12)}...` : 'undefined',
-    willShowDemoMode: !isStripeConfigured
+    willShowDemoMode: !isStripeConfigured,
+    keyChecks: {
+      hasKey: !!finalStripeKey,
+      notPlaceholder: finalStripeKey !== 'pk_test_placeholder',
+      notYourKey: finalStripeKey !== 'your_publishable_key_here',
+      startsWithPk: finalStripeKey?.startsWith('pk_'),
+      isTest: finalStripeKey?.startsWith('pk_test_'),
+      isLive: finalStripeKey?.startsWith('pk_live_')
+    }
   });
   
   if (!isStripeConfigured) {
