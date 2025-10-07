@@ -202,7 +202,7 @@ const PlaceOrderPage: React.FC = () => {
                     id="instructions"
                     value={orderData.specialInstructions}
                     onChange={(e) => setOrderData({...orderData, specialInstructions: e.target.value})}
-                    placeholder="Any special instructions for pickup or delivery..."
+                    placeholder="Add apt #, gate code, or any other special instructions"
                     className="bg-gray-700 border-gray-600 text-white"
                     rows={2}
                   />

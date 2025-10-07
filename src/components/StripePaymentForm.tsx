@@ -46,8 +46,13 @@ const PaymentForm: React.FC<{
       console.log('Missing required dependencies:', {
         stripe: !!stripe,
         elements: !!elements,
-        user: !!user
+        user: !!user,
+        stripeType: typeof stripe,
+        elementsType: typeof elements,
+        userType: typeof user
       });
+      setError('Payment system not ready. Please try again.');
+      setLoading(false);
       return;
     }
 

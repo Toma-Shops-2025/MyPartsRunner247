@@ -258,7 +258,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Final details</h3>
               <Textarea
-                placeholder="Special instructions (optional)"
+                placeholder="Add apt #, gate code, or any other special instructions"
                 value={formData.specialInstructions}
                 onChange={(e) => setFormData({...formData, specialInstructions: e.target.value})}
                 className="h-20"
