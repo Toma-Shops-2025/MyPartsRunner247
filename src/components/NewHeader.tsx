@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import NewAuthModal from './NewAuthModal';
-import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, Switch } from 'lucide-react';
+import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewHeader: React.FC = () => {
@@ -112,7 +112,7 @@ const NewHeader: React.FC = () => {
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSwitchToCustomer}>
-                          <Switch className="mr-2 h-4 w-4" />
+                          <ArrowRightLeft className="mr-2 h-4 w-4" />
                           Switch to Customer Mode
                         </DropdownMenuItem>
                       </>
