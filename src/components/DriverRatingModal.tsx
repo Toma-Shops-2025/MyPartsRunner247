@@ -32,15 +32,17 @@ const DriverRatingModal: React.FC<DriverRatingModalProps> = ({
 
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('update-driver-rating', {
-        body: {
-          driverId,
-          customerId,
-          orderId,
-          rating,
-          comment: comment.trim() || null
-        }
-      });
+      // Direct database update instead of Edge Function
+      const { data, error } = await supabase
+        .from('driver_ratings')
+        .insert([{
+          driver_id: driverId,
+          customer_id: customerId,
+          order_id: orderId,
+          rating: rating,
+          comment: comment.trim() || null,
+          created_at: new Date().toISOString()
+        }]);
 
       if (error) throw error;
 

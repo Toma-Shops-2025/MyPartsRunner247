@@ -37,16 +37,17 @@ const NearbyOrdersPanel: React.FC = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('find-nearby-orders', {
-        body: {
-          driverLat: driverLocation.lat,
-          driverLon: driverLocation.lng,
-          maxDistance: 15 // 15km radius
-        }
-      });
+      // Direct database query instead of Edge Function
+      // For now, get all pending orders (in production, you'd implement proper distance calculation)
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(10);
 
       if (error) throw error;
-      setNearbyOrders(data.orders || []);
+      setNearbyOrders(data || []);
     } catch (error) {
       console.error('Error fetching nearby orders:', error);
     } finally {

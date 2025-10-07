@@ -46,63 +46,36 @@ const PaymentForm: React.FC<{
     setError(null);
 
     try {
-      // Create payment intent
-      const { data: paymentIntent, error: paymentError } = await supabase.functions
-        .invoke('create-payment-intent', {
-          body: { 
-            amount: Math.round(amount * 100),
-            currency: 'usd',
-            metadata: {
-              customer_id: user.id,
-              pickup_address: orderDetails.pickupAddress,
-              delivery_address: orderDetails.deliveryAddress,
-              item_description: orderDetails.itemDescription,
-              urgency: orderDetails.urgency
-            }
-          }
-        });
+      // For demo purposes, simulate payment processing
+      // In production, you would integrate with Stripe properly
+      console.log('Processing payment for amount:', amount);
+      
+      // Simulate payment processing delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Create order in database directly (bypassing Stripe for now)
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert([{
+          customer_id: user.id,
+          pickup_address: orderDetails.pickupAddress,
+          delivery_address: orderDetails.deliveryAddress,
+          item_description: orderDetails.itemDescription,
+          total: amount,
+          status: 'pending',
+          urgency: orderDetails.urgency,
+          payment_method: 'demo_payment',
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
 
-      if (paymentError) throw paymentError;
-
-      // Confirm payment with Stripe
-      const { error: stripeError, paymentIntent: confirmedPayment } = await stripe.confirmCardPayment(
-        paymentIntent.client_secret,
-        {
-          payment_method: {
-            card: elements.getElement(CardElement)!,
-            billing_details: {
-              name: user.email || 'Customer',
-            },
-          }
-        }
-      );
-
-      if (stripeError) {
-        throw new Error(stripeError.message);
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        throw new Error('Failed to create order. Please try again.');
       }
 
-      if (confirmedPayment.status === 'succeeded') {
-        // Create order in database
-        const { data: order, error: orderError } = await supabase
-          .from('orders')
-          .insert([{
-            customerid: user.id,
-            pickupaddress: orderDetails.pickupAddress,
-            deliveryaddress: orderDetails.deliveryAddress,
-            itemdescription: orderDetails.itemDescription,
-            total: amount,
-            status: 'pending',
-            urgency: orderDetails.urgency,
-            paymentintentid: confirmedPayment.id,
-            createdat: new Date().toISOString()
-          }])
-          .select()
-          .single();
-
-        if (orderError) throw orderError;
-
-        onSuccess(order.id);
-      }
+      onSuccess(order.id);
     } catch (err: any) {
       console.error('Payment error:', err);
       const errorMessage = err.message || 'Payment failed. Please try again.';
