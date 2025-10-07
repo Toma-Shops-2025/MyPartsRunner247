@@ -198,7 +198,9 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     isTestKey: stripeKey?.startsWith('pk_test_'),
     isLiveKey: stripeKey?.startsWith('pk_live_'),
     fullStripeKey: stripeKey, // Show full key for debugging
-    allEnvVars: Object.keys(import.meta.env).filter(key => key.includes('STRIPE'))
+    allEnvVars: Object.keys(import.meta.env).filter(key => key.includes('STRIPE')),
+    finalStripeKey: finalStripeKey ? `${finalStripeKey.substring(0, 12)}...` : 'undefined',
+    isStripeConfigured: 'will be calculated below'
   });
   
   // More robust check - only show demo mode if keys are truly missing or placeholder
@@ -206,14 +208,17 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   const finalStripeKey = stripeKey || altStripeKey;
   const finalSecretKey = stripeSecretKey || altSecretKey;
   
+  // Only check for publishable key on client-side (secret key is server-side only)
   const isStripeConfigured = finalStripeKey && 
     finalStripeKey !== 'pk_test_placeholder' && 
     finalStripeKey !== 'your_publishable_key_here' &&
-    (finalStripeKey.startsWith('pk_test_') || finalStripeKey.startsWith('pk_live_')) &&
-    finalSecretKey &&
-    finalSecretKey !== 'sk_test_placeholder' &&
-    finalSecretKey !== 'your_secret_key_here' &&
-    (finalSecretKey.startsWith('sk_test_') || finalSecretKey.startsWith('sk_live_'));
+    (finalStripeKey.startsWith('pk_test_') || finalStripeKey.startsWith('pk_live_'));
+  
+  console.log('Final Stripe Configuration Result:', {
+    isStripeConfigured,
+    finalStripeKey: finalStripeKey ? `${finalStripeKey.substring(0, 12)}...` : 'undefined',
+    willShowDemoMode: !isStripeConfigured
+  });
   
   if (!isStripeConfigured) {
     return (
