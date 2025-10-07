@@ -28,15 +28,75 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   const [sizeMultiplier, setSizeMultiplier] = useState<number>(1);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-  // Calculate distance (simplified - in real app, use Google Maps API)
+  // Calculate distance using Mapbox Matrix API
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
-      // Mock distance calculation - replace with actual API call
-      const mockDistance = Math.random() * 20 + 1; // 1-21 miles
-      setDistance(mockDistance);
-      setDistancePrice(mockDistance * 0.75); // $0.75 per mile (reduced from $1.25)
+      calculateRealDistance();
     }
   }, [pickupAddress, deliveryAddress]);
+
+  const calculateRealDistance = async () => {
+    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    
+    if (!mapboxToken) {
+      // Fallback to deterministic calculation if no Mapbox token
+      const addressHash = (pickupAddress + deliveryAddress).split('').reduce((hash, char) => {
+        return ((hash << 5) - hash + char.charCodeAt(0)) & 0xffffffff;
+      }, 0);
+      
+      const mockDistance = Math.abs(addressHash % 1400) / 100 + 1; // 1-15 miles
+      setDistance(mockDistance);
+      setDistancePrice(mockDistance * 0.75);
+      return;
+    }
+
+    try {
+      // First, geocode both addresses to get coordinates
+      const [pickupResponse, deliveryResponse] = await Promise.all([
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(pickupAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`),
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(deliveryAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`)
+      ]);
+
+      const [pickupData, deliveryData] = await Promise.all([
+        pickupResponse.json(),
+        deliveryResponse.json()
+      ]);
+
+      if (pickupData.features.length === 0 || deliveryData.features.length === 0) {
+        throw new Error('Could not find coordinates for addresses');
+      }
+
+      const pickupCoords = pickupData.features[0].center; // [lng, lat]
+      const deliveryCoords = deliveryData.features[0].center; // [lng, lat]
+
+      // Use Mapbox Matrix API to get driving distance
+      const matrixResponse = await fetch(
+        `https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${pickupCoords[0]},${pickupCoords[1]};${deliveryCoords[0]},${deliveryCoords[1]}?access_token=${mapboxToken}&sources=0&destinations=1&annotations=distance`
+      );
+
+      const matrixData = await matrixResponse.json();
+      
+      if (matrixData.distances && matrixData.distances[0] && matrixData.distances[0][0]) {
+        const distanceInMeters = matrixData.distances[0][0];
+        const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
+        
+        setDistance(distanceInMiles);
+        setDistancePrice(distanceInMiles * 0.75); // $0.75 per mile
+      } else {
+        throw new Error('Could not calculate distance');
+      }
+    } catch (error) {
+      console.error('Distance calculation error:', error);
+      // Fallback to deterministic calculation
+      const addressHash = (pickupAddress + deliveryAddress).split('').reduce((hash, char) => {
+        return ((hash << 5) - hash + char.charCodeAt(0)) & 0xffffffff;
+      }, 0);
+      
+      const mockDistance = Math.abs(addressHash % 1400) / 100 + 1;
+      setDistance(mockDistance);
+      setDistancePrice(mockDistance * 0.75);
+    }
+  };
 
   // Calculate urgency multiplier
   useEffect(() => {

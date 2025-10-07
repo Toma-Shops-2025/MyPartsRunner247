@@ -249,17 +249,30 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
               <span>Your payment information is secure and encrypted</span>
             </div>
 
-            <Button 
-              onClick={() => {
-                // Simulate successful payment
-                setTimeout(() => {
-                  onSuccess('demo-order-' + Date.now());
-                }, 1000);
-              }}
-              className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
-            >
-              Pay ${amount.toFixed(2)} (Demo)
-            </Button>
+            <div className="space-y-2">
+              <Button 
+                onClick={() => {
+                  // Simulate successful payment
+                  setTimeout(() => {
+                    onSuccess('demo-order-' + Date.now());
+                  }, 1000);
+                }}
+                className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
+              >
+                Pay ${amount.toFixed(2)} (Demo)
+              </Button>
+              
+              <Button 
+                onClick={() => {
+                  // Skip payment entirely
+                  onSuccess('skip-payment-' + Date.now());
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                🚀 Skip Payment (Test Mode)
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

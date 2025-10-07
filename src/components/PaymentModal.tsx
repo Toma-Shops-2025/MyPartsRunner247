@@ -172,13 +172,24 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             Your payment information is secure and encrypted
           </div>
 
-          <Button 
-            onClick={handlePayment} 
-            disabled={loading}
-            className="w-full"
-          >
-            {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
-          </Button>
+          <div className="space-y-2">
+            <Button 
+              onClick={handlePayment} 
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
+            </Button>
+            
+            <Button 
+              onClick={handlePayment} 
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              🚀 Skip Payment (Demo)
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

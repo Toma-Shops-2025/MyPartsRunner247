@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/hooks/useLocation';
 import { Navigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { supabase } from '@/lib/supabase';
@@ -8,10 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Package, Clock, DollarSign } from 'lucide-react';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { MapPin, Package, Clock, DollarSign, Navigation } from 'lucide-react';
 
 const PlaceOrderPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const { location: userLocation, loading: locationLoading } = useLocation();
   const [orderData, setOrderData] = useState({
     pickupAddress: '',
     deliveryAddress: '',
@@ -19,6 +22,8 @@ const PlaceOrderPage: React.FC = () => {
     specialInstructions: '',
     contactPhone: ''
   });
+  const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [deliveryCoordinates, setDeliveryCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (loading) {
@@ -51,7 +56,7 @@ const PlaceOrderPage: React.FC = () => {
             pickup_address: orderData.pickupAddress,
             delivery_address: orderData.deliveryAddress,
             item_description: orderData.itemDescription,
-            total: calculateEstimatedCost(),
+            total: calculateEstimate(),
             status: 'pending',
             special_instructions: orderData.specialInstructions,
             contact_phone: orderData.contactPhone,
@@ -98,6 +103,20 @@ const PlaceOrderPage: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-4">Place Your Order</h1>
           <p className="text-gray-300">Get anything delivered from anywhere, anytime</p>
+          {userLocation && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-teal-900/20 border border-teal-600/30 rounded-lg">
+              <MapPin className="w-4 h-4 text-teal-400" />
+              <span className="text-teal-300 text-sm">
+                Currently serving: <strong>{userLocation.city}, {userLocation.state}</strong>
+              </span>
+            </div>
+          )}
+          {locationLoading && (
+            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-400"></div>
+              <span className="text-gray-300 text-sm">Detecting your location...</span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -113,25 +132,41 @@ const PlaceOrderPage: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <Label htmlFor="pickup" className="text-white">Pickup Address</Label>
-                  <Input
-                    id="pickup"
+                  <AddressAutocomplete
                     value={orderData.pickupAddress}
-                    onChange={(e) => setOrderData({...orderData, pickupAddress: e.target.value})}
+                    onChange={(address) => setOrderData({...orderData, pickupAddress: address})}
+                    onSelect={(address, coordinates) => {
+                      setOrderData({...orderData, pickupAddress: address});
+                      setPickupCoordinates(coordinates);
+                    }}
                     placeholder="Where should we pick up from?"
-                    required
-                    className="bg-gray-700 border-gray-600 text-white"
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    onUseCurrentLocation={() => {
+                      if (userLocation) {
+                        setOrderData({...orderData, pickupAddress: userLocation.formattedAddress});
+                        setPickupCoordinates({ lat: userLocation.lat, lng: userLocation.lng });
+                      }
+                    }}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="delivery" className="text-white">Delivery Address</Label>
-                  <Input
-                    id="delivery"
+                  <AddressAutocomplete
                     value={orderData.deliveryAddress}
-                    onChange={(e) => setOrderData({...orderData, deliveryAddress: e.target.value})}
+                    onChange={(address) => setOrderData({...orderData, deliveryAddress: address})}
+                    onSelect={(address, coordinates) => {
+                      setOrderData({...orderData, deliveryAddress: address});
+                      setDeliveryCoordinates(coordinates);
+                    }}
                     placeholder="Where should we deliver to?"
-                    required
-                    className="bg-gray-700 border-gray-600 text-white"
+                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    onUseCurrentLocation={() => {
+                      if (userLocation) {
+                        setOrderData({...orderData, deliveryAddress: userLocation.formattedAddress});
+                        setDeliveryCoordinates({ lat: userLocation.lat, lng: userLocation.lng });
+                      }
+                    }}
                   />
                 </div>
 
