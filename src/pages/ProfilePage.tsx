@@ -51,13 +51,19 @@ const ProfilePage: React.FC = () => {
     if (!user || !profile) return;
     
     try {
+      const updateData: any = {
+        full_name: formData.full_name,
+        phone: formData.phone
+      };
+      
+      // Only update address if it's not empty
+      if (formData.address && formData.address.trim()) {
+        updateData.address = { street: formData.address.trim() };
+      }
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          full_name: formData.full_name,
-          phone: formData.phone,
-          address: formData.address ? { street: formData.address } : null
-        })
+        .update(updateData)
         .eq('id', user.id);
       
       if (error) {
@@ -69,9 +75,9 @@ const ProfilePage: React.FC = () => {
         // Refresh the page to show updated data
         window.location.reload();
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
-      alert('Error: ' + error);
+      alert('Error: ' + (error.message || error));
     }
   };
 
@@ -128,9 +134,9 @@ const ProfilePage: React.FC = () => {
           window.location.reload();
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
-      alert('Error: ' + error);
+      alert('Error: ' + (error.message || error));
     }
   };
 
@@ -141,9 +147,9 @@ const ProfilePage: React.FC = () => {
       await createProfileManually();
       alert('Profile created successfully! Please refresh the page.');
       window.location.reload();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error);
-      alert('Error creating profile: ' + error);
+      alert('Error creating profile: ' + (error.message || error));
     }
   };
 

@@ -156,15 +156,15 @@ export const useAuth = () => {
 
       if (error) {
         console.error('Error creating profile:', error);
-        throw error;
+        throw new Error(error.message || 'Failed to create profile');
       } else {
         console.log('Profile created successfully:', data);
         setProfile(data);
         return data;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating profile:', error);
-      throw error;
+      throw new Error(error.message || 'Failed to create profile');
     }
   };
 
