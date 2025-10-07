@@ -20,7 +20,7 @@ export const getStripe = () => {
 
 // Create payment intent using Stripe API directly
 export const createPaymentIntent = async (amount: number, metadata: any) => {
-  const stripeSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
+  const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
   
   if (!stripeSecretKey) {
     throw new Error('Stripe secret key not configured');

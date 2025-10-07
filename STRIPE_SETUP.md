@@ -7,7 +7,7 @@ Add these to your `.env` file:
 ```env
 # Stripe Configuration
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
-VITE_STRIPE_SECRET_KEY=sk_test_your_secret_key_here
+STRIPE_SECRET_KEY=sk_test_your_secret_key_here
 
 # Mapbox Configuration (for location features)
 VITE_MAPBOX_ACCESS_TOKEN=your_mapbox_token_here
@@ -58,7 +58,19 @@ When ready for production:
 
 ## Security Notes
 
-- Secret keys are only used server-side (in the payment intent creation)
-- Publishable keys are safe to use client-side
+- **Secret keys** (`STRIPE_SECRET_KEY`) are server-side only and never exposed to client
+- **Publishable keys** (`VITE_STRIPE_PUBLISHABLE_KEY`) are safe to use client-side
 - All payment data is handled securely by Stripe
 - No sensitive payment information is stored in your database
+
+## Environment Variable Security
+
+### ✅ **Safe for Client-Side (VITE_ prefix):**
+- `VITE_STRIPE_PUBLISHABLE_KEY` - Safe to expose
+- `VITE_MAPBOX_ACCESS_TOKEN` - Safe to expose
+- `VITE_SUPABASE_ANON_KEY` - Safe to expose
+
+### 🔒 **Server-Side Only (NO VITE_ prefix):**
+- `STRIPE_SECRET_KEY` - **NEVER** expose to client
+- `STRIPE_WEBHOOK_SECRET` - **NEVER** expose to client
+- `SUPABASE_SERVICE_ROLE_KEY` - **NEVER** expose to client

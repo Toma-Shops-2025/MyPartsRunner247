@@ -178,7 +178,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
 
   // Check if Stripe is properly configured
   const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-  const stripeSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
+  const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
   
   if (!stripeKey || stripeKey === 'pk_test_placeholder' || !stripeSecretKey) {
     return (
