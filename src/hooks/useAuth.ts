@@ -132,7 +132,10 @@ export const useAuth = () => {
           email: userEmail,
           full_name: userData.user?.user_metadata?.full_name || userData.user?.user_metadata?.name || '',
           phone: userData.user?.user_metadata?.phone || '',
-          user_type: userType
+          user_type: userType,
+          status: userType === 'driver' ? 'active' : 'inactive',
+          is_online: userType === 'driver' ? true : false,
+          is_approved: userType === 'driver' ? true : false
         })
         .select()
         .single();

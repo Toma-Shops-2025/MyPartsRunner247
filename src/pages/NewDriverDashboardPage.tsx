@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
+import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle } from 'lucide-react';
@@ -77,8 +78,15 @@ const NewDriverDashboardPage: React.FC = () => {
                 <div>
                   <p className="text-gray-400 text-sm">Active</p>
                   <p className="text-2xl font-bold text-white">{driverStats.activeDeliveries}</p>
+                  {profile?.is_online && (
+                    <p className="text-xs text-green-400 mt-1">✓ Online & Ready</p>
+                  )}
                 </div>
-                <AlertCircle className="w-8 h-8 text-yellow-400" />
+                {profile?.is_online ? (
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                ) : (
+                  <AlertCircle className="w-8 h-8 text-yellow-400" />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -94,6 +102,11 @@ const NewDriverDashboardPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Driver Notifications */}
+        <div className="mb-8">
+          <DriverNotificationSystem />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

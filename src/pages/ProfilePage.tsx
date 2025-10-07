@@ -87,10 +87,15 @@ const ProfilePage: React.FC = () => {
         .single();
       
       if (existingProfile) {
-        // Update existing profile
+        // Update existing profile to driver with auto-approval
         const { error } = await supabase
           .from('profiles')
-          .update({ user_type: 'driver' })
+          .update({ 
+            user_type: 'driver',
+            status: 'active',
+            is_online: true,
+            is_approved: true
+          })
           .eq('id', user.id);
         
         if (error) {
@@ -101,7 +106,7 @@ const ProfilePage: React.FC = () => {
           window.location.reload();
         }
       } else {
-        // Create new profile as driver
+        // Create new profile as driver with auto-approval
         const { error } = await supabase
           .from('profiles')
           .insert({
@@ -109,7 +114,10 @@ const ProfilePage: React.FC = () => {
             email: user.email || '',
             full_name: '',
             phone: '',
-            user_type: 'driver'
+            user_type: 'driver',
+            status: 'active',
+            is_online: true,
+            is_approved: true
           });
         
         if (error) {
