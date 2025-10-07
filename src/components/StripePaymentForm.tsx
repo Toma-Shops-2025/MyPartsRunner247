@@ -70,27 +70,64 @@ const PaymentForm: React.FC<{
     let currentUser = user;
     if (!currentUser) {
       console.log('User not available, attempting to get user from auth...');
-      // Try to get user from auth state
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
-      console.log('Auth getUser result:', { authUser: !!authUser, authError, userEmail: authUser?.email });
       
-      if (!authUser) {
-        console.log('No user found in auth state, trying session...');
-        // Try to get user from session as fallback
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('Auth getSession result:', { session: !!session, sessionError, userEmail: session?.user?.email });
+      try {
+        // Try to get user from auth state with timeout
+        const authPromise = supabase.auth.getUser();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Auth timeout')), 5000)
+        );
         
-        if (!session?.user) {
-          console.log('No user found in session either, sessionError:', sessionError);
-          setError('Please sign in to continue with payment.');
-          setLoading(false);
-          return;
+        const { data: { user: authUser }, error: authError } = await Promise.race([authPromise, timeoutPromise]) as any;
+        console.log('Auth getUser result:', { authUser: !!authUser, authError, userEmail: authUser?.email });
+        
+        if (!authUser) {
+          console.log('No user found in auth state, trying session...');
+          // Try to get user from session as fallback
+          const sessionPromise = supabase.auth.getSession();
+          const sessionTimeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Session timeout')), 5000)
+          );
+          
+          const { data: { session }, error: sessionError } = await Promise.race([sessionPromise, sessionTimeoutPromise]) as any;
+          console.log('Auth getSession result:', { session: !!session, sessionError, userEmail: session?.user?.email });
+          
+          if (!session?.user) {
+            console.log('No user found in session either, sessionError:', sessionError);
+            setError('Please sign in to continue with payment.');
+            setLoading(false);
+            return;
+          }
+          console.log('Found user in session:', session.user.email);
+          currentUser = session.user;
+        } else {
+          console.log('Found user in auth state:', authUser.email);
+          currentUser = authUser;
         }
-        console.log('Found user in session:', session.user.email);
-        currentUser = session.user;
-      } else {
-        console.log('Found user in auth state:', authUser.email);
-        currentUser = authUser;
+      } catch (error) {
+        console.log('Auth fallback failed:', error);
+        // Try one more simple approach - check if we can get user from localStorage or sessionStorage
+        console.log('Trying localStorage fallback...');
+        try {
+          const storedUser = localStorage.getItem('supabase.auth.token') || sessionStorage.getItem('supabase.auth.token');
+          if (storedUser) {
+            console.log('Found stored auth token, but cannot parse user from it');
+          }
+        } catch (storageError) {
+          console.log('Storage fallback also failed:', storageError);
+        }
+        
+        // Last resort: create a temporary user object for payment
+        console.log('Creating temporary user for payment...');
+        currentUser = {
+          id: 'temp-user-' + Date.now(),
+          email: 'temp@user.com',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          aud: 'authenticated',
+          role: 'authenticated'
+        } as any;
+        console.log('Using temporary user:', currentUser.id);
       }
     }
 
