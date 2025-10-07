@@ -163,10 +163,10 @@ const ProfilePage: React.FC = () => {
                 )}
                 {profile?.user_type === 'customer' && (
                   <Button 
-                    onClick={() => updateUserType('driver')}
+                    onClick={() => navigate('/driver-application')}
                     className="bg-blue-600 hover:bg-blue-700 text-white"
                   >
-                    Switch to Driver Mode
+                    Apply to Become a Driver
                   </Button>
                 )}
                 {profile?.user_type === 'driver' && (

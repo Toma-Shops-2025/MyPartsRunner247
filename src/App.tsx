@@ -21,6 +21,7 @@ import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import UpdateUserTypePage from "./pages/UpdateUserTypePage";
+import DriverApplicationPage from "./pages/DriverApplicationPage";
 import DebugProfile from "./components/DebugProfile";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/update-user-type" element={<UpdateUserTypePage />} />
+            <Route path="/driver-application" element={<DriverApplicationPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
