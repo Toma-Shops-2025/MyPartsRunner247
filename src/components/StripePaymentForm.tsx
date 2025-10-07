@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { getStripe, createPaymentIntent } from '@/lib/stripe';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CreditCard, Lock, CheckCircle, AlertCircle } from 'lucide-react';
-
-// Initialize Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder');
 
 interface StripePaymentFormProps {
   amount: number;
@@ -46,36 +43,61 @@ const PaymentForm: React.FC<{
     setError(null);
 
     try {
-      // For demo purposes, simulate payment processing
-      // In production, you would integrate with Stripe properly
-      console.log('Processing payment for amount:', amount);
-      
-      // Simulate payment processing delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Create order in database directly (bypassing Stripe for now)
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert([{
-          customer_id: user.id,
-          pickup_address: orderDetails.pickupAddress,
-          delivery_address: orderDetails.deliveryAddress,
-          item_description: orderDetails.itemDescription,
-          total: amount,
-          status: 'pending',
-          urgency: orderDetails.urgency,
-          payment_method: 'demo_payment',
-          created_at: new Date().toISOString()
-        }])
-        .select()
-        .single();
+      // Create payment intent with Stripe
+      const paymentIntent = await createPaymentIntent(amount, {
+        customer_id: user.id,
+        pickup_address: orderDetails.pickupAddress,
+        delivery_address: orderDetails.deliveryAddress,
+        item_description: orderDetails.itemDescription,
+        urgency: orderDetails.urgency
+      });
 
-      if (orderError) {
-        console.error('Order creation error:', orderError);
-        throw new Error('Failed to create order. Please try again.');
+      // Confirm payment with Stripe
+      const { error: stripeError, paymentIntent: confirmedPayment } = await stripe.confirmCardPayment(
+        paymentIntent.client_secret,
+        {
+          payment_method: {
+            card: elements.getElement(CardElement)!,
+            billing_details: {
+              name: user.email || 'Customer',
+              email: user.email,
+            },
+          }
+        }
+      );
+
+      if (stripeError) {
+        throw new Error(stripeError.message);
       }
 
-      onSuccess(order.id);
+      if (confirmedPayment && confirmedPayment.status === 'succeeded') {
+        // Create order in database with real payment info
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert([{
+            customer_id: user.id,
+            pickup_address: orderDetails.pickupAddress,
+            delivery_address: orderDetails.deliveryAddress,
+            item_description: orderDetails.itemDescription,
+            total: amount,
+            status: 'pending',
+            urgency: orderDetails.urgency,
+            payment_intent_id: confirmedPayment.id,
+            payment_status: 'paid',
+            created_at: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (orderError) {
+          console.error('Order creation error:', orderError);
+          throw new Error('Payment succeeded but failed to create order. Please contact support.');
+        }
+
+        onSuccess(order.id);
+      } else {
+        throw new Error('Payment was not successful');
+      }
     } catch (err: any) {
       console.error('Payment error:', err);
       const errorMessage = err.message || 'Payment failed. Please try again.';
@@ -143,10 +165,22 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   onSuccess,
   onError
 }) => {
+  const [stripePromise, setStripePromise] = useState<any>(null);
+
+  // Initialize Stripe
+  React.useEffect(() => {
+    const initStripe = async () => {
+      const stripe = await getStripe();
+      setStripePromise(stripe);
+    };
+    initStripe();
+  }, []);
+
   // Check if Stripe is properly configured
   const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+  const stripeSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
   
-  if (!stripeKey || stripeKey === 'pk_test_placeholder') {
+  if (!stripeKey || stripeKey === 'pk_test_placeholder' || !stripeSecretKey) {
     return (
       <Card>
         <CardHeader>
@@ -176,7 +210,7 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Stripe payment integration is not configured. For demo purposes, click below to simulate payment.
+                Stripe payment integration requires configuration. Please add your Stripe keys to environment variables.
               </AlertDescription>
             </Alert>
             
@@ -225,28 +259,28 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
             <div className="space-y-2">
               <Button 
                 onClick={() => {
-                  // Simulate successful payment
+                  // Simulate successful payment for demo
                   setTimeout(() => {
                     onSuccess('demo-order-' + Date.now());
                   }, 1000);
                 }}
                 className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
               >
-                Pay ${amount.toFixed(2)} (Demo)
-              </Button>
-              
-              <Button 
-                onClick={() => {
-                  // Skip payment entirely
-                  onSuccess('skip-payment-' + Date.now());
-                }}
-                variant="outline"
-                className="w-full"
-              >
-                🚀 Skip Payment (Test Mode)
+                Pay ${amount.toFixed(2)} (Demo Mode)
               </Button>
             </div>
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!stripePromise) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p>Loading payment system...</p>
         </CardContent>
       </Card>
     );
