@@ -180,26 +180,40 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
   
+  // Also check for alternative environment variable names that might be used
+  const altStripeKey = import.meta.env.STRIPE_PUBLISHABLE_KEY;
+  const altSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
+  
   // Debug: Log the keys to see what's being loaded
   console.log('Stripe Configuration Check:', {
     stripeKey: stripeKey ? `${stripeKey.substring(0, 12)}...` : 'undefined',
     stripeSecretKey: stripeSecretKey ? `${stripeSecretKey.substring(0, 12)}...` : 'undefined',
+    altStripeKey: altStripeKey ? `${altStripeKey.substring(0, 12)}...` : 'undefined',
+    altSecretKey: altSecretKey ? `${altSecretKey.substring(0, 12)}...` : 'undefined',
     hasStripeKey: !!stripeKey,
     hasSecretKey: !!stripeSecretKey,
+    hasAltStripeKey: !!altStripeKey,
+    hasAltSecretKey: !!altSecretKey,
     isPlaceholder: stripeKey === 'pk_test_placeholder',
     isTestKey: stripeKey?.startsWith('pk_test_'),
-    isLiveKey: stripeKey?.startsWith('pk_live_')
+    isLiveKey: stripeKey?.startsWith('pk_live_'),
+    fullStripeKey: stripeKey, // Show full key for debugging
+    allEnvVars: Object.keys(import.meta.env).filter(key => key.includes('STRIPE'))
   });
   
   // More robust check - only show demo mode if keys are truly missing or placeholder
-  const isStripeConfigured = stripeKey && 
-    stripeKey !== 'pk_test_placeholder' && 
-    stripeKey !== 'your_publishable_key_here' &&
-    (stripeKey.startsWith('pk_test_') || stripeKey.startsWith('pk_live_')) &&
-    stripeSecretKey &&
-    stripeSecretKey !== 'sk_test_placeholder' &&
-    stripeSecretKey !== 'your_secret_key_here' &&
-    (stripeSecretKey.startsWith('sk_test_') || stripeSecretKey.startsWith('sk_live_'));
+  // Use primary keys if available, otherwise try alternative keys
+  const finalStripeKey = stripeKey || altStripeKey;
+  const finalSecretKey = stripeSecretKey || altSecretKey;
+  
+  const isStripeConfigured = finalStripeKey && 
+    finalStripeKey !== 'pk_test_placeholder' && 
+    finalStripeKey !== 'your_publishable_key_here' &&
+    (finalStripeKey.startsWith('pk_test_') || finalStripeKey.startsWith('pk_live_')) &&
+    finalSecretKey &&
+    finalSecretKey !== 'sk_test_placeholder' &&
+    finalSecretKey !== 'your_secret_key_here' &&
+    (finalSecretKey.startsWith('sk_test_') || finalSecretKey.startsWith('sk_live_'));
   
   if (!isStripeConfigured) {
     return (
@@ -239,10 +253,13 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
                     <li><code>STRIPE_SECRET_KEY</code> (starts with sk_test_ or sk_live_)</li>
                   </ul>
                   <p className="text-sm mt-2 text-gray-600">
-                    Current status: {!stripeKey ? 'No publishable key found' : 
-                    stripeKey === 'pk_test_placeholder' ? 'Using placeholder key' :
-                    stripeKey.startsWith('pk_test_') ? 'Test key detected' :
-                    stripeKey.startsWith('pk_live_') ? 'Live key detected' : 'Invalid key format'}
+                    Current status: {!finalStripeKey ? 'No publishable key found' : 
+                    finalStripeKey === 'pk_test_placeholder' ? 'Using placeholder key' :
+                    finalStripeKey.startsWith('pk_test_') ? 'Test key detected' :
+                    finalStripeKey.startsWith('pk_live_') ? 'Live key detected ✅' : 'Invalid key format'}
+                  </p>
+                  <p className="text-xs mt-1 text-gray-500">
+                    Debug: {finalStripeKey ? `Key starts with: ${finalStripeKey.substring(0, 8)}` : 'No key found'}
                   </p>
                 </div>
               </AlertDescription>
