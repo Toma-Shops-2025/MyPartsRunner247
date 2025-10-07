@@ -90,9 +90,23 @@ export const useAuth = () => {
     if (!user) return;
     
     try {
+      const updateData: any = { user_type: newUserType };
+      
+      // If switching to driver, also set as approved and online
+      if (newUserType === 'driver') {
+        updateData.status = 'active';
+        updateData.is_online = true;
+        updateData.is_approved = true;
+      } else {
+        // If switching to customer, set as inactive
+        updateData.status = 'inactive';
+        updateData.is_online = false;
+        updateData.is_approved = false;
+      }
+      
       const { error } = await supabase
         .from('profiles')
-        .update({ user_type: newUserType })
+        .update(updateData)
         .eq('id', user.id);
       
       if (error) {

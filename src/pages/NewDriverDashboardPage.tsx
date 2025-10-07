@@ -106,7 +106,8 @@ const NewDriverDashboardPage: React.FC = () => {
   };
 
   const handleViewRating = () => {
-    navigate('/profile');
+    // For now, show an alert. In the future, this could navigate to a dedicated ratings page
+    alert('Driver ratings and reviews feature coming soon! This will show your customer feedback and ratings.');
   };
 
   if (loading) {
@@ -172,11 +173,18 @@ const NewDriverDashboardPage: React.FC = () => {
                     <p className="text-xs text-green-400 mt-1">✓ Online & Ready</p>
                   )}
                 </div>
-                {profile?.is_approved && profile?.is_online ? (
-                  <CheckCircle className="w-8 h-8 text-green-400" />
-                ) : (
-                  <AlertCircle className="w-8 h-8 text-yellow-400" />
-                )}
+                {(() => {
+                  console.log('Driver status debug:', {
+                    is_approved: profile?.is_approved,
+                    is_online: profile?.is_online,
+                    user_type: profile?.user_type
+                  });
+                  return profile?.is_approved && profile?.is_online ? (
+                    <CheckCircle className="w-8 h-8 text-green-400" />
+                  ) : (
+                    <AlertCircle className="w-8 h-8 text-yellow-400" />
+                  );
+                })()}
               </div>
             </CardContent>
           </Card>
