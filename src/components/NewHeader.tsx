@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import NewAuthModal from './NewAuthModal';
-import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X } from 'lucide-react';
+import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, Switch } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewHeader: React.FC = () => {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, signOut, loading, updateUserType } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -22,6 +22,28 @@ const NewHeader: React.FC = () => {
     await signOut();
     navigate('/');
     setIsMobileMenuOpen(false);
+  };
+
+  const handleSwitchToDriver = async () => {
+    try {
+      await updateUserType('driver');
+      alert('Switched to Driver Mode! You can now access driver features.');
+      navigate('/driver-dashboard');
+    } catch (error) {
+      console.error('Error switching to driver mode:', error);
+      alert('Error switching to driver mode. Please try again.');
+    }
+  };
+
+  const handleSwitchToCustomer = async () => {
+    try {
+      await updateUserType('customer');
+      alert('Switched to Customer Mode! You can now place orders.');
+      navigate('/place-order');
+    } catch (error) {
+      console.error('Error switching to customer mode:', error);
+      alert('Error switching to customer mode. Please try again.');
+    }
   };
 
   return (
@@ -88,6 +110,11 @@ const NewHeader: React.FC = () => {
                           <Settings className="mr-2 h-4 w-4" />
                           Vehicle Settings
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSwitchToCustomer}>
+                          <Switch className="mr-2 h-4 w-4" />
+                          Switch to Customer Mode
+                        </DropdownMenuItem>
                       </>
                     )}
                     
@@ -101,6 +128,11 @@ const NewHeader: React.FC = () => {
                         <DropdownMenuItem onClick={() => handleNavigation('/my-orders')}>
                           <Package className="mr-2 h-4 w-4" />
                           My Orders
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSwitchToDriver}>
+                          <Switch className="mr-2 h-4 w-4" />
+                          Switch to Driver Mode
                         </DropdownMenuItem>
                       </>
                     )}
@@ -185,6 +217,13 @@ const NewHeader: React.FC = () => {
                         >
                           🚙 Vehicle Settings
                         </button>
+                        <hr className="my-2 border-gray-600" />
+                        <button 
+                          onClick={handleSwitchToCustomer}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
+                        >
+                          🔄 Switch to Customer Mode
+                        </button>
                       </>
                     )}
                     {profile?.user_type === 'customer' && (
@@ -200,6 +239,13 @@ const NewHeader: React.FC = () => {
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
                           📋 My Orders
+                        </button>
+                        <hr className="my-2 border-gray-600" />
+                        <button 
+                          onClick={handleSwitchToDriver}
+                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
+                        >
+                          🔄 Switch to Driver Mode
                         </button>
                       </>
                     )}
