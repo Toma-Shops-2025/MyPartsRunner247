@@ -180,7 +180,28 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
   const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
   const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
   
-  if (!stripeKey || stripeKey === 'pk_test_placeholder' || !stripeSecretKey) {
+  // Debug: Log the keys to see what's being loaded
+  console.log('Stripe Configuration Check:', {
+    stripeKey: stripeKey ? `${stripeKey.substring(0, 12)}...` : 'undefined',
+    stripeSecretKey: stripeSecretKey ? `${stripeSecretKey.substring(0, 12)}...` : 'undefined',
+    hasStripeKey: !!stripeKey,
+    hasSecretKey: !!stripeSecretKey,
+    isPlaceholder: stripeKey === 'pk_test_placeholder',
+    isTestKey: stripeKey?.startsWith('pk_test_'),
+    isLiveKey: stripeKey?.startsWith('pk_live_')
+  });
+  
+  // More robust check - only show demo mode if keys are truly missing or placeholder
+  const isStripeConfigured = stripeKey && 
+    stripeKey !== 'pk_test_placeholder' && 
+    stripeKey !== 'your_publishable_key_here' &&
+    (stripeKey.startsWith('pk_test_') || stripeKey.startsWith('pk_live_')) &&
+    stripeSecretKey &&
+    stripeSecretKey !== 'sk_test_placeholder' &&
+    stripeSecretKey !== 'your_secret_key_here' &&
+    (stripeSecretKey.startsWith('sk_test_') || stripeSecretKey.startsWith('sk_live_'));
+  
+  if (!isStripeConfigured) {
     return (
       <Card>
         <CardHeader>
@@ -210,7 +231,20 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Stripe payment integration requires configuration. Please add your Stripe keys to environment variables.
+                <div>
+                  <p className="font-semibold mb-2">Stripe payment integration requires configuration.</p>
+                  <p className="text-sm mb-2">Please add your Stripe keys to environment variables:</p>
+                  <ul className="text-sm list-disc list-inside space-y-1">
+                    <li><code>VITE_STRIPE_PUBLISHABLE_KEY</code> (starts with pk_test_ or pk_live_)</li>
+                    <li><code>STRIPE_SECRET_KEY</code> (starts with sk_test_ or sk_live_)</li>
+                  </ul>
+                  <p className="text-sm mt-2 text-gray-600">
+                    Current status: {!stripeKey ? 'No publishable key found' : 
+                    stripeKey === 'pk_test_placeholder' ? 'Using placeholder key' :
+                    stripeKey.startsWith('pk_test_') ? 'Test key detected' :
+                    stripeKey.startsWith('pk_live_') ? 'Live key detected' : 'Invalid key format'}
+                  </p>
+                </div>
               </AlertDescription>
             </Alert>
             
