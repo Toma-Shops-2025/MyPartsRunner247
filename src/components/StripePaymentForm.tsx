@@ -252,6 +252,21 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     }
   });
   
+  console.log('Will show demo mode?', !isStripeConfigured);
+  console.log('Configuration check details:', {
+    finalStripeKey: finalStripeKey,
+    keyLength: finalStripeKey?.length,
+    keyStart: finalStripeKey?.substring(0, 8),
+    allChecks: {
+      hasKey: !!finalStripeKey,
+      notPlaceholder: finalStripeKey !== 'pk_test_placeholder',
+      notYourKey: finalStripeKey !== 'your_publishable_key_here',
+      startsWithPk: finalStripeKey?.startsWith('pk_'),
+      isTest: finalStripeKey?.startsWith('pk_test_'),
+      isLive: finalStripeKey?.startsWith('pk_live_')
+    }
+  });
+  
   if (!isStripeConfigured) {
     return (
       <Card>
