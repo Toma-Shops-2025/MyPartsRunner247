@@ -26,25 +26,29 @@ const NewHeader: React.FC = () => {
 
   const handleSwitchToDriver = async () => {
     try {
+      console.log('Attempting to switch to driver mode...');
       await updateUserType('driver');
+      console.log('Successfully switched to driver mode');
       alert('Switched to Driver Mode! You can now access driver features.');
       // Force a page refresh to update the UI
       window.location.reload();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error switching to driver mode:', error);
-      alert('Error switching to driver mode. Please try again.');
+      alert(`Error switching to driver mode: ${error.message || error}. Please try again.`);
     }
   };
 
   const handleSwitchToCustomer = async () => {
     try {
+      console.log('Attempting to switch to customer mode...');
       await updateUserType('customer');
+      console.log('Successfully switched to customer mode');
       alert('Switched to Customer Mode! You can now place orders.');
       // Force a page refresh to update the UI
       window.location.reload();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error switching to customer mode:', error);
-      alert('Error switching to customer mode. Please try again.');
+      alert(`Error switching to customer mode: ${error.message || error}. Please try again.`);
     }
   };
 

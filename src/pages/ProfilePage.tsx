@@ -56,10 +56,11 @@ const ProfilePage: React.FC = () => {
         phone: formData.phone
       };
       
-      // Only update address if it's not empty
-      if (formData.address && formData.address.trim()) {
-        updateData.address = { street: formData.address.trim() };
-      }
+      // Skip address update for now - database schema issue
+      // TODO: Add address column to database schema
+      // if (formData.address && formData.address.trim()) {
+      //   updateData.address = { street: formData.address.trim() };
+      // }
       
       const { error } = await supabase
         .from('profiles')

@@ -90,19 +90,10 @@ export const useAuth = () => {
     if (!user) return;
     
     try {
+      // Start with basic user_type update only
       const updateData: any = { user_type: newUserType };
       
-      // If switching to driver, also set as approved and online
-      if (newUserType === 'driver') {
-        updateData.status = 'active';
-        updateData.is_online = true;
-        updateData.is_approved = true;
-      } else {
-        // If switching to customer, set as inactive
-        updateData.status = 'inactive';
-        updateData.is_online = false;
-        updateData.is_approved = false;
-      }
+      console.log('Updating user type to:', newUserType, 'for user:', user.id);
       
       const { error } = await supabase
         .from('profiles')
@@ -111,14 +102,46 @@ export const useAuth = () => {
       
       if (error) {
         console.error('Error updating user type:', error);
-      } else {
-        console.log('User type updated successfully to:', newUserType);
-        // Refresh profile data
-        await fetchProfile(user.id);
-        console.log('Profile refreshed after user type update');
+        throw error;
       }
+      
+      console.log('User type updated successfully to:', newUserType);
+      
+      // Try to update additional fields if they exist
+      try {
+        const additionalData: any = {};
+        
+        if (newUserType === 'driver') {
+          additionalData.status = 'active';
+          additionalData.is_online = true;
+          additionalData.is_approved = true;
+        } else {
+          additionalData.status = 'inactive';
+          additionalData.is_online = false;
+          additionalData.is_approved = false;
+        }
+        
+        const { error: additionalError } = await supabase
+          .from('profiles')
+          .update(additionalData)
+          .eq('id', user.id);
+        
+        if (additionalError) {
+          console.warn('Could not update additional fields:', additionalError);
+          // Don't throw - the main user_type update succeeded
+        }
+      } catch (additionalError) {
+        console.warn('Additional fields update failed:', additionalError);
+        // Don't throw - the main user_type update succeeded
+      }
+      
+      // Refresh profile data
+      await fetchProfile(user.id);
+      console.log('Profile refreshed after user type update');
+      
     } catch (error) {
       console.error('Error updating user type:', error);
+      throw error;
     }
   };
 
