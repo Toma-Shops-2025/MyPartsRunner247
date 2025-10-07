@@ -17,7 +17,7 @@ const ProfilePage: React.FC = () => {
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
-    address: profile?.address || ''
+    address: (typeof profile?.address === 'object' && profile?.address?.street) || ''
   });
 
   // Update form data when profile changes
@@ -26,7 +26,7 @@ const ProfilePage: React.FC = () => {
       setFormData({
         full_name: profile.full_name || '',
         phone: profile.phone || '',
-        address: profile.address || ''
+        address: (typeof profile.address === 'object' && profile.address?.street) || ''
       });
     }
   }, [profile]);
@@ -56,7 +56,7 @@ const ProfilePage: React.FC = () => {
         .update({
           full_name: formData.full_name,
           phone: formData.phone,
-          address: formData.address
+          address: formData.address ? { street: formData.address } : null
         })
         .eq('id', user.id);
       
