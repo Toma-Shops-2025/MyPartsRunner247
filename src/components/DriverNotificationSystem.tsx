@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle, Bell, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface DriverNotification {
   id: string;
@@ -21,6 +21,7 @@ const DriverNotificationSystem: React.FC = () => {
   const { user, profile } = useAuth();
   const [notifications, setNotifications] = useState<DriverNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
@@ -102,76 +103,88 @@ const DriverNotificationSystem: React.FC = () => {
     );
   }
 
-  if (notifications.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            Driver Status
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert>
-            <CheckCircle className="h-4 w-4" />
-            <AlertDescription>
-              Your driver account is active and approved. You're ready to start accepting deliveries!
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
+  const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <AlertTriangle className="h-5 w-5 text-yellow-500" />
-          Driver Notifications
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className={`p-4 rounded-lg border ${getNotificationColor(notification.severity)} ${
-              !notification.is_read ? 'ring-2 ring-opacity-50' : ''
-            }`}
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="h-5 w-5 text-teal-500" />
+            Driver Notifications
+            {unreadCount > 0 && (
+              <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                {unreadCount}
+              </span>
+            )}
+          </CardTitle>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-gray-400 hover:text-white"
           >
-            <div className="flex items-start gap-3">
-              {getNotificationIcon(notification.type, notification.severity)}
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-gray-900">
-                    {notification.title}
-                  </h4>
-                  {!notification.is_read && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => markAsRead(notification.id)}
-                      className="text-xs"
-                    >
-                      Mark as Read
-                    </Button>
-                  )}
-                </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  {notification.message}
-                </p>
-                {notification.action_required && (
-                  <div className="mt-2">
-                    <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                      Take Action
-                    </Button>
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </CardHeader>
+      
+      {isExpanded && (
+        <CardContent className="space-y-4">
+          {notifications.length === 0 ? (
+            <Alert>
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                Your driver account is active and approved. You're ready to start accepting deliveries!
+              </AlertDescription>
+            </Alert>
+          ) : (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`p-4 rounded-lg border ${getNotificationColor(notification.severity)} ${
+                  !notification.is_read ? 'ring-2 ring-opacity-50' : ''
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  {getNotificationIcon(notification.type, notification.severity)}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold text-gray-900">
+                        {notification.title}
+                      </h4>
+                      {!notification.is_read && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => markAsRead(notification.id)}
+                          className="text-xs"
+                        >
+                          Mark as Read
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {notification.message}
+                    </p>
+                    {notification.action_required && (
+                      <div className="mt-2">
+                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                          Take Action
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </CardContent>
+            ))
+          )}
+        </CardContent>
+      )}
     </Card>
   );
 };

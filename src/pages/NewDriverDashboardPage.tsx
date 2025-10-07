@@ -1,14 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle } from 'lucide-react';
+import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const NewDriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
+  const [driverStats, setDriverStats] = useState({
+    totalEarnings: 0.00,
+    completedDeliveries: 0,
+    activeDeliveries: 0,
+    rating: 0.0
+  });
+  const [availableOrders, setAvailableOrders] = useState<any[]>([]);
+  const [activeOrders, setActiveOrders] = useState<any[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (user && profile?.user_type === 'driver') {
+      fetchDriverData();
+    }
+  }, [user, profile]);
+
+  const fetchDriverData = async () => {
+    try {
+      // Fetch driver earnings
+      const { data: earnings } = await supabase
+        .from('earnings')
+        .select('amount')
+        .eq('driver_id', user?.id);
+
+      // Fetch completed orders
+      const { data: completedOrders } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('driver_id', user?.id)
+        .eq('status', 'delivered');
+
+      // Fetch active orders
+      const { data: activeOrdersData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('driver_id', user?.id)
+        .in('status', ['accepted', 'picked_up', 'in_transit']);
+
+      // Fetch available orders
+      const { data: availableOrdersData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('status', 'pending')
+        .limit(10);
+
+      const totalEarnings = earnings?.reduce((sum, earning) => sum + parseFloat(earning.amount), 0) || 0;
+      const completedDeliveries = completedOrders?.length || 0;
+      const activeDeliveries = activeOrdersData?.length || 0;
+
+      setDriverStats({
+        totalEarnings,
+        completedDeliveries,
+        activeDeliveries,
+        rating: completedDeliveries > 0 ? 4.5 : 0.0 // Mock rating
+      });
+
+      setActiveOrders(activeOrdersData || []);
+      setAvailableOrders(availableOrdersData || []);
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const handleAcceptOrder = async (orderId: string) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({ 
+          driver_id: user?.id,
+          status: 'accepted'
+        })
+        .eq('id', orderId);
+
+      if (error) throw error;
+      
+      // Refresh data
+      await fetchDriverData();
+      alert('Order accepted successfully!');
+    } catch (error) {
+      console.error('Error accepting order:', error);
+      alert('Failed to accept order. Please try again.');
+    }
+  };
+
+  const handleViewEarnings = () => {
+    navigate('/earnings');
+  };
+
+  const handleViewCompleted = () => {
+    navigate('/my-orders');
+  };
+
+  const handleViewRating = () => {
+    navigate('/profile');
+  };
 
   if (loading) {
     return (
@@ -26,17 +125,6 @@ const NewDriverDashboardPage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  // Real data - will be empty initially
-  const driverStats = {
-    totalEarnings: 0.00,
-    completedDeliveries: 0,
-    activeDeliveries: 0,
-    rating: 0.0
-  };
-
-  const availableOrders: any[] = [];
-  const activeOrders: any[] = [];
-
   return (
     <div className="min-h-screen bg-gray-900">
       <NewHeader />
@@ -48,24 +136,26 @@ const NewDriverDashboardPage: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewEarnings}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Total Earnings</p>
-                  <p className="text-2xl font-bold text-white">${driverStats.totalEarnings}</p>
+                  <p className="text-2xl font-bold text-white">${driverStats.totalEarnings.toFixed(2)}</p>
+                  <p className="text-xs text-gray-500 mt-1">Click to view details</p>
                 </div>
                 <DollarSign className="w-8 h-8 text-green-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewCompleted}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Completed</p>
                   <p className="text-2xl font-bold text-white">{driverStats.completedDeliveries}</p>
+                  <p className="text-xs text-gray-500 mt-1">Click to view history</p>
                 </div>
                 <CheckCircle className="w-8 h-8 text-blue-400" />
               </div>
@@ -82,7 +172,7 @@ const NewDriverDashboardPage: React.FC = () => {
                     <p className="text-xs text-green-400 mt-1">✓ Online & Ready</p>
                   )}
                 </div>
-                {profile?.is_online ? (
+                {profile?.is_approved && profile?.is_online ? (
                   <CheckCircle className="w-8 h-8 text-green-400" />
                 ) : (
                   <AlertCircle className="w-8 h-8 text-yellow-400" />
@@ -91,14 +181,15 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewRating}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-400 text-sm">Rating</p>
-                  <p className="text-2xl font-bold text-white">{driverStats.rating}</p>
+                  <p className="text-2xl font-bold text-white">{driverStats.rating.toFixed(1)}</p>
+                  <p className="text-xs text-gray-500 mt-1">Click to view reviews</p>
                 </div>
-                <Car className="w-8 h-8 text-teal-400" />
+                <Star className="w-8 h-8 text-purple-400" />
               </div>
             </CardContent>
           </Card>
@@ -158,7 +249,13 @@ const NewDriverDashboardPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-8">No active deliveries</p>
+                <div className="text-center py-8">
+                  <Package className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No active deliveries</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    You'll see your active deliveries here when you accept an order.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -205,7 +302,13 @@ const NewDriverDashboardPage: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center py-8">No available orders</p>
+                <div className="text-center py-8">
+                  <Clock className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No available orders</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    New orders will appear here when customers place them.
+                  </p>
+                </div>
               )}
             </CardContent>
           </Card>
