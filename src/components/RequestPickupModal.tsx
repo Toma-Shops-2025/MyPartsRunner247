@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/hooks/useLocation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Package, Clock, DollarSign } from 'lucide-react';
+import { MapPin, Package, Clock, DollarSign, Navigation } from 'lucide-react';
 import StripePaymentForm from './StripePaymentForm';
 import PricingCalculator from './PricingCalculator';
+import AddressAutocomplete from './AddressAutocomplete';
 
 interface RequestPickupModalProps {
   isOpen: boolean;
@@ -17,10 +19,13 @@ interface RequestPickupModalProps {
 
 const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { location: userLocation, loading: locationLoading } = useLocation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [calculatedPrice, setCalculatedPrice] = useState(0);
+  const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
+  const [deliveryCoordinates, setDeliveryCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [formData, setFormData] = useState({
     pickupAddress: '',
     deliveryAddress: '',
@@ -35,9 +40,15 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
   if (!isOpen) return null;
 
   const calculateEstimatedCost = () => {
+    if (!formData.pickupAddress || !formData.deliveryAddress) return 0;
+    
+    // Use the same pricing logic as the main system
     const baseFee = 8.00;
     const urgencyFee = formData.urgency === 'urgent' ? 5.00 : 0;
-    const distanceFee = 2.50; // Simplified calculation
+    
+    // Simple distance calculation for now - in production this would use Mapbox
+    const distanceFee = 2.50;
+    
     return baseFee + urgencyFee + distanceFee;
   };
 
@@ -132,18 +143,59 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
                 <MapPin className="w-5 h-5" />
                 Where should we pick up?
               </h3>
-              <Input
-                type="text"
-                placeholder="Pickup address"
-                value={formData.pickupAddress}
-                onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
-              />
-              <Input
-                type="text"
-                placeholder="Delivery address"
-                value={formData.deliveryAddress}
-                onChange={(e) => setFormData({...formData, deliveryAddress: e.target.value})}
-              />
+              
+              {/* Location Status Indicator */}
+              {userLocation && (
+                <div className="inline-flex items-center gap-2 px-3 py-2 bg-teal-50 border border-teal-200 rounded-lg">
+                  <Navigation className="w-4 h-4 text-teal-500" />
+                  <span className="text-teal-700 text-sm">
+                    Currently serving: <strong>{userLocation.city}, {userLocation.state}</strong>
+                  </span>
+                </div>
+              )}
+              {locationLoading && (
+                <div className="inline-flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-teal-500"></div>
+                  <span className="text-gray-600 text-sm">Detecting your location...</span>
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Pickup Address
+                </label>
+                <AddressAutocomplete
+                  value={formData.pickupAddress}
+                  onChange={(address) => setFormData({...formData, pickupAddress: address})}
+                  onSelect={(address, coordinates) => {
+                    setFormData({...formData, pickupAddress: address});
+                    setPickupCoordinates(coordinates);
+                  }}
+                  placeholder="Where should we pick up from?"
+                  onUseCurrentLocation={() => {
+                    if (userLocation) {
+                      setFormData({...formData, pickupAddress: userLocation.formattedAddress});
+                      setPickupCoordinates({ lat: userLocation.lat, lng: userLocation.lng });
+                    }
+                  }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Delivery Address
+                </label>
+                <AddressAutocomplete
+                  value={formData.deliveryAddress}
+                  onChange={(address) => setFormData({...formData, deliveryAddress: address})}
+                  onSelect={(address, coordinates) => {
+                    setFormData({...formData, deliveryAddress: address});
+                    setDeliveryCoordinates(coordinates);
+                  }}
+                  placeholder="Where should we deliver to?"
+                />
+              </div>
+              
               <Input
                 type="tel"
                 placeholder="Contact phone number"

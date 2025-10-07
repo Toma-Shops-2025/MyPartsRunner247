@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +18,7 @@ interface Order {
 }
 
 const OrderTracker: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +126,12 @@ const OrderTracker: React.FC = () => {
           <CardContent className="p-6 text-center">
             <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600">No orders yet</p>
-            <Button className="mt-4">Request Your First Pickup</Button>
+            <Button 
+              className="mt-4"
+              onClick={() => navigate('/services')}
+            >
+              Request Your First Pickup
+            </Button>
           </CardContent>
         </Card>
       ) : (
