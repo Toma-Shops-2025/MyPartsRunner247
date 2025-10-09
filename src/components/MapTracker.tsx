@@ -32,7 +32,7 @@ const MapTracker: React.FC<MapTrackerProps> = ({ orderId }) => {
           table: 'driver_locations',
           filter: `orderid=eq.${orderId}`
         }, 
-        (payload) => {
+        (payload: any) => {
           if (payload.new) {
             setDriverLocation({
               latitude: payload.new.latitude,

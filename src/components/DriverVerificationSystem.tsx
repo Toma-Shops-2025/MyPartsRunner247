@@ -367,7 +367,7 @@ const DriverVerificationSystem: React.FC<DriverVerificationSystemProps> = ({ dri
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => document.getElementById(`upload-${document.id}`)?.click()}
+                        onClick={() => (document as any).getElementById(`upload-${document.id}`)?.click()}
                       >
                         <Upload className="w-4 h-4 mr-1" />
                         Upload

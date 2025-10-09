@@ -38,7 +38,7 @@ const MapboxMap: React.FC<MapboxMapProps> = ({
         if (!mapContainer.current) return;
 
         // Initialize map
-        mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+        mapboxgl.default.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
         
         map.current = new mapboxgl.Map({
           container: mapContainer.current,

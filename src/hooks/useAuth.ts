@@ -7,8 +7,13 @@ export interface Profile {
   email: string;
   full_name: string;
   phone: string;
-  user_type: 'customer' | 'driver' | 'merchant';
+  user_type: 'customer' | 'driver' | 'merchant' | 'admin';
   avatar_url?: string;
+  is_online?: boolean;
+  is_approved?: boolean;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const useAuth = () => {
