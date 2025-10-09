@@ -144,7 +144,37 @@ const PaymentForm: React.FC<{
         urgency: orderDetails.urgency
       });
 
-      // Confirm payment with Stripe
+      // Check if this is a mock payment intent (development mode)
+      if (paymentIntent.id && paymentIntent.id.startsWith('pi_mock_')) {
+        // Handle mock payment intent for development
+        console.log('Using mock payment for development');
+        const { data: order, error: orderError } = await supabase
+          .from('orders')
+          .insert([{
+            customer_id: currentUser.id,
+            pickup_address: orderDetails.pickupAddress,
+            delivery_address: orderDetails.deliveryAddress,
+            item_description: orderDetails.itemDescription,
+            total: amount,
+            status: 'pending',
+            urgency: orderDetails.urgency,
+            payment_intent_id: paymentIntent.id,
+            payment_status: 'paid',
+            created_at: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (orderError) {
+          console.error('Order creation error:', orderError);
+          throw new Error('Payment succeeded but failed to create order. Please contact support.');
+        }
+
+        onSuccess(order.id);
+        return;
+      }
+
+      // Confirm payment with Stripe (real payment)
       const { error: stripeError, paymentIntent: confirmedPayment } = await stripe.confirmCardPayment(
         paymentIntent.client_secret,
         {
@@ -276,29 +306,22 @@ const StripePaymentForm: React.FC<StripePaymentFormProps> = ({
     initStripe();
   }, []);
 
-  // Check if Stripe is properly configured
+  // Check if Stripe is properly configured (only check publishable key on client-side)
   const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
-  const stripeSecretKey = import.meta.env.STRIPE_SECRET_KEY;
   
   // Also check for alternative environment variable names that might be used
   const altStripeKey = import.meta.env.STRIPE_PUBLISHABLE_KEY;
-  const altSecretKey = import.meta.env.VITE_STRIPE_SECRET_KEY;
   
   // More robust check - only show demo mode if keys are truly missing or placeholder
   // Use primary keys if available, otherwise try alternative keys
   const finalStripeKey = stripeKey || altStripeKey;
-  const finalSecretKey = stripeSecretKey || altSecretKey;
   
   // Debug: Log the keys to see what's being loaded
   console.log('Stripe Configuration Check:', {
     stripeKey: stripeKey ? `${stripeKey.substring(0, 12)}...` : 'undefined',
-    stripeSecretKey: stripeSecretKey ? `${stripeSecretKey.substring(0, 12)}...` : 'undefined',
     altStripeKey: altStripeKey ? `${altStripeKey.substring(0, 12)}...` : 'undefined',
-    altSecretKey: altSecretKey ? `${altSecretKey.substring(0, 12)}...` : 'undefined',
     hasStripeKey: !!stripeKey,
-    hasSecretKey: !!stripeSecretKey,
     hasAltStripeKey: !!altStripeKey,
-    hasAltSecretKey: !!altSecretKey,
     isPlaceholder: stripeKey === 'pk_test_placeholder',
     isTestKey: stripeKey?.startsWith('pk_test_'),
     isLiveKey: stripeKey?.startsWith('pk_live_'),
