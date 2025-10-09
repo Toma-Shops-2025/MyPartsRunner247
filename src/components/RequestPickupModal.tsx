@@ -82,6 +82,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
         deliveryAddress: '',
         itemDescription: '',
         urgency: 'standard',
+        itemSize: 'small',
         scheduledTime: '',
         specialInstructions: '',
         contactPhone: ''
