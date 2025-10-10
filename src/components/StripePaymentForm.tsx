@@ -31,6 +31,7 @@ const PaymentForm: React.FC<{
   const { user, profile, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   console.log('PaymentForm auth state:', {
     user: !!user,
@@ -42,6 +43,14 @@ const PaymentForm: React.FC<{
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    
+    // Prevent multiple submissions
+    if (loading || isSubmitting) {
+      console.log('Payment already in progress, ignoring duplicate submission');
+      return;
+    }
+    
+    setIsSubmitting(true);
     
     console.log('Payment form submitted!', {
       stripe: !!stripe,
@@ -56,14 +65,12 @@ const PaymentForm: React.FC<{
         elements: !!elements
       });
       setError('Payment system not ready. Please try again.');
-      setLoading(false);
       return;
     }
     
     if (authLoading) {
       console.log('Authentication still loading, please wait...');
       setError('Please wait for authentication to complete.');
-      setLoading(false);
       return;
     }
     
@@ -175,6 +182,12 @@ const PaymentForm: React.FC<{
       }
 
       // Confirm payment with Stripe (real payment)
+      // Double-check that we're not already processing a payment
+      if (loading) {
+        console.log('Payment already in progress, skipping Stripe confirmation');
+        return;
+      }
+      
       const { error: stripeError, paymentIntent: confirmedPayment } = await stripe.confirmCardPayment(
         paymentIntent.client_secret,
         {
@@ -227,6 +240,7 @@ const PaymentForm: React.FC<{
       onError(errorMessage);
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -272,11 +286,11 @@ const PaymentForm: React.FC<{
 
       <Button 
         type="submit" 
-        disabled={!stripe || loading}
+        disabled={!stripe || loading || isSubmitting}
         className="w-full"
-        onClick={() => console.log('Payment button clicked!', { stripe: !!stripe, loading, amount })}
+        onClick={() => console.log('Payment button clicked!', { stripe: !!stripe, loading, isSubmitting, amount })}
       >
-        {loading ? 'Processing Payment...' : `Pay $${amount.toFixed(2)}`}
+        {loading || isSubmitting ? 'Processing Payment...' : `Pay $${amount.toFixed(2)}`}
       </Button>
     </form>
   );
