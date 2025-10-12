@@ -88,6 +88,22 @@ export const useAuth = () => {
     
     setLastProcessedUserId(userId);
     
+    // Check for mock profile first
+    const mockProfile = localStorage.getItem('mock_profile');
+    if (mockProfile) {
+      try {
+        const parsedProfile = JSON.parse(mockProfile);
+        if (parsedProfile.id === userId) {
+          console.log('Using mock profile:', parsedProfile);
+          setProfile(parsedProfile);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing mock profile:', error);
+      }
+    }
+    
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase

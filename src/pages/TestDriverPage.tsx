@@ -37,20 +37,28 @@ const TestDriverPage: React.FC = () => {
               Test Click
             </button>
             <button 
-              onClick={async () => {
-                console.log('Testing Supabase connection...');
-                try {
-                  const { data, error } = await supabase.from('profiles').select('count').limit(1);
-                  console.log('Supabase test result:', { data, error });
-                  alert('Supabase test: ' + (error ? 'Error - ' + error.message : 'Success - ' + JSON.stringify(data)));
-                } catch (err) {
-                  console.error('Supabase test error:', err);
-                  alert('Supabase test failed: ' + err);
-                }
+              onClick={() => {
+                console.log('Creating local profile for testing...');
+                // Create a mock profile in localStorage for testing
+                const mockProfile = {
+                  id: user?.id,
+                  full_name: user?.email?.split('@')[0] || 'Driver',
+                  email: user?.email,
+                  user_type: 'driver',
+                  is_approved: true,
+                  is_online: false,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                };
+                
+                localStorage.setItem('mock_profile', JSON.stringify(mockProfile));
+                console.log('Mock profile created:', mockProfile);
+                alert('Mock profile created! This will allow you to test the driver dashboard. Refresh the page to see the changes.');
+                window.location.reload();
               }}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mr-2"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded mr-2"
             >
-              Test Supabase
+              Create Mock Profile
             </button>
             <button 
               onClick={async () => {
