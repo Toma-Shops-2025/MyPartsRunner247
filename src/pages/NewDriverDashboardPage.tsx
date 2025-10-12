@@ -140,28 +140,8 @@ const NewDriverDashboardPage: React.FC = () => {
       <NewHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
-              <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
-            </div>
-            <Button 
-              onClick={() => {
-                // Force complete cache clear and refresh
-                if ('caches' in window) {
-                  caches.keys().then(names => {
-                    names.forEach(name => caches.delete(name));
-                  });
-                }
-                localStorage.removeItem('mock_profile');
-                sessionStorage.clear();
-                window.location.href = '/driver-dashboard?t=' + Date.now() + '&force=1&nocache=1';
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white"
-            >
-              🔄 Force Refresh
-            </Button>
-          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
+          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
         </div>
 
         {/* Stats Cards */}
@@ -487,41 +467,20 @@ const NewDriverDashboardPage: React.FC = () => {
           {/* Available Orders */}
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Available Orders
-                </CardTitle>
-                <Button 
-                  onClick={() => {
-                    // Force complete cache clear and refresh
-                    if ('caches' in window) {
-                      caches.keys().then(names => {
-                        names.forEach(name => caches.delete(name));
-                      });
-                    }
-                    localStorage.removeItem('mock_profile');
-                    sessionStorage.clear();
-                    window.location.href = '/driver-dashboard?t=' + Date.now() + '&force=1&nocache=1';
-                  }}
-                  className="bg-red-600 hover:bg-red-700 text-white"
-                  size="sm"
-                >
-                  🔄 Force Refresh
-                </Button>
-              </div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Available Orders
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {availableOrders.length > 0 ? (
                 <div className="space-y-4">
                   {availableOrders.map((order) => (
                     <div key={order.id} className="bg-gray-700 rounded-lg p-4 relative">
-                      {/* SAMPLE ORDER Overlay */}
-                      <div className="absolute inset-0 bg-red-900 bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
-                        <div className="text-center">
-                          <div className="text-6xl font-bold text-red-200 mb-2">SAMPLE</div>
-                          <div className="text-4xl font-bold text-red-100">ORDER</div>
-                          <div className="text-lg text-red-300 mt-2">For Testing Only</div>
+                      {/* SAMPLE ORDER Badge */}
+                      <div className="absolute top-2 right-2 z-10">
+                        <div className="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                          SAMPLE ORDER
                         </div>
                       </div>
                       
