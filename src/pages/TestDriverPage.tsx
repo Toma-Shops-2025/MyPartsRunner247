@@ -28,21 +28,36 @@ const TestDriverPage: React.FC = () => {
             <h3 className="text-lg font-bold text-yellow-400 mb-2">Profile Missing!</h3>
             <p className="text-yellow-200 mb-4">This user doesn't have a profile in the database. This is why the driver dashboard isn't working.</p>
             <button 
+              onClick={() => {
+                console.log('Button clicked! User:', user?.id, 'Email:', user?.email);
+                alert('Button clicked! Check console for details.');
+              }}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded mr-2"
+            >
+              Test Click
+            </button>
+            <button 
               onClick={async () => {
-                console.log('Creating profile for user...');
+                console.log('Creating profile for user...', user?.id);
+                alert('Starting profile creation...');
+                
                 try {
+                  const profileData = {
+                    id: user?.id,
+                    full_name: user?.email?.split('@')[0] || 'Driver',
+                    email: user?.email,
+                    user_type: 'driver',
+                    is_approved: true,
+                    is_online: false,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                  };
+                  
+                  console.log('Profile data to insert:', profileData);
+                  
                   const { data, error } = await supabase
                     .from('profiles')
-                    .insert([{
-                      id: user?.id,
-                      full_name: user?.email?.split('@')[0] || 'Driver',
-                      email: user?.email,
-                      user_type: 'driver',
-                      is_approved: true,
-                      is_online: false,
-                      created_at: new Date().toISOString(),
-                      updated_at: new Date().toISOString()
-                    }])
+                    .insert([profileData])
                     .select()
                     .single();
 
@@ -59,7 +74,7 @@ const TestDriverPage: React.FC = () => {
                   alert('Error creating profile: ' + error);
                 }
               }}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
             >
               Create Driver Profile
             </button>
