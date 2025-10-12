@@ -177,7 +177,7 @@ const PaymentForm: React.FC<{
             urgency: orderDetails.urgency,
             payment_intent_id: paymentIntent.id,
             payment_status: 'paid',
-            createdat: new Date().toISOString()
+            created_at: new Date().toISOString()
           }])
           .select()
           .single();
@@ -245,7 +245,7 @@ const PaymentForm: React.FC<{
             urgency: orderDetails.urgency,
             payment_intent_id: confirmedPayment.id,
             payment_status: 'paid',
-            createdat: new Date().toISOString()
+            created_at: new Date().toISOString()
           }])
           .select()
           .single();
@@ -301,7 +301,7 @@ const PaymentForm: React.FC<{
               urgency: orderDetails.urgency,
               payment_intent_id: 'demo_' + Date.now(),
               payment_status: 'paid',
-              createdat: new Date().toISOString()
+              created_at: new Date().toISOString()
             }])
             .select()
             .single();

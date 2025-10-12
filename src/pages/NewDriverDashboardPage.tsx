@@ -308,7 +308,7 @@ const NewDriverDashboardPage: React.FC = () => {
                           urgency: 'standard',
                           payment_intent_id: 'test_' + Date.now(),
                           payment_status: 'paid',
-                          createdat: new Date().toISOString()
+                          created_at: new Date().toISOString()
                         };
                         
                         console.log('Test order data:', testOrder);
