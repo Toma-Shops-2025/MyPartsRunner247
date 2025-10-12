@@ -183,9 +183,9 @@ const NewDriverDashboardPage: React.FC = () => {
                   )}
                 </div>
                 {profile?.is_approved && profile?.is_online ? (
-                  <CheckCircle className="w-8 h-8 text-green-400" />
-                ) : (
-                  <AlertCircle className="w-8 h-8 text-yellow-400" />
+                    <CheckCircle className="w-8 h-8 text-green-400" />
+                  ) : (
+                    <AlertCircle className="w-8 h-8 text-yellow-400" />
                 )}
               </div>
             </CardContent>
@@ -416,7 +416,7 @@ const NewDriverDashboardPage: React.FC = () => {
                             }}
                           >
                             📸 Photo & Deliver
-                          </Button>
+                        </Button>
                           <Button 
                             size="sm" 
                             variant="outline" 
@@ -446,7 +446,7 @@ const NewDriverDashboardPage: React.FC = () => {
                             }}
                           >
                             ✅ Delivered
-                          </Button>
+                        </Button>
                         </div>
                       </div>
                     </div>
@@ -507,8 +507,8 @@ const NewDriverDashboardPage: React.FC = () => {
                           className="flex-1 bg-teal-600 hover:bg-teal-700"
                           onClick={() => handleAcceptOrder(order.id)}
                         >
-                          Accept Order
-                        </Button>
+                        Accept Order
+                      </Button>
                         <Button 
                           size="sm" 
                           variant="outline"
@@ -516,10 +516,14 @@ const NewDriverDashboardPage: React.FC = () => {
                           onClick={async () => {
                             if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
                               try {
-                                const { error } = await supabase
+                                console.log('Attempting to delete order:', order.id);
+                                const { data, error } = await supabase
                                   .from('orders')
                                   .delete()
-                                  .eq('id', order.id);
+                                  .eq('id', order.id)
+                                  .select();
+
+                                console.log('Delete result:', { data, error });
 
                                 if (error) {
                                   console.error('Error deleting order:', error);
@@ -527,8 +531,14 @@ const NewDriverDashboardPage: React.FC = () => {
                                   return;
                                 }
 
-                                alert('Order deleted successfully!');
-                                await fetchDriverData();
+                                if (!data || data.length === 0) {
+                                  alert('Order not found or already deleted.');
+                                  return;
+                                }
+
+                                alert('Order deleted successfully! Refreshing dashboard...');
+                                // Force a complete page refresh to ensure UI updates
+                                window.location.reload();
                               } catch (error) {
                                 console.error('Error deleting order:', error);
                                 alert('Error deleting order: ' + error);
