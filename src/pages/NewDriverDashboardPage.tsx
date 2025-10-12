@@ -560,7 +560,7 @@ const NewDriverDashboardPage: React.FC = () => {
                           variant="outline"
                           className="border-gray-500 text-gray-500 cursor-not-allowed"
                           disabled
-                           onClick={() => {
+                           onClick={async () => {
                              if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
                                try {
                                  console.log('Attempting to delete order:', order.id);
