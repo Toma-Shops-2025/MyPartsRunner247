@@ -15,7 +15,12 @@ const DriverDashboardPage: React.FC = () => {
     );
   }
 
-  if (!user || profile?.user_type !== 'driver') {
+  // Temporarily disabled for testing - allow any authenticated user to access driver dashboard
+  // if (!user || profile?.user_type !== 'driver') {
+  //   return <Navigate to="/" replace />;
+  // }
+  
+  if (!user) {
     return <Navigate to="/" replace />;
   }
 
