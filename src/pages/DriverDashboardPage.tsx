@@ -7,6 +7,8 @@ import DriverDashboard from '@/components/DriverDashboard';
 const DriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
 
+  console.log('DriverDashboardPage - User:', !!user, 'Profile:', !!profile, 'Loading:', loading, 'User type:', profile?.user_type);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -21,8 +23,11 @@ const DriverDashboardPage: React.FC = () => {
   // }
   
   if (!user) {
+    console.log('No user, redirecting to home');
     return <Navigate to="/" replace />;
   }
+
+  console.log('Rendering driver dashboard');
 
   return (
     <div className="min-h-screen bg-gray-900">

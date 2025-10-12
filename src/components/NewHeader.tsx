@@ -165,6 +165,13 @@ const NewHeader: React.FC = () => {
                       <User className="mr-2 h-4 w-4" />
                       Profile (Direct)
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      console.log('Direct navigation to test page');
+                      window.location.href = '/test-driver';
+                    }}>
+                      <Car className="mr-2 h-4 w-4" />
+                      Test Page
+                    </DropdownMenuItem>
                     
                     {/* Customer menu items */}
                     {profile?.user_type === 'customer' && (

@@ -22,6 +22,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import UpdateUserTypePage from "./pages/UpdateUserTypePage";
 import DriverApplicationPage from "./pages/DriverApplicationPage";
+import TestDriverPage from "./pages/TestDriverPage";
 import DebugProfile from "./components/DebugProfile";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
+            <Route path="/test-driver" element={<TestDriverPage />} />
             <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/earnings" element={<EarningsPage />} />
