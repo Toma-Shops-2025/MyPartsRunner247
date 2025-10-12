@@ -49,7 +49,15 @@ const NewDriverDashboardPage: React.FC = () => {
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
 
-      // Fetch available orders
+      // Fetch available orders - try different statuses and show all orders for debugging
+      console.log('Fetching all orders for debugging...');
+      const { data: allOrders } = await supabase
+        .from('orders')
+        .select('*')
+        .limit(10);
+      
+      console.log('All orders in database:', allOrders);
+      
       const { data: availableOrdersData } = await supabase
         .from('orders')
         .select('*')
