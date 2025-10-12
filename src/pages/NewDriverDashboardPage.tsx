@@ -305,7 +305,6 @@ const NewDriverDashboardPage: React.FC = () => {
                           item_description: 'Test Item',
                           total: 1.00,
                           status: 'pending',
-                          urgency: 'standard',
                           created_at: new Date().toISOString()
                         };
                         
