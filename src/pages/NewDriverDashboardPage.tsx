@@ -357,19 +357,19 @@ const NewDriverDashboardPage: React.FC = () => {
                       <div className="space-y-2 text-sm text-gray-300 mb-4">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          <span>From: {order.pickup}</span>
+                          <span>From: {order.pickup_address}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          <span>To: {order.delivery}</span>
+                          <span>To: {order.delivery_address}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Package className="w-4 h-4" />
-                          <span>Item: {order.item}</span>
+                          <span>Item: {order.item_description}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Distance: {order.distance}</span>
-                          <span className="font-bold text-green-400">Fee: {order.fee}</span>
+                          <span>Status: {order.status}</span>
+                          <span className="font-bold text-green-400">Total: ${order.total}</span>
                         </div>
                       </div>
                       <Button size="sm" className="w-full bg-teal-600 hover:bg-teal-700">
