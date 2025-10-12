@@ -139,8 +139,28 @@ const NewDriverDashboardPage: React.FC = () => {
       <NewHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
-          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
+              <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
+            </div>
+            <Button 
+              onClick={() => {
+                // Force complete cache clear and refresh
+                if ('caches' in window) {
+                  caches.keys().then(names => {
+                    names.forEach(name => caches.delete(name));
+                  });
+                }
+                localStorage.removeItem('mock_profile');
+                sessionStorage.clear();
+                window.location.href = '/driver-dashboard?t=' + Date.now() + '&force=1&nocache=1';
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              🔄 Force Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -574,8 +594,24 @@ const NewDriverDashboardPage: React.FC = () => {
                                    alert('Order could not be deleted, but refreshing dashboard anyway...');
                                  }
                                  
-                                 // Force a complete page refresh with cache busting
-                                 window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now() + '&force=1';
+                                 // Force a complete page refresh with aggressive cache busting
+                                 setTimeout(() => {
+                                   // Clear all possible caches
+                                   if ('caches' in window) {
+                                     caches.keys().then(names => {
+                                       names.forEach(name => caches.delete(name));
+                                     });
+                                   }
+                                   
+                                   // Clear localStorage and sessionStorage
+                                   localStorage.removeItem('mock_profile');
+                                   sessionStorage.clear();
+                                   
+                                   // Force hard refresh with multiple cache busting parameters
+                                   const baseUrl = window.location.href.split('?')[0];
+                                   const timestamp = Date.now();
+                                   window.location.href = `${baseUrl}?t=${timestamp}&force=1&nocache=1&refresh=${Math.random()}`;
+                                 }, 1000);
                               } catch (error) {
                                 console.error('Error deleting order:', error);
                                 alert('Error deleting order: ' + error);
