@@ -50,7 +50,8 @@ const NewDriverDashboardPage: React.FC = () => {
         .from('orders')
         .select('*')
         .eq('status', 'pending')
-        .limit(10);
+        .limit(10)
+        .order('created_at', { ascending: false });
 
       // Calculate earnings from completed orders
       const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
@@ -529,15 +530,15 @@ const NewDriverDashboardPage: React.FC = () => {
                                 }
 
                                 if (!data || data.length === 0) {
-                                  alert('Order not found or already deleted. Refreshing dashboard...');
-                                  // Force refresh even if order was already deleted
-                                  window.location.reload();
+                                 alert('Order not found or already deleted. Refreshing dashboard...');
+                                 // Force refresh even if order was already deleted with cache busting
+                                 window.location.href = window.location.href + '?t=' + Date.now();
                                   return;
                                 }
 
-                                alert('Order deleted successfully! Refreshing dashboard...');
-                                // Force a complete page refresh to ensure UI updates
-                                window.location.reload();
+                                 alert('Order deleted successfully! Refreshing dashboard...');
+                                 // Force a complete page refresh with cache busting
+                                 window.location.href = window.location.href + '?t=' + Date.now();
                               } catch (error) {
                                 console.error('Error deleting order:', error);
                                 alert('Error deleting order: ' + error);
