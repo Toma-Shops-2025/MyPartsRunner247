@@ -30,10 +30,6 @@ const NewDriverDashboardPage: React.FC = () => {
   const fetchDriverData = async () => {
     try {
       // Fetch driver earnings
-      const { data: earnings } = await supabase
-        .from('earnings')
-        .select('amount')
-        .eq('driver_id', user?.id);
 
       // Fetch completed orders
       const { data: completedOrders } = await supabase
@@ -56,7 +52,8 @@ const NewDriverDashboardPage: React.FC = () => {
         .eq('status', 'pending')
         .limit(10);
 
-      const totalEarnings = earnings?.reduce((sum, earning) => sum + parseFloat(earning.amount), 0) || 0;
+      // Calculate earnings from completed orders
+      const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
       const completedDeliveries = completedOrders?.length || 0;
       const activeDeliveries = activeOrdersData?.length || 0;
 
@@ -532,7 +529,9 @@ const NewDriverDashboardPage: React.FC = () => {
                                 }
 
                                 if (!data || data.length === 0) {
-                                  alert('Order not found or already deleted.');
+                                  alert('Order not found or already deleted. Refreshing dashboard...');
+                                  // Force refresh even if order was already deleted
+                                  window.location.reload();
                                   return;
                                 }
 
