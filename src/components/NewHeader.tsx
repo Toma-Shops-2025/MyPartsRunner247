@@ -19,9 +19,15 @@ const NewHeader: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-    setIsMobileMenuOpen(false);
+    console.log('Sign out button clicked!');
+    try {
+      await signOut();
+      console.log('Sign out completed, navigating to home...');
+      navigate('/');
+      setIsMobileMenuOpen(false);
+    } catch (error) {
+      console.error('Error in handleSignOut:', error);
+    }
   };
 
   const handleSwitchToDriver = async () => {
@@ -80,6 +86,14 @@ const NewHeader: React.FC = () => {
               {loading ? (
                 <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
               ) : user ? (
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    onClick={handleSignOut}
+                    variant="outline"
+                    className="h-10 px-4 text-sm font-medium border-red-600 text-red-600 hover:bg-red-50"
+                  >
+                    Logout
+                  </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
@@ -150,15 +164,25 @@ const NewHeader: React.FC = () => {
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      console.log('Alternative sign out clicked!');
+                      handleSignOut();
+                    }}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out (Alt)
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
               ) : (
-                <Button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="h-10 px-4 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white"
-                >
-                  Sign In
-                </Button>
+                <div className="flex items-center space-x-2">
+                  <Button 
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="h-10 px-4 text-sm font-medium bg-teal-600 hover:bg-teal-700 text-white"
+                  >
+                    Sign In
+                  </Button>
+                </div>
               )}
             </div>
 
