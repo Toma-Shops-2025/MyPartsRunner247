@@ -433,9 +433,9 @@ const NewDriverDashboardPage: React.FC = () => {
                         const testOrder = {
                           customer_id: user?.id || 'test-user',
                           driver_id: user?.id, // Pre-assign to current driver
-                          pickup_address: 'Test Pickup Address',
-                          delivery_address: 'Test Delivery Address', 
-                          item_description: 'Test Item',
+                          pickup_address: '123 Main Street, Louisville, KY 40202',
+                          delivery_address: '456 Oak Avenue, Louisville, KY 40205', 
+                          item_description: 'Test Package',
                           total: 1.00,
                           status: 'accepted', // Start as accepted
                           created_at: new Date().toISOString()
