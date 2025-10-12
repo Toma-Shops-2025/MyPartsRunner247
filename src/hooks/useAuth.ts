@@ -229,9 +229,25 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       console.log('Starting sign out process...');
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Error signing out:', error);
+      console.log('Calling supabase.auth.signOut()...');
+      
+      const signOutPromise = supabase.auth.signOut();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Sign out timeout after 5 seconds')), 5000)
+      );
+      
+      const result = await Promise.race([signOutPromise, timeoutPromise]) as any;
+      console.log('Supabase signOut result:', result);
+      
+      if (result.error) {
+        console.error('Supabase signOut error:', result.error);
+        // Even if there's an error, try to clear local state
+        console.log('Clearing local state despite error...');
+        setUser(null);
+        setProfile(null);
+        setSession(null);
+        setLoading(false);
+        window.location.href = '/';
       } else {
         console.log('Sign out successful, clearing local state...');
         // Clear local state
@@ -247,7 +263,26 @@ export const useAuth = () => {
       }
     } catch (error) {
       console.error('Error signing out:', error);
+      // Force logout even if Supabase fails
+      console.log('Forcing logout despite error...');
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      setLoading(false);
+      window.location.href = '/';
     }
+  };
+
+  const forceLogout = () => {
+    console.log('Force logout - bypassing Supabase entirely');
+    setUser(null);
+    setProfile(null);
+    setSession(null);
+    setLoading(false);
+    // Clear any stored auth data
+    localStorage.removeItem('supabase.auth.token');
+    sessionStorage.removeItem('supabase.auth.token');
+    window.location.href = '/';
   };
 
   return {
@@ -256,6 +291,7 @@ export const useAuth = () => {
     session,
     loading,
     signOut,
+    forceLogout,
     updateUserType,
     createProfileManually,
     isAuthenticated: !!user,

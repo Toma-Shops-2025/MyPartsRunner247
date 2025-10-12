@@ -8,7 +8,7 @@ import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRi
 import { useNavigate } from 'react-router-dom';
 
 const NewHeader: React.FC = () => {
-  const { user, profile, signOut, loading, updateUserType } = useAuth();
+  const { user, profile, signOut, forceLogout, loading, updateUserType } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -93,6 +93,13 @@ const NewHeader: React.FC = () => {
                     className="h-10 px-4 text-sm font-medium border-red-600 text-red-600 hover:bg-red-50"
                   >
                     Logout
+                  </Button>
+                  <Button 
+                    onClick={forceLogout}
+                    variant="outline"
+                    className="h-10 px-4 text-sm font-medium border-orange-600 text-orange-600 hover:bg-orange-50"
+                  >
+                    Force Logout
                   </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
