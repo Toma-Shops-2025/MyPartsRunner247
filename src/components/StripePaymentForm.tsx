@@ -217,6 +217,20 @@ const PaymentForm: React.FC<{
       }
 
       if (confirmedPayment && confirmedPayment.status === 'succeeded') {
+        console.log('Payment succeeded! Creating order in database...');
+        console.log('Order details:', {
+          customerid: currentUser.id,
+          pickupaddress: orderDetails.pickupAddress,
+          deliveryaddress: orderDetails.deliveryAddress,
+          itemdescription: orderDetails.itemDescription,
+          total: amount,
+          status: 'pending',
+          urgency: orderDetails.urgency,
+          payment_intent_id: confirmedPayment.id,
+          payment_status: 'paid',
+          createdat: new Date().toISOString()
+        });
+        
         // Create order in database with real payment info
         const { data: order, error: orderError } = await supabase
           .from('orders')
@@ -235,11 +249,14 @@ const PaymentForm: React.FC<{
           .select()
           .single();
 
+        console.log('Order creation result:', { order, orderError });
+
         if (orderError) {
           console.error('Order creation error:', orderError);
           throw new Error('Payment succeeded but failed to create order. Please contact support.');
         }
 
+        console.log('Order created successfully:', order.id);
         onSuccess(order.id);
       } else {
         throw new Error('Payment was not successful');
@@ -250,6 +267,19 @@ const PaymentForm: React.FC<{
       // If payment intent creation failed, try to create order directly (demo mode)
       if (err.message?.includes('timeout') || err.message?.includes('Failed to create payment intent')) {
         console.log('Payment intent failed, trying direct order creation...');
+        console.log('Direct order details:', {
+          customerid: currentUser.id,
+          pickupaddress: orderDetails.pickupAddress,
+          deliveryaddress: orderDetails.deliveryAddress,
+          itemdescription: orderDetails.itemDescription,
+          total: amount,
+          status: 'pending',
+          urgency: orderDetails.urgency,
+          payment_intent_id: 'demo_' + Date.now(),
+          payment_status: 'paid',
+          createdat: new Date().toISOString()
+        });
+        
         try {
           const { data: order, error: orderError } = await supabase
             .from('orders')
@@ -267,6 +297,8 @@ const PaymentForm: React.FC<{
             }])
             .select()
             .single();
+
+          console.log('Direct order creation result:', { order, orderError });
 
           if (orderError) {
             console.error('Direct order creation error:', orderError);
