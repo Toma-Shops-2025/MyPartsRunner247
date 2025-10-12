@@ -326,9 +326,10 @@ const NewDriverDashboardPage: React.FC = () => {
                         const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
                         
                         console.log('Test insert result:', { order, orderError });
+                        console.log('Full error details:', orderError);
                         
                         if (orderError) {
-                          alert('Test insert failed: ' + orderError.message);
+                          alert('Test insert failed: ' + orderError.message + '\n\nFull error: ' + JSON.stringify(orderError, null, 2));
                         } else {
                           alert('Test insert successful! Order ID: ' + order.id);
                           // Refresh orders to show the new test order
