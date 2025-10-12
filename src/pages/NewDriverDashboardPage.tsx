@@ -51,6 +51,7 @@ const NewDriverDashboardPage: React.FC = () => {
         .select('*')
         .eq('status', 'pending')
         .neq('status', 'cancelled')
+        .neq('status', 'deleted')
         .limit(10)
         .order('created_at', { ascending: false });
 
@@ -487,10 +488,27 @@ const NewDriverDashboardPage: React.FC = () => {
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
               <div className="flex justify-between items-center">
-              <CardTitle className="text-white flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Available Orders
-              </CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Available Orders
+                </CardTitle>
+                <Button 
+                  onClick={() => {
+                    // Force complete cache clear and refresh
+                    if ('caches' in window) {
+                      caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                      });
+                    }
+                    localStorage.removeItem('mock_profile');
+                    sessionStorage.clear();
+                    window.location.href = '/driver-dashboard?t=' + Date.now() + '&force=1&nocache=1';
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                  size="sm"
+                >
+                  🔄 Force Refresh
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -572,19 +590,19 @@ const NewDriverDashboardPage: React.FC = () => {
                                    }
                                  }
                                  
-                                 // Method 3: Update status to 'cancelled' instead of delete
+                                 // Method 3: Update status to 'deleted' instead of delete
                                  if (!deleted) {
                                    try {
                                      const { data, error } = await supabase
                                        .from('orders')
-                                       .update({ status: 'cancelled' })
+                                       .update({ status: 'deleted' })
                                        .eq('id', order.id)
                                        .select();
                                      
-                                     console.log('Status update result:', { data, error });
+                                     console.log('Status update to deleted result:', { data, error });
                                      deleted = true;
                                    } catch (e) {
-                                     console.log('Status update failed:', e);
+                                     console.log('Status update to deleted failed:', e);
                                    }
                                  }
                                  
