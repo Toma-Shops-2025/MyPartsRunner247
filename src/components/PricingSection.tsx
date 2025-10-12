@@ -5,7 +5,7 @@ const PricingSection: React.FC = () => {
   const plans = [
     {
       name: "Personal",
-      price: "$4.99",
+      price: "$1.00",
       period: "per delivery",
       description: "Perfect for individuals and occasional deliveries",
       features: [
