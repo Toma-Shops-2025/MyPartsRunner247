@@ -14,6 +14,7 @@ const NewHeader: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
+    console.log('Navigating to:', path, 'User:', !!user, 'Profile:', !!profile, 'User type:', profile?.user_type);
     navigate(path);
     setIsMobileMenuOpen(false);
   };
@@ -150,9 +151,19 @@ const NewHeader: React.FC = () => {
                     )}
                     
                     {/* Temporary: Show driver options for testing */}
-                    <DropdownMenuItem onClick={() => handleNavigation('/driver-dashboard')}>
+                    <DropdownMenuItem onClick={() => {
+                      console.log('Direct navigation to driver dashboard');
+                      window.location.href = '/driver-dashboard';
+                    }}>
                       <Car className="mr-2 h-4 w-4" />
-                      Driver Dashboard (Test)
+                      Driver Dashboard (Direct)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => {
+                      console.log('Direct navigation to profile');
+                      window.location.href = '/profile';
+                    }}>
+                      <User className="mr-2 h-4 w-4" />
+                      Profile (Direct)
                     </DropdownMenuItem>
                     
                     {/* Customer menu items */}
