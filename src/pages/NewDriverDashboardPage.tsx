@@ -253,6 +253,40 @@ const NewDriverDashboardPage: React.FC = () => {
           <DriverNotificationSystem />
         </div>
 
+        {/* Navigation Map Section */}
+        {activeOrders.length > 0 && (
+          <div className="mb-8">
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <MapPin className="w-5 h-5" />
+                  Navigation Map
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="bg-gray-700 rounded-lg p-4 h-64 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-400 mb-4">Interactive map will be displayed here</p>
+                    <Button 
+                      onClick={() => {
+                        const order = activeOrders[0];
+                        const pickup = encodeURIComponent(order.pickup_address);
+                        const delivery = encodeURIComponent(order.delivery_address);
+                        const googleMapsUrl = `https://www.google.com/maps/dir/${pickup}/${delivery}`;
+                        window.open(googleMapsUrl, '_blank');
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      🗺️ Open in Google Maps
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Active Orders */}
           <Card className="bg-gray-800 border-gray-700">
@@ -291,6 +325,18 @@ const NewDriverDashboardPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="mt-4 flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="bg-blue-600 hover:bg-blue-700"
+                          onClick={() => {
+                            const pickup = encodeURIComponent(order.pickup_address);
+                            const delivery = encodeURIComponent(order.delivery_address);
+                            const googleMapsUrl = `https://www.google.com/maps/dir/${pickup}/${delivery}`;
+                            window.open(googleMapsUrl, '_blank');
+                          }}
+                        >
+                          🗺️ Navigate
+                        </Button>
                         <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
                           Call Customer
                         </Button>
