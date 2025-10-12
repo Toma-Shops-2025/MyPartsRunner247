@@ -396,7 +396,8 @@ const NewDriverDashboardPage: React.FC = () => {
                             input.capture = 'environment'; // Use back camera on mobile
                             
                             input.onchange = async (e) => {
-                              const file = e.target.files[0];
+                              const target = e.target as HTMLInputElement;
+                              const file = target.files?.[0];
                               if (file) {
                                 try {
                                   // Convert image to base64 for storage
