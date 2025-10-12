@@ -39,14 +39,45 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
     
     if (!mapboxToken) {
-      // Fallback to deterministic calculation if no Mapbox token
-      const addressHash = (pickupAddress + deliveryAddress).split('').reduce((hash, char) => {
-        return ((hash << 5) - hash + char.charCodeAt(0)) & 0xffffffff;
-      }, 0);
+      // Fallback to simple distance estimation based on address similarity
+      const calculateSimpleDistance = (addr1: string, addr2: string) => {
+        // Extract street numbers for comparison
+        const num1 = addr1.match(/^\d+/)?.[0];
+        const num2 = addr2.match(/^\d+/)?.[0];
+        
+        if (num1 && num2) {
+          const streetNumDiff = Math.abs(parseInt(num1) - parseInt(num2));
+          // If addresses are on the same street with close numbers, estimate very short distance
+          if (streetNumDiff <= 10) {
+            return 0.1; // Very close - same street, few houses apart
+          } else if (streetNumDiff <= 100) {
+            return 0.5; // Same street, but further apart
+          }
+        }
+        
+        // Check if addresses contain similar street names
+        const street1 = addr1.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
+        const street2 = addr2.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
+        
+        if (street1 === street2) {
+          return 0.2; // Same street name
+        }
+        
+        // Check if addresses are in the same city/area
+        const city1 = addr1.toLowerCase().split(',').pop()?.trim() || '';
+        const city2 = addr2.toLowerCase().split(',').pop()?.trim() || '';
+        
+        if (city1 === city2) {
+          return 2.0; // Same city, different streets
+        }
+        
+        // Default fallback for different cities
+        return 5.0; // Different cities
+      };
       
-      const mockDistance = Math.abs(addressHash % 1400) / 100 + 1; // 1-15 miles
-      setDistance(mockDistance);
-      setDistancePrice(mockDistance * 0.75);
+      const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
+      setDistance(estimatedDistance);
+      setDistancePrice(estimatedDistance * 0.75);
       return;
     }
 
@@ -87,14 +118,45 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       }
     } catch (error) {
       console.error('Distance calculation error:', error);
-      // Fallback to deterministic calculation
-      const addressHash = (pickupAddress + deliveryAddress).split('').reduce((hash, char) => {
-        return ((hash << 5) - hash + char.charCodeAt(0)) & 0xffffffff;
-      }, 0);
+      // Fallback to simple distance estimation based on address similarity
+      const calculateSimpleDistance = (addr1: string, addr2: string) => {
+        // Extract street numbers for comparison
+        const num1 = addr1.match(/^\d+/)?.[0];
+        const num2 = addr2.match(/^\d+/)?.[0];
+        
+        if (num1 && num2) {
+          const streetNumDiff = Math.abs(parseInt(num1) - parseInt(num2));
+          // If addresses are on the same street with close numbers, estimate very short distance
+          if (streetNumDiff <= 10) {
+            return 0.1; // Very close - same street, few houses apart
+          } else if (streetNumDiff <= 100) {
+            return 0.5; // Same street, but further apart
+          }
+        }
+        
+        // Check if addresses contain similar street names
+        const street1 = addr1.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
+        const street2 = addr2.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
+        
+        if (street1 === street2) {
+          return 0.2; // Same street name
+        }
+        
+        // Check if addresses are in the same city/area
+        const city1 = addr1.toLowerCase().split(',').pop()?.trim() || '';
+        const city2 = addr2.toLowerCase().split(',').pop()?.trim() || '';
+        
+        if (city1 === city2) {
+          return 2.0; // Same city, different streets
+        }
+        
+        // Default fallback for different cities
+        return 5.0; // Different cities
+      };
       
-      const mockDistance = Math.abs(addressHash % 1400) / 100 + 1;
-      setDistance(mockDistance);
-      setDistancePrice(mockDistance * 0.75);
+      const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
+      setDistance(estimatedDistance);
+      setDistancePrice(estimatedDistance * 0.75);
     }
   };
 
