@@ -157,7 +157,6 @@ const NewHeader: React.FC = () => {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                </div>
               ) : (
                 <div className="flex items-center space-x-2">
                   <Button 
