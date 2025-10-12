@@ -243,7 +243,6 @@ const PaymentForm: React.FC<{
             total: amount,
             status: 'pending',
             urgency: orderDetails.urgency,
-            payment_intent_id: confirmedPayment.id,
             payment_status: 'paid',
             created_at: new Date().toISOString()
           }])
