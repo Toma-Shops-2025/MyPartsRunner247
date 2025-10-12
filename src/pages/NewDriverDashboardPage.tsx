@@ -58,6 +58,18 @@ const NewDriverDashboardPage: React.FC = () => {
       
       console.log('All orders in database:', allOrders);
       
+      // Log each order's status and driver_id
+      if (allOrders && allOrders.length > 0) {
+        allOrders.forEach((order, index) => {
+          console.log(`Order ${index}:`, {
+            id: order.id,
+            status: order.status,
+            driver_id: order.driver_id,
+            customer_id: order.customer_id
+          });
+        });
+      }
+      
       const { data: availableOrdersData } = await supabase
         .from('orders')
         .select('*')
@@ -299,6 +311,35 @@ const NewDriverDashboardPage: React.FC = () => {
                     className="bg-teal-600 hover:bg-teal-700 text-white"
                   >
                     Refresh Orders
+                  </Button>
+                  <Button 
+                    onClick={async () => {
+                      console.log('Toggling driver online status...');
+                      try {
+                        const newOnlineStatus = !profile?.is_online;
+                        console.log('Setting is_online to:', newOnlineStatus);
+                        
+                        // Update the mock profile in localStorage
+                        const updatedProfile = {
+                          ...profile,
+                          is_online: newOnlineStatus
+                        };
+                        localStorage.setItem('mock_profile', JSON.stringify(updatedProfile));
+                        
+                        console.log('Updated mock profile:', updatedProfile);
+                        alert(`Driver is now ${newOnlineStatus ? 'ONLINE' : 'OFFLINE'}`);
+                        
+                        // Refresh the page to update the profile
+                        window.location.reload();
+                      } catch (error) {
+                        console.error('Error toggling online status:', error);
+                        alert('Error toggling online status: ' + error);
+                      }
+                    }}
+                    size="sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    Toggle Online
                   </Button>
                   <Button 
                     onClick={async () => {
