@@ -43,11 +43,14 @@ const NewDriverDashboardPage: React.FC = () => {
         .eq('status', 'delivered');
 
       // Fetch active orders
+      console.log('Fetching active orders for driver:', user?.id);
       const { data: activeOrdersData } = await supabase
         .from('orders')
         .select('*')
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
+      
+      console.log('Active orders fetched:', activeOrdersData?.length || 0, activeOrdersData);
 
       // Fetch available orders - try different statuses and show all orders for debugging
       console.log('Fetching all orders for debugging...');
@@ -271,20 +274,20 @@ const NewDriverDashboardPage: React.FC = () => {
                       <div className="space-y-2 text-sm text-gray-300">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          <span>From: {order.pickup}</span>
+                          <span>From: {order.pickup_address}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          <span>To: {order.delivery}</span>
+                          <span>To: {order.delivery_address}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Package className="w-4 h-4" />
-                          <span>Item: {order.item}</span>
+                          <span>Item: {order.item_description}</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span>Customer: {order.customer}</span>
+                          <span>Customer: {order.customer_id}</span>
                           <span>•</span>
-                          <span>{order.phone}</span>
+                          <span>Total: ${order.total}</span>
                         </div>
                       </div>
                       <div className="mt-4 flex gap-2">
