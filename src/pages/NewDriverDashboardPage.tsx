@@ -515,12 +515,21 @@ const NewDriverDashboardPage: React.FC = () => {
               {availableOrders.length > 0 ? (
                 <div className="space-y-4">
                   {availableOrders.map((order) => (
-                    <div key={order.id} className="bg-gray-700 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
+                    <div key={order.id} className="bg-gray-700 rounded-lg p-4 relative">
+                      {/* SAMPLE ORDER Overlay */}
+                      <div className="absolute inset-0 bg-red-900 bg-opacity-90 flex items-center justify-center z-10 rounded-lg">
+                        <div className="text-center">
+                          <div className="text-6xl font-bold text-red-200 mb-2">SAMPLE</div>
+                          <div className="text-4xl font-bold text-red-100">ORDER</div>
+                          <div className="text-lg text-red-300 mt-2">For Testing Only</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-between items-start mb-2 opacity-30">
                         <span className="text-sm font-medium text-white">Order #{order.id}</span>
                         <span className="text-xs text-gray-400">{order.time}</span>
                       </div>
-                      <div className="space-y-2 text-sm text-gray-300 mb-4">
+                      <div className="space-y-2 text-sm text-gray-300 mb-4 opacity-30">
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
                           <span>From: {order.pickup_address}</span>
@@ -538,19 +547,20 @@ const NewDriverDashboardPage: React.FC = () => {
                           <span className="font-bold text-green-400">Total: ${order.total}</span>
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 opacity-30 pointer-events-none">
                         <Button 
                           size="sm" 
-                          className="flex-1 bg-teal-600 hover:bg-teal-700"
-                          onClick={() => handleAcceptOrder(order.id)}
+                          className="flex-1 bg-gray-500 cursor-not-allowed"
+                          disabled
                         >
                         Accept Order
                       </Button>
                         <Button 
                           size="sm" 
                           variant="outline"
-                          className="border-red-600 text-red-600 hover:bg-red-50"
-                           onClick={async () => {
+                          className="border-gray-500 text-gray-500 cursor-not-allowed"
+                          disabled
+                           onClick={() => {
                              if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
                                try {
                                  console.log('Attempting to delete order:', order.id);
