@@ -299,10 +299,10 @@ const NewDriverDashboardPage: React.FC = () => {
                       console.log('Testing database insert...');
                       try {
                         const testOrder = {
-                          customerid: user?.id || 'test-user',
-                          pickupaddress: 'Test Pickup Address',
-                          deliveryaddress: 'Test Delivery Address', 
-                          itemdescription: 'Test Item',
+                          customer_id: user?.id || 'test-user',
+                          pickup_address: 'Test Pickup Address',
+                          delivery_address: 'Test Delivery Address', 
+                          item_description: 'Test Item',
                           total: 1.00,
                           status: 'pending',
                           urgency: 'standard',
