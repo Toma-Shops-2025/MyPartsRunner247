@@ -88,6 +88,12 @@ export const useAuth = () => {
     
     setLastProcessedUserId(userId);
     
+    // Set a timeout to prevent infinite loading
+    const profileTimeout = setTimeout(() => {
+      console.log('Profile fetch timeout - setting loading to false');
+      setLoading(false);
+    }, 8000); // 8 second timeout
+    
     // Check for mock profile first
     const mockProfile = localStorage.getItem('mock_profile');
     if (mockProfile) {
@@ -95,6 +101,7 @@ export const useAuth = () => {
         const parsedProfile = JSON.parse(mockProfile);
         if (parsedProfile.id === userId) {
           console.log('Using mock profile:', parsedProfile);
+          clearTimeout(profileTimeout);
           setProfile(parsedProfile);
           setLoading(false);
           return;
@@ -114,21 +121,34 @@ export const useAuth = () => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
+        clearTimeout(profileTimeout);
         // Don't auto-create profile, just set loading to false
         setProfile(null);
         setLoading(false);
       } else if (data) {
         console.log('Profile found:', data);
+        clearTimeout(profileTimeout);
         setProfile(data);
         setLoading(false);
       } else {
         console.log('No profile found for user:', userId);
-        // No profile found, don't auto-create
-        setProfile(null);
-        setLoading(false);
+        // Auto-create profile for existing users
+        try {
+          console.log('Auto-creating profile for user:', userId);
+          const profileData = await createProfileManually();
+          clearTimeout(profileTimeout);
+          setProfile(profileData);
+          setLoading(false);
+        } catch (createError) {
+          console.error('Failed to auto-create profile:', createError);
+          clearTimeout(profileTimeout);
+          setProfile(null);
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      clearTimeout(profileTimeout);
       setProfile(null);
       setLoading(false);
     }
