@@ -56,6 +56,7 @@ const DriverDashboard: React.FC = () => {
 
   const fetchAvailableOrders = async () => {
     try {
+      console.log('Fetching available orders for driver...');
       const { data, error } = await supabase
         .from('orders')
         .select('*')
@@ -63,7 +64,12 @@ const DriverDashboard: React.FC = () => {
         .eq('status', 'pending')
         .order('createdat', { ascending: true });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching orders:', error);
+        throw error;
+      }
+      
+      console.log('Available orders found:', data?.length || 0, data);
       setAvailableOrders(data || []);
     } catch (error) {
       console.error('Error fetching available orders:', error);
@@ -137,6 +143,17 @@ const DriverDashboard: React.FC = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-white">Driver Dashboard</h1>
         <div className="flex items-center space-x-4">
+          <Button
+            variant="outline"
+            onClick={() => {
+              console.log('Refreshing orders...');
+              fetchAvailableOrders();
+              fetchDriverOrders();
+            }}
+            className="bg-gray-700 hover:bg-gray-600 text-white border-gray-600"
+          >
+            Refresh Orders
+          </Button>
           <Button
             variant={isOnline ? "destructive" : "default"}
             onClick={() => setIsOnline(!isOnline)}

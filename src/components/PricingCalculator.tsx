@@ -100,12 +100,30 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       const pickupCoords = pickupData.features[0].center; // [lng, lat]
       const deliveryCoords = deliveryData.features[0].center; // [lng, lat]
 
+      // Check if coordinates are too close (less than 10 meters apart)
+      const latDiff = Math.abs(pickupCoords[1] - deliveryCoords[1]);
+      const lngDiff = Math.abs(pickupCoords[0] - deliveryCoords[0]);
+      const distanceInDegrees = Math.sqrt(latDiff * latDiff + lngDiff * lngDiff);
+      
+      if (distanceInDegrees < 0.0001) { // Less than ~10 meters
+        // Use simple distance calculation for very close addresses
+        const estimatedDistance = 0.1; // Very close
+        setDistance(estimatedDistance);
+        setDistancePrice(estimatedDistance * 0.75);
+        return;
+      }
+
       // Use Mapbox Matrix API to get driving distance
       const matrixResponse = await fetch(
         `https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${pickupCoords[0]},${pickupCoords[1]};${deliveryCoords[0]},${deliveryCoords[1]}?access_token=${mapboxToken}&sources=0&destinations=1&annotations=distance`
       );
 
       const matrixData = await matrixResponse.json();
+      
+      if (!matrixResponse.ok) {
+        console.warn('Mapbox API error:', matrixResponse.status, matrixData);
+        throw new Error(`Mapbox API error: ${matrixResponse.status}`);
+      }
       
       if (matrixData.distances && matrixData.distances[0] && matrixData.distances[0][0]) {
         const distanceInMeters = matrixData.distances[0][0];
@@ -114,7 +132,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         setDistance(distanceInMiles);
         setDistancePrice(distanceInMiles * 0.75); // $0.75 per mile
       } else {
-        throw new Error('Could not calculate distance');
+        throw new Error('Could not calculate distance from Mapbox response');
       }
     } catch (error) {
       console.error('Distance calculation error:', error);
