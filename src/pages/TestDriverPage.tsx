@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 const TestDriverPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -21,6 +22,49 @@ const TestDriverPage: React.FC = () => {
       <div className="mt-8">
         <h2 className="text-2xl font-bold mb-4">This is a test page to verify navigation works</h2>
         <p>If you can see this page, navigation is working!</p>
+        
+        {!profile && (
+          <div className="mt-6 p-4 bg-yellow-900 border border-yellow-600 rounded-lg">
+            <h3 className="text-lg font-bold text-yellow-400 mb-2">Profile Missing!</h3>
+            <p className="text-yellow-200 mb-4">This user doesn't have a profile in the database. This is why the driver dashboard isn't working.</p>
+            <button 
+              onClick={async () => {
+                console.log('Creating profile for user...');
+                try {
+                  const { data, error } = await supabase
+                    .from('profiles')
+                    .insert([{
+                      id: user?.id,
+                      full_name: user?.email?.split('@')[0] || 'Driver',
+                      email: user?.email,
+                      user_type: 'driver',
+                      is_approved: true,
+                      is_online: false,
+                      created_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString()
+                    }])
+                    .select()
+                    .single();
+
+                  if (error) {
+                    console.error('Error creating profile:', error);
+                    alert('Error creating profile: ' + error.message);
+                  } else {
+                    console.log('Profile created successfully:', data);
+                    alert('Profile created successfully! Please refresh the page.');
+                    window.location.reload();
+                  }
+                } catch (error) {
+                  console.error('Error creating profile:', error);
+                  alert('Error creating profile: ' + error);
+                }
+              }}
+              className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded"
+            >
+              Create Driver Profile
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
