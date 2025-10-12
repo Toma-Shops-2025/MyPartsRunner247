@@ -102,17 +102,31 @@ const NewDriverDashboardPage: React.FC = () => {
     try {
       console.log('Accepting order:', orderId, 'for driver:', user?.id);
       
-      const { error } = await supabase
+      console.log('Updating order with:', {
+        driver_id: user?.id,
+        status: 'accepted',
+        orderId: orderId
+      });
+
+      const { data: updateResult, error } = await supabase
         .from('orders')
         .update({ 
           driver_id: user?.id,
           status: 'accepted'
         })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .select();
+
+      console.log('Update result:', { updateResult, error });
 
       if (error) {
         console.error('Error accepting order:', error);
         throw error;
+      }
+
+      if (!updateResult || updateResult.length === 0) {
+        console.error('No rows were updated - order might not exist or match criteria');
+        throw new Error('No rows were updated');
       }
       
       console.log('Order accepted, refreshing data...');
