@@ -267,19 +267,31 @@ const NewDriverDashboardPage: React.FC = () => {
                 <div className="bg-gray-700 rounded-lg p-4 h-64 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-400 mb-4">Interactive map will be displayed here</p>
-                    <Button 
-                      onClick={() => {
-                        const order = activeOrders[0];
-                        const pickup = encodeURIComponent(order.pickup_address);
-                        const delivery = encodeURIComponent(order.delivery_address);
-                        const googleMapsUrl = `https://www.google.com/maps/dir/${pickup}/${delivery}`;
-                        window.open(googleMapsUrl, '_blank');
-                      }}
-                      className="bg-blue-600 hover:bg-blue-700"
-                    >
-                      🗺️ Open in Google Maps
-                    </Button>
+                    <p className="text-gray-400 mb-4">Driver Navigation Workflow</p>
+                    <div className="flex gap-2 justify-center">
+                      <Button 
+                        onClick={() => {
+                          const order = activeOrders[0];
+                          const pickup = encodeURIComponent(order.pickup_address);
+                          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${pickup}`;
+                          window.open(googleMapsUrl, '_blank');
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        📍 Go to Pickup
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          const order = activeOrders[0];
+                          const delivery = encodeURIComponent(order.delivery_address);
+                          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${delivery}`;
+                          window.open(googleMapsUrl, '_blank');
+                        }}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        🚚 Go to Delivery
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -330,12 +342,22 @@ const NewDriverDashboardPage: React.FC = () => {
                           className="bg-blue-600 hover:bg-blue-700"
                           onClick={() => {
                             const pickup = encodeURIComponent(order.pickup_address);
-                            const delivery = encodeURIComponent(order.delivery_address);
-                            const googleMapsUrl = `https://www.google.com/maps/dir/${pickup}/${delivery}`;
+                            const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${pickup}`;
                             window.open(googleMapsUrl, '_blank');
                           }}
                         >
-                          🗺️ Navigate
+                          📍 Navigate to Pickup
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            const delivery = encodeURIComponent(order.delivery_address);
+                            const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${delivery}`;
+                            window.open(googleMapsUrl, '_blank');
+                          }}
+                        >
+                          🚚 Navigate to Delivery
                         </Button>
                         <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
                           Call Customer
