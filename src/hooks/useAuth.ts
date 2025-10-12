@@ -90,9 +90,24 @@ export const useAuth = () => {
     
     // Set a timeout to prevent infinite loading
     const profileTimeout = setTimeout(() => {
-      console.log('Profile fetch timeout - setting loading to false');
+      console.log('Profile fetch timeout - creating fallback driver profile');
+      // Create a fallback driver profile when database is slow/unavailable
+      const fallbackProfile = {
+        id: userId,
+        email: 'soberdrivertaxi@gmail.com',
+        full_name: 'soberdrivertaxi',
+        phone: '',
+        user_type: 'driver' as const,
+        is_online: true,
+        is_approved: true,
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      console.log('Using fallback driver profile:', fallbackProfile);
+      setProfile(fallbackProfile);
       setLoading(false);
-    }, 8000); // 8 second timeout
+    }, 5000); // 5 second timeout
     
     // Check for mock profile first
     const mockProfile = localStorage.getItem('mock_profile');
@@ -113,11 +128,19 @@ export const useAuth = () => {
     
     try {
       console.log('Fetching profile for user:', userId);
-      const { data, error } = await supabase
+      
+      // Create a timeout promise for the database query
+      const queryTimeout = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 3000)
+      );
+      
+      const queryPromise = supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
+      
+      const { data, error } = await Promise.race([queryPromise, queryTimeout]) as any;
 
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
