@@ -69,6 +69,8 @@ const NewDriverDashboardPage: React.FC = () => {
 
       setActiveOrders(activeOrdersData || []);
       setAvailableOrders(availableOrdersData || []);
+      
+      console.log('Available orders fetched:', availableOrdersData?.length || 0, availableOrdersData);
     } catch (error) {
       console.error('Error fetching driver data:', error);
     } finally {
@@ -271,10 +273,19 @@ const NewDriverDashboardPage: React.FC = () => {
           {/* Available Orders */}
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Available Orders
-              </CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5" />
+                  Available Orders
+                </CardTitle>
+                <Button 
+                  onClick={fetchDriverData}
+                  size="sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white"
+                >
+                  Refresh Orders
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {availableOrders.length > 0 ? (
