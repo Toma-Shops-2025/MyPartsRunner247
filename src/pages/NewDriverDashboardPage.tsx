@@ -49,30 +49,7 @@ const NewDriverDashboardPage: React.FC = () => {
         .select('*')
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
-      
-      console.log('Active orders fetched:', activeOrdersData?.length || 0, activeOrdersData);
 
-      // Fetch available orders - try different statuses and show all orders for debugging
-      console.log('Fetching all orders for debugging...');
-      const { data: allOrders } = await supabase
-        .from('orders')
-        .select('*')
-        .limit(10);
-      
-      console.log('All orders in database:', allOrders);
-      
-      // Log each order's status and driver_id
-      if (allOrders && allOrders.length > 0) {
-        allOrders.forEach((order, index) => {
-          console.log(`Order ${index}:`, {
-            id: order.id,
-            status: order.status,
-            driver_id: order.driver_id,
-            customer_id: order.customer_id
-          });
-        });
-      }
-      
       const { data: availableOrdersData } = await supabase
         .from('orders')
         .select('*')
@@ -92,8 +69,6 @@ const NewDriverDashboardPage: React.FC = () => {
 
       setActiveOrders(activeOrdersData || []);
       setAvailableOrders(availableOrdersData || []);
-      
-      console.log('Available orders fetched:', availableOrdersData?.length || 0, availableOrdersData);
     } catch (error) {
       console.error('Error fetching driver data:', error);
     } finally {
@@ -103,14 +78,6 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const handleAcceptOrder = async (orderId: string) => {
     try {
-      console.log('Accepting order:', orderId, 'for driver:', user?.id);
-      
-      console.log('Updating order with:', {
-        driver_id: user?.id,
-        status: 'accepted',
-        orderId: orderId
-      });
-
       const { data: updateResult, error } = await supabase
         .from('orders')
         .update({ 
@@ -119,8 +86,6 @@ const NewDriverDashboardPage: React.FC = () => {
         })
         .eq('id', orderId)
         .select();
-
-      console.log('Update result:', { updateResult, error });
 
       if (error) {
         console.error('Error accepting order:', error);
@@ -132,10 +97,9 @@ const NewDriverDashboardPage: React.FC = () => {
         throw new Error('No rows were updated');
       }
       
-      console.log('Order accepted, refreshing data...');
       // Refresh data
       await fetchDriverData();
-      alert('Order accepted successfully!');
+      alert('Order accepted successfully! You can now navigate to pickup location.');
     } catch (error) {
       console.error('Error accepting order:', error);
       alert('Failed to accept order. Please try again.');
@@ -218,18 +182,11 @@ const NewDriverDashboardPage: React.FC = () => {
                     <p className="text-xs text-green-400 mt-1">✓ Online & Ready</p>
                   )}
                 </div>
-                {(() => {
-                  console.log('Driver status debug:', {
-                    is_approved: profile?.is_approved,
-                    is_online: profile?.is_online,
-                    user_type: profile?.user_type
-                  });
-                  return profile?.is_approved && profile?.is_online ? (
-                    <CheckCircle className="w-8 h-8 text-green-400" />
-                  ) : (
-                    <AlertCircle className="w-8 h-8 text-yellow-400" />
-                  );
-                })()}
+                {profile?.is_approved && profile?.is_online ? (
+                  <CheckCircle className="w-8 h-8 text-green-400" />
+                ) : (
+                  <AlertCircle className="w-8 h-8 text-yellow-400" />
+                )}
               </div>
             </CardContent>
           </Card>
@@ -517,97 +474,10 @@ const NewDriverDashboardPage: React.FC = () => {
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Available Orders
-                </CardTitle>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={fetchDriverData}
-                    size="sm"
-                    className="bg-teal-600 hover:bg-teal-700 text-white"
-                  >
-                    Refresh Orders
-                  </Button>
-                  <Button 
-                    onClick={async () => {
-                      console.log('Toggling driver online status...');
-                      try {
-                        const newOnlineStatus = !profile?.is_online;
-                        console.log('Setting is_online to:', newOnlineStatus);
-                        
-                        // Update the mock profile in localStorage
-                        const updatedProfile = {
-                          ...profile,
-                          is_online: newOnlineStatus
-                        };
-                        localStorage.setItem('mock_profile', JSON.stringify(updatedProfile));
-                        
-                        console.log('Updated mock profile:', updatedProfile);
-                        alert(`Driver is now ${newOnlineStatus ? 'ONLINE' : 'OFFLINE'}`);
-                        
-                        // Refresh the page to update the profile
-                        window.location.reload();
-                      } catch (error) {
-                        console.error('Error toggling online status:', error);
-                        alert('Error toggling online status: ' + error);
-                      }
-                    }}
-                    size="sm"
-                    className="bg-orange-600 hover:bg-orange-700 text-white"
-                  >
-                    Toggle Online
-                  </Button>
-                  <Button 
-                    onClick={async () => {
-                      console.log('Creating test order with driver pre-assigned...');
-                      try {
-                        const testOrder = {
-                          customer_id: user?.id || 'test-user',
-                          driver_id: user?.id, // Pre-assign to current driver
-                          pickup_address: '123 Main Street, Louisville, KY 40202',
-                          delivery_address: '456 Oak Avenue, Louisville, KY 40205', 
-                          item_description: 'Test Package',
-                          total: 1.00,
-                          status: 'accepted', // Start as accepted
-                          created_at: new Date().toISOString()
-                        };
-                        
-                        console.log('Test order data:', testOrder);
-                        
-                        const insertPromise = supabase
-                          .from('orders')
-                          .insert([testOrder])
-                          .select()
-                          .single();
-
-                        const timeoutPromise = new Promise((_, reject) =>
-                          setTimeout(() => reject(new Error('Test insert timeout after 10 seconds')), 10000)
-                        );
-
-                        const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
-                        
-                        console.log('Test insert result:', { order, orderError });
-                        console.log('Full error details:', orderError);
-                        
-                        if (orderError) {
-                          alert('Test insert failed: ' + orderError.message + '\n\nFull error: ' + JSON.stringify(orderError, null, 2));
-                        } else {
-                          alert('Test insert successful! Order ID: ' + order.id);
-                          // Refresh orders to show the new test order
-                          await fetchDriverData();
-                        }
-                      } catch (error) {
-                        console.error('Test insert error:', error);
-                        alert('Test insert error: ' + error);
-                      }
-                    }}
-                    size="sm"
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                  >
-                    Test Order (Pre-Assigned)
-                  </Button>
-                </div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Clock className="w-5 h-5" />
+                Available Orders
+              </CardTitle>
               </div>
             </CardHeader>
             <CardContent>

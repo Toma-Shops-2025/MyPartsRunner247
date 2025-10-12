@@ -87,21 +87,6 @@ const NewHeader: React.FC = () => {
               {loading ? (
                 <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
               ) : user ? (
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    onClick={handleSignOut}
-                    variant="outline"
-                    className="h-10 px-4 text-sm font-medium border-red-600 text-red-600 hover:bg-red-50"
-                  >
-                    Logout
-                  </Button>
-                  <Button 
-                    onClick={forceLogout}
-                    variant="outline"
-                    className="h-10 px-4 text-sm font-medium border-orange-600 text-orange-600 hover:bg-orange-50"
-                  >
-                    Force Logout
-                  </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button 
@@ -120,10 +105,6 @@ const NewHeader: React.FC = () => {
                       <div className="font-medium">{profile?.full_name || 'User'}</div>
                       <div className="text-xs text-gray-500">
                         {user.email} • {profile?.user_type || 'customer'}
-                      </div>
-                      {/* Debug info - remove in production */}
-                      <div className="text-xs text-gray-400 mt-1">
-                        Debug: {JSON.stringify({ user_type: profile?.user_type, is_approved: profile?.is_approved, is_online: profile?.is_online })}
                       </div>
                     </DropdownMenuItem>
                     
@@ -151,27 +132,6 @@ const NewHeader: React.FC = () => {
                     )}
                     
                     {/* Temporary: Show driver options for testing */}
-                    <DropdownMenuItem onClick={() => {
-                      console.log('Direct navigation to driver dashboard');
-                      window.location.href = '/driver-dashboard';
-                    }}>
-                      <Car className="mr-2 h-4 w-4" />
-                      Driver Dashboard (Direct)
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                      console.log('Direct navigation to profile');
-                      window.location.href = '/profile';
-                    }}>
-                      <User className="mr-2 h-4 w-4" />
-                      Profile (Direct)
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                      console.log('Direct navigation to test page');
-                      window.location.href = '/test-driver';
-                    }}>
-                      <Car className="mr-2 h-4 w-4" />
-                      Test Page
-                    </DropdownMenuItem>
                     
                     {/* Customer menu items */}
                     {profile?.user_type === 'customer' && (
@@ -194,13 +154,6 @@ const NewHeader: React.FC = () => {
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => {
-                      console.log('Alternative sign out clicked!');
-                      handleSignOut();
-                    }}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign Out (Alt)
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
