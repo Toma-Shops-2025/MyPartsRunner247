@@ -357,15 +357,16 @@ const NewDriverDashboardPage: React.FC = () => {
                   </Button>
                   <Button 
                     onClick={async () => {
-                      console.log('Testing database insert...');
+                      console.log('Creating test order with driver pre-assigned...');
                       try {
                         const testOrder = {
                           customer_id: user?.id || 'test-user',
+                          driver_id: user?.id, // Pre-assign to current driver
                           pickup_address: 'Test Pickup Address',
                           delivery_address: 'Test Delivery Address', 
                           item_description: 'Test Item',
                           total: 1.00,
-                          status: 'pending',
+                          status: 'accepted', // Start as accepted
                           created_at: new Date().toISOString()
                         };
                         
@@ -401,7 +402,7 @@ const NewDriverDashboardPage: React.FC = () => {
                     size="sm"
                     className="bg-purple-600 hover:bg-purple-700 text-white"
                   >
-                    Test DB Insert
+                    Test Order (Pre-Assigned)
                   </Button>
                 </div>
               </div>
