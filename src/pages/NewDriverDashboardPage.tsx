@@ -359,11 +359,142 @@ const NewDriverDashboardPage: React.FC = () => {
                         >
                           🚚 Navigate to Delivery
                         </Button>
-                        <Button size="sm" className="bg-teal-600 hover:bg-teal-700">
-                          Call Customer
+                        <Button 
+                          size="sm" 
+                          className="bg-teal-600 hover:bg-teal-700"
+                          onClick={() => {
+                            // For now, we'll use a placeholder phone number
+                            // In production, this would come from the customer profile
+                            const customerPhone = '502-555-0123'; // Placeholder
+                            const smsUrl = `sms:${customerPhone}`;
+                            window.open(smsUrl, '_blank');
+                          }}
+                        >
+                          📞 Call Customer
                         </Button>
-                        <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
-                          Mark Delivered
+                        <Button 
+                          size="sm" 
+                          className="bg-purple-600 hover:bg-purple-700"
+                          onClick={() => {
+                            // For now, we'll use a placeholder phone number
+                            // In production, this would come from the customer profile
+                            const customerPhone = '502-555-0123'; // Placeholder
+                            const smsUrl = `sms:${customerPhone}`;
+                            window.open(smsUrl, '_blank');
+                          }}
+                        >
+                          💬 Text Customer
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="bg-orange-600 hover:bg-orange-700"
+                          onClick={() => {
+                            // Create a file input for photo capture
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*';
+                            input.capture = 'environment'; // Use back camera on mobile
+                            
+                            input.onchange = async (e) => {
+                              const file = e.target.files[0];
+                              if (file) {
+                                try {
+                                  // Convert image to base64 for storage
+                                  const reader = new FileReader();
+                                  reader.onload = async (event) => {
+                                    const base64Image = event.target.result;
+                                    
+                                    // Store photo in database
+                                    const { error: photoError } = await supabase
+                                      .from('delivery_photos')
+                                      .insert([{
+                                        order_id: order.id,
+                                        driver_id: user?.id,
+                                        photo_data: base64Image,
+                                        created_at: new Date().toISOString()
+                                      }]);
+
+                                    if (photoError) {
+                                      console.error('Error saving photo:', photoError);
+                                      alert('Photo saved but delivery not marked. Please try again.');
+                                      return;
+                                    }
+
+                                    // Send SMS to customer with photo
+                                    const customerPhone = '502-555-0123'; // Placeholder
+                                    const smsMessage = `Your delivery has been completed! 📦 Photo proof attached. Order #${order.id}`;
+                                    const smsUrl = `sms:${customerPhone}?body=${encodeURIComponent(smsMessage)}`;
+                                    
+                                    // Mark as delivered
+                                    const { error } = await supabase
+                                      .from('orders')
+                                      .update({ 
+                                        status: 'delivered',
+                                        updated_at: new Date().toISOString()
+                                      })
+                                      .eq('id', order.id);
+
+                                    if (error) {
+                                      console.error('Error marking delivered:', error);
+                                      alert('Photo saved but delivery not marked. Please try again.');
+                                      return;
+                                    }
+
+                                    alert('Delivery completed with photo proof! 📸');
+                                    
+                                    // Open SMS to send photo
+                                    window.open(smsUrl, '_blank');
+                                    
+                                    // Refresh data
+                                    await fetchDriverData();
+                                  };
+                                  reader.readAsDataURL(file);
+                                } catch (error) {
+                                  console.error('Error processing photo:', error);
+                                  alert('Error processing photo: ' + error);
+                                }
+                              }
+                            };
+                            
+                            input.click();
+                          }}
+                        >
+                          📸 Photo Proof & Deliver
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="border-gray-600 text-gray-300"
+                          onClick={async () => {
+                            try {
+                              console.log('Marking order as delivered (no photo):', order.id);
+                              
+                              const { error } = await supabase
+                                .from('orders')
+                                .update({ 
+                                  status: 'delivered',
+                                  updated_at: new Date().toISOString()
+                                })
+                                .eq('id', order.id);
+
+                              if (error) {
+                                console.error('Error marking delivered:', error);
+                                alert('Failed to mark as delivered: ' + error.message);
+                                return;
+                              }
+
+                              console.log('Order marked as delivered successfully');
+                              alert('Order delivered successfully! 🎉');
+                              
+                              // Refresh data to update the dashboard
+                              await fetchDriverData();
+                            } catch (error) {
+                              console.error('Error marking delivered:', error);
+                              alert('Error marking delivered: ' + error);
+                            }
+                          }}
+                        >
+                          Mark Delivered (No Photo)
                         </Button>
                       </div>
                     </div>
