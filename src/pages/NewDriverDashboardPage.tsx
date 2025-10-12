@@ -286,13 +286,65 @@ const NewDriverDashboardPage: React.FC = () => {
                   <Clock className="w-5 h-5" />
                   Available Orders
                 </CardTitle>
-                <Button 
-                  onClick={fetchDriverData}
-                  size="sm"
-                  className="bg-teal-600 hover:bg-teal-700 text-white"
-                >
-                  Refresh Orders
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={fetchDriverData}
+                    size="sm"
+                    className="bg-teal-600 hover:bg-teal-700 text-white"
+                  >
+                    Refresh Orders
+                  </Button>
+                  <Button 
+                    onClick={async () => {
+                      console.log('Testing database insert...');
+                      try {
+                        const testOrder = {
+                          customerid: user?.id || 'test-user',
+                          pickupaddress: 'Test Pickup Address',
+                          deliveryaddress: 'Test Delivery Address', 
+                          itemdescription: 'Test Item',
+                          total: 1.00,
+                          status: 'pending',
+                          urgency: 'standard',
+                          payment_intent_id: 'test_' + Date.now(),
+                          payment_status: 'paid',
+                          createdat: new Date().toISOString()
+                        };
+                        
+                        console.log('Test order data:', testOrder);
+                        
+                        const insertPromise = supabase
+                          .from('orders')
+                          .insert([testOrder])
+                          .select()
+                          .single();
+
+                        const timeoutPromise = new Promise((_, reject) =>
+                          setTimeout(() => reject(new Error('Test insert timeout after 10 seconds')), 10000)
+                        );
+
+                        const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
+                        
+                        console.log('Test insert result:', { order, orderError });
+                        
+                        if (orderError) {
+                          alert('Test insert failed: ' + orderError.message);
+                        } else {
+                          alert('Test insert successful! Order ID: ' + order.id);
+                          // Refresh orders to show the new test order
+                          await fetchDriverData();
+                        }
+                      } catch (error) {
+                        console.error('Test insert error:', error);
+                        alert('Test insert error: ' + error);
+                      }
+                    }}
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    Test DB Insert
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>

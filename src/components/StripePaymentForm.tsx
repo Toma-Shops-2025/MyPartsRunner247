@@ -231,8 +231,9 @@ const PaymentForm: React.FC<{
           createdat: new Date().toISOString()
         });
         
-        // Create order in database with real payment info
-        const { data: order, error: orderError } = await supabase
+        // Create order in database with real payment info (with timeout)
+        console.log('Starting database insert with timeout...');
+        const insertPromise = supabase
           .from('orders')
           .insert([{
             customerid: currentUser.id,
@@ -248,6 +249,12 @@ const PaymentForm: React.FC<{
           }])
           .select()
           .single();
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Database insert timeout after 10 seconds')), 10000)
+        );
+
+        const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
 
         console.log('Order creation result:', { order, orderError });
 
@@ -281,7 +288,8 @@ const PaymentForm: React.FC<{
         });
         
         try {
-          const { data: order, error: orderError } = await supabase
+          console.log('Starting direct database insert with timeout...');
+          const insertPromise = supabase
             .from('orders')
             .insert([{
               customerid: currentUser.id,
@@ -297,6 +305,12 @@ const PaymentForm: React.FC<{
             }])
             .select()
             .single();
+
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Direct database insert timeout after 10 seconds')), 10000)
+          );
+
+          const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
 
           console.log('Direct order creation result:', { order, orderError });
 
