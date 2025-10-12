@@ -88,6 +88,8 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const handleAcceptOrder = async (orderId: string) => {
     try {
+      console.log('Accepting order:', orderId, 'for driver:', user?.id);
+      
       const { error } = await supabase
         .from('orders')
         .update({ 
@@ -96,8 +98,12 @@ const NewDriverDashboardPage: React.FC = () => {
         })
         .eq('id', orderId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error accepting order:', error);
+        throw error;
+      }
       
+      console.log('Order accepted, refreshing data...');
       // Refresh data
       await fetchDriverData();
       alert('Order accepted successfully!');
