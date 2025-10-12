@@ -501,13 +501,44 @@ const NewDriverDashboardPage: React.FC = () => {
                           <span className="font-bold text-green-400">Total: ${order.total}</span>
                         </div>
                       </div>
-                      <Button 
-                        size="sm" 
-                        className="w-full bg-teal-600 hover:bg-teal-700"
-                        onClick={() => handleAcceptOrder(order.id)}
-                      >
-                        Accept Order
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="flex-1 bg-teal-600 hover:bg-teal-700"
+                          onClick={() => handleAcceptOrder(order.id)}
+                        >
+                          Accept Order
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          className="border-red-600 text-red-600 hover:bg-red-50"
+                          onClick={async () => {
+                            if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
+                              try {
+                                const { error } = await supabase
+                                  .from('orders')
+                                  .delete()
+                                  .eq('id', order.id);
+
+                                if (error) {
+                                  console.error('Error deleting order:', error);
+                                  alert('Failed to delete order: ' + error.message);
+                                  return;
+                                }
+
+                                alert('Order deleted successfully!');
+                                await fetchDriverData();
+                              } catch (error) {
+                                console.error('Error deleting order:', error);
+                                alert('Error deleting order: ' + error);
+                              }
+                            }
+                          }}
+                        >
+                          🗑️ Delete
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
