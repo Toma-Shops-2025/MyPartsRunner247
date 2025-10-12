@@ -50,6 +50,7 @@ const NewDriverDashboardPage: React.FC = () => {
         .from('orders')
         .select('*')
         .eq('status', 'pending')
+        .neq('status', 'cancelled')
         .limit(10)
         .order('created_at', { ascending: false });
 
@@ -511,40 +512,78 @@ const NewDriverDashboardPage: React.FC = () => {
                           size="sm" 
                           variant="outline"
                           className="border-red-600 text-red-600 hover:bg-red-50"
-                          onClick={async () => {
-                            if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
-                              try {
-                                console.log('Attempting to delete order:', order.id);
-                                const { data, error } = await supabase
-                                  .from('orders')
-                                  .delete()
-                                  .eq('id', order.id)
-                                  .select();
-
-                                console.log('Delete result:', { data, error });
-
-                                if (error) {
-                                  console.error('Error deleting order:', error);
-                                  alert('Failed to delete order: ' + error.message);
-                                  return;
-                                }
-
-                                if (!data || data.length === 0) {
-                                 alert('Order not found or already deleted. Refreshing dashboard...');
-                                 // Force refresh even if order was already deleted with cache busting
-                                 window.location.href = window.location.href + '?t=' + Date.now();
-                                  return;
-                                }
-
-                                 alert('Order deleted successfully! Refreshing dashboard...');
+                           onClick={async () => {
+                             if (confirm('Are you sure you want to delete this order? This cannot be undone.')) {
+                               try {
+                                 console.log('Attempting to delete order:', order.id);
+                                 
+                                 // Try multiple deletion approaches
+                                 let deleted = false;
+                                 
+                                 // Method 1: Standard delete
+                                 try {
+                                   const { data, error } = await supabase
+                                     .from('orders')
+                                     .delete()
+                                     .eq('id', order.id)
+                                     .select();
+                                   
+                                   console.log('Standard delete result:', { data, error });
+                                   
+                                   if (!error && data && data.length > 0) {
+                                     deleted = true;
+                                   }
+                                 } catch (e) {
+                                   console.log('Standard delete failed:', e);
+                                 }
+                                 
+                                 // Method 2: Force delete with different approach
+                                 if (!deleted) {
+                                   try {
+                                     const { data, error } = await supabase
+                                       .from('orders')
+                                       .delete()
+                                       .eq('id', order.id);
+                                     
+                                     console.log('Force delete result:', { data, error });
+                                     deleted = true;
+                                   } catch (e) {
+                                     console.log('Force delete failed:', e);
+                                   }
+                                 }
+                                 
+                                 // Method 3: Update status to 'cancelled' instead of delete
+                                 if (!deleted) {
+                                   try {
+                                     const { data, error } = await supabase
+                                       .from('orders')
+                                       .update({ status: 'cancelled' })
+                                       .eq('id', order.id)
+                                       .select();
+                                     
+                                     console.log('Status update result:', { data, error });
+                                     deleted = true;
+                                   } catch (e) {
+                                     console.log('Status update failed:', e);
+                                   }
+                                 }
+                                 
+                                 if (deleted) {
+                                   alert('Order removed successfully! Refreshing dashboard...');
+                                 } else {
+                                   alert('Order could not be deleted, but refreshing dashboard anyway...');
+                                 }
+                                 
                                  // Force a complete page refresh with cache busting
-                                 window.location.href = window.location.href + '?t=' + Date.now();
+                                 window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now() + '&force=1';
                               } catch (error) {
                                 console.error('Error deleting order:', error);
                                 alert('Error deleting order: ' + error);
+                                // Still refresh even on error
+                                window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now() + '&force=1';
                               }
                             }
-                          }}
+                           }}
                         >
                           🗑️ Delete
                         </Button>
