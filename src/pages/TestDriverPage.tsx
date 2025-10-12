@@ -38,6 +38,22 @@ const TestDriverPage: React.FC = () => {
             </button>
             <button 
               onClick={async () => {
+                console.log('Testing Supabase connection...');
+                try {
+                  const { data, error } = await supabase.from('profiles').select('count').limit(1);
+                  console.log('Supabase test result:', { data, error });
+                  alert('Supabase test: ' + (error ? 'Error - ' + error.message : 'Success - ' + JSON.stringify(data)));
+                } catch (err) {
+                  console.error('Supabase test error:', err);
+                  alert('Supabase test failed: ' + err);
+                }
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mr-2"
+            >
+              Test Supabase
+            </button>
+            <button 
+              onClick={async () => {
                 console.log('Creating profile for user...', user?.id);
                 alert('Starting profile creation...');
                 
@@ -55,11 +71,19 @@ const TestDriverPage: React.FC = () => {
                   
                   console.log('Profile data to insert:', profileData);
                   
-                  const { data, error } = await supabase
+                  // Add timeout to prevent hanging
+                  const insertPromise = supabase
                     .from('profiles')
                     .insert([profileData])
                     .select()
                     .single();
+                  
+                  const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Database timeout after 10 seconds')), 10000)
+                  );
+                  
+                  console.log('Calling Supabase with timeout...');
+                  const { data, error } = await Promise.race([insertPromise, timeoutPromise]) as any;
 
                   if (error) {
                     console.error('Error creating profile:', error);
