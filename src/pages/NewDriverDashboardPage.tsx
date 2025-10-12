@@ -306,7 +306,6 @@ const NewDriverDashboardPage: React.FC = () => {
                           total: 1.00,
                           status: 'pending',
                           urgency: 'standard',
-                          payment_status: 'paid',
                           created_at: new Date().toISOString()
                         };
                         
