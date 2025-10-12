@@ -149,6 +149,12 @@ const NewHeader: React.FC = () => {
                       </>
                     )}
                     
+                    {/* Temporary: Show driver options for testing */}
+                    <DropdownMenuItem onClick={() => handleNavigation('/driver-dashboard')}>
+                      <Car className="mr-2 h-4 w-4" />
+                      Driver Dashboard (Test)
+                    </DropdownMenuItem>
+                    
                     {/* Customer menu items */}
                     {profile?.user_type === 'customer' && (
                       <>
