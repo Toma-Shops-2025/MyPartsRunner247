@@ -372,7 +372,11 @@ const NewDriverDashboardPage: React.FC = () => {
                           <span className="font-bold text-green-400">Total: ${order.total}</span>
                         </div>
                       </div>
-                      <Button size="sm" className="w-full bg-teal-600 hover:bg-teal-700">
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-teal-600 hover:bg-teal-700"
+                        onClick={() => handleAcceptOrder(order.id)}
+                      >
                         Accept Order
                       </Button>
                     </div>
