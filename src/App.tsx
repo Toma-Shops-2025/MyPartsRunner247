@@ -23,7 +23,6 @@ import AuthCallbackPage from "./pages/AuthCallbackPage";
 import UpdateUserTypePage from "./pages/UpdateUserTypePage";
 import DriverApplicationPage from "./pages/DriverApplicationPage";
 import TestDriverPage from "./pages/TestDriverPage";
-import DebugProfile from "./components/DebugProfile";
 
 const queryClient = new QueryClient();
 
@@ -35,7 +34,6 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <DebugProfile />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />

@@ -136,10 +136,6 @@ const NewHeader: React.FC = () => {
                     {/* Customer menu items */}
                     {profile?.user_type === 'customer' && (
                       <>
-                        <DropdownMenuItem onClick={() => handleNavigation('/place-order')}>
-                          <Package className="mr-2 h-4 w-4" />
-                          Place Order
-                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleNavigation('/my-orders')}>
                           <Package className="mr-2 h-4 w-4" />
                           My Orders
@@ -240,12 +236,6 @@ const NewHeader: React.FC = () => {
                     )}
                     {profile?.user_type === 'customer' && (
                       <>
-                        <button 
-                          onClick={() => handleNavigation('/place-order')}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
-                        >
-                          📦 Place Order
-                        </button>
                         <button 
                           onClick={() => handleNavigation('/my-orders')}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
