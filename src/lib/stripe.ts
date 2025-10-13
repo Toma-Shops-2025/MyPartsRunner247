@@ -40,14 +40,7 @@ export const createPaymentIntent = async (amount: number, metadata: any) => {
     return await response.json();
   } catch (error) {
     console.error('Payment intent creation error:', error);
-    
-    // Fallback: Create a mock payment intent for development
-    // This allows the payment flow to continue while the server-side function is being deployed
-    console.warn('Using fallback payment intent for development');
-    return {
-      client_secret: 'pi_mock_' + Date.now() + '_secret_mock',
-      id: 'pi_mock_' + Date.now()
-    };
+    throw error; // Don't use fallback for live payments
   }
 };
 
