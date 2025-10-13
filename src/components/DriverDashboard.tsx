@@ -15,7 +15,7 @@ interface DriverOrder {
   pickupaddress: string;
   deliveryaddress: string;
   total: number;
-  createdat: string;
+  created_at: string;
   itemdescription: string;
   customerid: string;
 }
@@ -44,8 +44,8 @@ const DriverDashboard: React.FC = () => {
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .eq('driverid', user.id)
-        .order('createdat', { ascending: false });
+        .eq('driver_id', user.id)
+        .order('created_at', { ascending: false });
       
       if (error) throw error;
       setOrders(data || []);
@@ -60,9 +60,9 @@ const DriverDashboard: React.FC = () => {
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .is('driverid', null)
+        .is('driver_id', null)
         .eq('status', 'pending')
-        .order('createdat', { ascending: true });
+        .order('created_at', { ascending: true });
       
       if (error) {
         console.error('Error fetching orders:', error);
@@ -84,7 +84,7 @@ const DriverDashboard: React.FC = () => {
       const { data, error } = await supabase
         .from('orders')
         .select('total')
-        .eq('driverid', user.id)
+        .eq('driver_id', user.id)
         .eq('status', 'delivered');
       
       if (error) throw error;
@@ -100,7 +100,7 @@ const DriverDashboard: React.FC = () => {
       const { error } = await supabase
         .from('orders')
         .update({ 
-          driverid: user?.id, 
+          driver_id: user?.id, 
           status: 'accepted' 
         })
         .eq('id', orderId);

@@ -12,7 +12,7 @@ interface DeliveryOffer {
   deliveryaddress: string;
   total: number;
   itemdescription: string;
-  createdat: string;
+  created_at: string;
   distance?: number;
 }
 
@@ -34,9 +34,9 @@ const DriverNotifications: React.FC = () => {
       const { data, error } = await supabase
         .from('orders')
         .select('*')
-        .is('driverid', null)
+        .is('driver_id', null)
         .eq('status', 'pending')
-        .order('createdat', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(5);
       
       if (error) throw error;
@@ -76,7 +76,7 @@ const DriverNotifications: React.FC = () => {
       const { error } = await supabase
         .from('orders')
         .update({ 
-          driverid: user?.id, 
+          driver_id: user?.id, 
           status: 'accepted' 
         })
         .eq('id', offerId);
@@ -146,7 +146,7 @@ const DriverNotifications: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Clock className="w-4 h-4" />
-                    {new Date(offer.createdat).toLocaleTimeString()}
+                    {new Date(offer.created_at).toLocaleTimeString()}
                   </div>
                 </div>
                 <div className="flex gap-2">

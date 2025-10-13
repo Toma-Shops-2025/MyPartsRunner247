@@ -225,7 +225,7 @@ const PaymentForm: React.FC<{
           urgency: orderDetails.urgency,
           payment_intent_id: confirmedPayment.id,
           payment_status: 'paid',
-          createdat: new Date().toISOString()
+          created_at: new Date().toISOString()
         });
         
         // Create order in database with real payment info (with timeout)
@@ -278,7 +278,7 @@ const PaymentForm: React.FC<{
           urgency: orderDetails.urgency,
           payment_intent_id: 'demo_' + Date.now(),
           payment_status: 'paid',
-          createdat: new Date().toISOString()
+          created_at: new Date().toISOString()
         });
         
         try {

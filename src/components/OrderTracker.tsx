@@ -12,9 +12,9 @@ interface Order {
   status: string;
   deliveryaddress: string;
   total: number;
-  createdat: string;
+  created_at: string;
   estimateddeliverytime?: string;
-  driverid?: string;
+  driver_id?: string;
 }
 
 const OrderTracker: React.FC = () => {
@@ -64,7 +64,7 @@ const OrderTracker: React.FC = () => {
         .from('orders')
         .select('*')
         .eq('customerid', user.id)
-        .order('createdat', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       setOrders(data || []);
@@ -157,20 +157,20 @@ const OrderTracker: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-500">
-                      {new Date(order.createdat).toLocaleDateString()}
+                      {new Date(order.created_at).toLocaleDateString()}
                     </span>
                     <span className="font-semibold">
                       ${order.total?.toFixed(2) || '0.00'}
                     </span>
                   </div>
-                  {order.status === 'delivered' && order.driverid && (
+                  {order.status === 'delivered' && order.driver_id && (
                     <div className="pt-2">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => setRatingModal({
                           isOpen: true,
-                          driverId: order.driverid!,
+                          driverId: order.driver_id!,
                           orderId: order.id,
                           driverName: 'Driver'
                         })}

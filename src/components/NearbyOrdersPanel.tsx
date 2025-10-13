@@ -60,7 +60,7 @@ const NearbyOrdersPanel: React.FC = () => {
       const { error } = await supabase
         .from('orders')
         .update({ 
-          driverid: user?.id, 
+          driver_id: user?.id, 
           status: 'accepted' 
         })
         .eq('id', orderId);

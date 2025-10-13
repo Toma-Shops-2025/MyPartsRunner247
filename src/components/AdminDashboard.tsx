@@ -17,9 +17,9 @@ interface Order {
   id: string;
   status: string;
   total: number;
-  createdat: string;
+  created_at: string;
   customerid: string;
-  driverid: string;
+  driver_id: string;
 }
 
 interface Driver {
@@ -53,7 +53,7 @@ const AdminDashboard: React.FC = () => {
       const { data: ordersData, error: ordersError } = await supabase
         .from('orders')
         .select('*')
-        .order('createdat', { ascending: false })
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (ordersError) throw ordersError;
@@ -202,7 +202,7 @@ const AdminDashboard: React.FC = () => {
                     <div className="space-y-1">
                       <div className="font-medium">#{order.id.slice(0, 8)}</div>
                       <div className="text-sm text-gray-600">
-                        {new Date(order.createdat).toLocaleDateString()}
+                        {new Date(order.created_at).toLocaleDateString()}
                       </div>
                       <div className="text-lg font-bold">${order.total.toFixed(2)}</div>
                     </div>
