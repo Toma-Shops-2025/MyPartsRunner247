@@ -39,6 +39,21 @@ const NewDriverDashboardPage: React.FC = () => {
       console.log('All orders in database:', { allOrders, allOrdersError });
       console.log('🔍 DEBUGGING: All orders details:', allOrders);
       
+      // Debug: Check if the specific order ID exists
+      const { data: specificOrder } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', '79051d23-f7fd-4529-b8f8-011f3d0fdd7a');
+      
+      console.log('🔍 DEBUGGING: Specific order lookup:', specificOrder);
+      
+      // Debug: Check total count of orders
+      const { count: totalOrderCount } = await supabase
+        .from('orders')
+        .select('*', { count: 'exact', head: true });
+      
+      console.log('🔍 DEBUGGING: Total order count in database:', totalOrderCount);
+      
       // Debug: Log each order's details
       if (allOrders && allOrders.length > 0) {
         console.log('=== DETAILED ORDER DEBUG ===');
