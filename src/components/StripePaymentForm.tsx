@@ -15,6 +15,8 @@ interface StripePaymentFormProps {
     deliveryAddress: string;
     itemDescription: string;
     urgency: string;
+    specialInstructions?: string;
+    contactPhone?: string;
   };
   onSuccess: (orderId: string) => void;
   onError: (error: string) => void;
