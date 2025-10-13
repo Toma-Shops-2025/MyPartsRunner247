@@ -1,4 +1,4 @@
-const CACHE_NAME = `mypartsrunner-${Date.now()}`;
+const CACHE_NAME = `mypartsrunner-v2-${Date.now()}`;
 const urlsToCache = [
   '/',
   '/manifest.json'
@@ -27,23 +27,44 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Skip caching for dynamic imports and API calls
+  // Skip caching for JavaScript files, API calls, and dynamic content
   if (event.request.url.includes('/src/') || 
       event.request.url.includes('/api/') ||
       event.request.url.includes('?v=') ||
-      event.request.url.includes('?t=')) {
+      event.request.url.includes('?t=') ||
+      event.request.url.includes('.js') ||
+      event.request.url.includes('.css') ||
+      event.request.url.includes('index-') ||
+      event.request.url.includes('vendor-') ||
+      event.request.url.includes('supabase-') ||
+      event.request.url.includes('netlify') ||
+      event.request.url.includes('supabase.co')) {
     return fetch(event.request);
   }
 
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
-  );
+  // Only cache static assets like images, fonts, etc.
+  if (event.request.url.includes('.png') || 
+      event.request.url.includes('.jpg') || 
+      event.request.url.includes('.jpeg') || 
+      event.request.url.includes('.gif') || 
+      event.request.url.includes('.svg') || 
+      event.request.url.includes('.ico') ||
+      event.request.url.includes('.woff') ||
+      event.request.url.includes('.woff2') ||
+      event.request.url.includes('.ttf')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+          if (response) {
+            return response;
+          }
+          return fetch(event.request);
+        })
+    );
+  } else {
+    // For everything else, just fetch without caching
+    return fetch(event.request);
+  }
 });
 
 self.addEventListener('push', (event) => {

@@ -131,7 +131,7 @@ export const useAuth = () => {
       
       // Create a timeout promise for the database query
       const queryTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database query timeout')), 3000)
+        setTimeout(() => reject(new Error('Database query timeout')), 8000) // Increased to 8 seconds
       );
       
       const queryPromise = supabase
@@ -172,7 +172,23 @@ export const useAuth = () => {
     } catch (error) {
       console.error('Error fetching profile:', error);
       clearTimeout(profileTimeout);
-      setProfile(null);
+      
+      // Create a fallback profile based on the user ID and email
+      const fallbackProfile = {
+        id: userId,
+        email: user?.email || 'unknown@example.com',
+        full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
+        phone: user?.user_metadata?.phone || '',
+        user_type: (user?.email?.includes('driver') || user?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
+        is_online: false,
+        is_approved: false,
+        status: 'inactive',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Using fallback profile due to error:', fallbackProfile);
+      setProfile(fallbackProfile);
       setLoading(false);
     }
   };
