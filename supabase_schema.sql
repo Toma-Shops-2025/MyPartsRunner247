@@ -101,6 +101,14 @@ CREATE POLICY "Users can update own applications" ON driver_applications
 CREATE POLICY "Users can view own orders" ON orders
     FOR SELECT USING (auth.uid() = customer_id OR auth.uid() = driver_id);
 
+-- Drivers can see unassigned orders (where driver_id is NULL)
+CREATE POLICY "Drivers can view available orders" ON orders
+    FOR SELECT USING (driver_id IS NULL AND EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE profiles.id = auth.uid() 
+        AND profiles.user_type = 'driver'
+    ));
+
 CREATE POLICY "Users can create orders" ON orders
     FOR INSERT WITH CHECK (auth.uid() = customer_id);
 
