@@ -68,12 +68,21 @@ const NewDriverDashboardPage: React.FC = () => {
       console.log('Active orders query result:', { activeOrdersData });
       console.log('Completed orders query result:', { completedOrders });
 
+      // Log the actual order data
+      if (availableOrdersData && availableOrdersData.length > 0) {
+        console.log('Available order details:', availableOrdersData[0]);
+        console.log('Order status:', availableOrdersData[0].status);
+        console.log('Order driver_id:', availableOrdersData[0].driver_id);
+        console.log('Order created_at:', availableOrdersData[0].created_at);
+      }
+
       // Calculate earnings from completed orders
       const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
       const completedDeliveries = completedOrders?.length || 0;
       const activeDeliveries = activeOrdersData?.length || 0;
 
       console.log('Driver stats calculated:', { totalEarnings, completedDeliveries, activeDeliveries });
+      console.log('Setting available orders to state:', availableOrdersData);
 
       setDriverStats({
         totalEarnings,
@@ -488,6 +497,7 @@ const NewDriverDashboardPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {console.log('Rendering available orders:', availableOrders.length, availableOrders)}
               {availableOrders.length > 0 ? (
                 <div className="space-y-4">
                   {availableOrders.map((order) => (
