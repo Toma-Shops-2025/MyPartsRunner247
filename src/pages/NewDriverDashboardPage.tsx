@@ -101,13 +101,27 @@ const NewDriverDashboardPage: React.FC = () => {
       console.log('Fetching active orders for driver:', user?.id);
       const { data: activeOrdersData } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          customer:profiles!customer_id(
+            id,
+            full_name,
+            phone
+          )
+        `)
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
 
       const { data: availableOrdersData, error: availableOrdersError } = await supabase
         .from('orders')
-        .select('*')
+        .select(`
+          *,
+          customer:profiles!customer_id(
+            id,
+            full_name,
+            phone
+          )
+        `)
         .eq('status', 'pending')
         .neq('status', 'cancelled')
         .neq('status', 'deleted')
@@ -211,35 +225,6 @@ const NewDriverDashboardPage: React.FC = () => {
     alert('Driver ratings and reviews feature coming soon! This will show your customer feedback and ratings.');
   };
 
-  const handleToggleOnlineStatus = async () => {
-    try {
-      const newOnlineStatus = !profile?.is_online;
-      console.log('Toggling driver online status to:', newOnlineStatus);
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          is_online: newOnlineStatus,
-          is_approved: true  // Also set as approved if not already
-        })
-        .eq('id', user?.id);
-
-      if (error) {
-        console.error('Error updating online status:', error);
-        alert('Failed to update online status. Please try again.');
-        return;
-      }
-
-      console.log('Driver online status updated successfully');
-      alert(`You are now ${newOnlineStatus ? 'online' : 'offline'}!`);
-      
-      // Refresh the page to update the profile
-      window.location.reload();
-    } catch (error) {
-      console.error('Error toggling online status:', error);
-      alert('Error updating online status. Please try again.');
-    }
-  };
 
   if (loading) {
     return (
@@ -262,25 +247,9 @@ const NewDriverDashboardPage: React.FC = () => {
       <NewHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
-              <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-red-400'}`}></div>
-                <span className="text-sm text-gray-300">
-                  {profile?.is_online ? 'Online' : 'Offline'}
-                </span>
-              </div>
-              <Button 
-                onClick={handleToggleOnlineStatus}
-                className={`${profile?.is_online ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
-              >
-                {profile?.is_online ? 'Go Offline' : 'Go Online'}
-              </Button>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
+            <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
           </div>
         </div>
 
@@ -318,15 +287,8 @@ const NewDriverDashboardPage: React.FC = () => {
                 <div>
                   <p className="text-gray-400 text-sm">Active</p>
                   <p className="text-2xl font-bold text-white">{driverStats.activeDeliveries}</p>
-                  {profile?.is_online && (
-                    <p className="text-xs text-green-400 mt-1">✓ Online & Ready</p>
-                  )}
                 </div>
-                {profile?.is_approved && profile?.is_online ? (
-                    <CheckCircle className="w-8 h-8 text-green-400" />
-                  ) : (
-                    <AlertCircle className="w-8 h-8 text-yellow-400" />
-                )}
+                <AlertCircle className="w-8 h-8 text-yellow-400" />
               </div>
             </CardContent>
           </Card>
@@ -467,9 +429,10 @@ const NewDriverDashboardPage: React.FC = () => {
                             variant="outline"
                             className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
                             onClick={() => {
-                              const customerPhone = '502-555-0123';
-                              const smsUrl = `sms:${customerPhone}`;
-                              window.open(smsUrl, '_blank');
+                              const order = activeOrders[0];
+                              const customerPhone = order.customer?.phone || '502-555-0123';
+                              const callUrl = `tel:${customerPhone}`;
+                              window.open(callUrl, '_blank');
                             }}
                           >
                             📞 Call
@@ -479,7 +442,8 @@ const NewDriverDashboardPage: React.FC = () => {
                             variant="outline"
                             className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
                             onClick={() => {
-                              const customerPhone = '502-555-0123';
+                              const order = activeOrders[0];
+                              const customerPhone = order.customer?.phone || '502-555-0123';
                               const smsUrl = `sms:${customerPhone}`;
                               window.open(smsUrl, '_blank');
                             }}
@@ -523,7 +487,7 @@ const NewDriverDashboardPage: React.FC = () => {
                                         return;
                                       }
 
-                                      const customerPhone = '502-555-0123';
+                                      const customerPhone = order.customer?.phone || '502-555-0123';
                                       const smsMessage = `Your delivery has been completed! 📦 Photo proof attached. Order #${order.id}`;
                                       const smsUrl = `sms:${customerPhone}?body=${encodeURIComponent(smsMessage)}`;
                                       

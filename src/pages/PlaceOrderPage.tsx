@@ -47,6 +47,14 @@ const PlaceOrderPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // Update customer profile with phone number if provided
+      if (orderData.contactPhone) {
+        await supabase
+          .from('profiles')
+          .update({ phone: orderData.contactPhone })
+          .eq('id', user.id);
+      }
+
       // Create real order in database
       const { data, error } = await supabase
         .from('orders')
