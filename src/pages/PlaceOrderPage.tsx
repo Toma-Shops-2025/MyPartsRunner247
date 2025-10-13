@@ -44,6 +44,12 @@ const PlaceOrderPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent duplicate submissions
+    if (isSubmitting) {
+      return;
+    }
+    
     setIsSubmitting(true);
 
     try {
@@ -55,7 +61,34 @@ const PlaceOrderPage: React.FC = () => {
           .eq('id', user.id);
       }
 
+      // Check for duplicate orders first
+      const { data: existingOrders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('customer_id', user.id)
+        .eq('pickup_address', orderData.pickupAddress)
+        .eq('delivery_address', orderData.deliveryAddress)
+        .eq('status', 'pending')
+        .gte('created_at', new Date(Date.now() - 60000).toISOString()); // Last minute
+      
+      if (existingOrders && existingOrders.length > 0) {
+        alert('You have already placed a similar order recently. Please wait before placing another order.');
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create real order in database
+      console.log('Creating order with data:', {
+        customer_id: user.id,
+        pickup_address: orderData.pickupAddress,
+        delivery_address: orderData.deliveryAddress,
+        item_description: orderData.itemDescription,
+        total: calculateEstimate(),
+        status: 'pending',
+        special_instructions: orderData.specialInstructions,
+        contact_phone: orderData.contactPhone
+      });
+      
       const { data, error } = await supabase
         .from('orders')
         .insert([
@@ -89,6 +122,11 @@ const PlaceOrderPage: React.FC = () => {
         specialInstructions: '',
         contactPhone: ''
       });
+      
+      // Add a small delay before allowing new submissions
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 2000);
     } catch (error) {
       console.error('Error placing order:', error);
       alert('Error placing order. Please try again.');
