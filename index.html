@@ -46,25 +46,27 @@
       
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          // Force service worker update with cache busting
-          navigator.serviceWorker.register('/sw.js?v=' + Date.now())
+          navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
               console.log('SW registered: ', registration);
               
-              // Force update on every load to prevent caching issues
-              registration.update();
-              
-              // Only check for updates in production
-              if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+              // Only check for updates in production, and only once per session
+              if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && !sessionStorage.getItem('sw-updated')) {
                 registration.addEventListener('updatefound', () => {
                   const newWorker = registration.installing;
                   newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                      // Auto-reload to get latest version
-                      window.location.reload();
+                      // Mark as updated to prevent loops
+                      sessionStorage.setItem('sw-updated', 'true');
+                      // Only reload if user confirms
+                      if (confirm('New version available! Reload to update?')) {
+                        window.location.reload();
+                      }
                     }
                   });
                 });
+                // Check for updates only once
+                registration.update();
               }
             })
             .catch((registrationError) => {

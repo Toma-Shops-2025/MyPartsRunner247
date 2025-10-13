@@ -1,4 +1,4 @@
-const CACHE_NAME = `mypartsrunner-v2-${Date.now()}`;
+const CACHE_NAME = `mypartsrunner-v3-${Date.now()}`;
 const urlsToCache = [
   '/',
   '/manifest.json'
@@ -27,13 +27,10 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Skip caching for JavaScript files, API calls, and dynamic content
-  if (event.request.url.includes('/src/') || 
-      event.request.url.includes('/api/') ||
+  // Skip caching for most dynamic content
+  if (event.request.url.includes('/api/') ||
       event.request.url.includes('?v=') ||
       event.request.url.includes('?t=') ||
-      event.request.url.includes('.js') ||
-      event.request.url.includes('.css') ||
       event.request.url.includes('index-') ||
       event.request.url.includes('vendor-') ||
       event.request.url.includes('supabase-') ||
