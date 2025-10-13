@@ -282,10 +282,6 @@ const NewDriverDashboardPage: React.FC = () => {
               </Button>
             </div>
           </div>
-          {/* TEST: This should always show */}
-          <div className="mt-4 p-4 bg-yellow-600 text-black rounded">
-            <strong>TEST: Toggle button should be above this message. If you see this, the code is deployed.</strong>
-          </div>
         </div>
 
         {/* Stats Cards */}
