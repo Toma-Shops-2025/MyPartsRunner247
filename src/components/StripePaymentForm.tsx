@@ -34,6 +34,7 @@ const PaymentForm: React.FC<{
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderCreated, setOrderCreated] = useState(false);
   
   console.log('PaymentForm auth state:', {
     user: !!user,
@@ -189,6 +190,7 @@ const PaymentForm: React.FC<{
         }
 
         console.log('Mock payment successful, order created:', order.id);
+        setOrderCreated(true); // Prevent duplicate order creation
         onSuccess(order.id);
         return;
       }
@@ -279,12 +281,19 @@ const PaymentForm: React.FC<{
         }
 
         console.log('Order created successfully:', order.id);
+        setOrderCreated(true); // Prevent duplicate order creation
         onSuccess(order.id);
       } else {
         throw new Error('Payment was not successful');
       }
     } catch (err: any) {
       console.error('Payment error:', err);
+      
+      // Prevent duplicate order creation if order was already created
+      if (orderCreated) {
+        console.log('Order already created, skipping fallback order creation');
+        return;
+      }
       
       // If payment intent creation failed, try to create order directly (demo mode)
       if (err.message?.includes('timeout') || err.message?.includes('Failed to create payment intent')) {
@@ -351,6 +360,7 @@ const PaymentForm: React.FC<{
           }
 
           console.log('Direct order creation successful:', order.id);
+          setOrderCreated(true); // Prevent duplicate order creation
           onSuccess(order.id);
           return;
         } catch (directOrderError) {
