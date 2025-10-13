@@ -143,6 +143,14 @@ const NewDriverDashboardPage: React.FC = () => {
 
       console.log('Driver stats calculated:', { totalEarnings, completedDeliveries, activeDeliveries });
       console.log('Setting available orders to state:', availableOrdersData);
+      
+      // Debug: Check driver profile status
+      console.log('🔍 DEBUGGING: Driver profile status:', {
+        is_online: profile?.is_online,
+        is_approved: profile?.is_approved,
+        user_type: profile?.user_type,
+        full_name: profile?.full_name
+      });
 
       setDriverStats({
         totalEarnings,
@@ -203,6 +211,33 @@ const NewDriverDashboardPage: React.FC = () => {
     alert('Driver ratings and reviews feature coming soon! This will show your customer feedback and ratings.');
   };
 
+  const handleToggleOnlineStatus = async () => {
+    try {
+      const newOnlineStatus = !profile?.is_online;
+      console.log('Toggling driver online status to:', newOnlineStatus);
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_online: newOnlineStatus })
+        .eq('id', user?.id);
+
+      if (error) {
+        console.error('Error updating online status:', error);
+        alert('Failed to update online status. Please try again.');
+        return;
+      }
+
+      console.log('Driver online status updated successfully');
+      alert(`You are now ${newOnlineStatus ? 'online' : 'offline'}!`);
+      
+      // Refresh the page to update the profile
+      window.location.reload();
+    } catch (error) {
+      console.error('Error toggling online status:', error);
+      alert('Error updating online status. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -224,8 +259,26 @@ const NewDriverDashboardPage: React.FC = () => {
       <NewHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
-          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
+              <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-red-400'}`}></div>
+                <span className="text-sm text-gray-300">
+                  {profile?.is_online ? 'Online' : 'Offline'}
+                </span>
+              </div>
+              <Button 
+                onClick={handleToggleOnlineStatus}
+                className={`${profile?.is_online ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+              >
+                {profile?.is_online ? 'Go Offline' : 'Go Online'}
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
