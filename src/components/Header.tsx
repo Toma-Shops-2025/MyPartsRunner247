@@ -209,12 +209,6 @@ const Header: React.FC = () => {
                         >
                           🚙 Vehicle Settings
                         </button>
-                        <button 
-                          onClick={() => { handleNavigation('/driver-schedule'); setIsMobileMenuOpen(false); }}
-                          className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
-                        >
-                          📅 Schedule
-                        </button>
                       </>
                     )}
                     {profile?.user_type === 'customer' && (
