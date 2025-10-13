@@ -29,6 +29,15 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const fetchDriverData = async () => {
     try {
+      // First, let's check if ANY orders exist in the database
+      console.log('Checking if any orders exist in database...');
+      const { data: allOrders, error: allOrdersError } = await supabase
+        .from('orders')
+        .select('*')
+        .limit(5);
+      
+      console.log('All orders in database:', { allOrders, allOrdersError });
+
       // Fetch driver earnings
 
       // Fetch completed orders
@@ -46,7 +55,7 @@ const NewDriverDashboardPage: React.FC = () => {
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
 
-      const { data: availableOrdersData } = await supabase
+      const { data: availableOrdersData, error: availableOrdersError } = await supabase
         .from('orders')
         .select('*')
         .eq('status', 'pending')
@@ -55,10 +64,16 @@ const NewDriverDashboardPage: React.FC = () => {
         .limit(10)
         .order('created_at', { ascending: false });
 
+      console.log('Available orders query result:', { availableOrdersData, availableOrdersError });
+      console.log('Active orders query result:', { activeOrdersData });
+      console.log('Completed orders query result:', { completedOrders });
+
       // Calculate earnings from completed orders
       const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
       const completedDeliveries = completedOrders?.length || 0;
       const activeDeliveries = activeOrdersData?.length || 0;
+
+      console.log('Driver stats calculated:', { totalEarnings, completedDeliveries, activeDeliveries });
 
       setDriverStats({
         totalEarnings,
