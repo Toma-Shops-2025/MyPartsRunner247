@@ -497,7 +497,13 @@ const NewDriverDashboardPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {console.log('Rendering available orders:', availableOrders.length, availableOrders)}
+              {/* Debug: Show order count */}
+              <div className="mb-4 p-2 bg-yellow-900 text-yellow-200 text-sm rounded">
+                DEBUG: Available orders count: {availableOrders.length}
+                {availableOrders.length > 0 && (
+                  <div>First order ID: {availableOrders[0].id}</div>
+                )}
+              </div>
               {availableOrders.length > 0 ? (
                 <div className="space-y-4">
                   {availableOrders.map((order) => (
