@@ -53,13 +53,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
-          customerid: user.id,
-          pickupaddress: orderDetails.pickupAddress,
-          deliveryaddress: orderDetails.deliveryAddress,
-          itemdescription: orderDetails.itemDescription,
+          customer_id: user.id,
+          pickup_address: orderDetails.pickupAddress,
+          delivery_address: orderDetails.deliveryAddress,
+          item_description: orderDetails.itemDescription,
           total: amount,
           status: 'pending',
-          paymentintentid: `demo_${Date.now()}` // Demo payment ID
+          payment_intent_id: `demo_${Date.now()}` // Demo payment ID
         }])
         .select()
         .single();

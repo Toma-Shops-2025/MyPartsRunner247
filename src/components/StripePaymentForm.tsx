@@ -287,10 +287,10 @@ const PaymentForm: React.FC<{
           const insertPromise = supabase
             .from('orders')
             .insert([{
-              customerid: currentUser.id,
-              pickupaddress: orderDetails.pickupAddress,
-              deliveryaddress: orderDetails.deliveryAddress,
-              itemdescription: orderDetails.itemDescription,
+              customer_id: currentUser.id,
+              pickup_address: orderDetails.pickupAddress,
+              delivery_address: orderDetails.deliveryAddress,
+              item_description: orderDetails.itemDescription,
               total: amount,
               status: 'pending',
               payment_intent_id: 'demo_' + Date.now(),

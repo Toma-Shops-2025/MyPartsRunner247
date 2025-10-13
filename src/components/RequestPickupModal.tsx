@@ -61,16 +61,15 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
         .from('orders')
         .insert([
           {
-            customerid: user.id,
-            pickupaddress: formData.pickupAddress,
-            deliveryaddress: formData.deliveryAddress,
-            itemdescription: formData.itemDescription,
+            customer_id: user.id,
+            pickup_address: formData.pickupAddress,
+            delivery_address: formData.deliveryAddress,
+            item_description: formData.itemDescription,
             total: calculateEstimatedCost(),
             status: 'pending',
-            urgency: formData.urgency,
-            specialinstructions: formData.specialInstructions,
-            contactphone: formData.contactPhone,
-            createdat: new Date().toISOString()
+            special_instructions: formData.specialInstructions,
+            contact_phone: formData.contactPhone,
+            created_at: new Date().toISOString()
           }
         ]);
 
