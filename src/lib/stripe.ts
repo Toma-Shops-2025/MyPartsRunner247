@@ -21,6 +21,7 @@ export const getStripe = () => {
 // Create payment intent using server-side endpoint
 export const createPaymentIntent = async (amount: number, metadata: any) => {
   try {
+    console.log('Attempting to create payment intent via Netlify function...');
     const response = await fetch('/.netlify/functions/create-payment-intent', {
       method: 'POST',
       headers: {
@@ -34,10 +35,13 @@ export const createPaymentIntent = async (amount: number, metadata: any) => {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Netlify function error response:', errorData);
       throw new Error(errorData.error || 'Failed to create payment intent');
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('Payment intent created successfully via Netlify function:', result);
+    return result;
   } catch (error) {
     console.error('Payment intent creation error:', error);
     throw error; // Don't use fallback for live payments

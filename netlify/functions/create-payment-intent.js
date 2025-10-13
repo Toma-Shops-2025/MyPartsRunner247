@@ -28,6 +28,16 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Test Stripe connection first
+    console.log('Testing Stripe connection...');
+    try {
+      const account = await stripe.accounts.retrieve();
+      console.log('Stripe account retrieved successfully:', account.id);
+    } catch (accountError) {
+      console.error('Stripe account retrieval failed:', accountError);
+      throw new Error('Stripe connection failed: ' + accountError.message);
+    }
+
     // Create payment intent
     console.log('Creating payment intent with amount:', Math.round(amount * 100));
     const paymentIntent = await stripe.paymentIntents.create({
