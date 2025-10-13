@@ -78,7 +78,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
             {/* Hero Logo */}
             <div className="relative w-full h-96 rounded-2xl shadow-2xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center">
               <img 
-                src="/hero-logo.png"
+                src="/hero-logo.jpg"
                 alt="MyPartsRunner Logo"
                 className="max-w-full max-h-full object-contain"
               />
