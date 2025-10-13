@@ -37,6 +37,23 @@ const NewDriverDashboardPage: React.FC = () => {
         .limit(5);
       
       console.log('All orders in database:', { allOrders, allOrdersError });
+      console.log('🔍 DEBUGGING: All orders details:', allOrders);
+      
+      // Debug: Log each order's details
+      if (allOrders && allOrders.length > 0) {
+        console.log('=== DETAILED ORDER DEBUG ===');
+        allOrders.forEach((order, index) => {
+          console.log(`Order ${index + 1}:`, {
+            id: order.id,
+            status: order.status,
+            customer_id: order.customer_id,
+            driver_id: order.driver_id,
+            created_at: order.created_at,
+            total: order.total
+          });
+        });
+        console.log('=== END DETAILED ORDER DEBUG ===');
+      }
       
       // Debug: Log each order's status and details
       if (allOrders && allOrders.length > 0) {
