@@ -30,7 +30,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
   onSuccess,
   onError
 }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [paymentData, setPaymentData] = useState({
     cardNumber: '',
@@ -65,8 +65,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           item_description: orderDetails.itemDescription,
           total: amount,
           status: 'pending',
-          special_instructions: orderDetails.specialInstructions,
-          contact_phone: orderDetails.contactPhone
+            special_instructions: orderDetails.specialInstructions,
+            contact_phone: profile?.phone || orderDetails.contactPhone
         }])
         .select()
         .single();
