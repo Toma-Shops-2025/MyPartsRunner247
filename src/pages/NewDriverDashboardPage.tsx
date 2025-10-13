@@ -101,27 +101,13 @@ const NewDriverDashboardPage: React.FC = () => {
       console.log('Fetching active orders for driver:', user?.id);
       const { data: activeOrdersData } = await supabase
         .from('orders')
-        .select(`
-          *,
-          customer:profiles!customer_id(
-            id,
-            full_name,
-            phone
-          )
-        `)
+        .select('*')
         .eq('driver_id', user?.id)
         .in('status', ['accepted', 'picked_up', 'in_transit']);
 
       const { data: availableOrdersData, error: availableOrdersError } = await supabase
         .from('orders')
-        .select(`
-          *,
-          customer:profiles!customer_id(
-            id,
-            full_name,
-            phone
-          )
-        `)
+        .select('*')
         .eq('status', 'pending')
         .neq('status', 'cancelled')
         .neq('status', 'deleted')
@@ -428,9 +414,15 @@ const NewDriverDashboardPage: React.FC = () => {
                             size="sm" 
                             variant="outline"
                             className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
-                            onClick={() => {
+                            onClick={async () => {
                               const order = activeOrders[0];
-                              const customerPhone = order.customer?.phone || '502-555-0123';
+                              // Fetch customer phone number
+                              const { data: customerProfile } = await supabase
+                                .from('profiles')
+                                .select('phone')
+                                .eq('id', order.customer_id)
+                                .single();
+                              const customerPhone = customerProfile?.phone || '502-555-0123';
                               const callUrl = `tel:${customerPhone}`;
                               window.open(callUrl, '_blank');
                             }}
@@ -441,9 +433,15 @@ const NewDriverDashboardPage: React.FC = () => {
                             size="sm" 
                             variant="outline"
                             className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
-                            onClick={() => {
+                            onClick={async () => {
                               const order = activeOrders[0];
-                              const customerPhone = order.customer?.phone || '502-555-0123';
+                              // Fetch customer phone number
+                              const { data: customerProfile } = await supabase
+                                .from('profiles')
+                                .select('phone')
+                                .eq('id', order.customer_id)
+                                .single();
+                              const customerPhone = customerProfile?.phone || '502-555-0123';
                               const smsUrl = `sms:${customerPhone}`;
                               window.open(smsUrl, '_blank');
                             }}
@@ -487,7 +485,13 @@ const NewDriverDashboardPage: React.FC = () => {
                                         return;
                                       }
 
-                                      const customerPhone = order.customer?.phone || '502-555-0123';
+                                      // Fetch customer phone number
+                                      const { data: customerProfile } = await supabase
+                                        .from('profiles')
+                                        .select('phone')
+                                        .eq('id', order.customer_id)
+                                        .single();
+                                      const customerPhone = customerProfile?.phone || '502-555-0123';
                                       const smsMessage = `Your delivery has been completed! 📦 Photo proof attached. Order #${order.id}`;
                                       const smsUrl = `sms:${customerPhone}?body=${encodeURIComponent(smsMessage)}`;
                                       
