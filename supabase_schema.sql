@@ -115,6 +115,14 @@ CREATE POLICY "Users can create orders" ON orders
 CREATE POLICY "Drivers can update assigned orders" ON orders
     FOR UPDATE USING (auth.uid() = driver_id);
 
+-- Drivers can update unassigned orders (where driver_id is NULL) to accept them
+CREATE POLICY "Drivers can accept unassigned orders" ON orders
+    FOR UPDATE USING (driver_id IS NULL AND EXISTS (
+        SELECT 1 FROM profiles 
+        WHERE profiles.id = auth.uid() 
+        AND profiles.user_type = 'driver'
+    ));
+
 -- Earnings: Drivers can only see their own earnings
 CREATE POLICY "Drivers can view own earnings" ON earnings
     FOR SELECT USING (auth.uid() = driver_id);
