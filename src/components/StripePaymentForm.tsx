@@ -228,9 +228,19 @@ const PaymentForm: React.FC<{
           created_at: new Date().toISOString()
         });
         
-        // Create order in database with real payment info (with timeout)
-        console.log('Starting database insert with timeout...');
-        const insertPromise = supabase
+        // Create order in database with real payment info
+        console.log('Starting database insert...');
+        console.log('Order data being inserted:', {
+          customer_id: currentUser.id,
+          pickup_address: orderDetails.pickupAddress,
+          delivery_address: orderDetails.deliveryAddress,
+          item_description: orderDetails.itemDescription,
+          total: amount,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        });
+        
+        const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert([{
             customer_id: currentUser.id,
@@ -244,17 +254,22 @@ const PaymentForm: React.FC<{
           .select()
           .single();
 
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Database insert timeout after 10 seconds')), 10000)
-        );
-
-        const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
-
         console.log('Order creation result:', { order, orderError });
 
         if (orderError) {
           console.error('Order creation error:', orderError);
-          throw new Error('Payment succeeded but failed to create order. Please contact support.');
+          console.error('Error details:', {
+            message: orderError.message,
+            details: orderError.details,
+            hint: orderError.hint,
+            code: orderError.code
+          });
+          throw new Error(`Payment succeeded but failed to create order: ${orderError.message}`);
+        }
+
+        if (!order) {
+          console.error('No order returned from database insert');
+          throw new Error('Payment succeeded but order creation failed - no order returned');
         }
 
         console.log('Order created successfully:', order.id);
@@ -282,8 +297,18 @@ const PaymentForm: React.FC<{
         });
         
         try {
-          console.log('Starting direct database insert with timeout...');
-          const insertPromise = supabase
+          console.log('Starting direct database insert...');
+          console.log('Order data being inserted:', {
+            customer_id: currentUser.id,
+            pickup_address: orderDetails.pickupAddress,
+            delivery_address: orderDetails.deliveryAddress,
+            item_description: orderDetails.itemDescription,
+            total: amount,
+            status: 'pending',
+            created_at: new Date().toISOString()
+          });
+          
+          const { data: order, error: orderError } = await supabase
             .from('orders')
             .insert([{
               customer_id: currentUser.id,
@@ -297,17 +322,22 @@ const PaymentForm: React.FC<{
             .select()
             .single();
 
-          const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Direct database insert timeout after 10 seconds')), 10000)
-          );
-
-          const { data: order, error: orderError } = await Promise.race([insertPromise, timeoutPromise]) as any;
-
           console.log('Direct order creation result:', { order, orderError });
 
           if (orderError) {
             console.error('Direct order creation error:', orderError);
-            throw new Error('Failed to create order. Please try again.');
+            console.error('Error details:', {
+              message: orderError.message,
+              details: orderError.details,
+              hint: orderError.hint,
+              code: orderError.code
+            });
+            throw new Error(`Failed to create order: ${orderError.message}`);
+          }
+
+          if (!order) {
+            console.error('No order returned from database insert');
+            throw new Error('Order creation failed - no order returned');
           }
 
           console.log('Direct order creation successful:', order.id);
