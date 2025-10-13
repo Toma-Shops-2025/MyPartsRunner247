@@ -27,14 +27,7 @@ const MyOrdersPage: React.FC = () => {
       
       const { data: ordersData, error } = await supabase
         .from('orders')
-        .select(`
-          *,
-          driver:profiles!orders_driver_id_fkey(
-            id,
-            full_name,
-            phone
-          )
-        `)
+        .select('*')
         .eq('customer_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -164,35 +157,13 @@ const MyOrdersPage: React.FC = () => {
                   </div>
                 </div>
 
-                {order.driver && (
+                {order.driver_id && (
                   <div className="mt-4 pt-4 border-t">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm text-gray-600">
-                          Driver: <span className="font-medium">{order.driver.full_name}</span>
-                        </span>
-                      </div>
-                      {order.driver.phone && (
-                        <div className="flex space-x-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => window.open(`tel:${order.driver.phone}`)}
-                          >
-                            <Phone className="h-4 w-4 mr-1" />
-                            Call
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => window.open(`sms:${order.driver.phone}`)}
-                          >
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Text
-                          </Button>
-                        </div>
-                      )}
+                    <div className="flex items-center space-x-2">
+                      <User className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm text-gray-600">
+                        Driver: <span className="font-medium">Assigned (ID: {order.driver_id.slice(0, 8)})</span>
+                      </span>
                     </div>
                   </div>
                 )}
@@ -276,31 +247,11 @@ const MyOrdersPage: React.FC = () => {
                   </div>
                 </div>
                 
-                {selectedOrder.driver && (
+                {selectedOrder.driver_id && (
                   <div>
                     <label className="text-sm font-medium text-gray-600">Driver</label>
                     <div className="mt-1 flex items-center justify-between">
-                      <span>{selectedOrder.driver.full_name}</span>
-                      {selectedOrder.driver.phone && (
-                        <div className="flex space-x-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => window.open(`tel:${selectedOrder.driver.phone}`)}
-                          >
-                            <Phone className="h-4 w-4 mr-1" />
-                            Call
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => window.open(`sms:${selectedOrder.driver.phone}`)}
-                          >
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            Text
-                          </Button>
-                        </div>
-                      )}
+                      <span>Driver Assigned (ID: {selectedOrder.driver_id.slice(0, 8)})</span>
                     </div>
                   </div>
                 )}
@@ -315,7 +266,7 @@ const MyOrdersPage: React.FC = () => {
                     {selectedOrder.status !== 'pending' && (
                       <div className="flex items-center text-sm">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
-                        <span>Driver assigned - {selectedOrder.driver ? 'Driver: ' + selectedOrder.driver.full_name : 'Pending'}</span>
+                        <span>Driver assigned - {selectedOrder.driver_id ? 'Driver ID: ' + selectedOrder.driver_id.slice(0, 8) : 'Pending'}</span>
                       </div>
                     )}
                     {selectedOrder.status === 'delivered' && (
