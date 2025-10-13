@@ -14,10 +14,14 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    console.log('Event body:', event.body);
     const { amount, metadata } = JSON.parse(event.body);
+    console.log('Parsed amount:', amount);
+    console.log('Parsed metadata:', metadata);
 
     // Validate required fields
     if (!amount || amount <= 0) {
+      console.log('Invalid amount error');
       return {
         statusCode: 400,
         body: JSON.stringify({ error: 'Invalid amount' })
@@ -25,6 +29,7 @@ exports.handler = async (event, context) => {
     }
 
     // Create payment intent
+    console.log('Creating payment intent with amount:', Math.round(amount * 100));
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency: 'usd',
@@ -33,6 +38,7 @@ exports.handler = async (event, context) => {
         enabled: true,
       },
     });
+    console.log('Payment intent created successfully:', paymentIntent.id);
 
     return {
       statusCode: 200,

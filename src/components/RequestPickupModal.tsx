@@ -22,6 +22,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
   const { location: userLocation, loading: locationLoading } = useLocation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [calculatedPrice, setCalculatedPrice] = useState(0);
   const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
@@ -55,6 +56,14 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
   const handleSubmit = async () => {
     if (!user) return;
     
+    // Prevent duplicate submissions
+    if (isSubmitting) {
+      console.log('Form submission blocked - already submitting');
+      return;
+    }
+    
+    console.log('Form submission started');
+    setIsSubmitting(true);
     setLoading(true);
     try {
       const { data, error } = await supabase
@@ -96,6 +105,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
       alert('Error submitting request. Please try again.');
     } finally {
       setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
