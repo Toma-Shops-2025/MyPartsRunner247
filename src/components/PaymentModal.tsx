@@ -58,8 +58,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           delivery_address: orderDetails.deliveryAddress,
           item_description: orderDetails.itemDescription,
           total: amount,
-          status: 'pending',
-          payment_intent_id: `demo_${Date.now()}` // Demo payment ID
+          status: 'pending'
         }])
         .select()
         .single();

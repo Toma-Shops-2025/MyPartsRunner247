@@ -174,7 +174,6 @@ const PaymentForm: React.FC<{
             item_description: orderDetails.itemDescription,
             total: amount,
             status: 'pending',
-            payment_intent_id: paymentIntent.id,
             created_at: new Date().toISOString()
           }])
           .select()
@@ -293,7 +292,6 @@ const PaymentForm: React.FC<{
               item_description: orderDetails.itemDescription,
               total: amount,
               status: 'pending',
-              payment_intent_id: 'demo_' + Date.now(),
               created_at: new Date().toISOString()
             }])
             .select()
