@@ -174,6 +174,8 @@ const PaymentForm: React.FC<{
             item_description: orderDetails.itemDescription,
             total: amount,
             status: 'pending',
+            special_instructions: orderDetails.specialInstructions,
+            contact_phone: orderDetails.contactPhone,
             created_at: new Date().toISOString()
           }])
           .select()
@@ -249,6 +251,8 @@ const PaymentForm: React.FC<{
             item_description: orderDetails.itemDescription,
             total: amount,
             status: 'pending',
+            special_instructions: orderDetails.specialInstructions,
+            contact_phone: orderDetails.contactPhone,
             created_at: new Date().toISOString()
           }])
           .select()
@@ -305,6 +309,8 @@ const PaymentForm: React.FC<{
             item_description: orderDetails.itemDescription,
             total: amount,
             status: 'pending',
+            special_instructions: orderDetails.specialInstructions,
+            contact_phone: orderDetails.contactPhone,
             created_at: new Date().toISOString()
           });
           
@@ -317,6 +323,8 @@ const PaymentForm: React.FC<{
               item_description: orderDetails.itemDescription,
               total: amount,
               status: 'pending',
+              special_instructions: orderDetails.specialInstructions,
+              contact_phone: orderDetails.contactPhone,
               created_at: new Date().toISOString()
             }])
             .select()

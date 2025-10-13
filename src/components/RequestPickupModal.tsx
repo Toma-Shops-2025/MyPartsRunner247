@@ -284,7 +284,9 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
                   pickupAddress: formData.pickupAddress,
                   deliveryAddress: formData.deliveryAddress,
                   itemDescription: formData.itemDescription,
-                  urgency: formData.urgency
+                  urgency: formData.urgency,
+                  specialInstructions: formData.specialInstructions,
+                  contactPhone: formData.contactPhone
                 }}
                 onSuccess={(orderId) => {
                   alert('Order placed successfully!');
