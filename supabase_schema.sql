@@ -9,6 +9,7 @@ ADD COLUMN IF NOT EXISTS user_type TEXT DEFAULT 'customer',
 ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'inactive',
 ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT false,
 ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS phone TEXT,
 ADD COLUMN IF NOT EXISTS date_of_birth DATE,
 ADD COLUMN IF NOT EXISTS ssn_last_four TEXT,
 ADD COLUMN IF NOT EXISTS driver_license TEXT,
@@ -45,9 +46,16 @@ CREATE TABLE IF NOT EXISTS orders (
     item_description TEXT NOT NULL,
     total DECIMAL(10,2) NOT NULL,
     status TEXT DEFAULT 'pending',
+    contact_phone TEXT,
+    special_instructions TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Add missing columns to existing orders table
+ALTER TABLE orders 
+ADD COLUMN IF NOT EXISTS contact_phone TEXT,
+ADD COLUMN IF NOT EXISTS special_instructions TEXT;
 
 -- 4. CREATE EARNINGS TABLE (if not exists)
 -- This is for tracking driver earnings
