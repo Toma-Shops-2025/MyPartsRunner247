@@ -22,6 +22,7 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastProcessedUserId, setLastProcessedUserId] = useState<string | null>(null);
+  const [profileFetchTimeout, setProfileFetchTimeout] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -62,13 +63,18 @@ export const useAuth = () => {
         
         if (session?.user) {
           setLoading(true);
-          await fetchProfile(session.user.id);
+          // Only fetch profile if it's a new user or we don't have a profile yet
+          if (lastProcessedUserId !== session.user.id || !profile) {
+            await fetchProfile(session.user.id);
+          } else {
+            setLoading(false);
+          }
         } else {
           setProfile(null);
           setLoading(false);
         }
         
-        setTimeout(() => { isProcessing = false; }, 100);
+        setTimeout(() => { isProcessing = false; }, 500); // Increased delay
       }
     );
 
@@ -80,6 +86,11 @@ export const useAuth = () => {
   }, []);
 
   const fetchProfile = async (userId: string) => {
+    // Clear any existing timeout
+    if (profileFetchTimeout) {
+      clearTimeout(profileFetchTimeout);
+    }
+    
     // Prevent duplicate fetches for the same user
     if (lastProcessedUserId === userId) {
       console.log('Skipping duplicate profile fetch for user:', userId);
@@ -88,6 +99,15 @@ export const useAuth = () => {
     
     setLastProcessedUserId(userId);
     
+    // Debounce profile fetches to prevent rapid-fire requests
+    const timeout = setTimeout(async () => {
+      await performProfileFetch(userId);
+    }, 200);
+    
+    setProfileFetchTimeout(timeout);
+  };
+
+  const performProfileFetch = async (userId: string) => {
     // Set a timeout to prevent infinite loading
     const profileTimeout = setTimeout(() => {
       console.log('Profile fetch timeout - creating fallback driver profile');
@@ -304,46 +324,43 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       console.log('Starting sign out process...');
-      console.log('Calling supabase.auth.signOut()...');
       
-      const signOutPromise = supabase.auth.signOut();
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Sign out timeout after 5 seconds')), 5000)
-      );
-      
-      const result = await Promise.race([signOutPromise, timeoutPromise]) as any;
-      console.log('Supabase signOut result:', result);
-      
-      if (result.error) {
-        console.error('Supabase signOut error:', result.error);
-        // Even if there's an error, try to clear local state
-        console.log('Clearing local state despite error...');
-        setUser(null);
-        setProfile(null);
-        setSession(null);
-        setLoading(false);
-        window.location.href = '/';
-      } else {
-        console.log('Sign out successful, clearing local state...');
-        // Clear local state
-        setUser(null);
-        setProfile(null);
-        setSession(null);
-        setLoading(false);
-        
-        // Force page refresh to ensure clean state
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 100);
-      }
-    } catch (error) {
-      console.error('Error signing out:', error);
-      // Force logout even if Supabase fails
-      console.log('Forcing logout despite error...');
+      // Clear local state immediately to prevent loops
       setUser(null);
       setProfile(null);
       setSession(null);
       setLoading(false);
+      setLastProcessedUserId(null);
+      
+      // Clear any stored auth data
+      localStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('supabase.auth.token');
+      sessionStorage.removeItem('sw-updated');
+      
+      // Try Supabase sign out with shorter timeout
+      try {
+        const signOutPromise = supabase.auth.signOut();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Sign out timeout')), 2000)
+        );
+        
+        await Promise.race([signOutPromise, timeoutPromise]);
+        console.log('Supabase signOut successful');
+      } catch (supabaseError) {
+        console.warn('Supabase signOut failed, but continuing with local logout:', supabaseError);
+      }
+      
+      // Force immediate redirect
+      window.location.href = '/';
+      
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Force logout even if everything fails
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      setLoading(false);
+      setLastProcessedUserId(null);
       window.location.href = '/';
     }
   };
