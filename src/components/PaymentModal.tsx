@@ -8,21 +8,27 @@ import { Label } from '@/components/ui/label';
 import { CreditCard, Lock } from 'lucide-react';
 
 interface PaymentModalProps {
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose: () => void;
   amount: number;
   orderDetails: {
     pickupAddress: string;
     deliveryAddress: string;
     itemDescription: string;
+    specialInstructions?: string;
+    contactPhone?: string;
   };
+  onSuccess?: (orderId: string) => void;
+  onError?: (error: string) => void;
 }
 
 const PaymentModal: React.FC<PaymentModalProps> = ({ 
-  isOpen, 
+  isOpen = true, 
   onClose, 
   amount, 
-  orderDetails 
+  orderDetails,
+  onSuccess,
+  onError
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -58,7 +64,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           delivery_address: orderDetails.deliveryAddress,
           item_description: orderDetails.itemDescription,
           total: amount,
-          status: 'pending'
+          status: 'pending',
+          special_instructions: orderDetails.specialInstructions,
+          contact_phone: orderDetails.contactPhone
         }])
         .select()
         .single();
@@ -83,11 +91,18 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       }
 
       alert('Payment successful! Your order has been placed.');
+      if (onSuccess) {
+        onSuccess(order.id);
+      }
       onClose();
       
     } catch (error) {
       console.error('Payment error:', error);
-      alert(`Payment failed: ${error.message || 'Please try again.'}`);
+      const errorMessage = error.message || 'Please try again.';
+      alert(`Payment failed: ${errorMessage}`);
+      if (onError) {
+        onError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
