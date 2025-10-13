@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import PaymentModal from '@/components/PaymentModal';
 import { MapPin, Package, Clock, DollarSign, Navigation } from 'lucide-react';
 
 const PlaceOrderPage: React.FC = () => {
@@ -25,6 +26,7 @@ const PlaceOrderPage: React.FC = () => {
   const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [deliveryCoordinates, setDeliveryCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   if (loading) {
     return (
@@ -79,66 +81,13 @@ const PlaceOrderPage: React.FC = () => {
         return;
       }
 
-      // Create real order in database
-      console.log('Creating order with data:', {
-        customer_id: user.id,
-        pickup_address: orderData.pickupAddress,
-        delivery_address: orderData.deliveryAddress,
-        item_description: orderData.itemDescription,
-        total: calculateEstimate(),
-        status: 'pending',
-        special_instructions: orderData.specialInstructions,
-        contact_phone: orderData.contactPhone
-      });
+      // Show payment modal instead of creating order directly
+      setShowPaymentModal(true);
+      setIsSubmitting(false);
       
-      const { data, error } = await supabase
-        .from('orders')
-        .insert([
-          {
-            customer_id: user.id,
-            pickup_address: orderData.pickupAddress,
-            delivery_address: orderData.deliveryAddress,
-            item_description: orderData.itemDescription,
-            total: calculateEstimate(),
-            status: 'pending',
-            special_instructions: orderData.specialInstructions,
-            contact_phone: orderData.contactPhone,
-            created_at: new Date().toISOString()
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Order creation error:', error);
-        throw new Error('Failed to create order. Please try again.');
-      }
-      
-      alert(`Order #${data.id} placed successfully! A driver will be assigned soon.`);
-      
-      // Reset form
-      setOrderData({
-        pickupAddress: '',
-        deliveryAddress: '',
-        itemDescription: '',
-        specialInstructions: '',
-        contactPhone: ''
-      });
-      
-      // Reset form completely
-      const form = document.getElementById('order-form') as HTMLFormElement;
-      if (form) {
-        form.reset();
-      }
-      
-      // Add a small delay before allowing new submissions
-      setTimeout(() => {
-        setIsSubmitting(false);
-      }, 2000);
     } catch (error) {
-      console.error('Error placing order:', error);
-      alert('Error placing order. Please try again.');
-    } finally {
+      console.error('Error preparing order:', error);
+      alert('Error preparing order. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -148,6 +97,31 @@ const PlaceOrderPage: React.FC = () => {
     const baseFee = 0.00;
     const distanceFee = 2.50;
     return baseFee + distanceFee;
+  };
+
+  const handlePaymentSuccess = (orderId: string) => {
+    setShowPaymentModal(false);
+    alert(`Order #${orderId} placed successfully! A driver will be assigned soon.`);
+    
+    // Reset form
+    setOrderData({
+      pickupAddress: '',
+      deliveryAddress: '',
+      itemDescription: '',
+      specialInstructions: '',
+      contactPhone: ''
+    });
+    
+    // Reset form completely
+    const form = document.getElementById('order-form') as HTMLFormElement;
+    if (form) {
+      form.reset();
+    }
+  };
+
+  const handlePaymentError = (error: string) => {
+    setShowPaymentModal(false);
+    alert(`Payment failed: ${error}`);
   };
 
   return (
@@ -325,6 +299,23 @@ const PlaceOrderPage: React.FC = () => {
           </Card>
         </div>
       </main>
+      
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <PaymentModal
+          amount={calculateEstimate()}
+          orderDetails={{
+            pickupAddress: orderData.pickupAddress,
+            deliveryAddress: orderData.deliveryAddress,
+            itemDescription: orderData.itemDescription,
+            specialInstructions: orderData.specialInstructions,
+            contactPhone: orderData.contactPhone
+          }}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+          onClose={() => setShowPaymentModal(false)}
+        />
+      )}
     </div>
   );
 };

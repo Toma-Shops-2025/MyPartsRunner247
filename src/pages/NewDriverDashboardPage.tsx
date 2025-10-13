@@ -417,24 +417,15 @@ const NewDriverDashboardPage: React.FC = () => {
                             onClick={async () => {
                               const order = activeOrders[0];
                               console.log('Call button clicked for order:', order.id);
-                              console.log('Customer ID:', order.customer_id);
+                              console.log('Order contact_phone:', order.contact_phone);
                               
-                              // Fetch customer phone number
-                              const { data: customerProfile, error } = await supabase
-                                .from('profiles')
-                                .select('phone, full_name, email')
-                                .eq('id', order.customer_id)
-                                .single();
-                              
-                              console.log('Customer profile:', customerProfile);
-                              console.log('Profile error:', error);
-                              
-                              if (customerProfile?.phone) {
-                                const callUrl = `tel:${customerProfile.phone}`;
-                                console.log('Calling customer phone:', customerProfile.phone);
+                              // Use phone number from order placement, not customer profile
+                              if (order.contact_phone) {
+                                const callUrl = `tel:${order.contact_phone}`;
+                                console.log('Calling customer phone from order:', order.contact_phone);
                                 window.open(callUrl, '_blank');
                               } else {
-                                alert(`Customer phone number not found. Customer: ${customerProfile?.full_name || 'Unknown'} (${customerProfile?.email || 'No email'})`);
+                                alert('Customer phone number not found in order details. Please contact support.');
                               }
                             }}
                           >
@@ -447,24 +438,15 @@ const NewDriverDashboardPage: React.FC = () => {
                             onClick={async () => {
                               const order = activeOrders[0];
                               console.log('Text button clicked for order:', order.id);
-                              console.log('Customer ID:', order.customer_id);
+                              console.log('Order contact_phone:', order.contact_phone);
                               
-                              // Fetch customer phone number
-                              const { data: customerProfile, error } = await supabase
-                                .from('profiles')
-                                .select('phone, full_name, email')
-                                .eq('id', order.customer_id)
-                                .single();
-                              
-                              console.log('Customer profile:', customerProfile);
-                              console.log('Profile error:', error);
-                              
-                              if (customerProfile?.phone) {
-                                const smsUrl = `sms:${customerProfile.phone}`;
-                                console.log('Texting customer phone:', customerProfile.phone);
+                              // Use phone number from order placement, not customer profile
+                              if (order.contact_phone) {
+                                const smsUrl = `sms:${order.contact_phone}`;
+                                console.log('Texting customer phone from order:', order.contact_phone);
                                 window.open(smsUrl, '_blank');
                               } else {
-                                alert(`Customer phone number not found. Customer: ${customerProfile?.full_name || 'Unknown'} (${customerProfile?.email || 'No email'})`);
+                                alert('Customer phone number not found in order details. Please contact support.');
                               }
                             }}
                           >
@@ -507,13 +489,8 @@ const NewDriverDashboardPage: React.FC = () => {
                                         return;
                                       }
 
-                                      // Fetch customer phone number
-                                      const { data: customerProfile } = await supabase
-                                        .from('profiles')
-                                        .select('phone')
-                                        .eq('id', order.customer_id)
-                                        .single();
-                                      const customerPhone = customerProfile?.phone || '502-555-0123';
+                                      // Use phone number from order placement
+                                      const customerPhone = order.contact_phone || '502-555-0123';
                                       const smsMessage = `Your delivery has been completed! 📦 Photo proof attached. Order #${order.id}`;
                                       const smsUrl = `sms:${customerPhone}?body=${encodeURIComponent(smsMessage)}`;
                                       
