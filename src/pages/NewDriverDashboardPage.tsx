@@ -218,7 +218,10 @@ const NewDriverDashboardPage: React.FC = () => {
       
       const { error } = await supabase
         .from('profiles')
-        .update({ is_online: newOnlineStatus })
+        .update({ 
+          is_online: newOnlineStatus,
+          is_approved: true  // Also set as approved if not already
+        })
         .eq('id', user?.id);
 
       if (error) {
