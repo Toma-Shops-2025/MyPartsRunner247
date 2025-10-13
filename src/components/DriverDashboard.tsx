@@ -57,12 +57,24 @@ const DriverDashboard: React.FC = () => {
   const fetchAvailableOrders = async () => {
     try {
       console.log('Fetching available orders for driver...');
+      
+      // First, let's check if ANY orders exist
+      console.log('Checking all orders in database...');
+      const { data: allOrders, error: allOrdersError } = await supabase
+        .from('orders')
+        .select('*')
+        .limit(10);
+      
+      console.log('All orders in database:', { allOrders, allOrdersError });
+      
       const { data, error } = await supabase
         .from('orders')
         .select('*')
         .is('driver_id', null)
         .eq('status', 'pending')
         .order('created_at', { ascending: true });
+      
+      console.log('Available orders query result:', { data, error });
       
       if (error) {
         console.error('Error fetching orders:', error);
