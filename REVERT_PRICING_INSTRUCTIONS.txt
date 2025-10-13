@@ -1,0 +1,23 @@
+REVERT PRICING CHANGES - Instructions to restore original base pricing
+
+After testing is complete, revert the following changes to restore the original $1.00 base pricing:
+
+1. In src/components/PricingCalculator.tsx:
+   - Change line 25: const [basePrice, setBasePrice] = useState<number>(0.00); 
+   - TO: const [basePrice, setBasePrice] = useState<number>(1.00);
+
+2. In src/pages/PlaceOrderPage.tsx:
+   - Change line 94: const baseFee = 0.00;
+   - TO: const baseFee = 1.00;
+   - Change line 251: <span>$0.00</span>
+   - TO: <span>$1.00</span>
+
+3. In src/components/RequestPickupModal.tsx:
+   - Change line 46: const baseFee = 0.00;
+   - TO: const baseFee = 1.00;
+
+4. In src/pages/SystemSettingsPage.tsx:
+   - Change line 18: minimumFare: 0.00,
+   - TO: minimumFare: 1.00,
+
+These changes will restore the original $1.00 base pricing throughout the application.
