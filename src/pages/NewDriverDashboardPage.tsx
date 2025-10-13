@@ -37,6 +37,24 @@ const NewDriverDashboardPage: React.FC = () => {
         .limit(5);
       
       console.log('All orders in database:', { allOrders, allOrdersError });
+      
+      // Debug: Log each order's status and details
+      if (allOrders && allOrders.length > 0) {
+        console.log('=== ORDER DEBUG INFO ===');
+        allOrders.forEach((order, index) => {
+          console.log(`Order ${index + 1}:`, {
+            id: order.id,
+            status: order.status,
+            customer_id: order.customer_id,
+            driver_id: order.driver_id,
+            created_at: order.created_at,
+            pickup_address: order.pickup_address,
+            delivery_address: order.delivery_address,
+            total: order.total
+          });
+        });
+        console.log('=== END ORDER DEBUG ===');
+      }
 
       // Fetch driver earnings
 
@@ -65,6 +83,16 @@ const NewDriverDashboardPage: React.FC = () => {
         .order('created_at', { ascending: false });
 
       console.log('Available orders query result:', { availableOrdersData, availableOrdersError });
+      
+      // Debug: Let's also try a simpler query to see what orders exist with pending status
+      const { data: pendingOrdersDebug } = await supabase
+        .from('orders')
+        .select('id, status, created_at, customer_id, driver_id')
+        .eq('status', 'pending');
+      
+      console.log('=== PENDING ORDERS DEBUG ===');
+      console.log('Pending orders query result:', pendingOrdersDebug);
+      console.log('=== END PENDING ORDERS DEBUG ===');
       console.log('Active orders query result:', { activeOrdersData });
       console.log('Completed orders query result:', { completedOrders });
 
