@@ -47,9 +47,11 @@ const PlaceOrderPage: React.FC = () => {
     
     // Prevent duplicate submissions
     if (isSubmitting) {
+      console.log('Form submission blocked - already submitting');
       return;
     }
     
+    console.log('Form submission started');
     setIsSubmitting(true);
 
     try {
@@ -123,6 +125,12 @@ const PlaceOrderPage: React.FC = () => {
         contactPhone: ''
       });
       
+      // Reset form completely
+      const form = document.getElementById('order-form') as HTMLFormElement;
+      if (form) {
+        form.reset();
+      }
+      
       // Add a small delay before allowing new submissions
       setTimeout(() => {
         setIsSubmitting(false);
@@ -175,7 +183,7 @@ const PlaceOrderPage: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" id="order-form">
                 <div>
                   <Label htmlFor="pickup" className="text-white">Pickup Address</Label>
                   <AddressAutocomplete

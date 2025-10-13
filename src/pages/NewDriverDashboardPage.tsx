@@ -416,15 +416,26 @@ const NewDriverDashboardPage: React.FC = () => {
                             className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
                             onClick={async () => {
                               const order = activeOrders[0];
+                              console.log('Call button clicked for order:', order.id);
+                              console.log('Customer ID:', order.customer_id);
+                              
                               // Fetch customer phone number
-                              const { data: customerProfile } = await supabase
+                              const { data: customerProfile, error } = await supabase
                                 .from('profiles')
-                                .select('phone')
+                                .select('phone, full_name, email')
                                 .eq('id', order.customer_id)
                                 .single();
-                              const customerPhone = customerProfile?.phone || '502-555-0123';
-                              const callUrl = `tel:${customerPhone}`;
-                              window.open(callUrl, '_blank');
+                              
+                              console.log('Customer profile:', customerProfile);
+                              console.log('Profile error:', error);
+                              
+                              if (customerProfile?.phone) {
+                                const callUrl = `tel:${customerProfile.phone}`;
+                                console.log('Calling customer phone:', customerProfile.phone);
+                                window.open(callUrl, '_blank');
+                              } else {
+                                alert(`Customer phone number not found. Customer: ${customerProfile?.full_name || 'Unknown'} (${customerProfile?.email || 'No email'})`);
+                              }
                             }}
                           >
                             📞 Call
@@ -435,15 +446,26 @@ const NewDriverDashboardPage: React.FC = () => {
                             className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
                             onClick={async () => {
                               const order = activeOrders[0];
+                              console.log('Text button clicked for order:', order.id);
+                              console.log('Customer ID:', order.customer_id);
+                              
                               // Fetch customer phone number
-                              const { data: customerProfile } = await supabase
+                              const { data: customerProfile, error } = await supabase
                                 .from('profiles')
-                                .select('phone')
+                                .select('phone, full_name, email')
                                 .eq('id', order.customer_id)
                                 .single();
-                              const customerPhone = customerProfile?.phone || '502-555-0123';
-                              const smsUrl = `sms:${customerPhone}`;
-                              window.open(smsUrl, '_blank');
+                              
+                              console.log('Customer profile:', customerProfile);
+                              console.log('Profile error:', error);
+                              
+                              if (customerProfile?.phone) {
+                                const smsUrl = `sms:${customerProfile.phone}`;
+                                console.log('Texting customer phone:', customerProfile.phone);
+                                window.open(smsUrl, '_blank');
+                              } else {
+                                alert(`Customer phone number not found. Customer: ${customerProfile?.full_name || 'Unknown'} (${customerProfile?.email || 'No email'})`);
+                              }
                             }}
                           >
                             💬 Text
