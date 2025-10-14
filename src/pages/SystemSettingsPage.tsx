@@ -15,7 +15,7 @@ const SystemSettingsPage: React.FC = () => {
   const [settings, setSettings] = useState({
     baseFare: 5.00,
     perMileFare: 2.50,
-    minimumFare: 0.50,
+    minimumFare: 1.00,
     commissionRate: 20,
     maxDeliveryRadius: 50,
     enableNotifications: true,

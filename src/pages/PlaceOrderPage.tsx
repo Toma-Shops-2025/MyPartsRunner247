@@ -94,8 +94,8 @@ const PlaceOrderPage: React.FC = () => {
 
   const calculateEstimate = () => {
     // Simple calculation - in real app, this would use distance API
-    const baseFee = 0.50;
-    const distanceFee = 0.00; // Removed for testing
+    const baseFee = 5.00;
+    const distanceFee = 2.50;
     return baseFee + distanceFee;
   };
 
