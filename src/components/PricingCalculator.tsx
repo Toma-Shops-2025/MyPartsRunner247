@@ -135,14 +135,56 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   const calculateRealDistance = async () => {
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
     
-    if (!mapboxToken) {
-      // Try improved coordinate-based calculation first
-      const coordDistance = await calculateDistanceFromCoords(pickupAddress, deliveryAddress);
-      if (coordDistance !== null) {
-        setDistance(coordDistance);
-        setDistancePrice(coordDistance * 0.75);
-        return;
+    // Try Mapbox API first if token is available
+    if (mapboxToken) {
+      try {
+        console.log('Using Mapbox API for distance calculation');
+        
+        // Get coordinates for both addresses
+        const response1 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(pickupAddress)}.json?access_token=${mapboxToken}&limit=1`);
+        const response2 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(deliveryAddress)}.json?access_token=${mapboxToken}&limit=1`);
+        
+        if (response1.ok && response2.ok) {
+          const data1 = await response1.json();
+          const data2 = await response2.json();
+          
+          if (data1.features && data1.features[0] && data2.features && data2.features[0]) {
+            const [lng1, lat1] = data1.features[0].center;
+            const [lng2, lat2] = data2.features[0].center;
+            
+            // Use Mapbox Matrix API for driving distance
+            const matrixResponse = await fetch(
+              `https://api.mapbox.com/directions-matrix/v1/mapbox/driving/${lng1},${lat1};${lng2},${lat2}?access_token=${mapboxToken}&sources=0&destinations=1&annotations=distance`
+            );
+            
+            if (matrixResponse.ok) {
+              const matrixData = await matrixResponse.json();
+              if (matrixData.distances && matrixData.distances[0] && matrixData.distances[0][0]) {
+                const distanceInMeters = matrixData.distances[0][0];
+                const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
+                
+                console.log('Mapbox API distance calculated:', distanceInMiles, 'miles');
+                setDistance(distanceInMiles);
+                setDistancePrice(distanceInMiles * 0.75);
+                return;
+              }
+            }
+          }
+        }
+        console.log('Mapbox API failed, falling back to coordinate calculation');
+      } catch (error) {
+        console.log('Mapbox API error:', error);
       }
+    }
+    
+    // Try improved coordinate-based calculation as fallback
+    const coordDistance = await calculateDistanceFromCoords(pickupAddress, deliveryAddress);
+    if (coordDistance !== null) {
+      console.log('Using coordinate-based calculation:', coordDistance, 'miles');
+      setDistance(coordDistance);
+      setDistancePrice(coordDistance * 0.75);
+      return;
+    }
       
       // Fallback to simple distance estimation based on address similarity
       const calculateSimpleDistance = (addr1: string, addr2: string) => {
