@@ -208,15 +208,16 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     console.log('📍 Pickup:', pickupAddress);
     console.log('📍 Delivery:', deliveryAddress);
     console.log('🗝️ Google Maps API key available:', !!googleApiKey);
+    console.log('🚀 Using server-side OpenRouteService function (CORS-free)');
     
-    // Try OpenRouteService API first (100% accurate, free)
+    // Try server-side OpenRouteService API first (100% accurate, CORS-free)
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
-      console.log('✅ OpenRouteService API succeeded');
-      return; // Success with OpenRouteService API
+      console.log('✅ Server-side OpenRouteService API succeeded');
+      return; // Success with server-side OpenRouteService API
     }
     
-    console.log('❌ OpenRouteService API failed, using fallback');
+    console.log('❌ Server-side OpenRouteService API failed, using fallback');
     
     // Fallback to simple distance estimation based on address similarity
     const calculateSimpleDistance = (addr1: string, addr2: string) => {
