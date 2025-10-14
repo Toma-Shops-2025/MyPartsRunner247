@@ -158,8 +158,15 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           accuracy: data.accuracy
         });
         
+        const calculatedDistancePrice = data.distance * 2.50;
+        console.log('💰 Distance pricing:', {
+          distance: data.distance,
+          rate: '$2.50/mile',
+          total: calculatedDistancePrice
+        });
+        
         setDistance(data.distance);
-        setDistancePrice(data.distance * 2.50); // Use correct $2.50 per mile rate
+        setDistancePrice(calculatedDistancePrice);
         
         // Update estimated time based on traffic conditions
         if (data.duration < 30) {
@@ -257,16 +264,26 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       // Try Louisville-specific distance calculation first
       const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
       if (louisvilleDistance > 0) {
-        console.log('🏙️ Louisville-specific distance:', louisvilleDistance);
+        const calculatedDistancePrice = louisvilleDistance * 2.50;
+        console.log('🏙️ Louisville-specific distance:', {
+          distance: louisvilleDistance,
+          rate: '$2.50/mile',
+          total: calculatedDistancePrice
+        });
         setDistance(louisvilleDistance);
-        setDistancePrice(louisvilleDistance * 2.50); // Use correct $2.50 per mile rate
+        setDistancePrice(calculatedDistancePrice);
         return;
       }
       
       const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
-      console.log('📏 Fallback distance calculation:', estimatedDistance);
+      const calculatedDistancePrice = estimatedDistance * 2.50;
+      console.log('📏 Fallback distance calculation:', {
+        distance: estimatedDistance,
+        rate: '$2.50/mile',
+        total: calculatedDistancePrice
+      });
       setDistance(estimatedDistance);
-      setDistancePrice(estimatedDistance * 2.50); // Use correct $2.50 per mile rate
+      setDistancePrice(calculatedDistancePrice);
       return;
     }
 
@@ -454,7 +471,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
           </div>
           <div className="text-right">
             <div className="font-semibold">{distance.toFixed(1)} miles</div>
-            <div className="text-sm text-gray-600">${formatPrice(distancePrice)}</div>
+            <div className="text-sm text-gray-600">${formatPrice(distancePrice)} (${formatPrice(distance > 0 ? distancePrice / distance : 0)}/mile)</div>
           </div>
         </div>
 
