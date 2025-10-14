@@ -184,18 +184,27 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   const calculateRealDistance = async () => {
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
     
+    console.log('🔍 Starting distance calculation...');
+    console.log('📍 Pickup:', pickupAddress);
+    console.log('📍 Delivery:', deliveryAddress);
+    console.log('🗝️ Mapbox token available:', !!mapboxToken);
+    
     // Try 100% accurate calculation first
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
+      console.log('✅ Server-side Mapbox API succeeded');
       return; // Success with Mapbox API
     }
+    
+    console.log('❌ Server-side Mapbox API failed, using fallback');
     
     if (!mapboxToken) {
       // Try improved coordinate-based calculation first
       const coordDistance = await calculateDistanceFromCoords(pickupAddress, deliveryAddress);
       if (coordDistance !== null) {
+        console.log('🌍 Coordinate-based distance:', coordDistance);
         setDistance(coordDistance);
-        setDistancePrice(coordDistance * 0.75);
+        setDistancePrice(coordDistance * 2.50); // Use correct $2.50 per mile rate
         return;
       }
       
@@ -248,14 +257,16 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       // Try Louisville-specific distance calculation first
       const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
       if (louisvilleDistance > 0) {
+        console.log('🏙️ Louisville-specific distance:', louisvilleDistance);
         setDistance(louisvilleDistance);
-        setDistancePrice(louisvilleDistance * 0.75);
+        setDistancePrice(louisvilleDistance * 2.50); // Use correct $2.50 per mile rate
         return;
       }
       
       const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
+      console.log('📏 Fallback distance calculation:', estimatedDistance);
       setDistance(estimatedDistance);
-      setDistancePrice(estimatedDistance * 0.75);
+      setDistancePrice(estimatedDistance * 2.50); // Use correct $2.50 per mile rate
       return;
     }
 
@@ -287,7 +298,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         // Use simple distance calculation for very close addresses
         const estimatedDistance = 0.1; // Very close
         setDistance(estimatedDistance);
-        setDistancePrice(estimatedDistance * 0.75);
+        setDistancePrice(estimatedDistance * 2.50); // Use correct $2.50 per mile rate
         return;
       }
 
