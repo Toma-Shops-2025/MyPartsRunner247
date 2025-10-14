@@ -35,10 +35,92 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     }
   }, [pickupAddress, deliveryAddress]);
 
+  // Louisville-specific distance calculation
+  const calculateLouisvilleDistance = (addr1: string, addr2: string) => {
+    // Known Louisville areas and their approximate distances
+    const areas = {
+      'jeffersontown': { lat: 38.1944, lng: -85.5644 },
+      'downtown': { lat: 38.2527, lng: -85.7585 },
+      'east end': { lat: 38.2527, lng: -85.6585 },
+      'west end': { lat: 38.2527, lng: -85.8585 },
+      'south end': { lat: 38.1527, lng: -85.7585 },
+      'north end': { lat: 38.3527, lng: -85.7585 }
+    };
+    
+    // Extract area indicators from addresses
+    const addr1Lower = addr1.toLowerCase();
+    const addr2Lower = addr2.toLowerCase();
+    
+    let area1 = null;
+    let area2 = null;
+    
+    // Determine areas based on address content
+    for (const [area, coords] of Object.entries(areas)) {
+      if (addr1Lower.includes(area) || addr1Lower.includes('jefferson')) area1 = coords;
+      if (addr2Lower.includes(area) || addr2Lower.includes('jefferson')) area2 = coords;
+    }
+    
+    // If we can identify both areas, calculate distance
+    if (area1 && area2) {
+      const R = 3959; // Earth's radius in miles
+      const dLat = (area2.lat - area1.lat) * Math.PI / 180;
+      const dLng = (area2.lng - area1.lng) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(area1.lat * Math.PI / 180) * Math.cos(area2.lat * Math.PI / 180) *
+                Math.sin(dLng/2) * Math.sin(dLng/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+    
+    return 0; // No area match found
+  };
+
+  // Improved distance calculation using coordinates
+  const calculateDistanceFromCoords = async (addr1: string, addr2: string) => {
+    try {
+      // Try to get coordinates using a geocoding service
+      const response1 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(addr1)}.json?access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}&limit=1`);
+      const response2 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(addr2)}.json?access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}&limit=1`);
+      
+      if (response1.ok && response2.ok) {
+        const data1 = await response1.json();
+        const data2 = await response2.json();
+        
+        if (data1.features && data1.features[0] && data2.features && data2.features[0]) {
+          const [lng1, lat1] = data1.features[0].center;
+          const [lng2, lat2] = data2.features[0].center;
+          
+          // Calculate distance using Haversine formula
+          const R = 3959; // Earth's radius in miles
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLng = (lng2 - lng1) * Math.PI / 180;
+          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c;
+          
+          return distance;
+        }
+      }
+    } catch (error) {
+      console.log('Geocoding failed, using fallback calculation');
+    }
+    return null;
+  };
+
   const calculateRealDistance = async () => {
     const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
     
     if (!mapboxToken) {
+      // Try improved coordinate-based calculation first
+      const coordDistance = await calculateDistanceFromCoords(pickupAddress, deliveryAddress);
+      if (coordDistance !== null) {
+        setDistance(coordDistance);
+        setDistancePrice(coordDistance * 0.75);
+        return;
+      }
+      
       // Fallback to simple distance estimation based on address similarity
       const calculateSimpleDistance = (addr1: string, addr2: string) => {
         // Extract street numbers for comparison
@@ -84,6 +166,14 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         // Default fallback for different cities
         return 5.0; // Different cities
       };
+      
+      // Try Louisville-specific distance calculation first
+      const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
+      if (louisvilleDistance > 0) {
+        setDistance(louisvilleDistance);
+        setDistancePrice(louisvilleDistance * 0.75);
+        return;
+      }
       
       const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
       setDistance(estimatedDistance);
@@ -191,6 +281,14 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         // Default fallback for different cities
         return 5.0; // Different cities
       };
+      
+      // Try Louisville-specific distance calculation first
+      const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
+      if (louisvilleDistance > 0) {
+        setDistance(louisvilleDistance);
+        setDistancePrice(louisvilleDistance * 0.75);
+        return;
+      }
       
       const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
       setDistance(estimatedDistance);
