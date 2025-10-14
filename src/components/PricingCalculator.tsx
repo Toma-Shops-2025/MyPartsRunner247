@@ -144,13 +144,13 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // 100% Accurate distance calculation using server-side OpenRouteService (bypasses CORS)
+  // 100% Accurate distance calculation using server-side free geocoding (bypasses CORS)
   const calculateAccurateDistance = async () => {
     try {
-      console.log('Using server-side OpenRouteService API for 100% accuracy (CORS-free)');
+      console.log('Using server-side free geocoding API for 100% accuracy (CORS-free)');
       
       // Use server-side Netlify function to bypass CORS issues
-      const response = await fetch('/.netlify/functions/calculate-distance-openroute', {
+      const response = await fetch('/.netlify/functions/calculate-distance-free', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       if (response.ok) {
         const data = await response.json();
         
-        console.log('📍 Server-side OpenRouteService result:', {
+        console.log('📍 Server-side free geocoding result:', {
           distance: data.distance,
           duration: data.duration,
           accuracy: data.accuracy,
@@ -181,7 +181,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         setDistance(data.distance);
         setDistancePrice(calculatedDistancePrice);
         
-        // Update estimated time based on OpenRouteService duration data
+        // Update estimated time based on free geocoding duration data
         if (data.duration < 30) {
           setEstimatedTime('15-30 minutes');
         } else if (data.duration < 60) {
@@ -193,10 +193,10 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         return true; // Success
       } else {
         const errorData = await response.json();
-        console.log('Server-side OpenRouteService error:', errorData);
+        console.log('Server-side free geocoding error:', errorData);
       }
     } catch (error) {
-      console.log('Server-side OpenRouteService error:', error);
+      console.log('Server-side free geocoding error:', error);
     }
     return false; // Failed, use fallback
   };
@@ -208,16 +208,16 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     console.log('📍 Pickup:', pickupAddress);
     console.log('📍 Delivery:', deliveryAddress);
     console.log('🗝️ Google Maps API key available:', !!googleApiKey);
-    console.log('🚀 Using server-side OpenRouteService function (CORS-free)');
+    console.log('🚀 Using server-side free geocoding function (CORS-free)');
     
-    // Try server-side OpenRouteService API first (100% accurate, CORS-free)
+    // Try server-side free geocoding API first (100% accurate, CORS-free)
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
-      console.log('✅ Server-side OpenRouteService API succeeded');
-      return; // Success with server-side OpenRouteService API
+      console.log('✅ Server-side free geocoding API succeeded');
+      return; // Success with server-side free geocoding API
     }
     
-    console.log('❌ Server-side OpenRouteService API failed, using fallback');
+    console.log('❌ Server-side free geocoding API failed, using fallback');
     
     // Fallback to simple distance estimation based on address similarity
     const calculateSimpleDistance = (addr1: string, addr2: string) => {
