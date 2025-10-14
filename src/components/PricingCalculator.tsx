@@ -68,7 +68,17 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         const city2 = addr2.toLowerCase().split(',').pop()?.trim() || '';
         
         if (city1 === city2) {
-          return 2.0; // Same city, different streets
+          // Use ZIP code analysis for better distance estimation
+          const zip1 = addr1.match(/\d{5}/)?.[0];
+          const zip2 = addr2.match(/\d{5}/)?.[0];
+          
+          if (zip1 && zip2 && zip1 !== zip2) {
+            // Different ZIP codes in same city - estimate 4-6 miles
+            return 5.0;
+          } else {
+            // Same ZIP code or no ZIP - estimate 1-3 miles  
+            return 2.0;
+          }
         }
         
         // Default fallback for different cities
@@ -165,7 +175,17 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         const city2 = addr2.toLowerCase().split(',').pop()?.trim() || '';
         
         if (city1 === city2) {
-          return 2.0; // Same city, different streets
+          // Use ZIP code analysis for better distance estimation
+          const zip1 = addr1.match(/\d{5}/)?.[0];
+          const zip2 = addr2.match(/\d{5}/)?.[0];
+          
+          if (zip1 && zip2 && zip1 !== zip2) {
+            // Different ZIP codes in same city - estimate 4-6 miles
+            return 5.0;
+          } else {
+            // Same ZIP code or no ZIP - estimate 1-3 miles  
+            return 2.0;
+          }
         }
         
         // Default fallback for different cities
