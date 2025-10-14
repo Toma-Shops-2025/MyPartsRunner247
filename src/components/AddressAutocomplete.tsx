@@ -35,7 +35,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<number>();
 
   const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 

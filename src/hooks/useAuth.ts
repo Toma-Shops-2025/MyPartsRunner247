@@ -22,7 +22,7 @@ export const useAuth = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [lastProcessedUserId, setLastProcessedUserId] = useState<string | null>(null);
-  const [profileFetchTimeout, setProfileFetchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [profileFetchTimeout, setProfileFetchTimeout] = useState<number | null>(null);
 
   useEffect(() => {
     let mounted = true;
