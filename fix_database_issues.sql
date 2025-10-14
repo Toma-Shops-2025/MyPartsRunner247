@@ -26,36 +26,34 @@ ADD COLUMN IF NOT EXISTS emergency_contact JSONB;
 -- Go to Storage > Create Bucket > Name: "vehicle-documents" > Public: false
 
 -- 7. Set up storage policies for vehicle-documents bucket
--- Enable RLS on storage.objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+-- Note: Storage policies need to be created through Supabase Dashboard
+-- Go to Storage > vehicle-documents bucket > Policies tab
+-- Create these policies manually:
 
--- Allow authenticated users to upload to vehicle-documents bucket
-CREATE POLICY "Allow authenticated users to upload vehicle documents" ON storage.objects
-FOR INSERT WITH CHECK (
-  bucket_id = 'vehicle-documents' 
-  AND auth.role() = 'authenticated'
-);
+-- Policy 1: Allow authenticated users to upload
+-- Name: "Allow authenticated uploads"
+-- Operation: INSERT
+-- Target roles: authenticated
+-- USING expression: true
+-- WITH CHECK expression: true
 
--- Allow users to view their own vehicle documents
-CREATE POLICY "Allow users to view their own vehicle documents" ON storage.objects
-FOR SELECT USING (
-  bucket_id = 'vehicle-documents' 
-  AND auth.uid()::text = (storage.foldername(name))[1]
-);
+-- Policy 2: Allow users to view their own files
+-- Name: "Allow users to view own files"  
+-- Operation: SELECT
+-- Target roles: authenticated
+-- USING expression: auth.uid()::text = (storage.foldername(name))[1]
 
--- Allow users to update their own vehicle documents
-CREATE POLICY "Allow users to update their own vehicle documents" ON storage.objects
-FOR UPDATE USING (
-  bucket_id = 'vehicle-documents' 
-  AND auth.uid()::text = (storage.foldername(name))[1]
-);
+-- Policy 3: Allow users to update their own files
+-- Name: "Allow users to update own files"
+-- Operation: UPDATE  
+-- Target roles: authenticated
+-- USING expression: auth.uid()::text = (storage.foldername(name))[1]
 
--- Allow users to delete their own vehicle documents
-CREATE POLICY "Allow users to delete their own vehicle documents" ON storage.objects
-FOR DELETE USING (
-  bucket_id = 'vehicle-documents' 
-  AND auth.uid()::text = (storage.foldername(name))[1]
-);
+-- Policy 4: Allow users to delete their own files
+-- Name: "Allow users to delete own files"
+-- Operation: DELETE
+-- Target roles: authenticated  
+-- USING expression: auth.uid()::text = (storage.foldername(name))[1]
 
 -- 8. Verify the columns were added
 SELECT column_name, data_type 
