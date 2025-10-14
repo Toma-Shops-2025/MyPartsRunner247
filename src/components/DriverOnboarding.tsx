@@ -77,7 +77,7 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
             </div>
           </div>
         </CardContent>
-      </CardCard>
+      </Card>
     );
   }
 
