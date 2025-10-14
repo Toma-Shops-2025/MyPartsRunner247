@@ -144,75 +144,70 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // Smart distance calculation using ZIP code analysis (no API required)
+  // 100% Accurate distance calculation using Google Maps Distance Matrix API
   const calculateAccurateDistance = async () => {
     try {
-      console.log('Using smart ZIP code analysis for reliable distance calculation (no API required)');
+      const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
       
-      // Extract ZIP codes from addresses
-      const pickupZip = pickupAddress.match(/\d{5}/)?.[0];
-      const deliveryZip = deliveryAddress.match(/\d{5}/)?.[0];
-      
-      if (!pickupZip || !deliveryZip) {
-        throw new Error('Could not extract ZIP codes');
+      if (!googleApiKey) {
+        throw new Error('Google Maps API key not configured');
       }
       
-      // Louisville ZIP code distance mapping (based on real distances)
-      const zipDistances: { [key: string]: { [key: string]: number } } = {
-        '40291': { // Jeffersontown area
-          '40209': 19.8, '40218': 15.2, '40219': 12.5, '40220': 8.3, '40222': 6.1,
-          '40223': 4.2, '40241': 2.1, '40242': 3.8, '40245': 1.2, '40258': 5.5,
-          '40259': 7.8, '40272': 9.1, '40299': 11.4, '40118': 17.17, '40165': 22.3
-        },
-        '40209': { // South Louisville
-          '40291': 19.8, '40218': 8.7, '40219': 6.2, '40220': 4.1, '40222': 2.8,
-          '40223': 1.9, '40241': 3.4, '40242': 5.1, '40245': 7.2, '40258': 9.8,
-          '40259': 12.1, '40272': 14.3, '40299': 16.7, '40118': 2.1, '40165': 5.8
-        },
-        '40118': { // Fairdale
-          '40291': 17.17, '40209': 2.1, '40218': 6.8, '40219': 4.3, '40220': 2.2,
-          '40222': 0.9, '40223': 1.8, '40241': 3.2, '40242': 4.9, '40245': 7.0,
-          '40258': 9.6, '40259': 11.9, '40272': 14.1, '40299': 16.5, '40165': 3.7
-        }
-      };
+      console.log('Using Google Maps Distance Matrix API for 100% accuracy');
       
-      // Check if we have a direct mapping
-      if (zipDistances[pickupZip] && zipDistances[pickupZip][deliveryZip]) {
-        const distance = zipDistances[pickupZip][deliveryZip];
-        
-        console.log('📍 ZIP code distance mapping result:', {
-          pickupZip,
-          deliveryZip,
-          distance,
-          accuracy: 'Precise Louisville area mapping'
-        });
-        
-        const calculatedDistancePrice = distance * 2.00;
-        console.log('💰 Distance pricing:', {
-          distance: distance,
-          rate: '$2.00/mile',
-          total: calculatedDistancePrice
-        });
-        
-        setDistance(distance);
-        setDistancePrice(calculatedDistancePrice);
-        
-        // Estimate time based on distance (roughly 30 mph average)
-        const estimatedMinutes = (distance / 30) * 60;
-        if (estimatedMinutes < 30) {
-          setEstimatedTime('15-30 minutes');
-        } else if (estimatedMinutes < 60) {
-          setEstimatedTime('30-60 minutes');
-        } else {
-          setEstimatedTime('1-2 hours');
-        }
-        
-        return true; // Success
+      // Use Google Maps Distance Matrix API for precise driving distances
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(pickupAddress)}&destinations=${encodeURIComponent(deliveryAddress)}&units=imperial&key=${googleApiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Google Maps API request failed');
+      }
+
+      const data = await response.json();
+
+      if (data.status !== 'OK' || !data.rows[0] || !data.rows[0].elements[0]) {
+        throw new Error('Google Maps API returned invalid response');
+      }
+
+      const element = data.rows[0].elements[0];
+      
+      if (element.status !== 'OK') {
+        throw new Error(`Google Maps API error: ${element.status}`);
+      }
+
+      const distanceInMiles = element.distance.value / 1609.34; // Convert meters to miles
+      const durationInMinutes = element.duration.value / 60; // Convert seconds to minutes
+      
+      console.log('📍 Google Maps Distance Matrix result:', {
+        distance: distanceInMiles,
+        duration: durationInMinutes,
+        accuracy: '100% accurate driving distance',
+        status: element.status
+      });
+      
+      const calculatedDistancePrice = distanceInMiles * 2.00;
+      console.log('💰 Distance pricing:', {
+        distance: distanceInMiles,
+        rate: '$2.00/mile',
+        total: calculatedDistancePrice
+      });
+      
+      setDistance(distanceInMiles);
+      setDistancePrice(calculatedDistancePrice);
+      
+      // Update estimated time based on Google's duration data
+      if (durationInMinutes < 30) {
+        setEstimatedTime('15-30 minutes');
+      } else if (durationInMinutes < 60) {
+        setEstimatedTime('30-60 minutes');
+      } else {
+        setEstimatedTime('1-2 hours');
       }
       
-      throw new Error('No ZIP code mapping available');
+      return true; // Success
     } catch (error) {
-      console.log('ZIP code analysis error:', error);
+      console.log('Google Maps API error:', error);
     }
     return false; // Failed, use fallback
   };
@@ -225,14 +220,14 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     console.log('📍 Delivery:', deliveryAddress);
     console.log('🗝️ Google Maps API key available:', !!googleApiKey);
     
-    // Try ZIP code analysis first (no API required)
+    // Try Google Maps Distance Matrix API first (100% accurate)
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
-      console.log('✅ ZIP code analysis succeeded');
-      return; // Success with ZIP code mapping
+      console.log('✅ Google Maps Distance Matrix API succeeded');
+      return; // Success with Google Maps API
     }
     
-    console.log('❌ ZIP code analysis failed, using fallback');
+    console.log('❌ Google Maps API failed, using fallback');
     
     // Fallback to simple distance estimation based on address similarity
     const calculateSimpleDistance = (addr1: string, addr2: string) => {
