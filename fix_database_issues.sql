@@ -26,7 +26,36 @@ ADD COLUMN IF NOT EXISTS emergency_contact JSONB;
 -- Go to Storage > Create Bucket > Name: "vehicle-documents" > Public: false
 
 -- 7. Set up storage policies for vehicle-documents bucket
--- (These will be created automatically when you create the bucket)
+-- Enable RLS on storage.objects
+ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to upload to vehicle-documents bucket
+CREATE POLICY "Allow authenticated users to upload vehicle documents" ON storage.objects
+FOR INSERT WITH CHECK (
+  bucket_id = 'vehicle-documents' 
+  AND auth.role() = 'authenticated'
+);
+
+-- Allow users to view their own vehicle documents
+CREATE POLICY "Allow users to view their own vehicle documents" ON storage.objects
+FOR SELECT USING (
+  bucket_id = 'vehicle-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Allow users to update their own vehicle documents
+CREATE POLICY "Allow users to update their own vehicle documents" ON storage.objects
+FOR UPDATE USING (
+  bucket_id = 'vehicle-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Allow users to delete their own vehicle documents
+CREATE POLICY "Allow users to delete their own vehicle documents" ON storage.objects
+FOR DELETE USING (
+  bucket_id = 'vehicle-documents' 
+  AND auth.uid()::text = (storage.foldername(name))[1]
+);
 
 -- 8. Verify the columns were added
 SELECT column_name, data_type 
