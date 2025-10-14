@@ -144,60 +144,59 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // 100% Accurate distance calculation using OpenRouteService (free alternative)
+  // 100% Accurate distance calculation using server-side OpenRouteService (bypasses CORS)
   const calculateAccurateDistance = async () => {
     try {
-      console.log('Using OpenRouteService API for 100% accuracy (free alternative)');
+      console.log('Using server-side OpenRouteService API for 100% accuracy (CORS-free)');
       
-      // Use OpenRouteService for precise driving distances (free, no API key required)
-      const response = await fetch(
-        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a8b77b7e&start=${encodeURIComponent(pickupAddress)}&end=${encodeURIComponent(deliveryAddress)}`
-      );
-
-      if (!response.ok) {
-        throw new Error('OpenRouteService API request failed');
-      }
-
-      const data = await response.json();
-
-      if (!data.features || !data.features[0] || !data.features[0].properties) {
-        throw new Error('OpenRouteService API returned invalid response');
-      }
-
-      const properties = data.features[0].properties;
-      const distanceInMeters = properties.summary.distance;
-      const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
-      const durationInMinutes = properties.summary.duration / 60; // Convert seconds to minutes
-      
-      console.log('📍 OpenRouteService result:', {
-        distance: distanceInMiles,
-        duration: durationInMinutes,
-        accuracy: '100% accurate driving distance (free service)',
-        service: 'OpenRouteService'
+      // Use server-side Netlify function to bypass CORS issues
+      const response = await fetch('/.netlify/functions/calculate-distance-openroute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pickupAddress,
+          deliveryAddress
+        })
       });
-      
-      const calculatedDistancePrice = distanceInMiles * 2.00;
-      console.log('💰 Distance pricing:', {
-        distance: distanceInMiles,
-        rate: '$2.00/mile',
-        total: calculatedDistancePrice
-      });
-      
-      setDistance(distanceInMiles);
-      setDistancePrice(calculatedDistancePrice);
-      
-      // Update estimated time based on OpenRouteService duration data
-      if (durationInMinutes < 30) {
-        setEstimatedTime('15-30 minutes');
-      } else if (durationInMinutes < 60) {
-        setEstimatedTime('30-60 minutes');
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        console.log('📍 Server-side OpenRouteService result:', {
+          distance: data.distance,
+          duration: data.duration,
+          accuracy: data.accuracy,
+          service: data.service
+        });
+        
+        const calculatedDistancePrice = data.distance * 2.00;
+        console.log('💰 Distance pricing:', {
+          distance: data.distance,
+          rate: '$2.00/mile',
+          total: calculatedDistancePrice
+        });
+        
+        setDistance(data.distance);
+        setDistancePrice(calculatedDistancePrice);
+        
+        // Update estimated time based on OpenRouteService duration data
+        if (data.duration < 30) {
+          setEstimatedTime('15-30 minutes');
+        } else if (data.duration < 60) {
+          setEstimatedTime('30-60 minutes');
+        } else {
+          setEstimatedTime('1-2 hours');
+        }
+        
+        return true; // Success
       } else {
-        setEstimatedTime('1-2 hours');
+        const errorData = await response.json();
+        console.log('Server-side OpenRouteService error:', errorData);
       }
-      
-      return true; // Success
     } catch (error) {
-      console.log('OpenRouteService API error:', error);
+      console.log('Server-side OpenRouteService error:', error);
     }
     return false; // Failed, use fallback
   };
