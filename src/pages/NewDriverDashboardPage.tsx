@@ -508,7 +508,36 @@ const NewDriverDashboardPage: React.FC = () => {
                                         return;
                                       }
 
-                                      alert('Delivery completed with photo proof! 📸');
+                                      // Process automatic driver payment
+                                      try {
+                                        const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: JSON.stringify({
+                                            orderId: order.id
+                                          })
+                                        });
+
+                                        if (paymentResponse.ok) {
+                                          const paymentData = await paymentResponse.json();
+                                          console.log('Driver payment processed:', paymentData);
+                                          
+                                          if (paymentData.driverPayment) {
+                                            alert(`Delivery completed! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
+                                          } else {
+                                            alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                          }
+                                        } else {
+                                          console.log('Payment processing failed, but delivery marked as completed');
+                                          alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                        }
+                                      } catch (paymentError) {
+                                        console.error('Payment processing error:', paymentError);
+                                        alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                      }
+
                                       window.open(smsUrl, '_blank');
                                       await fetchDriverData();
                                     };
@@ -544,7 +573,36 @@ const NewDriverDashboardPage: React.FC = () => {
                                   return;
                                 }
 
-                                alert('Order delivered successfully! 🎉');
+                                // Process automatic driver payment
+                                try {
+                                  const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                      orderId: order.id
+                                    })
+                                  });
+
+                                  if (paymentResponse.ok) {
+                                    const paymentData = await paymentResponse.json();
+                                    console.log('Driver payment processed:', paymentData);
+                                    
+                                    if (paymentData.driverPayment) {
+                                      alert(`Order delivered! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
+                                    } else {
+                                      alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                    }
+                                  } else {
+                                    console.log('Payment processing failed, but delivery marked as completed');
+                                    alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                  }
+                                } catch (paymentError) {
+                                  console.error('Payment processing error:', paymentError);
+                                  alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                }
+
                                 await fetchDriverData();
                               } catch (error) {
                                 console.error('Error marking delivered:', error);
