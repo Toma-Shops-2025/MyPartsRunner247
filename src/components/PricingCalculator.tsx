@@ -132,81 +132,51 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // 100% Accurate distance calculation using Mapbox Directions API with traffic
+  // 100% Accurate distance calculation using server-side Mapbox API (bypasses CORS)
   const calculateAccurateDistance = async () => {
-    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    
-    if (mapboxToken) {
-      try {
-        console.log('Using Mapbox Directions API with traffic for 100% accuracy');
+    try {
+      console.log('Using server-side Mapbox API for 100% accuracy (CORS-free)');
+      
+      const response = await fetch('/.netlify/functions/calculate-distance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pickupAddress,
+          deliveryAddress
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
         
-        // Get coordinates for both addresses using Mapbox Geocoding
-        const [pickupResponse, deliveryResponse] = await Promise.all([
-          fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(pickupAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`),
-          fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(deliveryAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`)
-        ]);
-
-        if (pickupResponse.ok && deliveryResponse.ok) {
-          const [pickupData, deliveryData] = await Promise.all([
-            pickupResponse.json(),
-            deliveryResponse.json()
-          ]);
-
-          if (pickupData.features && pickupData.features[0] && deliveryData.features && deliveryData.features[0]) {
-            const [lng1, lat1] = pickupData.features[0].center;
-            const [lng2, lat2] = deliveryData.features[0].center;
-
-            // Try Mapbox Directions API with traffic conditions first
-            let directionsResponse = await fetch(
-              `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${lng1},${lat1};${lng2},${lat2}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=distance,duration`
-            );
-            
-            // If traffic API fails, fallback to regular driving API
-            if (!directionsResponse.ok) {
-              console.log('Traffic API failed, trying regular driving API');
-              directionsResponse = await fetch(
-                `https://api.mapbox.com/directions/v5/mapbox/driving/${lng1},${lat1};${lng2},${lat2}?access_token=${mapboxToken}&geometries=geojson&overview=full&steps=true&annotations=distance,duration`
-              );
-            }
-
-            if (directionsResponse.ok) {
-              const directionsData = await directionsResponse.json();
-              
-              if (directionsData.routes && directionsData.routes[0]) {
-                const route = directionsData.routes[0];
-                const distanceInMeters = route.distance;
-                const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
-                const durationInMinutes = route.duration / 60; // Convert seconds to minutes
-                
-                const hasTrafficData = directionsResponse.url.includes('driving-traffic');
-                console.log('Mapbox Directions API:', {
-                  distance: distanceInMiles,
-                  duration: durationInMinutes,
-                  traffic: hasTrafficData ? 'Real-time traffic data included' : 'Standard driving route (no traffic)',
-                  accuracy: '100% accurate driving distance'
-                });
-                
-                setDistance(distanceInMiles);
-                setDistancePrice(distanceInMiles * 0.75);
-                
-                // Update estimated time based on traffic conditions
-                if (durationInMinutes < 30) {
-                  setEstimatedTime('15-30 minutes');
-                } else if (durationInMinutes < 60) {
-                  setEstimatedTime('30-60 minutes');
-                } else {
-                  setEstimatedTime('1-2 hours');
-                }
-                
-                return true; // Success
-              }
-            }
-          }
+        console.log('Server-side Mapbox API result:', {
+          distance: data.distance,
+          duration: data.duration,
+          traffic: data.hasTrafficData ? 'Real-time traffic data included' : 'Standard driving route (no traffic)',
+          accuracy: data.accuracy
+        });
+        
+        setDistance(data.distance);
+        setDistancePrice(data.distance * 2.50); // Use correct $2.50 per mile rate
+        
+        // Update estimated time based on traffic conditions
+        if (data.duration < 30) {
+          setEstimatedTime('15-30 minutes');
+        } else if (data.duration < 60) {
+          setEstimatedTime('30-60 minutes');
+        } else {
+          setEstimatedTime('1-2 hours');
         }
-        console.log('Mapbox Directions API failed, falling back to standard calculation');
-      } catch (error) {
-        console.log('Mapbox Directions API error:', error);
+        
+        return true; // Success
+      } else {
+        const errorData = await response.json();
+        console.log('Server-side API error:', errorData);
       }
+    } catch (error) {
+      console.log('Server-side API error:', error);
     }
     return false; // Failed, use fallback
   };
