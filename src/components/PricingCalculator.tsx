@@ -336,7 +336,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
         
         setDistance(distanceInMiles);
-        setDistancePrice(distanceInMiles * 0.75); // $0.75 per mile
+        setDistancePrice(distanceInMiles * 2.50); // $2.50 per mile
       } else {
         throw new Error('Could not calculate distance from Mapbox response');
       }
@@ -392,13 +392,13 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
       if (louisvilleDistance > 0) {
         setDistance(louisvilleDistance);
-        setDistancePrice(louisvilleDistance * 0.75);
+        setDistancePrice(louisvilleDistance * 2.50);
         return;
       }
       
       const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
       setDistance(estimatedDistance);
-      setDistancePrice(estimatedDistance * 0.75);
+      setDistancePrice(estimatedDistance * 2.50);
     }
   };
 

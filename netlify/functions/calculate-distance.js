@@ -1,4 +1,5 @@
-const fetch = require('node-fetch');
+// Use built-in fetch (available in Node.js 18+)
+// const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   // Only allow POST requests
