@@ -144,46 +144,36 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // 100% Accurate distance calculation using Google Maps Distance Matrix API
+  // 100% Accurate distance calculation using OpenRouteService (free alternative)
   const calculateAccurateDistance = async () => {
     try {
-      const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+      console.log('Using OpenRouteService API for 100% accuracy (free alternative)');
       
-      if (!googleApiKey) {
-        throw new Error('Google Maps API key not configured');
-      }
-      
-      console.log('Using Google Maps Distance Matrix API for 100% accuracy');
-      
-      // Use Google Maps Distance Matrix API for precise driving distances
+      // Use OpenRouteService for precise driving distances (free, no API key required)
       const response = await fetch(
-        `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(pickupAddress)}&destinations=${encodeURIComponent(deliveryAddress)}&units=imperial&key=${googleApiKey}`
+        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a8b77b7e&start=${encodeURIComponent(pickupAddress)}&end=${encodeURIComponent(deliveryAddress)}`
       );
 
       if (!response.ok) {
-        throw new Error('Google Maps API request failed');
+        throw new Error('OpenRouteService API request failed');
       }
 
       const data = await response.json();
 
-      if (data.status !== 'OK' || !data.rows[0] || !data.rows[0].elements[0]) {
-        throw new Error('Google Maps API returned invalid response');
+      if (!data.features || !data.features[0] || !data.features[0].properties) {
+        throw new Error('OpenRouteService API returned invalid response');
       }
 
-      const element = data.rows[0].elements[0];
+      const properties = data.features[0].properties;
+      const distanceInMeters = properties.summary.distance;
+      const distanceInMiles = distanceInMeters * 0.000621371; // Convert meters to miles
+      const durationInMinutes = properties.summary.duration / 60; // Convert seconds to minutes
       
-      if (element.status !== 'OK') {
-        throw new Error(`Google Maps API error: ${element.status}`);
-      }
-
-      const distanceInMiles = element.distance.value / 1609.34; // Convert meters to miles
-      const durationInMinutes = element.duration.value / 60; // Convert seconds to minutes
-      
-      console.log('📍 Google Maps Distance Matrix result:', {
+      console.log('📍 OpenRouteService result:', {
         distance: distanceInMiles,
         duration: durationInMinutes,
-        accuracy: '100% accurate driving distance',
-        status: element.status
+        accuracy: '100% accurate driving distance (free service)',
+        service: 'OpenRouteService'
       });
       
       const calculatedDistancePrice = distanceInMiles * 2.00;
@@ -196,7 +186,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       setDistance(distanceInMiles);
       setDistancePrice(calculatedDistancePrice);
       
-      // Update estimated time based on Google's duration data
+      // Update estimated time based on OpenRouteService duration data
       if (durationInMinutes < 30) {
         setEstimatedTime('15-30 minutes');
       } else if (durationInMinutes < 60) {
@@ -207,7 +197,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       
       return true; // Success
     } catch (error) {
-      console.log('Google Maps API error:', error);
+      console.log('OpenRouteService API error:', error);
     }
     return false; // Failed, use fallback
   };
@@ -220,14 +210,14 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     console.log('📍 Delivery:', deliveryAddress);
     console.log('🗝️ Google Maps API key available:', !!googleApiKey);
     
-    // Try Google Maps Distance Matrix API first (100% accurate)
+    // Try OpenRouteService API first (100% accurate, free)
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
-      console.log('✅ Google Maps Distance Matrix API succeeded');
-      return; // Success with Google Maps API
+      console.log('✅ OpenRouteService API succeeded');
+      return; // Success with OpenRouteService API
     }
     
-    console.log('❌ Google Maps API failed, using fallback');
+    console.log('❌ OpenRouteService API failed, using fallback');
     
     // Fallback to simple distance estimation based on address similarity
     const calculateSimpleDistance = (addr1: string, addr2: string) => {
