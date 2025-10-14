@@ -185,10 +185,10 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         accuracy: 'Reliable coordinate-based calculation'
       });
       
-      const calculatedDistancePrice = distance * 2.50;
+      const calculatedDistancePrice = distance * 2.00;
       console.log('💰 Distance pricing:', {
         distance: distance,
-        rate: '$2.50/mile',
+        rate: '$2.00/mile',
         total: calculatedDistancePrice
       });
       
@@ -278,10 +278,10 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     // Try Louisville-specific distance calculation first
     const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
     if (louisvilleDistance > 0) {
-      const calculatedDistancePrice = louisvilleDistance * 2.50;
+      const calculatedDistancePrice = louisvilleDistance * 2.00;
       console.log('🏙️ Louisville-specific distance:', {
         distance: louisvilleDistance,
-        rate: '$2.50/mile',
+        rate: '$2.00/mile',
         total: calculatedDistancePrice
       });
       setDistance(louisvilleDistance);
@@ -290,10 +290,10 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     }
     
     const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
-    const calculatedDistancePrice = estimatedDistance * 2.50;
+    const calculatedDistancePrice = estimatedDistance * 2.00;
     console.log('📏 Fallback distance calculation:', {
       distance: estimatedDistance,
-      rate: '$2.50/mile',
+      rate: '$2.00/mile',
       total: calculatedDistancePrice
     });
     setDistance(estimatedDistance);
