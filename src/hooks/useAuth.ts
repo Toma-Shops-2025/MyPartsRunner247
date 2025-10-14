@@ -334,6 +334,7 @@ export const useAuth = () => {
       
       // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('mock_profile');
       sessionStorage.removeItem('supabase.auth.token');
       sessionStorage.removeItem('sw-updated');
       
@@ -350,8 +351,11 @@ export const useAuth = () => {
         console.warn('Supabase signOut failed, but continuing with local logout:', supabaseError);
       }
       
-      // Force immediate redirect
-      window.location.href = '/';
+      // Small delay to ensure state is cleared before redirect
+      setTimeout(() => {
+        console.log('Redirecting to home page...');
+        window.location.href = '/';
+      }, 100);
       
     } catch (error) {
       console.error('Error signing out:', error);
@@ -361,7 +365,9 @@ export const useAuth = () => {
       setSession(null);
       setLoading(false);
       setLastProcessedUserId(null);
-      window.location.href = '/';
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 100);
     }
   };
 

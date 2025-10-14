@@ -22,10 +22,10 @@ const NewHeader: React.FC = () => {
   const handleSignOut = async () => {
     console.log('Sign out button clicked!');
     try {
-      await signOut();
-      console.log('Sign out completed, navigating to home...');
-      navigate('/');
       setIsMobileMenuOpen(false);
+      await signOut();
+      console.log('Sign out completed');
+      // Note: signOut() already handles navigation via window.location.href
     } catch (error) {
       console.error('Error in handleSignOut:', error);
     }
