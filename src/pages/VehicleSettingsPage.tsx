@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Car, Save, Upload, CheckCircle, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -19,7 +20,8 @@ const VehicleSettingsPage: React.FC = () => {
     color: 'Silver',
     license_plate: 'ABC123',
     insurance_number: 'INS-789456',
-    vehicle_type: 'sedan'
+    vehicle_type: 'sedan',
+    transportation_type: ''
   });
   const [uploadedFiles, setUploadedFiles] = useState({
     registration: null as File | null,
@@ -103,6 +105,7 @@ const VehicleSettingsPage: React.FC = () => {
             license_plate: vehicleData.license_plate,
             insurance_number: vehicleData.insurance_number,
             vehicle_type: vehicleData.vehicle_type,
+            transportation_type: vehicleData.transportation_type,
             registration_uploaded: uploadStatus.registration === 'success',
             insurance_uploaded: uploadStatus.insurance === 'success'
           }
@@ -208,6 +211,17 @@ const VehicleSettingsPage: React.FC = () => {
                   id="insurance_number" 
                   value={vehicleData.insurance_number}
                   onChange={(e) => setVehicleData({...vehicleData, insurance_number: e.target.value})}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="transportation_type">Transportation Method (if not using a vehicle, please describe your delivery method)</Label>
+                <Textarea 
+                  id="transportation_type" 
+                  value={vehicleData.transportation_type}
+                  onChange={(e) => setVehicleData({...vehicleData, transportation_type: e.target.value})}
+                  rows={3}
+                  placeholder="Please describe your delivery method (e.g., Car - Honda Civic 2020, Motorcycle - Yamaha R3, Bicycle, Walking, etc.)"
                 />
               </div>
             </CardContent>
