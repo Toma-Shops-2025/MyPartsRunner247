@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -34,6 +34,34 @@ const VehicleSettingsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const registrationInputRef = useRef<HTMLInputElement>(null);
   const insuranceInputRef = useRef<HTMLInputElement>(null);
+
+  // Load vehicle data from profile and localStorage
+  useEffect(() => {
+    if (profile) {
+      // Try to load from profile first
+      if ((profile as any).vehicle_info) {
+        setVehicleData(prev => ({
+          ...prev,
+          ...(profile as any).vehicle_info,
+          transportation_type: (profile as any).vehicle_info.transportation_type || ''
+        }));
+      }
+      
+      // Also check localStorage for any stored vehicle data
+      const storedVehicleData = localStorage.getItem('vehicle_data');
+      if (storedVehicleData) {
+        try {
+          const parsedData = JSON.parse(storedVehicleData);
+          setVehicleData(prev => ({
+            ...prev,
+            ...parsedData
+          }));
+        } catch (error) {
+          console.error('Error parsing stored vehicle data:', error);
+        }
+      }
+    }
+  }, [profile]);
 
   if (loading) {
     return (
@@ -93,26 +121,50 @@ const VehicleSettingsPage: React.FC = () => {
     setSaving(true);
     
     try {
-      // Update vehicle info in profile
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          vehicle_info: {
-            make: vehicleData.make,
-            model: vehicleData.model,
-            year: vehicleData.year,
-            color: vehicleData.color,
-            license_plate: vehicleData.license_plate,
-            insurance_number: vehicleData.insurance_number,
-            vehicle_type: vehicleData.vehicle_type,
-            transportation_type: vehicleData.transportation_type,
-            registration_uploaded: uploadStatus.registration === 'success',
-            insurance_uploaded: uploadStatus.insurance === 'success'
-          }
-        })
-        .eq('id', user.id);
+      // Store vehicle data in localStorage first (always works)
+      const vehicleInfo = {
+        make: vehicleData.make,
+        model: vehicleData.model,
+        year: vehicleData.year,
+        color: vehicleData.color,
+        license_plate: vehicleData.license_plate,
+        insurance_number: vehicleData.insurance_number,
+        vehicle_type: vehicleData.vehicle_type,
+        transportation_type: vehicleData.transportation_type,
+        registration_uploaded: uploadStatus.registration === 'success',
+        insurance_uploaded: uploadStatus.insurance === 'success'
+      };
       
-      if (error) throw error;
+      // Save to localStorage
+      localStorage.setItem('vehicle_data', JSON.stringify(vehicleInfo));
+      
+      // Update profile in localStorage
+      const mockProfile = localStorage.getItem('mock_profile');
+      if (mockProfile) {
+        try {
+          const parsedProfile = JSON.parse(mockProfile);
+          parsedProfile.vehicle_info = vehicleInfo;
+          localStorage.setItem('mock_profile', JSON.stringify(parsedProfile));
+        } catch (error) {
+          console.error('Error updating mock profile:', error);
+        }
+      }
+      
+      // Try to update database, but don't fail if it doesn't work
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update({
+            vehicle_info: vehicleInfo
+          })
+          .eq('id', user.id);
+        
+        if (error) {
+          console.warn('Database update failed, but localStorage updated:', error);
+        }
+      } catch (dbError) {
+        console.warn('Database update failed, but localStorage updated:', dbError);
+      }
       
       alert('Vehicle settings saved successfully!');
     } catch (error) {

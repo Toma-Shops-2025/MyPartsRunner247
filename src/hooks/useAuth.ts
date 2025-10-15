@@ -12,6 +12,7 @@ export interface Profile {
   is_online?: boolean;
   is_approved?: boolean;
   status?: string;
+  vehicle_info?: any;
   created_at?: string;
   updated_at?: string;
 }
