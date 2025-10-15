@@ -124,6 +124,12 @@ export const useAuth = () => {
       }
     }
     
+    // Prevent multiple simultaneous fetches for the same user
+    if (lastProcessedUserId === userId) {
+      console.log('Already processing profile for user:', userId);
+      return;
+    }
+    
     // Set a timeout to prevent infinite loading
     const profileTimeout = setTimeout(() => {
       console.log('Profile fetch timeout - creating fallback profile');
@@ -140,7 +146,10 @@ export const useAuth = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
-      console.log('Using fallback profile:', fallbackProfile);
+      
+      // Store the fallback profile in localStorage to prevent repeated database calls
+      localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
+      console.log('Using fallback profile and storing in localStorage:', fallbackProfile);
       setProfile(fallbackProfile);
       setLoading(false);
     }, 1000); // Reduced to 1 second for faster fallback
@@ -264,7 +273,9 @@ export const useAuth = () => {
         updated_at: new Date().toISOString()
       };
       
-      console.log('Using fallback profile due to error:', fallbackProfile);
+      // Store the fallback profile in localStorage to prevent repeated database calls
+      localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
+      console.log('Using fallback profile due to error and storing in localStorage:', fallbackProfile);
       setProfile(fallbackProfile);
       setLoading(false);
     }
