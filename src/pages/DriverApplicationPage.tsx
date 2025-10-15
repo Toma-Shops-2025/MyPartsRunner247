@@ -57,10 +57,7 @@ const DriverApplicationPage: React.FC = () => {
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
-          user_type: 'driver',
-          is_approved: true,
-          is_online: true,
-          status: 'active'
+          user_type: 'driver'
         })
         .eq('id', user?.id);
 
