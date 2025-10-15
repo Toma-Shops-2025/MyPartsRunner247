@@ -53,18 +53,26 @@ const DriverApplicationPage: React.FC = () => {
     setSubmitting(true);
     
     try {
-      // Update user profile to driver and automatically approve
+      console.log('Submitting driver application for user:', user?.id);
+      console.log('Current profile:', profile);
+      
+      // First, ensure profile exists, then update user type
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({
-          user_type: 'driver'
-        })
-        .eq('id', user?.id);
+        .upsert({
+          id: user?.id,
+          user_type: 'driver',
+          full_name: applicationData.full_name,
+          phone: applicationData.phone,
+          email: user?.email
+        });
 
       if (profileError) {
         console.error('Profile update error:', profileError);
         throw profileError;
       }
+      
+      console.log('Profile updated successfully');
 
       // Create driver application record for tracking
       const { error: applicationError } = await supabase

@@ -80,6 +80,11 @@ const NewHeader: React.FC = () => {
                 <button onClick={() => handleNavigation('/about')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   About
                 </button>
+                {!user && (
+                  <button onClick={() => handleNavigation('/driver-application')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
+                    Become a Driver
+                  </button>
+                )}
               </nav>
             </div>
 
@@ -139,6 +144,10 @@ const NewHeader: React.FC = () => {
                         <DropdownMenuItem onClick={() => handleNavigation('/my-orders')}>
                           <Package className="mr-2 h-4 w-4" />
                           My Orders
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleNavigation('/driver-application')}>
+                          <Car className="mr-2 h-4 w-4" />
+                          Become a Driver
                         </DropdownMenuItem>
                       </>
                     )}
