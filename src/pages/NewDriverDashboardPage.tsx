@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import DriverNotificationSystem from '@/components/DriverNotificationSystem';
+import DriverOnboarding from '@/components/DriverOnboarding';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp } from 'lucide-react';
@@ -20,12 +21,19 @@ const NewDriverDashboardPage: React.FC = () => {
   const [availableOrders, setAvailableOrders] = useState<any[]>([]);
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [hasStripeAccount, setHasStripeAccount] = useState(false);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
       fetchDriverData();
     }
   }, [user, profile]);
+
+  useEffect(() => {
+    // Check if driver has Stripe account connected
+    const stripeAccountId = localStorage.getItem('stripe_account_id');
+    setHasStripeAccount(!!stripeAccountId);
+  }, []);
 
   const fetchDriverData = async () => {
     try {
@@ -292,6 +300,17 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Stripe Connect Setup - Show if driver hasn't connected payment method */}
+        {!hasStripeAccount && (
+          <div className="mb-8">
+            <DriverOnboarding onComplete={() => {
+              setHasStripeAccount(true);
+              // Refresh the page to update the UI
+              window.location.reload();
+            }} />
+          </div>
+        )}
 
         {/* Driver Notifications */}
         <div className="mb-8">
