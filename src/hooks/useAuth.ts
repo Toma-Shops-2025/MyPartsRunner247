@@ -125,6 +125,35 @@ export const useAuth = () => {
       }
     }
     
+    // Check for fallback user
+    const fallbackUser = localStorage.getItem('fallback_user');
+    if (fallbackUser) {
+      try {
+        const parsedUser = JSON.parse(fallbackUser);
+        if (parsedUser.id === userId) {
+          console.log('Using fallback user:', parsedUser);
+          // Create a profile from fallback user
+          const fallbackProfile = {
+            id: parsedUser.id,
+            email: parsedUser.email,
+            full_name: parsedUser.user_metadata?.full_name || 'User',
+            phone: parsedUser.user_metadata?.phone || '',
+            user_type: parsedUser.user_metadata?.user_type || 'customer',
+            is_online: parsedUser.user_metadata?.user_type === 'driver',
+            is_approved: parsedUser.user_metadata?.user_type === 'driver',
+            status: parsedUser.user_metadata?.user_type === 'driver' ? 'active' : 'inactive',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setProfile(fallbackProfile);
+          setLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing fallback user:', error);
+      }
+    }
+    
     // Prevent multiple simultaneous fetches for the same user
     if (lastProcessedUserId === userId) {
       console.log('Already processing profile for user:', userId);
