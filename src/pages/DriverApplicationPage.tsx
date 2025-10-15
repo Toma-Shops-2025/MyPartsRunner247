@@ -27,7 +27,8 @@ const DriverApplicationPage: React.FC = () => {
     insurance_policy: '',
     experience_years: '',
     availability: '',
-    why_drive: ''
+    why_drive: '',
+    transportation_type: ''
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -103,6 +104,26 @@ const DriverApplicationPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-white mb-2">Driver Application</h1>
           <p className="text-gray-300">Apply to become a MyPartsRunner driver and start earning money delivering packages.</p>
         </div>
+
+        {/* Attention Notice */}
+        <Card className="bg-blue-900 border-blue-700 mb-6">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">!</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-blue-100 mb-2">ATTENTION:</h3>
+                <p className="text-blue-200 text-sm leading-relaxed">
+                  All drivers are immediately approved with access to the Driver Dashboard and able to start accepting and delivering orders. 
+                  Please submit/upload your Vehicle Registration and Insurance Verification or provide your mode of delivery in Vehicle Settings in the dropdown menu.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
@@ -315,6 +336,17 @@ const DriverApplicationPage: React.FC = () => {
                   className="bg-gray-700 border-gray-600 text-white"
                   rows={3}
                   placeholder="Tell us why you'd like to join our driver team..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="transportation_type" className="text-white">What type of transportation will you be using for deliveries?</Label>
+                <Textarea 
+                  id="transportation_type" 
+                  value={applicationData.transportation_type}
+                  onChange={(e) => setApplicationData({...applicationData, transportation_type: e.target.value})}
+                  className="bg-gray-700 border-gray-600 text-white"
+                  rows={3}
+                  placeholder="Please describe your delivery method (e.g., Car - Honda Civic 2020, Motorcycle - Yamaha R3, Bicycle, Walking, etc.)"
                 />
               </div>
             </CardContent>
