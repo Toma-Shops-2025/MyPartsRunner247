@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Car, FileText, CheckCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const DriverApplicationPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -29,7 +30,6 @@ const DriverApplicationPage: React.FC = () => {
     why_drive: ''
   });
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
 
   if (loading) {
     return (
@@ -52,13 +52,41 @@ const DriverApplicationPage: React.FC = () => {
     setSubmitting(true);
     
     try {
-      // Simulate application submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Update user profile to driver and automatically approve
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          user_type: 'driver',
+          is_approved: true,
+          is_online: true,
+          status: 'active'
+        })
+        .eq('id', user?.id);
+
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
+
+      // Create driver application record for tracking
+      const { error: applicationError } = await supabase
+        .from('driver_applications')
+        .insert([{
+          user_id: user?.id,
+          status: 'approved',
+          approved_at: new Date().toISOString()
+        }]);
+
+      if (applicationError) {
+        console.error('Application insert error:', applicationError);
+        // Don't throw - profile update succeeded
+      }
+
+      // Show success message and redirect to driver dashboard
+      alert('Congratulations! You are now approved as a driver. You are automatically set to ONLINE and ready to accept deliveries!');
       
-      // In a real app, this would save to a driver_applications table
-      console.log('Driver application submitted:', applicationData);
-      
-      setSubmitted(true);
+      // Force page reload to update auth state
+      window.location.href = '/driver-dashboard';
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('Error submitting application. Please try again.');
@@ -66,28 +94,6 @@ const DriverApplicationPage: React.FC = () => {
       setSubmitting(false);
     }
   };
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-gray-900">
-        <Header />
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-8 text-center">
-              <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Application Submitted!</h2>
-              <p className="text-gray-300 mb-4">
-                Thank you for your interest in becoming a driver. We'll review your application and get back to you within 2-3 business days.
-              </p>
-              <p className="text-sm text-gray-400">
-                You'll receive an email notification once your application is approved.
-              </p>
-            </CardContent>
-          </Card>
-        </main>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-900">
