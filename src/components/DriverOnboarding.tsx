@@ -40,7 +40,13 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
       } else {
         const error = await response.json();
         console.error('Error creating account:', error);
-        alert('Failed to create payment account. Please try again.');
+        
+        // Check if it's a platform profile issue
+        if (error.details && error.details.includes('platform profile')) {
+          alert('Stripe Connect setup is not yet complete. The platform needs to complete Stripe Connect onboarding first. Please contact support or try again later.');
+        } else {
+          alert('Failed to create payment account. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Error creating account:', error);
@@ -94,6 +100,9 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
           <h3 className="font-semibold text-blue-800">Get Paid Automatically!</h3>
           <p className="text-sm text-blue-600">
             Connect your payment method to receive 70% of each delivery automatically.
+          </p>
+          <p className="text-xs text-blue-500">
+            Note: If you encounter an error, the platform may need to complete Stripe Connect setup first.
           </p>
         </div>
 
