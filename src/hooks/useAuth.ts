@@ -164,10 +164,12 @@ export const useAuth = () => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
+        console.log('Error details:', { code: error.code, message: error.message, status: error.status });
         clearTimeout(profileTimeout);
         
         // Handle 406 error specifically - database access issue
-        if (error.code === 'PGRST204' || error.message?.includes('406')) {
+        if (error.code === 'PGRST204' || error.message?.includes('406') || error.status === 406 || 
+            (error.message && error.message.includes('Not Acceptable'))) {
           console.log('Database access issue detected, checking for stored profile');
           
           // First check if there's a stored mock profile
@@ -231,6 +233,22 @@ export const useAuth = () => {
     } catch (error) {
       console.error('Error fetching profile:', error);
       clearTimeout(profileTimeout);
+      
+      // Check for stored mock profile first
+      const mockProfile = localStorage.getItem('mock_profile');
+      if (mockProfile) {
+        try {
+          const parsedProfile = JSON.parse(mockProfile);
+          if (parsedProfile.id === userId) {
+            console.log('Using stored mock profile due to error:', parsedProfile);
+            setProfile(parsedProfile);
+            setLoading(false);
+            return;
+          }
+        } catch (parseError) {
+          console.error('Error parsing mock profile:', parseError);
+        }
+      }
       
       // Create a fallback profile based on the user ID and email
       const fallbackProfile = {
@@ -444,6 +462,34 @@ export const useAuth = () => {
     window.location.href = '/';
   };
 
+  // Function to manually create a driver profile (for debugging)
+  const createDriverProfileManually = () => {
+    if (!user) return;
+    
+    const driverProfile = {
+      id: user.id,
+      email: user.email || 'unknown@example.com',
+      full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
+      phone: user.user_metadata?.phone || '',
+      user_type: 'driver' as const,
+      is_online: true,
+      is_approved: true,
+      status: 'active',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    localStorage.setItem('mock_profile', JSON.stringify(driverProfile));
+    setProfile(driverProfile);
+    setLoading(false);
+    console.log('Created driver profile manually:', driverProfile);
+  };
+
+  // Make the function available globally for debugging
+  if (typeof window !== 'undefined') {
+    (window as any).createDriverProfile = createDriverProfileManually;
+  }
+
   return {
     user,
     profile,
@@ -453,6 +499,7 @@ export const useAuth = () => {
     forceLogout,
     updateUserType,
     createProfileManually,
+    createDriverProfileManually,
     isAuthenticated: !!user,
   };
 };
