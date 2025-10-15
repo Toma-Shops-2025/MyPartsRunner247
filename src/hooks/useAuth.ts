@@ -126,8 +126,8 @@ export const useAuth = () => {
     
     // Set a timeout to prevent infinite loading
     const profileTimeout = setTimeout(() => {
-      console.log('Profile fetch timeout - creating fallback driver profile');
-      // Create a fallback driver profile when database is slow/unavailable
+      console.log('Profile fetch timeout - creating fallback profile');
+      // Create a fallback profile when database is slow/unavailable
       const fallbackProfile = {
         id: userId,
         email: user?.email || 'unknown@example.com',
@@ -143,7 +143,7 @@ export const useAuth = () => {
       console.log('Using fallback profile:', fallbackProfile);
       setProfile(fallbackProfile);
       setLoading(false);
-    }, 2000); // Reduced to 2 seconds
+    }, 1000); // Reduced to 1 second for faster fallback
     
     
     try {

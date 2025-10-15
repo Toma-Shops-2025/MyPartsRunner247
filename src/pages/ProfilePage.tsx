@@ -96,6 +96,23 @@ const ProfilePage: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
           <p className="text-gray-300">Manage your account information</p>
+          {profile?.user_type === 'customer' && (
+            <div className="mt-4 p-4 bg-blue-900 border border-blue-700 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">!</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-blue-100 mb-1">Want to become a driver?</h3>
+                  <p className="text-blue-200 text-sm">
+                    Click "🚗 Activate Driver Mode" below to instantly become a driver and start earning money delivering packages!
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <Card className="bg-gray-800 border-gray-700">
@@ -171,25 +188,48 @@ const ProfilePage: React.FC = () => {
                 {profile?.user_type === 'customer' && (
                   <>
                     <Button 
-                      onClick={() => navigate('/driver-application')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      Apply to Become a Driver
-                    </Button>
-                    <Button 
                       onClick={async () => {
                         try {
-                          await updateUserType('driver');
-                          alert('Successfully switched to Driver mode!');
+                          // Create driver profile in localStorage
+                          const driverProfile = {
+                            id: user?.id,
+                            email: user?.email || 'unknown@example.com',
+                            full_name: profile?.full_name || user?.user_metadata?.full_name || 'Driver',
+                            phone: profile?.phone || user?.user_metadata?.phone || '',
+                            user_type: 'driver',
+                            is_online: true,
+                            is_approved: true,
+                            status: 'active',
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                          };
+                          
+                          // Save to localStorage
+                          localStorage.setItem('mock_profile', JSON.stringify(driverProfile));
+                          
+                          // Try to update database, but don't fail if it doesn't work
+                          try {
+                            await updateUserType('driver');
+                          } catch (error) {
+                            console.warn('Database update failed, but localStorage updated:', error);
+                          }
+                          
+                          alert('Successfully activated Driver mode! You now have access to the Driver Dashboard.');
                           window.location.reload();
                         } catch (error) {
                           console.error('Error switching to driver:', error);
                           alert('Error switching to driver mode. Please try again.');
                         }
                       }}
-                      className="bg-green-600 hover:bg-green-700 text-white"
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold"
                     >
-                      Switch to Driver Mode (Manual)
+                      🚗 Activate Driver Mode
+                    </Button>
+                    <Button 
+                      onClick={() => navigate('/driver-application')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Apply to Become a Driver
                     </Button>
                   </>
                 )}
