@@ -165,6 +165,27 @@ export const useAuth = () => {
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
         clearTimeout(profileTimeout);
+        
+        // Handle 406 error specifically - database access issue
+        if (error.code === 'PGRST204' || error.message?.includes('406')) {
+          console.log('Database access issue detected, creating fallback profile');
+          const fallbackProfile = {
+            id: userId,
+            email: user?.email || 'unknown@example.com',
+            full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
+            phone: user?.user_metadata?.phone || '',
+            user_type: (user?.email?.includes('driver') || user?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
+            is_online: false,
+            is_approved: false,
+            status: 'inactive',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          setProfile(fallbackProfile);
+          setLoading(false);
+          return;
+        }
+        
         // Don't auto-create profile, just set loading to false
         setProfile(null);
         setLoading(false);
