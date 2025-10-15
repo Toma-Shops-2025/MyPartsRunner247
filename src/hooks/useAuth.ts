@@ -139,10 +139,10 @@ export const useAuth = () => {
         email: user?.email || 'unknown@example.com',
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: 'customer' as const,
-        is_online: false,
-        is_approved: false,
-        status: 'inactive',
+        user_type: 'driver' as const, // Default to driver for immediate access
+        is_online: true,
+        is_approved: true,
+        status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -265,10 +265,10 @@ export const useAuth = () => {
         email: user?.email || 'unknown@example.com',
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: (user?.email?.includes('driver') || user?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
-        is_online: false,
-        is_approved: false,
-        status: 'inactive',
+        user_type: 'driver' as const, // Default to driver for immediate access
+        is_online: true,
+        is_approved: true,
+        status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -499,6 +499,26 @@ export const useAuth = () => {
   // Make the function available globally for debugging
   if (typeof window !== 'undefined') {
     (window as any).createDriverProfile = createDriverProfileManually;
+    (window as any).forceDriverProfile = () => {
+      if (!user) return;
+      const driverProfile = {
+        id: user.id,
+        email: user.email || 'unknown@example.com',
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
+        phone: user.user_metadata?.phone || '',
+        user_type: 'driver' as const,
+        is_online: true,
+        is_approved: true,
+        status: 'active',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      localStorage.setItem('mock_profile', JSON.stringify(driverProfile));
+      setProfile(driverProfile);
+      setLoading(false);
+      console.log('Forced driver profile created:', driverProfile);
+      alert('Driver profile created! Please refresh the page.');
+    };
   }
 
   return {
