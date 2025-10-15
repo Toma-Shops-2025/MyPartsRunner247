@@ -32,6 +32,8 @@ const NewDriverDashboardPage: React.FC = () => {
   useEffect(() => {
     // Check if driver has Stripe account connected
     const stripeAccountId = localStorage.getItem('stripe_account_id');
+    console.log('Checking Stripe account ID:', stripeAccountId);
+    console.log('hasStripeAccount will be set to:', !!stripeAccountId);
     setHasStripeAccount(!!stripeAccountId);
   }, []);
 
@@ -304,6 +306,11 @@ const NewDriverDashboardPage: React.FC = () => {
         {/* Stripe Connect Setup - Show if driver hasn't connected payment method */}
         {!hasStripeAccount && (
           <div className="mb-8">
+            <div className="bg-yellow-900 border border-yellow-700 rounded-lg p-4 mb-4">
+              <p className="text-yellow-200 text-sm">
+                🔧 Debug: hasStripeAccount = {hasStripeAccount.toString()}, showing DriverOnboarding component
+              </p>
+            </div>
             <DriverOnboarding onComplete={() => {
               setHasStripeAccount(true);
               // Refresh the page to update the UI
@@ -311,6 +318,14 @@ const NewDriverDashboardPage: React.FC = () => {
             }} />
           </div>
         )}
+        
+        {/* Debug info for hasStripeAccount */}
+        <div className="mb-4 p-4 bg-gray-800 border border-gray-600 rounded-lg">
+          <p className="text-gray-300 text-sm">
+            🔍 Debug Info: hasStripeAccount = {hasStripeAccount.toString()}, 
+            stripe_account_id = {localStorage.getItem('stripe_account_id') || 'null'}
+          </p>
+        </div>
 
         {/* Driver Notifications */}
         <div className="mb-8">
