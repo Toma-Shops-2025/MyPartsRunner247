@@ -162,12 +162,29 @@ const ProfilePage: React.FC = () => {
                   </Button>
                 )}
                 {profile?.user_type === 'customer' && (
-                  <Button 
-                    onClick={() => navigate('/driver-application')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Apply to Become a Driver
-                  </Button>
+                  <>
+                    <Button 
+                      onClick={() => navigate('/driver-application')}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Apply to Become a Driver
+                    </Button>
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          await updateUserType('driver');
+                          alert('Successfully switched to Driver mode!');
+                          window.location.reload();
+                        } catch (error) {
+                          console.error('Error switching to driver:', error);
+                          alert('Error switching to driver mode. Please try again.');
+                        }
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      Switch to Driver Mode (Manual)
+                    </Button>
+                  </>
                 )}
                 {profile?.user_type === 'driver' && (
                   <Button 

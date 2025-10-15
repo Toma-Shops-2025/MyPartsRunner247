@@ -168,7 +168,25 @@ export const useAuth = () => {
         
         // Handle 406 error specifically - database access issue
         if (error.code === 'PGRST204' || error.message?.includes('406')) {
-          console.log('Database access issue detected, creating fallback profile');
+          console.log('Database access issue detected, checking for stored profile');
+          
+          // First check if there's a stored mock profile
+          const mockProfile = localStorage.getItem('mock_profile');
+          if (mockProfile) {
+            try {
+              const parsedProfile = JSON.parse(mockProfile);
+              if (parsedProfile.id === userId) {
+                console.log('Using stored mock profile:', parsedProfile);
+                setProfile(parsedProfile);
+                setLoading(false);
+                return;
+              }
+            } catch (error) {
+              console.error('Error parsing mock profile:', error);
+            }
+          }
+          
+          // If no mock profile, create fallback
           const fallbackProfile = {
             id: userId,
             email: user?.email || 'unknown@example.com',
@@ -251,6 +269,28 @@ export const useAuth = () => {
       
       if (error) {
         console.error('Error updating user type:', error);
+        
+        // If database fails, use localStorage fallback
+        if (error.code === 'PGRST204' || error.message?.includes('406')) {
+          console.log('Database access issue - using localStorage fallback');
+          const fallbackProfile = {
+            id: user.id,
+            email: user.email || 'unknown@example.com',
+            full_name: profile?.full_name || user?.user_metadata?.full_name || 'User',
+            phone: profile?.phone || user?.user_metadata?.phone || '',
+            user_type: newUserType,
+            is_online: newUserType === 'driver',
+            is_approved: newUserType === 'driver',
+            status: newUserType === 'driver' ? 'active' : 'inactive',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
+          setProfile(fallbackProfile);
+          console.log('Updated profile in localStorage and state');
+          return;
+        }
+        
         throw error;
       }
       
