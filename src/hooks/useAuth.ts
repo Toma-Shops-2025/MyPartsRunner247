@@ -108,35 +108,13 @@ export const useAuth = () => {
   };
 
   const performProfileFetch = async (userId: string) => {
-    // Set a timeout to prevent infinite loading
-    const profileTimeout = setTimeout(() => {
-      console.log('Profile fetch timeout - creating fallback driver profile');
-      // Create a fallback driver profile when database is slow/unavailable
-      const fallbackProfile = {
-        id: userId,
-        email: 'soberdrivertaxi@gmail.com',
-        full_name: 'soberdrivertaxi',
-        phone: '',
-        user_type: 'driver' as const,
-        is_online: true,
-        is_approved: true,
-        status: 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      console.log('Using fallback driver profile:', fallbackProfile);
-      setProfile(fallbackProfile);
-      setLoading(false);
-    }, 5000); // 5 second timeout
-    
-    // Check for mock profile first
+    // Check localStorage first - bypass database entirely for now
     const mockProfile = localStorage.getItem('mock_profile');
     if (mockProfile) {
       try {
         const parsedProfile = JSON.parse(mockProfile);
         if (parsedProfile.id === userId) {
-          console.log('Using mock profile:', parsedProfile);
-          clearTimeout(profileTimeout);
+          console.log('Using stored mock profile:', parsedProfile);
           setProfile(parsedProfile);
           setLoading(false);
           return;
@@ -145,6 +123,28 @@ export const useAuth = () => {
         console.error('Error parsing mock profile:', error);
       }
     }
+    
+    // Set a timeout to prevent infinite loading
+    const profileTimeout = setTimeout(() => {
+      console.log('Profile fetch timeout - creating fallback driver profile');
+      // Create a fallback driver profile when database is slow/unavailable
+      const fallbackProfile = {
+        id: userId,
+        email: user?.email || 'unknown@example.com',
+        full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
+        phone: user?.user_metadata?.phone || '',
+        user_type: 'customer' as const,
+        is_online: false,
+        is_approved: false,
+        status: 'inactive',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      console.log('Using fallback profile:', fallbackProfile);
+      setProfile(fallbackProfile);
+      setLoading(false);
+    }, 2000); // Reduced to 2 seconds
+    
     
     try {
       console.log('Fetching profile for user:', userId);
