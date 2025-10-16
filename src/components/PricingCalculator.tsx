@@ -144,66 +144,13 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     return null;
   };
 
-  // 100% Accurate distance calculation using advanced multi-service approach
+  // Robust distance calculation with better error handling
   const calculateAccurateDistance = async () => {
     try {
-      console.log('🌍 Using advanced multi-service distance calculation for 100% accuracy');
+      console.log('🌍 Using robust distance calculation');
       
-      // Try advanced calculation first (uses multiple APIs)
-      const advancedResponse = await fetch('/.netlify/functions/calculate-distance-advanced', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pickupAddress,
-          deliveryAddress
-        })
-      });
-
-      if (advancedResponse.ok) {
-        const data = await advancedResponse.json();
-        
-        console.log('🏆 Advanced distance calculation result:', {
-          distance: data.distance,
-          duration: data.duration,
-          accuracy: data.accuracy,
-          service: data.service,
-          hasTrafficData: data.hasTrafficData
-        });
-        
-        const calculatedDistancePrice = data.distance * 2.00;
-        console.log('💰 Distance pricing:', {
-          distance: data.distance,
-          rate: '$2.00/mile',
-          total: calculatedDistancePrice
-        });
-        
-        setDistance(data.distance);
-        setDistancePrice(calculatedDistancePrice);
-        
-        // Update estimated time based on duration data
-        if (data.duration < 30) {
-          setEstimatedTime('15-30 minutes');
-        } else if (data.duration < 60) {
-          setEstimatedTime('30-60 minutes');
-        } else {
-          setEstimatedTime('1-2 hours');
-        }
-        
-        return true; // Success
-      } else {
-        console.log('Advanced calculation failed, trying free geocoding...');
-      }
-    } catch (error) {
-      console.log('Advanced calculation error:', error);
-    }
-
-    // Fallback to free geocoding
-    try {
-      console.log('🔄 Trying free geocoding fallback...');
-      
-      const response = await fetch('/.netlify/functions/calculate-distance-free', {
+      // Try simple, robust calculation first
+      const response = await fetch('/.netlify/functions/calculate-distance-simple', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -217,7 +164,7 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
       if (response.ok) {
         const data = await response.json();
         
-        console.log('📍 Free geocoding result:', {
+        console.log('✅ Distance calculation result:', {
           distance: data.distance,
           duration: data.duration,
           accuracy: data.accuracy,
@@ -246,29 +193,29 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
         return true; // Success
       } else {
         const errorData = await response.json();
-        console.log('Free geocoding error:', errorData);
+        console.log('Distance calculation error:', errorData);
       }
     } catch (error) {
-      console.log('Free geocoding error:', error);
+      console.log('Distance calculation error:', error);
     }
     
     return false; // Failed, use fallback
   };
 
   const calculateRealDistance = async () => {
-    console.log('🔍 Starting 100% accurate distance calculation...');
+    console.log('🔍 Starting distance calculation...');
     console.log('📍 Pickup:', pickupAddress);
     console.log('📍 Delivery:', deliveryAddress);
-    console.log('🚀 Using advanced multi-service distance calculation');
+    console.log('🚀 Using robust distance calculation');
     
-    // Try advanced multi-service calculation first (100% accurate)
+    // Try robust calculation first
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
-      console.log('✅ Advanced distance calculation succeeded');
-      return; // Success with advanced calculation
+      console.log('✅ Distance calculation succeeded');
+      return; // Success with calculation
     }
     
-    console.log('❌ Advanced calculation failed, using fallback');
+    console.log('❌ Distance calculation failed, using fallback');
     
     // Fallback to simple distance estimation based on address similarity
     const calculateSimpleDistance = (addr1: string, addr2: string) => {
