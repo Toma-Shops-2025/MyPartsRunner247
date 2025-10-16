@@ -178,16 +178,46 @@ export const useAuth = () => {
       }
       
       console.log('Profile fetch timeout - creating fallback profile');
+      
+      // Try to determine user type from email or existing data
+      let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
+      const email = user?.email || 'unknown@example.com';
+      
+      // Check if email suggests driver (contains 'driver', 'taxi', etc.)
+      if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
+        userType = 'driver';
+      }
+      // Check if this is the specific customer email that should stay customer
+      else if (email === 'tomababyshopsonline@gmail.com') {
+        userType = 'customer';
+      }
+      // For other emails, try to preserve existing profile if available
+      else {
+        // Check if there's an existing profile in localStorage for this user
+        const existingProfile = localStorage.getItem('mock_profile');
+        if (existingProfile) {
+          try {
+            const parsed = JSON.parse(existingProfile);
+            if (parsed.id === userId && parsed.user_type) {
+              userType = parsed.user_type;
+              console.log('Preserving existing user type from localStorage:', userType);
+            }
+          } catch (error) {
+            console.log('Could not parse existing profile, using default');
+          }
+        }
+      }
+      
       // Create a fallback profile when database is slow/unavailable
       const fallbackProfile = {
         id: userId,
-        email: user?.email || 'unknown@example.com',
+        email: email,
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: 'customer' as const, // Default to customer for proper access control
-        is_online: true,
-        is_approved: true,
-        status: 'active',
+        user_type: userType,
+        is_online: userType === 'driver',
+        is_approved: userType === 'driver',
+        status: userType === 'driver' ? 'active' : 'inactive',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -305,15 +335,27 @@ export const useAuth = () => {
       }
       
       // Create a fallback profile based on the user ID and email
+      const email = user?.email || 'unknown@example.com';
+      let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
+      
+      // Check if email suggests driver (contains 'driver', 'taxi', etc.)
+      if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
+        userType = 'driver';
+      }
+      // Check if this is the specific customer email that should stay customer
+      else if (email === 'tomababyshopsonline@gmail.com') {
+        userType = 'customer';
+      }
+      
       const fallbackProfile = {
         id: userId,
-        email: user?.email || 'unknown@example.com',
+        email: email,
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: 'customer' as const, // Default to customer for proper access control
-        is_online: true,
-        is_approved: true,
-        status: 'active',
+        user_type: userType,
+        is_online: userType === 'driver',
+        is_approved: userType === 'driver',
+        status: userType === 'driver' ? 'active' : 'inactive',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
