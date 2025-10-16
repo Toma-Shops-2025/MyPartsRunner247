@@ -149,8 +149,8 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     try {
       console.log('🌍 Using robust distance calculation');
       
-      // Try direct calculation first
-      const response = await fetch('/.netlify/functions/calculate-distance-direct', {
+      // Try Google Distance Matrix API first
+      const response = await fetch('/.netlify/functions/calculate-distance-google', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
