@@ -48,8 +48,8 @@ const PaymentForm: React.FC<{
     event.preventDefault();
     
     // Prevent multiple submissions
-    if (loading || isSubmitting) {
-      console.log('Payment already in progress, ignoring duplicate submission');
+    if (loading || isSubmitting || orderCreated) {
+      console.log('Payment already in progress or order already created, ignoring duplicate submission');
       return;
     }
     
@@ -168,6 +168,23 @@ const PaymentForm: React.FC<{
         // Simulate a brief processing delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // Check for existing order to prevent duplicates
+        const { data: existingOrders } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('customer_id', currentUser.id)
+          .eq('pickup_address', orderDetails.pickupAddress)
+          .eq('delivery_address', orderDetails.deliveryAddress)
+          .eq('status', 'pending')
+          .gte('created_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // Last 5 minutes
+        
+        if (existingOrders && existingOrders.length > 0) {
+          console.log('Duplicate order detected, using existing order:', existingOrders[0].id);
+          setOrderCreated(true);
+          onSuccess(existingOrders[0].id);
+          return;
+        }
+        
         const { data: order, error: orderError } = await supabase
           .from('orders')
           .insert([{
@@ -233,6 +250,23 @@ const PaymentForm: React.FC<{
           payment_status: 'paid',
           created_at: new Date().toISOString()
         });
+        
+        // Check for existing order to prevent duplicates
+        const { data: existingOrders } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('customer_id', currentUser.id)
+          .eq('pickup_address', orderDetails.pickupAddress)
+          .eq('delivery_address', orderDetails.deliveryAddress)
+          .eq('status', 'pending')
+          .gte('created_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // Last 5 minutes
+        
+        if (existingOrders && existingOrders.length > 0) {
+          console.log('Duplicate order detected, using existing order:', existingOrders[0].id);
+          setOrderCreated(true);
+          onSuccess(existingOrders[0].id);
+          return;
+        }
         
         // Create order in database with real payment info
         console.log('Starting database insert...');
