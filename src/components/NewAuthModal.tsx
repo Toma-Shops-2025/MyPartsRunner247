@@ -95,6 +95,62 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
       // Clear any existing Stripe account ID for new user
       localStorage.removeItem('stripe_account_id');
 
+      // Create profile in database if user was created
+      if (data.user) {
+        try {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: data.user.email,
+              full_name: fullName,
+              phone: phone,
+              user_type: userType,
+              is_online: userType === 'driver',
+              is_approved: userType === 'driver',
+              status: userType === 'driver' ? 'active' : 'inactive',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+
+          if (profileError) {
+            console.warn('Profile creation failed, but user created:', profileError);
+            // Create fallback profile in localStorage
+            const fallbackProfile = {
+              id: data.user.id,
+              email: data.user.email,
+              full_name: fullName,
+              phone: phone,
+              user_type: userType,
+              is_online: userType === 'driver',
+              is_approved: userType === 'driver',
+              status: userType === 'driver' ? 'active' : 'inactive',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            };
+            localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
+          } else {
+            console.log('Profile created successfully in database');
+          }
+        } catch (profileError) {
+          console.warn('Profile creation failed, but user created:', profileError);
+          // Create fallback profile in localStorage
+          const fallbackProfile = {
+            id: data.user.id,
+            email: data.user.email,
+            full_name: fullName,
+            phone: phone,
+            user_type: userType,
+            is_online: userType === 'driver',
+            is_approved: userType === 'driver',
+            status: userType === 'driver' ? 'active' : 'inactive',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
+        }
+      }
+
       // Check if email confirmation is required
       if (data.user && !data.user.email_confirmed_at) {
         toast({
