@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-// @ts-ignore
 import mapboxgl from 'mapbox-gl';
-// @ts-ignore
 import MapboxDirections from '@mapbox/mapbox-gl-directions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -44,13 +42,15 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
       return;
     }
 
+    // Set Mapbox access token globally
+    mapboxgl.accessToken = mapboxToken;
+
     // Initialize map
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
       center: [-85.7585, 38.2527], // Louisville center
-      zoom: 12,
-      accessToken: mapboxToken
+      zoom: 12
     });
 
     // Initialize directions

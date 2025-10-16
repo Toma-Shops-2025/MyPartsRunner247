@@ -26,11 +26,13 @@ export default defineConfig(({ mode }) => ({
     sourcemap: mode === "development",
     minify: mode === "production" ? "esbuild" : false,
     rollupOptions: {
+      external: [],
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
           supabase: ['@supabase/supabase-js'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast']
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
+          mapbox: ['mapbox-gl', '@mapbox/mapbox-gl-directions']
         },
         // Add timestamp to chunk names for cache busting
         chunkFileNames: (chunkInfo) => {
