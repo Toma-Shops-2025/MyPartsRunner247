@@ -24,6 +24,7 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [lastProcessedUserId, setLastProcessedUserId] = useState<string | null>(null);
   const [profileFetchTimeout, setProfileFetchTimeout] = useState<number | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -109,6 +110,13 @@ export const useAuth = () => {
   };
 
   const performProfileFetch = async (userId: string) => {
+    // Check if user is signing out or no longer authenticated
+    if (isSigningOut || !user || !userId) {
+      console.log('User signing out or no longer authenticated, skipping profile fetch');
+      setLoading(false);
+      return;
+    }
+    
     // Check localStorage first - bypass database entirely for now
     const mockProfile = localStorage.getItem('mock_profile');
     if (mockProfile) {
@@ -162,6 +170,13 @@ export const useAuth = () => {
     
     // Set a timeout to prevent infinite loading
     const profileTimeout = setTimeout(() => {
+      // Check if user is signing out or no longer authenticated before creating fallback
+      if (isSigningOut || !user || !userId) {
+        console.log('User signing out or no longer authenticated, skipping fallback profile creation');
+        setLoading(false);
+        return;
+      }
+      
       console.log('Profile fetch timeout - creating fallback profile');
       // Create a fallback profile when database is slow/unavailable
       const fallbackProfile = {
@@ -444,6 +459,7 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       console.log('Starting sign out process...');
+      setIsSigningOut(true);
       
       // Clear local state immediately to prevent loops
       setUser(null);
