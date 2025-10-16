@@ -1,4 +1,4 @@
-// Mapbox-only distance calculation - no fallbacks
+// Mapbox-only distance calculation with robust address handling
 exports.handler = async (event, context) => {
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -64,29 +64,74 @@ exports.handler = async (event, context) => {
 
     console.log('🚗 Using Mapbox for distance calculation...');
     
-    // Step 1: Geocode both addresses using Mapbox
+    // Clean and format addresses for better geocoding
+    const cleanAddress = (address) => {
+      return address
+        .replace(/,/g, ' ')  // Replace commas with spaces
+        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+        .trim()
+        .replace(/Louisville, Kentucky/g, 'Louisville KY') // Simplify state format
+        .replace(/United States/g, '') // Remove country if present
+        .trim();
+    };
+
+    const cleanPickup = cleanAddress(pickupAddress);
+    const cleanDelivery = cleanAddress(deliveryAddress);
+    
+    console.log('🧹 Cleaned addresses:', { pickup: cleanPickup, delivery: cleanDelivery });
+
+    // Step 1: Geocode both addresses using Mapbox with multiple attempts
     console.log('📍 Geocoding addresses with Mapbox...');
     
-    const [pickupResponse, deliveryResponse] = await Promise.all([
-      fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(pickupAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`),
-      fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(deliveryAddress)}.json?access_token=${mapboxToken}&country=US&limit=1`)
+    const geocodeAddress = async (address, attempt = 1) => {
+      const maxAttempts = 3;
+      const variations = [
+        address, // Original
+        address + ', Louisville KY', // Add city/state
+        address + ', KY', // Add state only
+        address.split(',')[0] // Just the street address
+      ];
+
+      for (let i = 0; i < variations.length; i++) {
+        const variation = variations[i];
+        console.log(`📍 Attempt ${attempt}.${i + 1}: Geocoding "${variation}"`);
+        
+        try {
+          const response = await fetch(
+            `https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(variation)}.json?access_token=${mapboxToken}&country=US&limit=1&types=address`
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.features && data.features.length > 0) {
+              const [lng, lat] = data.features[0].center;
+              console.log(`✅ Geocoding successful for "${variation}": [${lng}, ${lat}]`);
+              return { lng, lat, address: variation };
+            }
+          }
+          
+          console.log(`❌ Geocoding failed for "${variation}": ${response.status}`);
+        } catch (error) {
+          console.log(`❌ Geocoding error for "${variation}": ${error.message}`);
+        }
+      }
+
+      if (attempt < maxAttempts) {
+        console.log(`🔄 Retrying geocoding (attempt ${attempt + 1}/${maxAttempts})...`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+        return geocodeAddress(address, attempt + 1);
+      }
+
+      return null;
+    };
+
+    const [pickupResult, deliveryResult] = await Promise.all([
+      geocodeAddress(cleanPickup),
+      geocodeAddress(cleanDelivery)
     ]);
 
-    if (!pickupResponse.ok || !deliveryResponse.ok) {
-      console.error('❌ Mapbox geocoding failed:', {
-        pickup: { status: pickupResponse.status, statusText: pickupResponse.statusText },
-        delivery: { status: deliveryResponse.status, statusText: deliveryResponse.statusText }
-      });
-      
-      // Try to get error details
-      try {
-        const pickupError = await pickupResponse.text();
-        const deliveryError = await deliveryResponse.text();
-        console.error('❌ Geocoding error details:', { pickupError, deliveryError });
-      } catch (e) {
-        console.error('❌ Could not read error details:', e.message);
-      }
-      
+    if (!pickupResult || !deliveryResult) {
+      console.error('❌ Could not geocode one or both addresses');
       return {
         statusCode: 500,
         headers: {
@@ -95,44 +140,21 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({ 
           error: 'Address geocoding failed',
-          details: `Pickup: ${pickupResponse.status} ${pickupResponse.statusText}, Delivery: ${deliveryResponse.status} ${deliveryResponse.statusText}`
+          details: 'Could not find coordinates for one or both addresses. Please check the address format.'
         })
       };
     }
-
-    const [pickupData, deliveryData] = await Promise.all([
-      pickupResponse.json(),
-      deliveryResponse.json()
-    ]);
-
-    if (!pickupData.features?.[0] || !deliveryData.features?.[0]) {
-      console.error('❌ No coordinates found for addresses');
-      return {
-        statusCode: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({ 
-          error: 'Address not found',
-          details: 'Could not find coordinates for one or both addresses'
-        })
-      };
-    }
-
-    const [lng1, lat1] = pickupData.features[0].center;
-    const [lng2, lat2] = deliveryData.features[0].center;
 
     console.log('📍 Coordinates found:', { 
-      pickup: [lng1, lat1], 
-      delivery: [lng2, lat2] 
+      pickup: [pickupResult.lng, pickupResult.lat], 
+      delivery: [deliveryResult.lng, deliveryResult.lat] 
     });
 
     // Step 2: Get driving directions using Mapbox Directions API
     console.log('🚗 Getting driving directions from Mapbox...');
     
     const directionsResponse = await fetch(
-      `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${lng1},${lat1};${lng2},${lat2}?access_token=${mapboxToken}&geometries=geojson&overview=full&annotations=distance,duration&alternatives=false&continue_straight=false`
+      `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${pickupResult.lng},${pickupResult.lat};${deliveryResult.lng},${deliveryResult.lat}?access_token=${mapboxToken}&geometries=geojson&overview=full&annotations=distance,duration&alternatives=false&continue_straight=false`
     );
 
     if (!directionsResponse.ok) {
@@ -141,7 +163,7 @@ exports.handler = async (event, context) => {
       // Try without traffic data as fallback
       console.log('🔄 Trying without traffic data...');
       const fallbackResponse = await fetch(
-        `https://api.mapbox.com/directions/v5/mapbox/driving/${lng1},${lat1};${lng2},${lat2}?access_token=${mapboxToken}&geometries=geojson&overview=full&annotations=distance,duration&alternatives=false&continue_straight=false`
+        `https://api.mapbox.com/directions/v5/mapbox/driving/${pickupResult.lng},${pickupResult.lat};${deliveryResult.lng},${deliveryResult.lat}?access_token=${mapboxToken}&geometries=geojson&overview=full&annotations=distance,duration&alternatives=false&continue_straight=false`
       );
 
       if (!fallbackResponse.ok) {
