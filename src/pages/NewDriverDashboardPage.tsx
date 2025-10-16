@@ -4,10 +4,12 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
+import DriverNavigation from '@/components/DriverNavigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { locationTrackingService } from '@/services/LocationTrackingService';
 
 const NewDriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -317,49 +319,43 @@ const NewDriverDashboardPage: React.FC = () => {
           <DriverNotificationSystem />
         </div>
 
-        {/* Navigation Map Section */}
+        {/* Mapbox Navigation Section */}
         {activeOrders.length > 0 && (
           <div className="mb-8">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <MapPin className="w-5 h-5" />
-                  Navigation Map
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-700 rounded-lg p-4 h-64 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-400 mb-4">Driver Navigation Workflow</p>
-                    <div className="flex gap-2 justify-center">
-                      <Button 
-                        onClick={() => {
-                          const order = activeOrders[0];
-                          const pickup = encodeURIComponent(order.pickup_address);
-                          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${pickup}`;
-                          window.open(googleMapsUrl, '_blank');
-                        }}
-                        className="bg-blue-600 hover:bg-blue-700"
-                      >
-                        📍 Go to Pickup
-                      </Button>
-                      <Button 
-                        onClick={() => {
-                          const order = activeOrders[0];
-                          const delivery = encodeURIComponent(order.delivery_address);
-                          const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${delivery}`;
-                          window.open(googleMapsUrl, '_blank');
-                        }}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        🚚 Go to Delivery
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <DriverNavigation
+              pickupLocation={activeOrders[0].pickup_address}
+              deliveryLocation={activeOrders[0].delivery_address}
+              orderId={activeOrders[0].id}
+              onPickupComplete={() => {
+                console.log('Pickup completed for order:', activeOrders[0].id);
+                // Update order status in database
+                // You can add database update logic here
+              }}
+              onDeliveryComplete={() => {
+                console.log('Delivery completed for order:', activeOrders[0].id);
+                // Update order status in database
+                // You can add database update logic here
+              }}
+              onLocationUpdate={(lat, lng) => {
+                console.log('Driver location updated:', { lat, lng });
+                // Start location tracking
+                if (user?.id) {
+                  locationTrackingService.startLocationTracking(
+                    user.id,
+                    activeOrders[0].id,
+                    (location) => {
+                      console.log('Location tracked:', location);
+                      // Update order tracking status
+                      locationTrackingService.updateOrderStatus(
+                        activeOrders[0].id,
+                        'in_transit',
+                        { lat: location.lat, lng: location.lng }
+                      );
+                    }
+                  );
+                }
+              }}
+            />
           </div>
         )}
 

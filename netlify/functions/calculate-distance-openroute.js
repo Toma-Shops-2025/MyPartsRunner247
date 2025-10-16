@@ -20,8 +20,15 @@ exports.handler = async (event, context) => {
     console.log('Calculating distance using OpenRouteService:', pickupAddress, 'to', deliveryAddress);
 
     // Use OpenRouteService for precise driving distances (server-side, no CORS issues)
+    // Using a public demo key that should work
     const response = await fetch(
-      `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a8b77b7e&start=${encodeURIComponent(pickupAddress)}&end=${encodeURIComponent(deliveryAddress)}`
+      `https://api.openrouteservice.org/v2/directions/driving-car?api_key=5b3ce3597851110001cf6248a8b77b7e&start=${encodeURIComponent(pickupAddress)}&end=${encodeURIComponent(deliveryAddress)}`,
+      {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
     );
 
     if (!response.ok) {
