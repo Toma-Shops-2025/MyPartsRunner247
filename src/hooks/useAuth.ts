@@ -169,7 +169,7 @@ export const useAuth = () => {
         email: user?.email || 'unknown@example.com',
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: 'driver' as const, // Default to driver for immediate access
+        user_type: 'customer' as const, // Default to customer for proper access control
         is_online: true,
         is_approved: true,
         status: 'active',
@@ -295,7 +295,7 @@ export const useAuth = () => {
         email: user?.email || 'unknown@example.com',
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
-        user_type: 'driver' as const, // Default to driver for immediate access
+        user_type: 'customer' as const, // Default to customer for proper access control
         is_online: true,
         is_approved: true,
         status: 'active',
