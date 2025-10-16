@@ -26,7 +26,6 @@ exports.handler = async (event, context) => {
 
     const results = [];
     const mapboxToken = process.env.VITE_MAPBOX_ACCESS_TOKEN;
-    const googleApiKey = process.env.VITE_GOOGLE_MAPS_API_KEY;
     const orsApiKey = process.env.OPENROUTE_API_KEY;
 
     // Method 1: Mapbox Matrix API (most accurate for traffic)
@@ -81,40 +80,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // Method 2: Google Maps Distance Matrix API
-    if (googleApiKey) {
-      try {
-        console.log('🚗 Trying Google Maps Distance Matrix API...');
-        
-        const googleResponse = await fetch(
-          `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(pickupAddress)}&destinations=${encodeURIComponent(deliveryAddress)}&units=imperial&key=${googleApiKey}`
-        );
-
-        if (googleResponse.ok) {
-          const googleData = await googleResponse.json();
-          
-          if (googleData.rows?.[0]?.elements?.[0]?.status === 'OK') {
-            const element = googleData.rows[0].elements[0];
-            const distanceInMiles = element.distance.value * 0.000621371; // Convert meters to miles
-            const durationInMinutes = element.duration.value / 60; // Convert seconds to minutes
-            
-            results.push({
-              service: 'Google Maps Distance Matrix',
-              distance: distanceInMiles,
-              duration: durationInMinutes,
-              accuracy: 100,
-              hasTrafficData: true
-            });
-            
-            console.log('✅ Google Maps result:', { distance: distanceInMiles, duration: durationInMinutes });
-          }
-        }
-      } catch (error) {
-        console.log('Google Maps API failed:', error.message);
-      }
-    }
-
-    // Method 3: OpenRouteService
+    // Method 2: OpenRouteService (free alternative to Google)
     if (orsApiKey) {
       try {
         console.log('🚗 Trying OpenRouteService...');
@@ -173,7 +139,7 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // Method 4: Free fallback calculation
+    // Method 3: Free fallback calculation
     if (results.length === 0) {
       try {
         console.log('🚗 Using free fallback calculation...');

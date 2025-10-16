@@ -256,12 +256,9 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   };
 
   const calculateRealDistance = async () => {
-    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    
     console.log('🔍 Starting 100% accurate distance calculation...');
     console.log('📍 Pickup:', pickupAddress);
     console.log('📍 Delivery:', deliveryAddress);
-    console.log('🗝️ Google Maps API key available:', !!googleApiKey);
     console.log('🚀 Using advanced multi-service distance calculation');
     
     // Try advanced multi-service calculation first (100% accurate)
