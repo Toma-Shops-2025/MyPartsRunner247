@@ -31,8 +31,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
-          supabase: ['@supabase/supabase-js'],
-          mapbox: ['mapbox-gl']
+          supabase: ['@supabase/supabase-js']
         }
       }
     }

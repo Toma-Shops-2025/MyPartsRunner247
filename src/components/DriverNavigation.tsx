@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, CheckCircle, Clock, Car } from 'lucide-react';
@@ -22,90 +21,179 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   onLocationUpdate
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const directionsService = useRef<google.maps.DirectionsService | null>(null);
+  const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
   const [currentStep, setCurrentStep] = useState<'pickup' | 'delivery'>('pickup');
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  // Initialize map
+  // Initialize Google Maps
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    if (!mapboxToken) {
-      console.error('Mapbox token not found');
+    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!googleApiKey) {
+      console.error('Google Maps API key not found');
       return;
     }
 
-    // Set Mapbox access token globally
-    mapboxgl.accessToken = mapboxToken;
+    // Load Google Maps JavaScript API
+    const loadGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        initializeMap();
+        return;
+      }
 
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-85.7585, 38.2527], // Louisville center
-      zoom: 12
-    });
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=geometry`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeMap;
+      document.head.appendChild(script);
+    };
 
-    // Add navigation control
-    const nav = new mapboxgl.NavigationControl();
-    map.current.addControl(nav, 'top-right');
+    const initializeMap = () => {
+      if (!mapContainer.current || !window.google) return;
 
-    // Add geolocate control
-    const geolocate = new mapboxgl.GeolocateControl({
-      positionOptions: {
-        enableHighAccuracy: true
-      },
-      trackUserLocation: true,
-      showUserHeading: true
-    });
-    map.current.addControl(geolocate, 'top-right');
+      // Initialize map
+      mapRef.current = new google.maps.Map(mapContainer.current, {
+        center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      });
 
-    // Get user location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setCurrentLocation({ lat: latitude, lng: longitude });
-          onLocationUpdate(latitude, longitude);
-        },
-        (error) => {
-          console.error('Error getting location:', error);
-        }
-      );
-    }
+      // Initialize directions service
+      directionsService.current = new google.maps.DirectionsService();
+      directionsRenderer.current = new google.maps.DirectionsRenderer({
+        draggable: false,
+        suppressMarkers: false
+      });
 
-    // Add markers for pickup and delivery locations
-    map.current.on('load', () => {
-      // Add pickup marker
-      new mapboxgl.Marker({ color: 'blue' })
-        .setLngLat([-85.7585, 38.2527]) // Mock coordinates
-        .setPopup(new mapboxgl.Popup().setHTML('<h3>Pickup Location</h3>'))
-        .addTo(map.current!);
+      directionsRenderer.current.setMap(mapRef.current);
 
-      // Add delivery marker
-      new mapboxgl.Marker({ color: 'red' })
-        .setLngLat([-85.7585, 38.2527]) // Mock coordinates
-        .setPopup(new mapboxgl.Popup().setHTML('<h3>Delivery Location</h3>'))
-        .addTo(map.current!);
-    });
+      // Get user location
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setCurrentLocation({ lat: latitude, lng: longitude });
+            onLocationUpdate(latitude, longitude);
+            
+            // Center map on user location
+            mapRef.current?.setCenter({ lat: latitude, lng: longitude });
+            mapRef.current?.setZoom(14);
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+          }
+        );
+      }
+
+      // Set up route to pickup location
+      setRouteToPickup();
+    };
+
+    loadGoogleMaps();
 
     return () => {
-      if (map.current) {
-        map.current.remove();
+      // Cleanup
+      if (directionsRenderer.current) {
+        directionsRenderer.current.setMap(null);
       }
     };
   }, []);
 
-  const handlePickupComplete = () => {
+  const setRouteToPickup = () => {
+    if (!directionsService.current || !directionsRenderer.current || !currentLocation) return;
+    
+    setCurrentStep('pickup');
+    setIsNavigating(true);
+    
+    const request: google.maps.DirectionsRequest = {
+      origin: { lat: currentLocation.lat, lng: currentLocation.lng },
+      destination: pickupLocation,
+      travelMode: google.maps.TravelMode.DRIVING,
+      drivingOptions: {
+        departureTime: new Date(),
+        trafficModel: google.maps.TrafficModel.BEST_GUESS
+      }
+    };
+
+    directionsService.current.route(request, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK && result) {
+        directionsRenderer.current?.setDirections(result);
+        
+        const route = result.routes[0];
+        const leg = route.legs[0];
+        setDistance(leg.distance?.value ? leg.distance.value * 0.000621371 : 0);
+        setDuration(leg.duration?.value ? leg.duration.value / 60 : 0);
+      }
+    });
+  };
+
+  const setRouteToDelivery = () => {
+    if (!directionsService.current || !directionsRenderer.current) return;
+    
     setCurrentStep('delivery');
+    setIsNavigating(true);
+    
+    const request: google.maps.DirectionsRequest = {
+      origin: pickupLocation,
+      destination: deliveryLocation,
+      travelMode: google.maps.TravelMode.DRIVING,
+      drivingOptions: {
+        departureTime: new Date(),
+        trafficModel: google.maps.TrafficModel.BEST_GUESS
+      }
+    };
+
+    directionsService.current.route(request, (result, status) => {
+      if (status === google.maps.DirectionsStatus.OK && result) {
+        directionsRenderer.current?.setDirections(result);
+        
+        const route = result.routes[0];
+        const leg = route.legs[0];
+        setDistance(leg.distance?.value ? leg.distance.value * 0.000621371 : 0);
+        setDuration(leg.duration?.value ? leg.duration.value / 60 : 0);
+      }
+    });
+  };
+
+  const handlePickupComplete = () => {
+    setIsNavigating(false);
+    setRouteToDelivery();
     onPickupComplete();
   };
 
   const handleDeliveryComplete = () => {
+    setIsNavigating(false);
     onDeliveryComplete();
+  };
+
+  const startNavigation = () => {
+    if (currentStep === 'pickup') {
+      setRouteToPickup();
+    } else {
+      setRouteToDelivery();
+    }
+    setIsNavigating(true);
+  };
+
+  const stopNavigation = () => {
+    setIsNavigating(false);
+    if (directionsRenderer.current) {
+      directionsRenderer.current.setDirections({ routes: [] });
+    }
   };
 
   return (
@@ -148,6 +236,26 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
                 {Math.round(duration)} min
               </p>
             </div>
+          </div>
+
+          {/* Navigation Controls */}
+          <div className="flex gap-2">
+            {!isNavigating ? (
+              <Button 
+                onClick={startNavigation}
+                className="bg-teal-600 hover:bg-teal-700 text-white flex-1"
+              >
+                <Navigation className="w-4 h-4 mr-2" />
+                Start Navigation
+              </Button>
+            ) : (
+              <Button 
+                onClick={stopNavigation}
+                className="bg-red-600 hover:bg-red-700 text-white flex-1"
+              >
+                Stop Navigation
+              </Button>
+            )}
           </div>
 
           {/* Action Buttons */}

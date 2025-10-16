@@ -1,293 +1,200 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Clock, Car, Navigation } from 'lucide-react';
 
 interface CustomerTrackingProps {
   orderId: string;
-  pickupLocation: string;
-  deliveryLocation: string;
-  driverLocation?: { lat: number; lng: number };
-  driverName?: string;
-  estimatedArrival?: string;
-  orderStatus: 'preparing' | 'picked_up' | 'in_transit' | 'delivered';
 }
 
-const CustomerTracking: React.FC<CustomerTrackingProps> = ({
-  orderId,
-  pickupLocation,
-  deliveryLocation,
-  driverLocation,
-  driverName = 'Your driver',
-  estimatedArrival,
-  orderStatus
-}) => {
+const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const driverMarker = useRef<mapboxgl.Marker | null>(null);
-  const [route, setRoute] = useState<any>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const driverMarker = useRef<google.maps.Marker | null>(null);
+  const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [orderStatus, setOrderStatus] = useState<string>('Pending');
+  const [pickupLocation, setPickupLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [deliveryLocation, setDeliveryLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [eta, setEta] = useState<string>('Calculating...');
 
-  // Initialize map
+  // Initialize Google Maps
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    if (!mapboxToken) {
-      console.error('Mapbox token not found');
+    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!googleApiKey) {
+      console.error('Google Maps API key not found');
       return;
     }
 
-    // Set Mapbox access token globally
-    mapboxgl.accessToken = mapboxToken;
+    // Load Google Maps JavaScript API
+    const loadGoogleMaps = () => {
+      if (window.google && window.google.maps) {
+        initializeMap();
+        return;
+      }
 
-    // Initialize map
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-85.7585, 38.2527], // Louisville center
-      zoom: 12
-    });
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=geometry`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeMap;
+      document.head.appendChild(script);
+    };
 
-    // Add navigation control
-    const nav = new mapboxgl.NavigationControl();
-    map.current.addControl(nav, 'top-right');
+    const initializeMap = () => {
+      if (!mapContainer.current || !window.google) return;
 
-    // Add pickup and delivery markers
-    if (pickupLocation && deliveryLocation) {
-      addLocationMarkers();
-    }
+      // Initialize map
+      mapRef.current = new google.maps.Map(mapContainer.current, {
+        center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+          {
+            featureType: 'poi',
+            elementType: 'labels',
+            stylers: [{ visibility: 'off' }]
+          }
+        ]
+      });
+
+      // Mock order data (in real app, fetch from your backend)
+      const mockOrder = {
+        pickup_address: '5120 Cynthia Drive, Louisville, KY 40291',
+        delivery_address: '7101 Cedar Springs Boulevard, Louisville, KY 40291',
+      };
+
+      // Geocode addresses
+      const geocoder = new google.maps.Geocoder();
+      
+      geocoder.geocode({ address: mockOrder.pickup_address }, (results, status) => {
+        if (status === 'OK' && results?.[0]) {
+          const location = results[0].geometry.location;
+          setPickupLocation({ lat: location.lat(), lng: location.lng() });
+          
+          // Add pickup marker
+          new google.maps.Marker({
+            position: location,
+            map: mapRef.current,
+            title: 'Pickup Location',
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#3B82F6"/>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(24, 24)
+            }
+          });
+        }
+      });
+
+      geocoder.geocode({ address: mockOrder.delivery_address }, (results, status) => {
+        if (status === 'OK' && results?.[0]) {
+          const location = results[0].geometry.location;
+          setDeliveryLocation({ lat: location.lat(), lng: location.lng() });
+          
+          // Add delivery marker
+          new google.maps.Marker({
+            position: location,
+            map: mapRef.current,
+            title: 'Delivery Location',
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#EF4444"/>
+                </svg>
+              `),
+              scaledSize: new google.maps.Size(24, 24)
+            }
+          });
+        }
+      });
+
+      // Simulate real-time driver location updates
+      const interval = setInterval(() => {
+        // In a real app, this would fetch from your backend
+        setDriverLocation(prev => {
+          if (!prev) return { lat: 38.2527, lng: -85.7585 }; // Start at Louisville center
+          const newLat = prev.lat + (Math.random() - 0.5) * 0.001;
+          const newLng = prev.lng + (Math.random() - 0.5) * 0.001;
+          return { lat: newLat, lng: newLng };
+        });
+        setOrderStatus('In Transit');
+        setEta('15-20 minutes'); // Mock ETA
+      }, 3000); // Update every 3 seconds
+
+      return () => {
+        clearInterval(interval);
+      };
+    };
+
+    loadGoogleMaps();
 
     return () => {
-      if (map.current) {
-        map.current.remove();
+      if (driverMarker.current) {
+        driverMarker.current.setMap(null);
       }
     };
-  }, [pickupLocation, deliveryLocation]);
+  }, [orderId]);
 
-  // Update driver location
+  // Update driver marker when location changes
   useEffect(() => {
-    if (driverLocation && map.current) {
-      updateDriverLocation(driverLocation);
+    if (mapRef.current && driverLocation) {
+      if (!driverMarker.current) {
+        driverMarker.current = new google.maps.Marker({
+          position: { lat: driverLocation.lat, lng: driverLocation.lng },
+          map: mapRef.current,
+          title: 'Driver Location',
+          icon: {
+            url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="8" fill="#10B981"/>
+                <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="white"/>
+              </svg>
+            `),
+            scaledSize: new google.maps.Size(32, 32)
+          }
+        });
+      } else {
+        driverMarker.current.setPosition({ lat: driverLocation.lat, lng: driverLocation.lng });
+      }
+      
+      // Center map on driver location
+      mapRef.current.setCenter({ lat: driverLocation.lat, lng: driverLocation.lng });
     }
   }, [driverLocation]);
 
-  const addLocationMarkers = async () => {
-    if (!map.current) return;
-
-    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
-    
-    try {
-      // Geocode pickup location
-      const pickupResponse = await fetch(
-        `https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(pickupLocation)}.json?access_token=${mapboxToken}&limit=1`
-      );
-      const pickupData = await pickupResponse.json();
-      
-      if (pickupData.features?.[0]) {
-        const [lng, lat] = pickupData.features[0].center;
-        
-        // Add pickup marker
-        const pickupMarker = new mapboxgl.Marker({ color: '#10b981' })
-          .setLngLat([lng, lat])
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <div class="p-2">
-              <h3 class="font-semibold text-green-600">Pickup Location</h3>
-              <p class="text-sm text-gray-600">${pickupLocation}</p>
-            </div>
-          `))
-          .addTo(map.current);
-      }
-
-      // Geocode delivery location
-      const deliveryResponse = await fetch(
-        `https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(deliveryLocation)}.json?access_token=${mapboxToken}&limit=1`
-      );
-      const deliveryData = await deliveryResponse.json();
-      
-      if (deliveryData.features?.[0]) {
-        const [lng, lat] = deliveryData.features[0].center;
-        
-        // Add delivery marker
-        const deliveryMarker = new mapboxgl.Marker({ color: '#ef4444' })
-          .setLngLat([lng, lat])
-          .setPopup(new mapboxgl.Popup().setHTML(`
-            <div class="p-2">
-              <h3 class="font-semibold text-red-600">Delivery Location</h3>
-              <p class="text-sm text-gray-600">${deliveryLocation}</p>
-            </div>
-          `))
-          .addTo(map.current);
-      }
-    } catch (error) {
-      console.error('Error adding location markers:', error);
-    }
-  };
-
-  const updateDriverLocation = (location: { lat: number; lng: number }) => {
-    if (!map.current) return;
-
-    // Remove existing driver marker
-    if (driverMarker.current) {
-      driverMarker.current.remove();
-    }
-
-    // Add new driver marker
-    driverMarker.current = new mapboxgl.Marker({ 
-      color: '#3b82f6',
-      scale: 1.2
-    })
-      .setLngLat([location.lng, location.lat])
-      .setPopup(new mapboxgl.Popup().setHTML(`
-        <div class="p-2">
-          <h3 class="font-semibold text-blue-600">${driverName}</h3>
-          <p class="text-sm text-gray-600">Currently here</p>
-        </div>
-      `))
-      .addTo(map.current);
-
-    // Center map on driver location
-    map.current.flyTo({
-      center: [location.lng, location.lat],
-      zoom: 14,
-      duration: 1000
-    });
-  };
-
-  const getStatusInfo = () => {
-    switch (orderStatus) {
-      case 'preparing':
-        return {
-          text: 'Preparing your order',
-          color: 'text-yellow-400',
-          icon: <Clock className="w-4 h-4" />
-        };
-      case 'picked_up':
-        return {
-          text: 'Order picked up - on the way',
-          color: 'text-blue-400',
-          icon: <Car className="w-4 h-4" />
-        };
-      case 'in_transit':
-        return {
-          text: 'In transit to you',
-          color: 'text-blue-400',
-          icon: <Navigation className="w-4 h-4" />
-        };
-      case 'delivered':
-        return {
-          text: 'Delivered successfully',
-          color: 'text-green-400',
-          icon: <MapPin className="w-4 h-4" />
-        };
-      default:
-        return {
-          text: 'Processing',
-          color: 'text-gray-400',
-          icon: <Clock className="w-4 h-4" />
-        };
-    }
-  };
-
-  const statusInfo = getStatusInfo();
-
   return (
-    <div className="space-y-4">
-      {/* Order Status */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            {statusInfo.icon}
-            Order Tracking
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Status */}
-          <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                orderStatus === 'delivered' ? 'bg-green-500' : 
-                orderStatus === 'in_transit' ? 'bg-blue-500' : 'bg-yellow-500'
-              }`}>
-                {statusInfo.icon}
-              </div>
-              <div>
-                <p className={`font-medium ${statusInfo.color}`}>
-                  {statusInfo.text}
-                </p>
-                <p className="text-gray-300 text-sm">
-                  Order #{orderId}
-                </p>
-              </div>
-            </div>
-            {estimatedArrival && (
-              <div className="text-right">
-                <p className="text-teal-400 font-semibold">
-                  ETA: {estimatedArrival}
-                </p>
-                <p className="text-gray-300 text-sm">
-                  {driverName}
-                </p>
-              </div>
-            )}
+    <Card className="bg-gray-800 border-gray-700 text-white">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Navigation className="w-5 h-5" />
+          Tracking Order: {orderId}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="relative h-96 rounded-lg overflow-hidden mb-4">
+          <div ref={mapContainer} className="w-full h-full" />
+        </div>
+        <div className="space-y-3 text-gray-300">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-2"><Car className="w-4 h-4" /> Driver Status:</span>
+            <span className="font-semibold capitalize text-teal-400">{orderStatus}</span>
           </div>
-
-          {/* Driver Location */}
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-2"><Clock className="w-4 h-4" /> Estimated Arrival:</span>
+            <span className="font-semibold">{eta}</span>
+          </div>
           {driverLocation && (
-            <div className="p-3 bg-blue-900 border border-blue-700 rounded-lg">
-              <div className="flex items-center gap-2">
-                <Car className="w-4 h-4 text-blue-400" />
-                <span className="text-blue-200 text-sm">
-                  Driver location updated in real-time
-                </span>
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2"><MapPin className="w-4 h-4" /> Driver Location:</span>
+              <span className="font-semibold">{driverLocation.lat.toFixed(4)}, {driverLocation.lng.toFixed(4)}</span>
             </div>
           )}
-
-          {/* Order Details */}
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Pickup:</span>
-              <span className="text-white text-sm">{pickupLocation}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Delivery:</span>
-              <span className="text-white text-sm">{deliveryLocation}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Map */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-0">
-          <div 
-            ref={mapContainer} 
-            className="w-full h-96 rounded-lg"
-            style={{ minHeight: '400px' }}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Legend */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-center gap-6 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-gray-300">Pickup</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-300">Delivery</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-300">Driver</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

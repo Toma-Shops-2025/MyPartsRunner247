@@ -28,121 +28,14 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
   const [sizeMultiplier, setSizeMultiplier] = useState<number>(1);
   const [totalPrice, setTotalPrice] = useState<number>(0);
 
-  // Calculate distance using Mapbox Matrix API
+  // Calculate distance using Google Maps Distance Matrix API
   useEffect(() => {
     if (pickupAddress && deliveryAddress) {
       calculateRealDistance();
     }
   }, [pickupAddress, deliveryAddress]);
 
-  // Haversine formula for calculating distance between two points
-  const calculateHaversineDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-    const R = 3959; // Earth's radius in miles
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
 
-  // More accurate Louisville distance calculation using known coordinates
-  const calculateLouisvilleDistance = (addr1: string, addr2: string) => {
-    // Known Louisville coordinates for better accuracy
-    const locations = {
-      // Jeffersontown area
-      'jeffersontown': { lat: 38.1944, lng: -85.5644 },
-      'jefferson': { lat: 38.1944, lng: -85.5644 },
-      
-      // Downtown Louisville
-      'downtown': { lat: 38.2527, lng: -85.7585 },
-      'central': { lat: 38.2527, lng: -85.7585 },
-      
-      // East Louisville
-      'east end': { lat: 38.2527, lng: -85.6585 },
-      'east': { lat: 38.2527, lng: -85.6585 },
-      
-      // West Louisville  
-      'west end': { lat: 38.2527, lng: -85.8585 },
-      'west': { lat: 38.2527, lng: -85.8585 },
-      
-      // South Louisville
-      'south end': { lat: 38.1527, lng: -85.7585 },
-      'south': { lat: 38.1527, lng: -85.7585 },
-      
-      // North Louisville
-      'north end': { lat: 38.3527, lng: -85.7585 },
-      'north': { lat: 38.3527, lng: -85.7585 },
-      
-      // Specific areas based on your addresses
-      'cynthia': { lat: 38.1944, lng: -85.5644 }, // Jeffersontown area
-      'allmond': { lat: 38.2527, lng: -85.6585 }  // East Louisville area
-    };
-    
-    const addr1Lower = addr1.toLowerCase();
-    const addr2Lower = addr2.toLowerCase();
-    
-    let coords1 = null;
-    let coords2 = null;
-    
-    // Find coordinates for each address
-    for (const [key, coords] of Object.entries(locations)) {
-      if (addr1Lower.includes(key)) coords1 = coords;
-      if (addr2Lower.includes(key)) coords2 = coords;
-    }
-    
-    // If we found coordinates for both addresses, calculate distance
-    if (coords1 && coords2) {
-      const R = 3959; // Earth's radius in miles
-      const dLat = (coords2.lat - coords1.lat) * Math.PI / 180;
-      const dLng = (coords2.lng - coords1.lng) * Math.PI / 180;
-      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(coords1.lat * Math.PI / 180) * Math.cos(coords2.lat * Math.PI / 180) *
-                Math.sin(dLng/2) * Math.sin(dLng/2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-      const distance = R * c;
-      
-      // Add 20% for road network (not straight line)
-      return distance * 1.2;
-    }
-    
-    return 0; // No coordinates found
-  };
-
-  // Improved distance calculation using coordinates
-  const calculateDistanceFromCoords = async (addr1: string, addr2: string) => {
-    try {
-      // Try to get coordinates using a geocoding service
-      const response1 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(addr1)}.json?access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}&limit=1`);
-      const response2 = await fetch(`https://api.mapbox.com/geocoding/v1/mapbox.places/${encodeURIComponent(addr2)}.json?access_token=${import.meta.env.VITE_MAPBOX_ACCESS_TOKEN}&limit=1`);
-      
-      if (response1.ok && response2.ok) {
-        const data1 = await response1.json();
-        const data2 = await response2.json();
-        
-        if (data1.features && data1.features[0] && data2.features && data2.features[0]) {
-          const [lng1, lat1] = data1.features[0].center;
-          const [lng2, lat2] = data2.features[0].center;
-          
-          // Calculate distance using Haversine formula
-          const R = 3959; // Earth's radius in miles
-          const dLat = (lat2 - lat1) * Math.PI / 180;
-          const dLng = (lng2 - lng1) * Math.PI / 180;
-          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                    Math.sin(dLng/2) * Math.sin(dLng/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-          const distance = R * c;
-          
-          return distance;
-        }
-      }
-    } catch (error) {
-      console.log('Geocoding failed, using fallback calculation');
-    }
-    return null;
-  };
 
   // Robust distance calculation with better error handling
   const calculateAccurateDistance = async () => {
@@ -206,87 +99,20 @@ const PricingCalculator: React.FC<PricingCalculatorProps> = ({
     console.log('🔍 Starting distance calculation...');
     console.log('📍 Pickup:', pickupAddress);
     console.log('📍 Delivery:', deliveryAddress);
-    console.log('🚀 Using robust distance calculation');
+    console.log('🚀 Using Google Maps Distance Matrix API');
     
-    // Try robust calculation first
+    // Use Google Maps Distance Matrix API
     const accurateResult = await calculateAccurateDistance();
     if (accurateResult) {
       console.log('✅ Distance calculation succeeded');
       return; // Success with calculation
     }
     
-    console.log('❌ Distance calculation failed, using fallback');
-    
-    // Fallback to simple distance estimation based on address similarity
-    const calculateSimpleDistance = (addr1: string, addr2: string) => {
-      // Extract street numbers for comparison
-      const num1 = addr1.match(/^\d+/)?.[0];
-      const num2 = addr2.match(/^\d+/)?.[0];
-      
-      if (num1 && num2) {
-        const streetNumDiff = Math.abs(parseInt(num1) - parseInt(num2));
-        // If addresses are on the same street with close numbers, estimate very short distance
-        if (streetNumDiff <= 10) {
-          return 0.1; // Very close - same street, few houses apart
-        } else if (streetNumDiff <= 100) {
-          return 0.5; // Same street, but further apart
-        }
-      }
-      
-      // Check if addresses contain similar street names
-      const street1 = addr1.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
-      const street2 = addr2.toLowerCase().replace(/^\d+\s*/, '').split(',')[0].trim();
-      
-      if (street1 === street2) {
-        return 0.2; // Same street name
-      }
-      
-      // Check if addresses are in the same city/area
-      const city1 = addr1.toLowerCase().split(',').pop()?.trim() || '';
-      const city2 = addr2.toLowerCase().split(',').pop()?.trim() || '';
-      
-      if (city1 === city2) {
-        // Use ZIP code analysis for better distance estimation
-        const zip1 = addr1.match(/\d{5}/)?.[0];
-        const zip2 = addr2.match(/\d{5}/)?.[0];
-        
-        if (zip1 && zip2 && zip1 !== zip2) {
-          // Different ZIP codes in Louisville - estimate 8-15 miles
-          return 13.0;
-        } else {
-          // Same ZIP code or no ZIP - estimate 1-3 miles  
-          return 2.0;
-        }
-      }
-      
-      // Default fallback for different cities
-      return 5.0; // Different cities
-    };
-    
-    // Try Louisville-specific distance calculation first
-    const louisvilleDistance = calculateLouisvilleDistance(pickupAddress, deliveryAddress);
-    if (louisvilleDistance > 0) {
-      const calculatedDistancePrice = louisvilleDistance * 2.00;
-      console.log('🏙️ Louisville-specific distance:', {
-        distance: louisvilleDistance,
-        rate: '$2.00/mile',
-        total: calculatedDistancePrice
-      });
-      setDistance(louisvilleDistance);
-      setDistancePrice(calculatedDistancePrice);
-      return;
-    }
-    
-    const estimatedDistance = calculateSimpleDistance(pickupAddress, deliveryAddress);
-    const calculatedDistancePrice = estimatedDistance * 2.00;
-    console.log('📏 Fallback distance calculation:', {
-      distance: estimatedDistance,
-      rate: '$2.00/mile',
-      total: calculatedDistancePrice
-    });
-    setDistance(estimatedDistance);
-    setDistancePrice(calculatedDistancePrice);
-    return;
+    console.log('❌ Distance calculation failed - please check your Google Maps API key');
+    // Set default values if calculation fails
+    setDistance(0);
+    setDistancePrice(0);
+    setEstimatedTime('Unable to calculate');
   };
 
   // Calculate urgency multiplier
