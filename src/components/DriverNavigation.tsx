@@ -192,7 +192,7 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   const stopNavigation = () => {
     setIsNavigating(false);
     if (directionsRenderer.current) {
-      directionsRenderer.current.setDirections({ routes: [] });
+      directionsRenderer.current.setDirections({ routes: [], request: {} as google.maps.DirectionsRequest });
     }
   };
 

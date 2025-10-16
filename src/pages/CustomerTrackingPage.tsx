@@ -142,12 +142,6 @@ const CustomerTrackingPage: React.FC = () => {
         {/* Tracking Component */}
         <CustomerTracking
           orderId={orderId || ''}
-          pickupLocation={orderData.pickup_address}
-          deliveryLocation={orderData.delivery_address}
-          driverLocation={driverLocation}
-          driverName={orderData.driver_name || 'Your driver'}
-          estimatedArrival={orderData.estimated_arrival}
-          orderStatus={orderStatus}
         />
 
         {/* Order Details */}
