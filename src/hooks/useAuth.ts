@@ -455,6 +455,7 @@ export const useAuth = () => {
       // Clear any stored auth data
       localStorage.removeItem('supabase.auth.token');
       localStorage.removeItem('mock_profile');
+      localStorage.removeItem('stripe_account_id');
       sessionStorage.removeItem('supabase.auth.token');
       sessionStorage.removeItem('sw-updated');
       
@@ -548,6 +549,11 @@ export const useAuth = () => {
       setLoading(false);
       console.log('Forced driver profile created:', driverProfile);
       alert('Driver profile created! Please refresh the page.');
+    };
+    (window as any).clearStripeAccount = () => {
+      localStorage.removeItem('stripe_account_id');
+      console.log('Stripe account ID cleared from localStorage');
+      alert('Stripe account ID cleared! Please refresh the page to see the Stripe Connect button.');
     };
   }
 

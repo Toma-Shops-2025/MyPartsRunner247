@@ -60,6 +60,9 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
           // Store user data in localStorage
           localStorage.setItem('fallback_user', JSON.stringify(fallbackUser));
           
+          // Clear any existing Stripe account ID for new user
+          localStorage.removeItem('stripe_account_id');
+          
           // Create a fallback profile
           const fallbackProfile = {
             id: fallbackUser.id,
@@ -88,6 +91,9 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
         
         throw error;
       }
+
+      // Clear any existing Stripe account ID for new user
+      localStorage.removeItem('stripe_account_id');
 
       // Check if email confirmation is required
       if (data.user && !data.user.email_confirmed_at) {
