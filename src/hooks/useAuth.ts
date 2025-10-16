@@ -9,7 +9,6 @@ export interface Profile {
   phone: string;
   user_type: 'customer' | 'driver' | 'merchant' | 'admin';
   avatar_url?: string;
-  is_online?: boolean;
   is_approved?: boolean;
   status?: string;
   vehicle_info?: any;
@@ -147,7 +146,6 @@ export const useAuth = () => {
             full_name: parsedUser.user_metadata?.full_name || 'User',
             phone: parsedUser.user_metadata?.phone || '',
             user_type: parsedUser.user_metadata?.user_type || 'customer',
-            is_online: parsedUser.user_metadata?.user_type === 'driver',
             is_approved: parsedUser.user_metadata?.user_type === 'driver',
             status: parsedUser.user_metadata?.user_type === 'driver' ? 'active' : 'inactive',
             created_at: new Date().toISOString(),
@@ -223,7 +221,6 @@ export const useAuth = () => {
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
         user_type: userType,
-        is_online: userType === 'driver',
         is_approved: userType === 'driver',
         status: userType === 'driver' ? 'active' : 'inactive',
         created_at: new Date().toISOString(),
@@ -287,7 +284,6 @@ export const useAuth = () => {
             full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
             phone: user?.user_metadata?.phone || '',
             user_type: (user?.email?.includes('driver') || user?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
-            is_online: false,
             is_approved: false,
             status: 'inactive',
             created_at: new Date().toISOString(),
@@ -369,7 +365,6 @@ export const useAuth = () => {
         full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
         phone: user?.user_metadata?.phone || '',
         user_type: userType,
-        is_online: userType === 'driver',
         is_approved: userType === 'driver',
         status: userType === 'driver' ? 'active' : 'inactive',
         created_at: new Date().toISOString(),
@@ -411,7 +406,6 @@ export const useAuth = () => {
             full_name: profile?.full_name || user?.user_metadata?.full_name || 'User',
             phone: profile?.phone || user?.user_metadata?.phone || '',
             user_type: newUserType,
-            is_online: newUserType === 'driver',
             is_approved: newUserType === 'driver',
             status: newUserType === 'driver' ? 'active' : 'inactive',
             created_at: new Date().toISOString(),
@@ -434,11 +428,9 @@ export const useAuth = () => {
         
         if (newUserType === 'driver') {
           additionalData.status = 'active';
-          additionalData.is_online = true;
           additionalData.is_approved = true;
         } else {
           additionalData.status = 'inactive';
-          additionalData.is_online = false;
           additionalData.is_approved = false;
         }
         
@@ -494,7 +486,6 @@ export const useAuth = () => {
           phone: userData.user?.user_metadata?.phone || '',
           user_type: userType,
           status: userType === 'driver' ? 'active' : 'inactive',
-          is_online: userType === 'driver' ? true : false,
           is_approved: userType === 'driver' ? true : false
         })
         .select()
@@ -588,7 +579,6 @@ export const useAuth = () => {
       full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
       phone: user.user_metadata?.phone || '',
       user_type: 'driver' as const,
-      is_online: true,
       is_approved: true,
       status: 'active',
       created_at: new Date().toISOString(),
@@ -612,7 +602,6 @@ export const useAuth = () => {
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
         phone: user.user_metadata?.phone || '',
         user_type: 'driver' as const,
-        is_online: true,
         is_approved: true,
         status: 'active',
         created_at: new Date().toISOString(),
