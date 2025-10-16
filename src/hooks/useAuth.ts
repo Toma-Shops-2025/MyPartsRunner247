@@ -183,13 +183,21 @@ export const useAuth = () => {
       let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
       const email = user?.email || 'unknown@example.com';
       
+      // Check if this is the specific customer email that should stay customer
+      if (email === 'tomababyshopsonline@gmail.com') {
+        userType = 'customer';
+      }
       // Check if email suggests driver (contains 'driver', 'taxi', etc.)
-      if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
+      else if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
         userType = 'driver';
       }
-      // Check if this is the specific customer email that should stay customer
-      else if (email === 'tomababyshopsonline@gmail.com') {
-        userType = 'customer';
+      // Check for your specific driver accounts
+      else if (email === 'tomashops578@gmail.com' || 
+               email === 'tomavault@gmail.com' || 
+               email === 'timandmarciaadkins@gmail.com' || 
+               email === 'soberdrivertaxi@gmail.com' || 
+               email === 'tomaadkins533@gmail.com') {
+        userType = 'driver';
       }
       // For other emails, try to preserve existing profile if available
       else {
@@ -338,13 +346,21 @@ export const useAuth = () => {
       const email = user?.email || 'unknown@example.com';
       let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
       
+      // Check if this is the specific customer email that should stay customer
+      if (email === 'tomababyshopsonline@gmail.com') {
+        userType = 'customer';
+      }
       // Check if email suggests driver (contains 'driver', 'taxi', etc.)
-      if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
+      else if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
         userType = 'driver';
       }
-      // Check if this is the specific customer email that should stay customer
-      else if (email === 'tomababyshopsonline@gmail.com') {
-        userType = 'customer';
+      // Check for your specific driver accounts
+      else if (email === 'tomashops578@gmail.com' || 
+               email === 'tomavault@gmail.com' || 
+               email === 'timandmarciaadkins@gmail.com' || 
+               email === 'soberdrivertaxi@gmail.com' || 
+               email === 'tomaadkins533@gmail.com') {
+        userType = 'driver';
       }
       
       const fallbackProfile = {
