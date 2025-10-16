@@ -44,6 +44,9 @@ exports.handler = async (event, context) => {
     // Check for Mapbox token - REQUIRED
     const mapboxToken = process.env.VITE_MAPBOX_ACCESS_TOKEN;
     
+    console.log('🔑 Mapbox token check:', mapboxToken ? 'Token found' : 'Token missing');
+    console.log('🔑 Token preview:', mapboxToken ? `${mapboxToken.substring(0, 10)}...` : 'No token');
+    
     if (!mapboxToken) {
       console.error('❌ Mapbox token not found - distance calculation requires Mapbox');
       return {
@@ -71,9 +74,19 @@ exports.handler = async (event, context) => {
 
     if (!pickupResponse.ok || !deliveryResponse.ok) {
       console.error('❌ Mapbox geocoding failed:', {
-        pickup: pickupResponse.status,
-        delivery: deliveryResponse.status
+        pickup: { status: pickupResponse.status, statusText: pickupResponse.statusText },
+        delivery: { status: deliveryResponse.status, statusText: deliveryResponse.statusText }
       });
+      
+      // Try to get error details
+      try {
+        const pickupError = await pickupResponse.text();
+        const deliveryError = await deliveryResponse.text();
+        console.error('❌ Geocoding error details:', { pickupError, deliveryError });
+      } catch (e) {
+        console.error('❌ Could not read error details:', e.message);
+      }
+      
       return {
         statusCode: 500,
         headers: {
@@ -82,7 +95,7 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({ 
           error: 'Address geocoding failed',
-          details: 'Could not convert addresses to coordinates'
+          details: `Pickup: ${pickupResponse.status} ${pickupResponse.statusText}, Delivery: ${deliveryResponse.status} ${deliveryResponse.statusText}`
         })
       };
     }
