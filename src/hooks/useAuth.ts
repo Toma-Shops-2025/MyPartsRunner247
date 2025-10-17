@@ -71,8 +71,11 @@ export const useAuth = () => {
             setLoading(false);
           }
         } else {
+          // Clear profile and localStorage when signing out
           setProfile(null);
           setLoading(false);
+          localStorage.removeItem('mock_profile');
+          localStorage.removeItem('fallback_user');
         }
         
         setTimeout(() => { isProcessing = false; }, 500); // Increased delay
@@ -244,7 +247,7 @@ export const useAuth = () => {
       console.log('Using fallback profile and storing in localStorage:', fallbackProfile);
       setProfile(fallbackProfile);
       setLoading(false);
-    }, 1000); // Reduced to 1 second for faster fallback
+    }, 5000); // Increased to 5 seconds to give database more time
     
     
     try {
