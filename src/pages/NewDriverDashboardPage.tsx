@@ -156,7 +156,7 @@ const NewDriverDashboardPage: React.FC = () => {
       
       // Debug: Check driver profile status
       console.log('🔍 DEBUGGING: Driver profile status:', {
-        is_online: profile?.is_online,
+        status: profile?.status,
         is_approved: profile?.is_approved,
         user_type: profile?.user_type,
         full_name: profile?.full_name

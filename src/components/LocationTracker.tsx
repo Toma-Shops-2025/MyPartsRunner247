@@ -16,7 +16,7 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (profile?.user_type === 'driver' && profile?.is_online) {
+    if (profile?.user_type === 'driver') {
       startTracking();
     }
     return () => stopTracking();
@@ -78,12 +78,12 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
   const toggleOnlineStatus = async () => {
     if (!user) return;
 
-    const newOnlineStatus = !profile?.is_online;
+    const newOnlineStatus = !isTracking;
     
     try {
       await supabase
         .from('profiles')
-        .update({ is_online: newOnlineStatus })
+        .update({ status: newOnlineStatus ? 'active' : 'inactive' })
         .eq('id', user.id);
 
       if (newOnlineStatus) {
@@ -111,22 +111,22 @@ const LocationTracker: React.FC<LocationTrackerProps> = ({ onLocationUpdate }) =
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {profile?.is_online ? (
+            {isTracking ? (
               <Wifi className="w-4 h-4 text-green-400" />
             ) : (
               <WifiOff className="w-4 h-4 text-gray-400" />
             )}
-            <span className={profile?.is_online ? 'text-green-400' : 'text-gray-300'}>
-              {profile?.is_online ? 'Online' : 'Offline'}
+            <span className={isTracking ? 'text-green-400' : 'text-gray-300'}>
+              {isTracking ? 'Online' : 'Offline'}
             </span>
           </div>
           <Button
-            variant={profile?.is_online ? "destructive" : "default"}
+            variant={isTracking ? "destructive" : "default"}
             onClick={toggleOnlineStatus}
             size="sm"
-            className={profile?.is_online ? "bg-red-600 hover:bg-red-700 text-white" : "bg-teal-600 hover:bg-teal-700 text-white"}
+            className={isTracking ? "bg-red-600 hover:bg-red-700 text-white" : "bg-teal-600 hover:bg-teal-700 text-white"}
           >
-            {profile?.is_online ? 'Go Offline' : 'Go Online'}
+            {isTracking ? 'Go Offline' : 'Go Online'}
           </Button>
         </div>
 

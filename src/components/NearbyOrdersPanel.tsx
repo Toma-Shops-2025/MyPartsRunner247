@@ -25,12 +25,12 @@ const NearbyOrdersPanel: React.FC = () => {
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
-    if (profile?.is_online && driverLocation) {
+    if (profile?.user_type === 'driver' && driverLocation) {
       fetchNearbyOrders();
       const interval = setInterval(fetchNearbyOrders, 30000); // Refresh every 30 seconds
       return () => clearInterval(interval);
     }
-  }, [profile?.is_online, driverLocation]);
+  }, [profile?.user_type, driverLocation]);
 
   const fetchNearbyOrders = async () => {
     if (!driverLocation || !user) return;
@@ -79,7 +79,7 @@ const NearbyOrdersPanel: React.FC = () => {
     setDriverLocation({ lat, lng });
   };
 
-  if (profile?.user_type !== 'driver' || !profile?.is_online) {
+  if (profile?.user_type !== 'driver') {
     return null;
   }
 
