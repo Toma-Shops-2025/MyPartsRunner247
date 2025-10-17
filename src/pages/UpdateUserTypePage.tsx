@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { updateCurrentUserToDriver } from '@/utils/updateUserType';
 import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
+import NewHeader from '@/components/NewHeader';
 
 const UpdateUserTypePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -47,7 +47,7 @@ const UpdateUserTypePage: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-900">
-        <Header />
+        <NewHeader />
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="bg-gray-800 rounded-lg p-6 text-center">
             <h1 className="text-2xl font-bold text-white mb-4">Please Sign In</h1>

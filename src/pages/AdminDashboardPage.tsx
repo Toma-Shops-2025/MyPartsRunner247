@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
-import Header from '@/components/Header';
+import NewHeader from '@/components/NewHeader';
 import AdminDashboard from '@/components/AdminDashboard';
 
 const AdminDashboardPage: React.FC = () => {
@@ -21,7 +21,7 @@ const AdminDashboardPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+        <NewHeader />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AdminDashboard />
       </main>

@@ -13,7 +13,6 @@ import CTASection from './CTASection';
 import Footer from './Footer';
 import RequestPickupModal from './RequestPickupModal';
 import OrderTracker from './OrderTracker';
-import DriverDashboard from './DriverDashboard';
 import AdminDashboard from './AdminDashboard';
 import DriverRegistration from './DriverRegistration';
 import PaymentModal from './PaymentModal';

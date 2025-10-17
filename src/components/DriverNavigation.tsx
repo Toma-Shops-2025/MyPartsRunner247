@@ -42,7 +42,7 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
 
     // Load Google Maps JavaScript API
     const loadGoogleMaps = () => {
-      if (window.google && window.window.google.maps) {
+      if (window.google && window.(window as any).google.maps) {
         initializeMap();
         return;
       }
@@ -59,10 +59,10 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
       if (!mapContainer.current || !window.google) return;
 
       // Initialize map
-      mapRef.current = new window.google.maps.Map(mapContainer.current, {
+      mapRef.current = new (window as any).google.maps.Map(mapContainer.current, {
         center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
         zoom: 12,
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+        mapTypeId: (window as any).google.maps.MapTypeId.ROADMAP,
         styles: [
           {
             featureType: 'poi',
@@ -73,8 +73,8 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
       });
 
       // Initialize directions service
-      directionsService.current = new window.google.maps.DirectionsService();
-      directionsRenderer.current = new window.google.maps.DirectionsRenderer({
+      directionsService.current = new (window as any).google.maps.DirectionsService();
+      directionsRenderer.current = new (window as any).google.maps.DirectionsRenderer({
         draggable: false,
         suppressMarkers: false
       });
@@ -119,18 +119,18 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
     setCurrentStep('pickup');
     setIsNavigating(true);
     
-    const request: window.google.maps.DirectionsRequest = {
+    const request: (window as any).google.maps.DirectionsRequest = {
       origin: { lat: currentLocation.lat, lng: currentLocation.lng },
       destination: pickupLocation,
-      travelMode: window.google.maps.TravelMode.DRIVING,
+      travelMode: (window as any).google.maps.TravelMode.DRIVING,
       drivingOptions: {
         departureTime: new Date(),
-        trafficModel: window.google.maps.TrafficModel.BEST_GUESS
+        trafficModel: (window as any).google.maps.TrafficModel.BEST_GUESS
       }
     };
 
     directionsService.current.route(request, (result, status) => {
-      if (status === window.google.maps.DirectionsStatus.OK && result) {
+      if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
         directionsRenderer.current?.setDirections(result);
         
         const route = result.routes[0];
@@ -147,18 +147,18 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
     setCurrentStep('delivery');
     setIsNavigating(true);
     
-    const request: window.google.maps.DirectionsRequest = {
+    const request: (window as any).google.maps.DirectionsRequest = {
       origin: pickupLocation,
       destination: deliveryLocation,
-      travelMode: window.google.maps.TravelMode.DRIVING,
+      travelMode: (window as any).google.maps.TravelMode.DRIVING,
       drivingOptions: {
         departureTime: new Date(),
-        trafficModel: window.google.maps.TrafficModel.BEST_GUESS
+        trafficModel: (window as any).google.maps.TrafficModel.BEST_GUESS
       }
     };
 
     directionsService.current.route(request, (result, status) => {
-      if (status === window.google.maps.DirectionsStatus.OK && result) {
+      if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
         directionsRenderer.current?.setDirections(result);
         
         const route = result.routes[0];
@@ -192,7 +192,7 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   const stopNavigation = () => {
     setIsNavigating(false);
     if (directionsRenderer.current) {
-      directionsRenderer.current.setDirections({ routes: [], request: {} as window.google.maps.DirectionsRequest });
+      directionsRenderer.current.setDirections({ routes: [], request: {} as (window as any).google.maps.DirectionsRequest });
     }
   };
 

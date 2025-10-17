@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
+import NewHeader from '@/components/NewHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +40,7 @@ const ServicesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <Header />
+        <NewHeader />
       
       {/* Hero Section */}
       <section className="bg-gray-800 py-20">
