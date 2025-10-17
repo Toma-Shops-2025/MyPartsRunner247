@@ -8,8 +8,8 @@ interface CustomerTrackingProps {
 
 const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const driverMarker = useRef<google.maps.Marker | null>(null);
+  const mapRef = useRef<any | null>(null);
+  const driverMarker = useRef<any | null>(null);
   const [driverLocation, setDriverLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [orderStatus, setOrderStatus] = useState<string>('Pending');
   const [pickupLocation, setPickupLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -28,7 +28,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
 
     // Load Google Maps JavaScript API
     const loadGoogleMaps = () => {
-      if (window.google && window.google.maps) {
+      if (window.google && window.window.google.maps) {
         initializeMap();
         return;
       }
@@ -45,10 +45,10 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
       if (!mapContainer.current || !window.google) return;
 
       // Initialize map
-      mapRef.current = new google.maps.Map(mapContainer.current, {
+      mapRef.current = new window.google.maps.Map(mapContainer.current, {
         center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
         zoom: 12,
-        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
         styles: [
           {
             featureType: 'poi',
@@ -65,7 +65,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
       };
 
       // Geocode addresses
-      const geocoder = new google.maps.Geocoder();
+      const geocoder = new window.google.maps.Geocoder();
       
       geocoder.geocode({ address: mockOrder.pickup_address }, (results, status) => {
         if (status === 'OK' && results?.[0]) {
@@ -73,7 +73,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
           setPickupLocation({ lat: location.lat(), lng: location.lng() });
           
           // Add pickup marker
-          new google.maps.Marker({
+          new window.google.maps.Marker({
             position: location,
             map: mapRef.current,
             title: 'Pickup Location',
@@ -83,7 +83,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#3B82F6"/>
                 </svg>
               `),
-              scaledSize: new google.maps.Size(24, 24)
+              scaledSize: new window.google.maps.Size(24, 24)
             }
           });
         }
@@ -95,7 +95,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
           setDeliveryLocation({ lat: location.lat(), lng: location.lng() });
           
           // Add delivery marker
-          new google.maps.Marker({
+          new window.google.maps.Marker({
             position: location,
             map: mapRef.current,
             title: 'Delivery Location',
@@ -105,7 +105,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#EF4444"/>
                 </svg>
               `),
-              scaledSize: new google.maps.Size(24, 24)
+              scaledSize: new window.google.maps.Size(24, 24)
             }
           });
         }
@@ -142,7 +142,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
   useEffect(() => {
     if (mapRef.current && driverLocation) {
       if (!driverMarker.current) {
-        driverMarker.current = new google.maps.Marker({
+        driverMarker.current = new window.google.maps.Marker({
           position: { lat: driverLocation.lat, lng: driverLocation.lng },
           map: mapRef.current,
           title: 'Driver Location',
@@ -153,7 +153,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
                 <path d="M12 2L13.09 8.26L19 9L13.09 9.74L12 16L10.91 9.74L5 9L10.91 8.26L12 2Z" fill="white"/>
               </svg>
             `),
-            scaledSize: new google.maps.Size(32, 32)
+            scaledSize: new window.google.maps.Size(32, 32)
           }
         });
       } else {
