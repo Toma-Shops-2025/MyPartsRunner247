@@ -119,73 +119,10 @@ export const useAuth = () => {
       return;
     }
     
-    // Check localStorage first - bypass database entirely for now
-    const mockProfile = localStorage.getItem('mock_profile');
-    if (mockProfile) {
-      try {
-        const parsedProfile = JSON.parse(mockProfile);
-        if (parsedProfile.id === userId) {
-          console.log('Using stored mock profile:', parsedProfile);
-          setProfile(parsedProfile);
-          setLoading(false);
-          return;
-        }
-      } catch (error) {
-        console.error('Error parsing mock profile:', error);
-      }
-    }
+    // Skip localStorage fallback - use database only
+    console.log('Fetching profile from database for user:', userId);
     
-    // Check for fallback user
-    const fallbackUser = localStorage.getItem('fallback_user');
-    if (fallbackUser) {
-      try {
-        const parsedUser = JSON.parse(fallbackUser);
-        if (parsedUser.id === userId) {
-          console.log('Using fallback user:', parsedUser);
-          // Create a profile from fallback user
-          // Use the user_type from the signup process (stored in user_metadata)
-          let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
-          
-          // First, try to get user_type from user_metadata (set during signup)
-          if (parsedUser.user_metadata?.user_type) {
-            userType = parsedUser.user_metadata.user_type;
-            console.log('Using user_type from signup metadata:', userType);
-          }
-          // If no metadata, check for existing profile in localStorage
-          else {
-            const existingProfile = localStorage.getItem('mock_profile');
-            if (existingProfile) {
-              try {
-                const parsed = JSON.parse(existingProfile);
-                if (parsed.id === userId && parsed.user_type) {
-                  userType = parsed.user_type;
-                  console.log('Preserving existing user type from localStorage:', userType);
-                }
-              } catch (error) {
-                console.log('Could not parse existing profile, using default');
-              }
-            }
-          }
-          
-          const fallbackProfile = {
-            id: parsedUser.id,
-            email: parsedUser.email,
-            full_name: parsedUser.user_metadata?.full_name || 'User',
-            phone: parsedUser.user_metadata?.phone || '',
-            user_type: userType,
-            is_approved: userType === 'driver',
-            status: userType === 'driver' ? 'active' : 'inactive',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          setProfile(fallbackProfile);
-          setLoading(false);
-          return;
-        }
-      } catch (error) {
-        console.error('Error parsing fallback user:', error);
-      }
-    }
+    // Skip fallback user logic - use database only
     
     // Prevent multiple simultaneous fetches for the same user
     if (lastProcessedUserId === userId) {
@@ -193,61 +130,7 @@ export const useAuth = () => {
       return;
     }
     
-    // Set a timeout to prevent infinite loading
-    const profileTimeout = setTimeout(() => {
-      // Check if user is signing out or no longer authenticated before creating fallback
-      if (isSigningOut || !user || !userId) {
-        console.log('User signing out or no longer authenticated, skipping fallback profile creation');
-        setLoading(false);
-        return;
-      }
-      
-      console.log('Profile fetch timeout - creating fallback profile');
-      
-      // Try to determine user type from signup data or existing profile
-      let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
-      const email = user?.email || 'unknown@example.com';
-      
-      // First, try to get user_type from user_metadata (set during signup)
-      if (user?.user_metadata?.user_type) {
-        userType = user.user_metadata.user_type;
-        console.log('Using user_type from signup metadata:', userType);
-      }
-      // If no metadata, check for existing profile in localStorage
-      else {
-        const existingProfile = localStorage.getItem('mock_profile');
-        if (existingProfile) {
-          try {
-            const parsed = JSON.parse(existingProfile);
-            if (parsed.id === userId && parsed.user_type) {
-              userType = parsed.user_type;
-              console.log('Preserving existing user type from localStorage:', userType);
-            }
-          } catch (error) {
-            console.log('Could not parse existing profile, using default');
-          }
-        }
-      }
-      
-      // Create a fallback profile when database is slow/unavailable
-      const fallbackProfile = {
-        id: userId,
-        email: email,
-        full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
-        phone: user?.user_metadata?.phone || '',
-        user_type: userType,
-        is_approved: userType === 'driver',
-        status: userType === 'driver' ? 'active' : 'inactive',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      // Store the fallback profile in localStorage to prevent repeated database calls
-      localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
-      console.log('Using fallback profile and storing in localStorage:', fallbackProfile);
-      setProfile(fallbackProfile);
-      setLoading(false);
-    }, 5000); // Increased to 5 seconds to give database more time
+    // Remove timeout fallback - use database only
     
     
     try {
