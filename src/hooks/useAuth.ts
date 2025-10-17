@@ -140,14 +140,51 @@ export const useAuth = () => {
         if (parsedUser.id === userId) {
           console.log('Using fallback user:', parsedUser);
           // Create a profile from fallback user
+          // Use smart detection for user type
+          let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
+          const email = parsedUser.email || 'unknown@example.com';
+          
+          // Check if this is the specific customer email that should stay customer
+          if (email === 'tomababyshopsonline@gmail.com') {
+            userType = 'customer';
+          }
+          // Check if email suggests driver (contains 'driver', 'taxi', etc.)
+          else if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
+            userType = 'driver';
+          }
+          // Check for your specific driver accounts
+          else if (email === 'tomashops578@gmail.com' || 
+                   email === 'tomavault@gmail.com' || 
+                   email === 'timandmarciaadkins@gmail.com' || 
+                   email === 'soberdrivertaxi@gmail.com' || 
+                   email === 'tomaadkins533@gmail.com') {
+            userType = 'driver';
+          }
+          // For other emails, try to preserve existing profile if available
+          else {
+            // Check if there's an existing profile in localStorage for this user
+            const existingProfile = localStorage.getItem('mock_profile');
+            if (existingProfile) {
+              try {
+                const parsed = JSON.parse(existingProfile);
+                if (parsed.id === userId && parsed.user_type) {
+                  userType = parsed.user_type;
+                  console.log('Preserving existing user type from localStorage:', userType);
+                }
+              } catch (error) {
+                console.log('Could not parse existing profile, using default');
+              }
+            }
+          }
+          
           const fallbackProfile = {
             id: parsedUser.id,
             email: parsedUser.email,
             full_name: parsedUser.user_metadata?.full_name || 'User',
             phone: parsedUser.user_metadata?.phone || '',
-            user_type: parsedUser.user_metadata?.user_type || 'customer',
-            is_approved: parsedUser.user_metadata?.user_type === 'driver',
-            status: parsedUser.user_metadata?.user_type === 'driver' ? 'active' : 'inactive',
+            user_type: userType,
+            is_approved: userType === 'driver',
+            status: userType === 'driver' ? 'active' : 'inactive',
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
