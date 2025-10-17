@@ -30,35 +30,33 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   const [duration, setDuration] = useState<number>(0);
   const [isNavigating, setIsNavigating] = useState(false);
 
-  // Initialize Google Maps
   useEffect(() => {
-    if (!mapContainer.current) return;
-
-    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-    if (!googleApiKey) {
-      console.error('Google Maps API key not found');
+    if (!mapContainer.current) {
       return;
     }
 
     // Load Google Maps JavaScript API
     const loadGoogleMaps = () => {
-      if (window.google && window.(window as any).google.maps) {
+      if ((window as any).google && (window as any).google.maps) {
         initializeMap();
         return;
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=geometry`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
-      script.onload = initializeMap;
       document.head.appendChild(script);
+
+      script.onload = () => {
+        initializeMap();
+      };
     };
 
+    // Initialize map
     const initializeMap = () => {
-      if (!mapContainer.current || !window.google) return;
+      if (!mapContainer.current) return;
 
-      // Initialize map
       mapRef.current = new (window as any).google.maps.Map(mapContainer.current, {
         center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
         zoom: 12,
@@ -79,47 +77,35 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
         suppressMarkers: false
       });
 
-      directionsRenderer.current.setMap(mapRef.current);
+      // Start watching user's geolocation
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const newLocation = { lat: latitude, lng: longitude };
+          setCurrentLocation(newLocation);
+          onLocationUpdate(latitude, longitude);
 
-      // Get user location
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            setCurrentLocation({ lat: latitude, lng: longitude });
-            onLocationUpdate(latitude, longitude);
-            
-            // Center map on user location
-            mapRef.current?.setCenter({ lat: latitude, lng: longitude });
-            mapRef.current?.setZoom(14);
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-          }
-        );
-      }
+          // Update map center to driver's current location
+          mapRef.current?.setCenter(newLocation);
+        },
+        (error) => console.error('Geolocation error:', error),
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      );
 
-      // Set up route to pickup location
-      setRouteToPickup();
+      return () => {
+        navigator.geolocation.clearWatch(watchId);
+      };
     };
 
     loadGoogleMaps();
+  }, [pickupLocation, deliveryLocation, onLocationUpdate]);
 
-    return () => {
-      // Cleanup
-      if (directionsRenderer.current) {
-        directionsRenderer.current.setMap(null);
-      }
-    };
-  }, []);
+  const navigateToPickup = () => {
+    if (!currentLocation) return;
 
-  const setRouteToPickup = () => {
-    if (!directionsService.current || !directionsRenderer.current || !currentLocation) return;
-    
-    setCurrentStep('pickup');
     setIsNavigating(true);
     
-    const request: (window as any).google.maps.DirectionsRequest = {
+    const request = {
       origin: { lat: currentLocation.lat, lng: currentLocation.lng },
       destination: pickupLocation,
       travelMode: (window as any).google.maps.TravelMode.DRIVING,
@@ -129,25 +115,27 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
       }
     };
 
-    directionsService.current.route(request, (result, status) => {
+    directionsService.current.route(request, (result: any, status: any) => {
       if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
         directionsRenderer.current?.setDirections(result);
         
-        const route = result.routes[0];
-        const leg = route.legs[0];
-        setDistance(leg.distance?.value ? leg.distance.value * 0.000621371 : 0);
-        setDuration(leg.duration?.value ? leg.duration.value / 60 : 0);
+        const route = result.routes[0].legs[0];
+        setDistance(route.distance.value / 1000); // Convert to km
+        setDuration(route.duration.value / 60); // Convert to minutes
+        
+        setCurrentStep('pickup');
+      } else {
+        console.error('Directions request failed due to ' + status);
       }
     });
   };
 
-  const setRouteToDelivery = () => {
-    if (!directionsService.current || !directionsRenderer.current) return;
-    
-    setCurrentStep('delivery');
+  const navigateToDelivery = () => {
+    if (!currentLocation) return;
+
     setIsNavigating(true);
     
-    const request: (window as any).google.maps.DirectionsRequest = {
+    const request = {
       origin: pickupLocation,
       destination: deliveryLocation,
       travelMode: (window as any).google.maps.TravelMode.DRIVING,
@@ -157,168 +145,144 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
       }
     };
 
-    directionsService.current.route(request, (result, status) => {
+    directionsService.current.route(request, (result: any, status: any) => {
       if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
         directionsRenderer.current?.setDirections(result);
         
-        const route = result.routes[0];
-        const leg = route.legs[0];
-        setDistance(leg.distance?.value ? leg.distance.value * 0.000621371 : 0);
-        setDuration(leg.duration?.value ? leg.duration.value / 60 : 0);
+        const route = result.routes[0].legs[0];
+        setDistance(route.distance.value / 1000); // Convert to km
+        setDuration(route.duration.value / 60); // Convert to minutes
+        
+        setCurrentStep('delivery');
+      } else {
+        console.error('Directions request failed due to ' + status);
       }
     });
-  };
-
-  const handlePickupComplete = () => {
-    setIsNavigating(false);
-    setRouteToDelivery();
-    onPickupComplete();
-  };
-
-  const handleDeliveryComplete = () => {
-    setIsNavigating(false);
-    onDeliveryComplete();
-  };
-
-  const startNavigation = () => {
-    if (currentStep === 'pickup') {
-      setRouteToPickup();
-    } else {
-      setRouteToDelivery();
-    }
-    setIsNavigating(true);
   };
 
   const stopNavigation = () => {
     setIsNavigating(false);
     if (directionsRenderer.current) {
-      directionsRenderer.current.setDirections({ routes: [], request: {} as (window as any).google.maps.DirectionsRequest });
+      directionsRenderer.current.setDirections({ routes: [], request: {} });
     }
   };
 
+  const handlePickupComplete = () => {
+    onPickupComplete();
+    setCurrentStep('delivery');
+    navigateToDelivery();
+  };
+
+  const handleDeliveryComplete = () => {
+    onDeliveryComplete();
+    stopNavigation();
+  };
+
   return (
-    <div className="space-y-4">
-      {/* Navigation Status */}
+    <div className="space-y-6">
+      {/* Navigation Controls */}
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
-            <Navigation className="w-5 h-5 text-teal-400" />
+            <Navigation className="w-5 h-5" />
             Driver Navigation
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Current Step */}
-          <div className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === 'pickup' ? 'bg-yellow-500' : 'bg-green-500'
-              }`}>
-                {currentStep === 'pickup' ? (
-                  <MapPin className="w-4 h-4 text-white" />
-                ) : (
-                  <CheckCircle className="w-4 h-4 text-white" />
-                )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <MapPin className="w-4 h-4" />
+                <span>Pickup Location</span>
               </div>
-              <div>
-                <p className="text-white font-medium">
-                  {currentStep === 'pickup' ? 'Go to Pickup Location' : 'Go to Delivery Location'}
-                </p>
-                <p className="text-gray-300 text-sm">
-                  {currentStep === 'pickup' ? pickupLocation : deliveryLocation}
-                </p>
-              </div>
+              <p className="text-white text-sm">{pickupLocation}</p>
+              <Button
+                onClick={navigateToPickup}
+                disabled={!currentLocation || isNavigating}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                size="sm"
+              >
+                Navigate to Pickup
+              </Button>
             </div>
-            <div className="text-right">
-              <p className="text-teal-400 font-semibold">
-                {distance.toFixed(1)} miles
-              </p>
-              <p className="text-gray-300 text-sm">
-                {Math.round(duration)} min
-              </p>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <MapPin className="w-4 h-4" />
+                <span>Delivery Location</span>
+              </div>
+              <p className="text-white text-sm">{deliveryLocation}</p>
+              <Button
+                onClick={navigateToDelivery}
+                disabled={!currentLocation || isNavigating}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                size="sm"
+              >
+                Navigate to Delivery
+              </Button>
             </div>
           </div>
 
-          {/* Navigation Controls */}
-          <div className="flex gap-2">
-            {!isNavigating ? (
-              <Button 
-                onClick={startNavigation}
-                className="bg-teal-600 hover:bg-teal-700 text-white flex-1"
-              >
-                <Navigation className="w-4 h-4 mr-2" />
-                Start Navigation
-              </Button>
-            ) : (
-              <Button 
+          {/* Navigation Status */}
+          {isNavigating && (
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-blue-300 mb-2">
+                <Navigation className="w-4 h-4" />
+                <span className="font-medium">Navigation Active</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>ETA: {Math.round(duration)} min</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Car className="w-4 h-4" />
+                  <span>Distance: {distance.toFixed(1)} km</span>
+                </div>
+              </div>
+              <Button
                 onClick={stopNavigation}
-                className="bg-red-600 hover:bg-red-700 text-white flex-1"
+                className="w-full mt-3 bg-red-600 hover:bg-red-700 text-white"
+                size="sm"
               >
                 Stop Navigation
               </Button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            {currentStep === 'pickup' ? (
-              <Button 
-                onClick={handlePickupComplete}
-                className="bg-green-600 hover:bg-green-700 text-white flex-1"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Mark Pickup Complete
-              </Button>
-            ) : (
-              <Button 
-                onClick={handleDeliveryComplete}
-                className="bg-green-600 hover:bg-green-700 text-white flex-1"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Mark Delivery Complete
-              </Button>
-            )}
+            <Button
+              onClick={handlePickupComplete}
+              disabled={currentStep !== 'pickup'}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Mark Pickup Complete
+            </Button>
+            <Button
+              onClick={handleDeliveryComplete}
+              disabled={currentStep !== 'delivery'}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <CheckCircle className="w-4 h-4 mr-2" />
+              Mark Delivery Complete
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Map Container */}
       <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-0">
-          <div 
-            ref={mapContainer} 
-            className="w-full h-96 rounded-lg"
-            style={{ minHeight: '400px' }}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Order Info */}
-      <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Car className="w-5 h-5 text-teal-400" />
-            Order #{orderId}
-          </CardTitle>
+          <CardTitle className="text-white">Navigation Map</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-300">Pickup:</span>
-              <span className="text-white">{pickupLocation}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Delivery:</span>
-              <span className="text-white">{deliveryLocation}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-300">Status:</span>
-              <span className={`font-semibold ${
-                currentStep === 'pickup' ? 'text-yellow-400' : 'text-green-400'
-              }`}>
-                {currentStep === 'pickup' ? 'En Route to Pickup' : 'En Route to Delivery'}
-              </span>
-            </div>
-          </div>
+          <div 
+            ref={mapContainer}
+            className="w-full h-96 bg-gray-700 rounded-lg"
+            style={{ minHeight: '400px' }}
+          />
         </CardContent>
       </Card>
     </div>
