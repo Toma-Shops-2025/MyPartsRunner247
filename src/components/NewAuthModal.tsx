@@ -70,7 +70,6 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
             full_name: fullName,
             phone,
             user_type: userType,
-            is_online: userType === 'driver',
             is_approved: userType === 'driver',
             status: userType === 'driver' ? 'active' : 'inactive',
             created_at: new Date().toISOString(),

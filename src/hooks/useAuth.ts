@@ -140,29 +140,16 @@ export const useAuth = () => {
         if (parsedUser.id === userId) {
           console.log('Using fallback user:', parsedUser);
           // Create a profile from fallback user
-          // Use smart detection for user type
+          // Use the user_type from the signup process (stored in user_metadata)
           let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
-          const email = parsedUser.email || 'unknown@example.com';
           
-          // Check if this is the specific customer email that should stay customer
-          if (email === 'tomababyshopsonline@gmail.com') {
-            userType = 'customer';
+          // First, try to get user_type from user_metadata (set during signup)
+          if (parsedUser.user_metadata?.user_type) {
+            userType = parsedUser.user_metadata.user_type;
+            console.log('Using user_type from signup metadata:', userType);
           }
-          // Check if email suggests driver (contains 'driver', 'taxi', etc.)
-          else if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
-            userType = 'driver';
-          }
-          // Check for your specific driver accounts
-          else if (email === 'tomashops578@gmail.com' || 
-                   email === 'tomavault@gmail.com' || 
-                   email === 'timandmarciaadkins@gmail.com' || 
-                   email === 'soberdrivertaxi@gmail.com' || 
-                   email === 'tomaadkins533@gmail.com') {
-            userType = 'driver';
-          }
-          // For other emails, try to preserve existing profile if available
+          // If no metadata, check for existing profile in localStorage
           else {
-            // Check if there's an existing profile in localStorage for this user
             const existingProfile = localStorage.getItem('mock_profile');
             if (existingProfile) {
               try {
@@ -214,29 +201,17 @@ export const useAuth = () => {
       
       console.log('Profile fetch timeout - creating fallback profile');
       
-      // Try to determine user type from email or existing data
+      // Try to determine user type from signup data or existing profile
       let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
       const email = user?.email || 'unknown@example.com';
       
-      // Check if this is the specific customer email that should stay customer
-      if (email === 'tomababyshopsonline@gmail.com') {
-        userType = 'customer';
+      // First, try to get user_type from user_metadata (set during signup)
+      if (user?.user_metadata?.user_type) {
+        userType = user.user_metadata.user_type;
+        console.log('Using user_type from signup metadata:', userType);
       }
-      // Check if email suggests driver (contains 'driver', 'taxi', etc.)
-      else if (email.includes('driver') || email.includes('taxi') || email.includes('courier')) {
-        userType = 'driver';
-      }
-      // Check for your specific driver accounts
-      else if (email === 'tomashops578@gmail.com' || 
-               email === 'tomavault@gmail.com' || 
-               email === 'timandmarciaadkins@gmail.com' || 
-               email === 'soberdrivertaxi@gmail.com' || 
-               email === 'tomaadkins533@gmail.com') {
-        userType = 'driver';
-      }
-      // For other emails, try to preserve existing profile if available
+      // If no metadata, check for existing profile in localStorage
       else {
-        // Check if there's an existing profile in localStorage for this user
         const existingProfile = localStorage.getItem('mock_profile');
         if (existingProfile) {
           try {
@@ -502,14 +477,28 @@ export const useAuth = () => {
       const { data: userData } = await supabase.auth.getUser();
       const userEmail = userData.user?.email || '';
       
-      // Determine user type based on email or metadata
+      // Determine user type from signup metadata first, then fallback to email patterns
       let userType = 'customer';
-      if (userEmail.includes('driver') || userEmail.includes('taxi')) {
-        userType = 'driver';
-      } else {
-        userType = userData.user?.user_metadata?.user_type || 
-                  userData.user?.user_metadata?.role || 
-                  'customer';
+      
+      // First priority: user_metadata from signup
+      if (userData.user?.user_metadata?.user_type) {
+        userType = userData.user.user_metadata.user_type;
+        console.log('Using user_type from signup metadata:', userType);
+      }
+      // Second priority: check for existing profile in localStorage
+      else {
+        const existingProfile = localStorage.getItem('mock_profile');
+        if (existingProfile) {
+          try {
+            const parsed = JSON.parse(existingProfile);
+            if (parsed.id === user.id && parsed.user_type) {
+              userType = parsed.user_type;
+              console.log('Using user_type from existing localStorage profile:', userType);
+            }
+          } catch (error) {
+            console.log('Could not parse existing profile, using default');
+          }
+        }
       }
       
       console.log('Creating profile with user type:', userType, 'for email:', userEmail);
