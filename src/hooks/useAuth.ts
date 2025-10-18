@@ -55,8 +55,7 @@ export const useAuth = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        if (!mounted || isProcessing) return;
-        isProcessing = true;
+        if (!mounted) return;
         
         console.log('Auth state change:', event, session?.user?.email);
         setSession(session);
@@ -64,12 +63,8 @@ export const useAuth = () => {
         
         if (session?.user) {
           setLoading(true);
-          // Only fetch profile if it's a new user or we don't have a profile yet
-          if (lastProcessedUserId !== session.user.id || !profile) {
-            await fetchProfile(session.user.id);
-          } else {
-            setLoading(false);
-          }
+          // Always fetch profile for authenticated users
+          await fetchProfile(session.user.id);
         } else {
           // Clear profile and localStorage when signing out
           setProfile(null);
@@ -77,8 +72,6 @@ export const useAuth = () => {
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
         }
-        
-        setTimeout(() => { isProcessing = false; }, 500); // Increased delay
       }
     );
 
@@ -112,9 +105,9 @@ export const useAuth = () => {
   };
 
   const performProfileFetch = async (userId: string) => {
-    // Check if user is signing out or no longer authenticated
-    if (isSigningOut || !user || !userId) {
-      console.log('User signing out or no longer authenticated, skipping profile fetch');
+    // Check if user exists and is authenticated
+    if (!user || !userId) {
+      console.log('No user or userId, skipping profile fetch');
       setLoading(false);
       return;
     }
