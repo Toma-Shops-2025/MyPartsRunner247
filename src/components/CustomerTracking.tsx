@@ -20,7 +20,7 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const googleApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const googleApiKey = 'AIzaSyBNIjxagh6NVm-NQz0lyUMlGAQJEkReJ7o';
     if (!googleApiKey) {
       console.error('Google Maps API key not found');
       return;
