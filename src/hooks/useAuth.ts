@@ -152,7 +152,7 @@ export const useAuth = () => {
       if (error && error.code !== 'PGRST116') {
         console.error('Profile fetch error:', error);
         console.log('Error details:', { code: error.code, message: error.message, status: error.status });
-        clearTimeout(profileTimeout);
+        // Timeout removed - no need to clear
         
         // Handle 406 error specifically - database access issue
         if (error.code === 'PGRST204' || error.message?.includes('406') || error.status === 406 || 
@@ -197,7 +197,7 @@ export const useAuth = () => {
         setLoading(false);
       } else if (data) {
         console.log('Profile found:', data);
-        clearTimeout(profileTimeout);
+        // Timeout removed - no need to clear
         setProfile(data);
         setLoading(false);
       } else {
@@ -206,19 +206,19 @@ export const useAuth = () => {
         try {
           console.log('Auto-creating profile for user:', userId);
           const profileData = await createProfileManually();
-          clearTimeout(profileTimeout);
+          // Timeout removed - no need to clear
           setProfile(profileData);
           setLoading(false);
         } catch (createError) {
           console.error('Failed to auto-create profile:', createError);
-          clearTimeout(profileTimeout);
+          // Timeout removed - no need to clear
           setProfile(null);
           setLoading(false);
         }
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      clearTimeout(profileTimeout);
+      // Timeout removed - no need to clear
       
       // Check for stored mock profile first
       const mockProfile = localStorage.getItem('mock_profile');
