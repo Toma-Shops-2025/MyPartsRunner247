@@ -105,9 +105,9 @@ export const useAuth = () => {
   };
 
   const performProfileFetch = async (userId: string) => {
-    // Check if user exists and is authenticated
-    if (!user || !userId) {
-      console.log('No user or userId, skipping profile fetch');
+    // Check if userId is provided
+    if (!userId) {
+      console.log('No userId provided, skipping profile fetch');
       setLoading(false);
       return;
     }
@@ -169,12 +169,13 @@ export const useAuth = () => {
           }
           
           // If no mock profile, create fallback
+          const currentUser = user || session?.user;
           const fallbackProfile = {
             id: userId,
-            email: user?.email || 'unknown@example.com',
-            full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
-            phone: user?.user_metadata?.phone || '',
-            user_type: (user?.email?.includes('driver') || user?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
+            email: currentUser?.email || 'unknown@example.com',
+            full_name: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'User',
+            phone: currentUser?.user_metadata?.phone || '',
+            user_type: (currentUser?.email?.includes('driver') || currentUser?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
             is_approved: false,
             status: 'inactive',
             created_at: new Date().toISOString(),
@@ -230,12 +231,13 @@ export const useAuth = () => {
       }
       
       // Create a fallback profile based on the user ID and email
-      const email = user?.email || 'unknown@example.com';
+      const currentUser = user || session?.user;
+      const email = currentUser?.email || 'unknown@example.com';
       let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
       
       // First, try to get user_type from user_metadata (set during signup)
-      if (user?.user_metadata?.user_type) {
-        userType = user.user_metadata.user_type;
+      if (currentUser?.user_metadata?.user_type) {
+        userType = currentUser.user_metadata.user_type;
         console.log('Using user_type from signup metadata in error fallback:', userType);
       }
       // If no metadata, check for existing profile in localStorage
@@ -257,8 +259,8 @@ export const useAuth = () => {
       const fallbackProfile = {
         id: userId,
         email: email,
-        full_name: user?.user_metadata?.full_name || user?.user_metadata?.name || 'User',
-        phone: user?.user_metadata?.phone || '',
+        full_name: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'User',
+        phone: currentUser?.user_metadata?.phone || '',
         user_type: userType,
         is_approved: userType === 'driver',
         status: userType === 'driver' ? 'active' : 'inactive',
