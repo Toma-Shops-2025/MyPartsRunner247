@@ -222,7 +222,7 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `url("/auth-modal-background.webp?v=${Date.now()}")`,
+            backgroundImage: `url("/auth-modal-background.png?v=${Date.now()}")`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
