@@ -48,7 +48,8 @@ class LocationTrackingService {
         onLocationUpdate(location);
       },
       (error) => {
-        console.error('Error getting initial location:', error);
+        console.warn('Geolocation not available:', error.message);
+        // Don't treat this as a critical error - location is optional
       },
       {
         enableHighAccuracy: true,
@@ -73,7 +74,8 @@ class LocationTrackingService {
         onLocationUpdate(location);
       },
       (error) => {
-        console.error('Error watching location:', error);
+        console.warn('Geolocation tracking unavailable:', error.message);
+        // Don't treat this as a critical error - location is optional
       },
       {
         enableHighAccuracy: true,
