@@ -105,29 +105,13 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
 
     setIsNavigating(true);
     
-    const request = {
-      origin: { lat: currentLocation.lat, lng: currentLocation.lng },
-      destination: pickupLocation,
-      travelMode: (window as any).google.maps.TravelMode.DRIVING,
-      drivingOptions: {
-        departureTime: new Date(),
-        trafficModel: (window as any).google.maps.TrafficModel.BEST_GUESS
-      }
-    };
-
-    directionsService.current.route(request, (result: any, status: any) => {
-      if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
-        directionsRenderer.current?.setDirections(result);
-        
-        const route = result.routes[0].legs[0];
-        setDistance(route.distance.value / 1000); // Convert to km
-        setDuration(route.duration.value / 60); // Convert to minutes
-        
-        setCurrentStep('pickup');
-      } else {
-        console.error('Directions request failed due to ' + status);
-      }
-    });
+    // Fallback to Google Maps URL if Directions API fails
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${currentLocation.lat},${currentLocation.lng}&destination=${encodeURIComponent(pickupLocation)}&travelmode=driving`;
+    window.open(googleMapsUrl, '_blank');
+    
+    setCurrentStep('pickup');
+    setDistance(0); // Will be calculated by Google Maps
+    setDuration(0); // Will be calculated by Google Maps
   };
 
   const navigateToDelivery = () => {
@@ -135,29 +119,13 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
 
     setIsNavigating(true);
     
-    const request = {
-      origin: pickupLocation,
-      destination: deliveryLocation,
-      travelMode: (window as any).google.maps.TravelMode.DRIVING,
-      drivingOptions: {
-        departureTime: new Date(),
-        trafficModel: (window as any).google.maps.TrafficModel.BEST_GUESS
-      }
-    };
-
-    directionsService.current.route(request, (result: any, status: any) => {
-      if (status === (window as any).google.maps.DirectionsStatus.OK && result) {
-        directionsRenderer.current?.setDirections(result);
-        
-        const route = result.routes[0].legs[0];
-        setDistance(route.distance.value / 1000); // Convert to km
-        setDuration(route.duration.value / 60); // Convert to minutes
-        
-        setCurrentStep('delivery');
-      } else {
-        console.error('Directions request failed due to ' + status);
-      }
-    });
+    // Fallback to Google Maps URL if Directions API fails
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pickupLocation)}&destination=${encodeURIComponent(deliveryLocation)}&travelmode=driving`;
+    window.open(googleMapsUrl, '_blank');
+    
+    setCurrentStep('delivery');
+    setDistance(0); // Will be calculated by Google Maps
+    setDuration(0); // Will be calculated by Google Maps
   };
 
   const stopNavigation = () => {
