@@ -35,32 +35,46 @@ exports.handler = async (event, context) => {
     }
 
     console.log('🔑 Google API key check:', googleApiKey ? 'Found' : 'Missing');
+    console.log('🔑 API key length:', googleApiKey ? googleApiKey.length : 0);
 
     // Use Google Distance Matrix API
     const distanceMatrixUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(pickupAddress)}&destinations=${encodeURIComponent(deliveryAddress)}&units=imperial&key=${googleApiKey}`;
     
     console.log('🚗 Calling Google Distance Matrix API...');
+    console.log('🔗 Full URL:', distanceMatrixUrl);
     
     const response = await fetch(distanceMatrixUrl);
     
     if (!response.ok) {
-      console.error('❌ Google API failed:', response.status);
+      console.error('❌ Google API failed:', response.status, response.statusText);
+      const errorText = await response.text();
+      console.error('❌ Error response body:', errorText);
       return {
         statusCode: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'Google Distance Matrix API failed', status: response.status })
+        body: JSON.stringify({ 
+          error: 'Google Distance Matrix API failed', 
+          status: response.status,
+          statusText: response.statusText,
+          details: errorText
+        })
       };
     }
 
     const data = await response.json();
-    console.log('📊 Google API response:', data);
+    console.log('📊 Google API response:', JSON.stringify(data, null, 2));
 
     if (data.status !== 'OK') {
       console.error('❌ Google API error:', data.status, data.error_message);
       return {
         statusCode: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: 'Google API error', details: data.error_message || data.status })
+        body: JSON.stringify({ 
+          error: 'Google API error', 
+          status: data.status,
+          details: data.error_message || data.status,
+          fullResponse: data
+        })
       };
     }
 
