@@ -65,7 +65,10 @@ export const useAuth = () => {
           setLoading(true);
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
+            console.log('Fetching profile for new user:', session.user.id);
             await fetchProfile(session.user.id);
+          } else {
+            console.log('Skipping profile fetch - already processed user:', session.user.id);
           }
         } else {
           // Clear profile and localStorage when signing out
@@ -111,6 +114,13 @@ export const useAuth = () => {
     // Check if userId is provided
     if (!userId) {
       console.log('No userId provided, skipping profile fetch');
+      setLoading(false);
+      return;
+    }
+    
+    // Check if we already have a profile for this user
+    if (profile && profile.id === userId) {
+      console.log('Profile already loaded for user:', userId, '- skipping fetch');
       setLoading(false);
       return;
     }
@@ -193,7 +203,7 @@ export const useAuth = () => {
         setProfile(null);
         setLoading(false);
       } else if (data) {
-        console.log('Profile found:', data);
+        console.log('Profile found for user:', userId, '-', data.email, data.user_type);
         // Timeout removed - no need to clear
         setProfile(data);
         setLoading(false);
