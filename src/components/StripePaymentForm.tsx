@@ -47,6 +47,13 @@ const PaymentForm: React.FC<{
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     
+    console.log('🚨 ORDER CREATION ATTEMPT - handleSubmit called', {
+      loading,
+      isSubmitting,
+      orderCreated,
+      timestamp: new Date().toISOString()
+    });
+    
     // Prevent multiple submissions
     if (loading || isSubmitting || orderCreated) {
       console.log('Payment already in progress or order already created, ignoring duplicate submission');
@@ -237,7 +244,7 @@ const PaymentForm: React.FC<{
       }
 
       if (confirmedPayment && confirmedPayment.status === 'succeeded') {
-        console.log('Payment succeeded! Creating order in database...');
+        console.log('🚨 PAYMENT SUCCEEDED - About to create order in database...');
         console.log('Order details:', {
           customerid: currentUser.id,
           pickupaddress: orderDetails.pickupAddress,
@@ -269,7 +276,7 @@ const PaymentForm: React.FC<{
         }
         
         // Create order in database with real payment info
-        console.log('Starting database insert...');
+        console.log('🚨 STARTING DATABASE INSERT - Creating order...');
         console.log('Order data being inserted:', {
           customer_id: currentUser.id,
           pickup_address: orderDetails.pickupAddress,
