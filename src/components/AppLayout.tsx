@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import NewHeader from './NewHeader';
 import HeroSection from './HeroSection';
@@ -19,6 +20,7 @@ import PaymentModal from './PaymentModal';
 import NewAuthModal from './NewAuthModal';
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
+  const navigate = useNavigate();
   const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
   const [showOrderTracker, setShowOrderTracker] = useState(false);
   const [showDriverRegistration, setShowDriverRegistration] = useState(false);
@@ -59,7 +61,7 @@ const AppLayout: React.FC = () => {
                   setShowDriverRegistration(true);
                 } else {
                   // Navigate to driver application page for unauthenticated users
-                  window.location.href = '/driver-application';
+                  navigate('/driver-application');
                 }
               }}
             />
@@ -82,7 +84,7 @@ const AppLayout: React.FC = () => {
                   setShowDriverRegistration(true);
                 } else {
                   // Navigate to driver application page for unauthenticated users
-                  window.location.href = '/driver-application';
+                  navigate('/driver-application');
                 }
               }}
             />
