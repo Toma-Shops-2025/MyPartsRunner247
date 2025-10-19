@@ -39,7 +39,7 @@ const AuthCallbackPage: React.FC = () => {
           // Redirect based on user type (from profile or metadata)
           const finalUserType = profile?.user_type || userType;
           if (finalUserType === 'driver') {
-            navigate('/driver-dashboard');
+            navigate('/driver-application');
           } else {
             navigate('/');
           }
