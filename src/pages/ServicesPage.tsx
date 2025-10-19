@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Package, Clock, MapPin, Shield } from 'lucide-react';
-import RequestPickupModal from '@/components/RequestPickupModal';
 
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();
-  const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
   
   const services = [
     {
@@ -98,7 +96,7 @@ const ServicesPage: React.FC = () => {
           <div className="flex justify-center">
             <Button 
               size="lg" 
-              onClick={() => setIsPickupModalOpen(true)}
+              onClick={() => navigate('/place-order')}
               className="bg-white text-teal-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold"
             >
               Request Pickup Now
@@ -108,11 +106,6 @@ const ServicesPage: React.FC = () => {
       </section>
 
       <Footer />
-      
-      <RequestPickupModal 
-        isOpen={isPickupModalOpen} 
-        onClose={() => setIsPickupModalOpen(false)} 
-      />
     </div>
   );
 };
