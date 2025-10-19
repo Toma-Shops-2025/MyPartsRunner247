@@ -40,9 +40,8 @@ const DriverApplicationPage: React.FC = () => {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/" replace />;
-  }
+  // Allow unauthenticated users to access the page
+  // They'll be prompted to sign up during the application process
 
   if (profile?.user_type === 'driver') {
     return <Navigate to="/driver-dashboard" replace />;
@@ -50,6 +49,13 @@ const DriverApplicationPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // If user is not authenticated, redirect to sign up
+    if (!user) {
+      alert('Please sign up or log in to submit your driver application.');
+      return;
+    }
+    
     setSubmitting(true);
     
     try {
@@ -130,6 +136,28 @@ const DriverApplicationPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-white mb-2">Driver Application</h1>
           <p className="text-gray-300">Apply to become a MyPartsRunner driver and start earning money delivering packages.</p>
         </div>
+
+        {/* Authentication Notice for Unauthenticated Users */}
+        {!user && (
+          <Card className="bg-yellow-900 border-yellow-700 mb-6">
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-3">
+                <div className="flex-shrink-0">
+                  <div className="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">!</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-yellow-100 mb-2">SIGN UP REQUIRED:</h3>
+                  <p className="text-yellow-200 text-sm leading-relaxed">
+                    You need to create an account to submit your driver application. 
+                    Please sign up or log in using the buttons in the header, then return to this page to complete your application.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Attention Notice */}
         <Card className="bg-blue-900 border-blue-700 mb-6">
