@@ -259,7 +259,7 @@ const PaymentForm: React.FC<{
           .eq('pickup_address', orderDetails.pickupAddress)
           .eq('delivery_address', orderDetails.deliveryAddress)
           .eq('status', 'pending')
-          .gte('created_at', new Date(Date.now() - 5 * 60 * 1000).toISOString()); // Last 5 minutes
+          .gte('created_at', new Date(Date.now() - 60000).toISOString()); // Last minute
         
         if (existingOrders && existingOrders.length > 0) {
           console.log('Duplicate order detected, using existing order:', existingOrders[0].id);

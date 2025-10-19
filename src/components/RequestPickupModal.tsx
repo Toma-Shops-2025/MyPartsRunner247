@@ -65,7 +65,26 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
     console.log('Form submission started');
     setIsSubmitting(true);
     setLoading(true);
+    
     try {
+      // Check for duplicate orders first
+      const { data: existingOrders } = await supabase
+        .from('orders')
+        .select('id')
+        .eq('customer_id', user.id)
+        .eq('pickup_address', formData.pickupAddress)
+        .eq('delivery_address', formData.deliveryAddress)
+        .eq('status', 'pending')
+        .gte('created_at', new Date(Date.now() - 60000).toISOString()); // Last minute
+      
+      if (existingOrders && existingOrders.length > 0) {
+        console.log('Duplicate order detected, using existing order:', existingOrders[0].id);
+        alert('You have already placed a similar order recently. Please wait before placing another order.');
+        setIsSubmitting(false);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('orders')
         .insert([
