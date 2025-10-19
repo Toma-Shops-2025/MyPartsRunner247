@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, ExternalLink, CreditCard } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/lib/supabase';
 
 interface DriverOnboardingProps {
   onComplete: () => void;
@@ -35,8 +36,21 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
         const data = await response.json();
         setOnboardingUrl(data.onboardingUrl);
         
-        // Store account ID for later use
+        // Store account ID in both localStorage and database
         localStorage.setItem('stripe_account_id', data.accountId);
+        
+        // Update database with Stripe account info
+        try {
+          await supabase
+            .from('profiles')
+            .update({ 
+              stripe_account_id: data.accountId,
+              stripe_connected: false // Will be set to true when onboarding is completed
+            })
+            .eq('id', user.id);
+        } catch (dbError) {
+          console.error('Error updating profile with Stripe account:', dbError);
+        }
       } else {
         const error = await response.json();
         console.error('Error creating account:', error);
@@ -56,18 +70,58 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
     }
   };
 
-  const handleCompleteOnboarding = () => {
+  const handleCompleteOnboarding = async () => {
     setIsConnected(true);
+    
+    // Update database to mark Stripe as connected
+    if (user) {
+      try {
+        await supabase
+          .from('profiles')
+          .update({ stripe_connected: true })
+          .eq('id', user.id);
+      } catch (error) {
+        console.error('Error updating Stripe connection status:', error);
+      }
+    }
+    
     onComplete();
   };
 
   // Check if driver already has Stripe account
   useEffect(() => {
-    const accountId = localStorage.getItem('stripe_account_id');
-    if (accountId) {
-      setIsConnected(true);
-    }
-  }, []);
+    const checkStripeStatus = async () => {
+      if (!user) return;
+      
+      // First check localStorage (for immediate feedback)
+      const accountId = localStorage.getItem('stripe_account_id');
+      if (accountId) {
+        setIsConnected(true);
+        return;
+      }
+      
+      // Then check database for persistent status
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('stripe_account_id, stripe_connected')
+          .eq('id', user.id)
+          .single();
+          
+        if (profile?.stripe_account_id || profile?.stripe_connected) {
+          setIsConnected(true);
+          // Update localStorage for consistency
+          if (profile.stripe_account_id) {
+            localStorage.setItem('stripe_account_id', profile.stripe_account_id);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking Stripe status:', error);
+      }
+    };
+    
+    checkStripeStatus();
+  }, [user]);
 
   if (isConnected) {
     return (
