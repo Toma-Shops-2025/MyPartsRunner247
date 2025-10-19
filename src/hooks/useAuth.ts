@@ -63,12 +63,15 @@ export const useAuth = () => {
         
         if (session?.user) {
           setLoading(true);
-          // Always fetch profile for authenticated users
-          await fetchProfile(session.user.id);
+          // Only fetch profile if we don't already have it for this user
+          if (lastProcessedUserId !== session.user.id) {
+            await fetchProfile(session.user.id);
+          }
         } else {
           // Clear profile and localStorage when signing out
           setProfile(null);
           setLoading(false);
+          setLastProcessedUserId(null);
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
         }
@@ -99,7 +102,7 @@ export const useAuth = () => {
     // Debounce profile fetches to prevent rapid-fire requests
     const timeout = setTimeout(async () => {
       await performProfileFetch(userId);
-    }, 200);
+    }, 500); // Increased debounce time
     
     setProfileFetchTimeout(timeout);
   };
