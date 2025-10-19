@@ -16,12 +16,14 @@ import OrderTracker from './OrderTracker';
 import AdminDashboard from './AdminDashboard';
 import DriverRegistration from './DriverRegistration';
 import PaymentModal from './PaymentModal';
+import NewAuthModal from './NewAuthModal';
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
   const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
   const [showOrderTracker, setShowOrderTracker] = useState(false);
   const [showDriverRegistration, setShowDriverRegistration] = useState(false);
   const [paymentModal, setPaymentModal] = useState({ isOpen: false, amount: 0, orderDetails: {} });
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   // For the main landing page, show the full homepage regardless of user type
   return (
@@ -45,8 +47,21 @@ const AppLayout: React.FC = () => {
         ) : (
           <>
             <HeroSection 
-              onRequestPickup={() => setIsPickupModalOpen(true)}
-              onBecomeDriver={() => setShowDriverRegistration(true)}
+              onRequestPickup={() => {
+                if (user) {
+                  setIsPickupModalOpen(true);
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              onBecomeDriver={() => {
+                if (user) {
+                  setShowDriverRegistration(true);
+                } else {
+                  // Navigate to driver application page for unauthenticated users
+                  window.location.href = '/driver-application';
+                }
+              }}
             />
             <ServicesSection />
             <HowItWorksSection />
@@ -54,7 +69,23 @@ const AppLayout: React.FC = () => {
             <StatsSection />
             <DriversSection />
             <TestimonialsSection />
-            <CTASection />
+            <CTASection 
+              onRequestPickup={() => {
+                if (user) {
+                  setIsPickupModalOpen(true);
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              onBecomeDriver={() => {
+                if (user) {
+                  setShowDriverRegistration(true);
+                } else {
+                  // Navigate to driver application page for unauthenticated users
+                  window.location.href = '/driver-application';
+                }
+              }}
+            />
           </>
         )}
       </main>
@@ -68,6 +99,15 @@ const AppLayout: React.FC = () => {
         onClose={() => setPaymentModal({ isOpen: false, amount: 0, orderDetails: {} })}
         amount={paymentModal.amount}
         orderDetails={paymentModal.orderDetails as any}
+      />
+      <NewAuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => {
+          setIsAuthModalOpen(false);
+          // After successful auth, open the pickup modal
+          setIsPickupModalOpen(true);
+        }}
       />
     </div>
   );

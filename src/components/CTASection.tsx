@@ -2,7 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Smartphone, Truck } from 'lucide-react';
 
-const CTASection: React.FC = () => {
+interface CTASectionProps {
+  onRequestPickup?: () => void;
+  onBecomeDriver?: () => void;
+}
+
+const CTASection: React.FC<CTASectionProps> = ({ onRequestPickup, onBecomeDriver }) => {
   const navigate = useNavigate();
   return (
     <section className="py-20 bg-gray-900">
@@ -42,7 +47,7 @@ const CTASection: React.FC = () => {
               </li>
             </ul>
             <button 
-              onClick={() => navigate('/services')}
+              onClick={onRequestPickup || (() => navigate('/services'))}
               className="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white py-4 rounded-full font-semibold hover:from-teal-600 hover:to-blue-700 transition-all transform hover:scale-105 shadow-lg"
             >
               Request Pickup Now
@@ -74,7 +79,7 @@ const CTASection: React.FC = () => {
               </li>
             </ul>
             <button 
-              onClick={() => navigate('/driver-application')}
+              onClick={onBecomeDriver || (() => navigate('/driver-application'))}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg"
             >
               Become a Driver
