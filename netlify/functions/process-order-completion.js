@@ -48,12 +48,15 @@ exports.handler = async (event, context) => {
       throw new Error('Driver not found');
     }
 
-    // Calculate driver payment (70% of order total)
+    // Calculate payment split after Stripe fees
     const orderTotal = parseFloat(order.total) || 0;
-    const driverPayment = orderTotal * 0.70; // 70% commission
-    const platformFee = orderTotal * 0.30; // 30% platform fee
+    const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ processing fee
+    const netAmount = orderTotal - stripeFee;
+    const driverPayment = netAmount * 0.70; // 70% of net amount
+    const platformFee = netAmount * 0.30; // 30% of net amount
 
-    console.log(`Order total: $${orderTotal}, Driver payment: $${driverPayment}, Platform fee: $${platformFee}`);
+    console.log(`Order total: $${orderTotal}, Stripe fee: $${stripeFee.toFixed(2)}, Net amount: $${netAmount.toFixed(2)}`);
+    console.log(`Driver payment: $${driverPayment.toFixed(2)}, Platform fee: $${platformFee.toFixed(2)}`);
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
@@ -118,6 +121,9 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: true,
           transferId: transfer.id,
+          orderTotal: orderTotal,
+          stripeFee: stripeFee,
+          netAmount: netAmount,
           driverPayment: driverPayment,
           platformFee: platformFee,
           message: 'Driver payment processed successfully'
