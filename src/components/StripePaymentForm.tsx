@@ -62,6 +62,12 @@ const PaymentForm: React.FC<{
       return;
     }
     
+    // Additional safety check - if order is already created, don't proceed
+    if (orderCreated) {
+      console.log('Order already created, preventing duplicate submission');
+      return;
+    }
+    
     setSubmissionLock(true);
     setIsSubmitting(true);
     
@@ -175,6 +181,12 @@ const PaymentForm: React.FC<{
         // Handle mock payment intent for development
         console.log('Using mock payment for development');
         
+        // Prevent duplicate execution
+        if (orderCreated) {
+          console.log('Order already created, skipping mock payment processing');
+          return;
+        }
+        
         // Simulate a brief processing delay
         await new Promise(resolve => setTimeout(resolve, 1000));
         
@@ -226,6 +238,12 @@ const PaymentForm: React.FC<{
       // Double-check that we're not already processing a payment
       if (loading) {
         console.log('Payment already in progress, skipping Stripe confirmation');
+        return;
+      }
+      
+      // Prevent duplicate execution
+      if (orderCreated) {
+        console.log('Order already created, skipping real payment processing');
         return;
       }
       
