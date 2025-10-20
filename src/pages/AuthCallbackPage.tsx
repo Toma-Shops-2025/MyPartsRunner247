@@ -20,7 +20,7 @@ const AuthCallbackPage: React.FC = () => {
           // User is authenticated, check their profile to determine redirect
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('user_type')
+            .select('user_type, is_approved')
             .eq('id', data.session.user.id)
             .single();
 
@@ -39,7 +39,12 @@ const AuthCallbackPage: React.FC = () => {
           // Redirect based on user type (from profile or metadata)
           const finalUserType = profile?.user_type || userType;
           if (finalUserType === 'driver') {
-            navigate('/driver-application');
+            // Check if driver is already approved
+            if (profile?.is_approved) {
+              navigate('/driver-dashboard');
+            } else {
+              navigate('/driver-application');
+            }
           } else {
             navigate('/');
           }
