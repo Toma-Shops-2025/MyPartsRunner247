@@ -35,6 +35,7 @@ const PaymentForm: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderCreated, setOrderCreated] = useState(false);
+  const [submissionLock, setSubmissionLock] = useState(false);
   
   console.log('PaymentForm auth state:', {
     user: !!user,
@@ -51,15 +52,17 @@ const PaymentForm: React.FC<{
       loading,
       isSubmitting,
       orderCreated,
+      submissionLock,
       timestamp: new Date().toISOString()
     });
     
-    // Prevent multiple submissions
-    if (loading || isSubmitting || orderCreated) {
+    // Prevent multiple submissions with additional lock
+    if (loading || isSubmitting || orderCreated || submissionLock) {
       console.log('Payment already in progress or order already created, ignoring duplicate submission');
       return;
     }
     
+    setSubmissionLock(true);
     setIsSubmitting(true);
     
     console.log('Payment form submitted!', {
@@ -415,6 +418,7 @@ const PaymentForm: React.FC<{
     } finally {
       setLoading(false);
       setIsSubmitting(false);
+      setSubmissionLock(false);
     }
   };
 
@@ -462,7 +466,6 @@ const PaymentForm: React.FC<{
         type="submit" 
         disabled={!stripe || loading || isSubmitting}
         className="w-full"
-        onClick={() => console.log('Payment button clicked!', { stripe: !!stripe, loading, isSubmitting, amount })}
       >
         {loading || isSubmitting ? 'Processing Payment...' : `Pay $${amount.toFixed(2)}`}
       </Button>
