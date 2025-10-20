@@ -298,6 +298,26 @@ const DriverApplicationPage: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Transportation Method */}
+          <Card className="bg-gray-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Transportation Method</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="transportation_type" className="text-white">What will you be using to make deliveries if not using a vehicle</Label>
+                <Textarea 
+                  id="transportation_type" 
+                  value={applicationData.transportation_type}
+                  onChange={(e) => setApplicationData({...applicationData, transportation_type: e.target.value})}
+                  className="bg-gray-700 border-gray-600 text-white"
+                  rows={3}
+                  placeholder="Please describe your delivery method (e.g., Bicycle, Walking, Motorcycle, etc.)"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Vehicle Information */}
           <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
@@ -438,17 +458,6 @@ const DriverApplicationPage: React.FC = () => {
                   className="bg-gray-700 border-gray-600 text-white"
                   rows={3}
                   placeholder="Tell us why you'd like to join our driver team..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="transportation_type" className="text-white">What type of transportation will you be using for deliveries?</Label>
-                <Textarea 
-                  id="transportation_type" 
-                  value={applicationData.transportation_type}
-                  onChange={(e) => setApplicationData({...applicationData, transportation_type: e.target.value})}
-                  className="bg-gray-700 border-gray-600 text-white"
-                  rows={3}
-                  placeholder="Please describe your delivery method (e.g., Car - Honda Civic 2020, Motorcycle - Yamaha R3, Bicycle, Walking, etc.)"
                 />
               </div>
             </CardContent>
