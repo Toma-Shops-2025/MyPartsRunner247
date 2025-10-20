@@ -43,7 +43,8 @@ const DriverApplicationPage: React.FC = () => {
   // Allow unauthenticated users to access the page
   // They'll be prompted to sign up during the application process
 
-  if (profile?.user_type === 'driver') {
+  // Check if driver has already completed their application
+  if (profile?.user_type === 'driver' && profile?.is_approved) {
     return <Navigate to="/driver-dashboard" replace />;
   }
 
@@ -62,7 +63,7 @@ const DriverApplicationPage: React.FC = () => {
       console.log('Submitting driver application for user:', user?.id);
       console.log('Current profile:', profile);
       
-      // First, ensure profile exists, then update user type
+      // First, ensure profile exists, then update user type and mark as approved
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
@@ -70,7 +71,9 @@ const DriverApplicationPage: React.FC = () => {
           user_type: 'driver',
           full_name: applicationData.full_name,
           phone: applicationData.phone,
-          email: user?.email
+          email: user?.email,
+          is_approved: true,
+          status: 'active'
         });
 
       if (profileError) {
