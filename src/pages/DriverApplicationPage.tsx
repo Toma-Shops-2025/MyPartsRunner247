@@ -51,6 +51,12 @@ const DriverApplicationPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // If authentication is still loading, wait
+    if (loading) {
+      alert('Please wait while we verify your account...');
+      return;
+    }
+    
     // If user is not authenticated, redirect to sign up
     if (!user) {
       alert('Please sign up or log in to submit your driver application.');
@@ -467,9 +473,9 @@ const DriverApplicationPage: React.FC = () => {
             <Button 
               type="submit" 
               className="bg-teal-600 hover:bg-teal-700 text-white"
-              disabled={submitting}
+              disabled={submitting || loading}
             >
-              {submitting ? 'Submitting Application...' : 'Submit Application'}
+              {loading ? 'Loading...' : submitting ? 'Submitting Application...' : 'Submit Application'}
             </Button>
           </div>
         </form>
