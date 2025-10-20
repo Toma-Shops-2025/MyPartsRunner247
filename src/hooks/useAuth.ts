@@ -194,6 +194,13 @@ export const useAuth = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           };
+          
+          console.log('🔍 DATABASE ACCESS ISSUE FALLBACK PROFILE:', {
+            userId,
+            userType: fallbackProfile.user_type,
+            isApproved: fallbackProfile.is_approved,
+            email: fallbackProfile.email
+          });
           setProfile(fallbackProfile);
           setLoading(false);
           return;
@@ -280,6 +287,13 @@ export const useAuth = () => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
+      
+      console.log('🔍 FALLBACK PROFILE CREATED:', {
+        userId,
+        userType,
+        isApproved: fallbackProfile.is_approved,
+        email: fallbackProfile.email
+      });
       
       // Store the fallback profile in localStorage to prevent repeated database calls
       localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));

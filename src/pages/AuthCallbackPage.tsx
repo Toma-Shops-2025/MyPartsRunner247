@@ -29,6 +29,15 @@ const AuthCallbackPage: React.FC = () => {
           const userType = data.session.user?.user_metadata?.user_type || 
                           data.session.user?.user_metadata?.role;
           
+          console.log('🔍 AUTH CALLBACK DEBUG:', {
+            userId: data.session.user.id,
+            userEmail: data.session.user.email,
+            userType,
+            profile,
+            profileError,
+            userMetadata: data.session.user.user_metadata
+          });
+          
           if (profileError && !userType) {
             console.error('Profile fetch error:', profileError);
             // If we can't get profile and no metadata, redirect to home
@@ -38,14 +47,24 @@ const AuthCallbackPage: React.FC = () => {
 
           // Redirect based on user type (from profile or metadata)
           const finalUserType = profile?.user_type || userType;
+          console.log('🔍 FINAL ROUTING DECISION:', {
+            finalUserType,
+            isApproved: profile?.is_approved,
+            willGoToDashboard: finalUserType === 'driver' && profile?.is_approved,
+            willGoToApplication: finalUserType === 'driver' && !profile?.is_approved
+          });
+          
           if (finalUserType === 'driver') {
             // Check if driver is already approved
             if (profile?.is_approved) {
+              console.log('🚗 Redirecting approved driver to dashboard');
               navigate('/driver-dashboard');
             } else {
+              console.log('📝 Redirecting unapproved driver to application');
               navigate('/driver-application');
             }
           } else {
+            console.log('🏠 Redirecting non-driver to home');
             navigate('/');
           }
         } else {
