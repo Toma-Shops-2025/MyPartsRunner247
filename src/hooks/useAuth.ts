@@ -275,8 +275,8 @@ export const useAuth = () => {
         full_name: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'User',
         phone: currentUser?.user_metadata?.phone || '',
         user_type: userType,
-        is_approved: userType === 'driver',
-        status: userType === 'driver' ? 'active' : 'inactive',
+        is_approved: false, // New drivers should not be auto-approved
+        status: userType === 'driver' ? 'inactive' : 'inactive',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
