@@ -410,7 +410,7 @@ export const useAuth = () => {
           phone: userData.user?.user_metadata?.phone || '',
           user_type: userType,
           status: userType === 'driver' ? 'active' : 'inactive',
-          is_approved: userType === 'driver' ? true : false
+          is_approved: false
         })
         .select()
         .single();
@@ -503,8 +503,8 @@ export const useAuth = () => {
       full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
       phone: user.user_metadata?.phone || '',
       user_type: 'driver' as const,
-      is_approved: true,
-      status: 'active',
+      is_approved: false,
+      status: 'inactive',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
@@ -526,8 +526,8 @@ export const useAuth = () => {
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
         phone: user.user_metadata?.phone || '',
         user_type: 'driver' as const,
-        is_approved: true,
-        status: 'active',
+        is_approved: false,
+        status: 'inactive',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
