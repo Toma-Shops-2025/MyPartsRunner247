@@ -500,9 +500,11 @@ const NewDriverDashboardPage: React.FC = () => {
 
                                       if (photoError) {
                                         console.error('Error saving photo:', photoError);
-                                        alert('Photo saved but delivery not marked. Please try again.');
+                                        alert('Failed to save delivery photo. Please try again.');
                                         return;
                                       }
+                                      
+                                      console.log('Photo saved successfully for order:', order.id);
 
                                       // Use phone number from order placement
                                       const customerPhone = order.contact_phone || '502-555-0123';
@@ -519,9 +521,11 @@ const NewDriverDashboardPage: React.FC = () => {
 
                                       if (error) {
                                         console.error('Error marking delivered:', error);
-                                        alert('Photo saved but delivery not marked. Please try again.');
+                                        alert('Photo saved but failed to mark delivery as completed. Please try again.');
                                         return;
                                       }
+                                      
+                                      console.log('Order marked as delivered:', order.id);
 
                                       // Process automatic driver payment
                                       try {
