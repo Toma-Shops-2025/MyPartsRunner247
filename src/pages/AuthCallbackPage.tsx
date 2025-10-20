@@ -38,6 +38,17 @@ const AuthCallbackPage: React.FC = () => {
             userMetadata: data.session.user.user_metadata
           });
           
+          // Additional debug: Check if profile exists and its approval status
+          if (profile) {
+            console.log('🔍 PROFILE DETAILS:', {
+              id: profile.id,
+              user_type: profile.user_type,
+              is_approved: profile.is_approved,
+              status: profile.status,
+              email: profile.email
+            });
+          }
+          
           if (profileError && !userType) {
             console.error('Profile fetch error:', profileError);
             // If we can't get profile and no metadata, redirect to home
