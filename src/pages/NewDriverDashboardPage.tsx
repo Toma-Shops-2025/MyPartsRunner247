@@ -509,29 +509,29 @@ const NewDriverDashboardPage: React.FC = () => {
                                       // Use phone number from order placement
                                       const customerPhone = order.contact_phone || '502-555-0123';
                                       
-                                      // Send photo to customer via SMS/MMS
+                                      // Send photo to customer via EMAIL (FREE!)
                                       try {
-                                        const photoResponse = await fetch('/.netlify/functions/send-delivery-photo', {
+                                        const emailResponse = await fetch('/.netlify/functions/send-delivery-email', {
                                           method: 'POST',
                                           headers: {
                                             'Content-Type': 'application/json',
                                           },
                                           body: JSON.stringify({
                                             orderId: order.id,
-                                            customerPhone: customerPhone,
+                                            customerEmail: order.customer_email || 'customer@example.com',
                                             photoData: base64Image,
                                             driverName: profile?.full_name || 'Driver'
                                           })
                                         });
 
-                                        if (photoResponse.ok) {
-                                          console.log('Photo sent to customer successfully!');
+                                        if (emailResponse.ok) {
+                                          console.log('Delivery email sent to customer successfully!');
                                         } else {
-                                          console.log('Failed to send photo to customer, but continuing...');
+                                          console.log('Failed to send email to customer, but continuing...');
                                         }
-                                      } catch (photoError) {
-                                        console.error('Error sending photo to customer:', photoError);
-                                        // Don't fail the whole process if photo sending fails
+                                      } catch (emailError) {
+                                        console.error('Error sending email to customer:', emailError);
+                                        // Don't fail the whole process if email sending fails
                                       }
                                       
                                       const { error } = await supabase
