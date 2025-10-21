@@ -1,94 +1,112 @@
-const CACHE_NAME = `mypartsrunner-v3-${Date.now()}`;
+// Service Worker for FREE Push Notifications
+// ===========================================
+
+const CACHE_NAME = 'mypartsrunner-v1';
 const urlsToCache = [
   '/',
-  '/manifest.json'
+  '/static/js/bundle.js',
+  '/static/css/main.css',
+  '/icon-192x192.png',
+  '/icon-512x512.png'
 ];
 
-self.addEventListener('install', (event) => {
+// Install event
+self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting())
+      .then(function(cache) {
+        return cache.addAll(urlsToCache);
+      })
   );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+// Fetch event
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.match(event.request)
+      .then(function(response) {
+        // Return cached version or fetch from network
+        return response || fetch(event.request);
+      }
+    )
   );
 });
 
-self.addEventListener('fetch', (event) => {
-  // Skip caching for most dynamic content
-  if (event.request.url.includes('/api/') ||
-      event.request.url.includes('?v=') ||
-      event.request.url.includes('?t=') ||
-      event.request.url.includes('index-') ||
-      event.request.url.includes('vendor-') ||
-      event.request.url.includes('supabase-') ||
-      event.request.url.includes('netlify') ||
-      event.request.url.includes('supabase.co')) {
-    return fetch(event.request);
+// Push event - Handle incoming push notifications
+self.addEventListener('push', function(event) {
+  console.log('Push event received:', event);
+
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      data = { title: 'MyPartsRunner', body: event.data.text() };
+    }
   }
 
-  // Only cache static assets like images, fonts, etc.
-  if (event.request.url.includes('.png') || 
-      event.request.url.includes('.jpg') || 
-      event.request.url.includes('.jpeg') || 
-      event.request.url.includes('.gif') || 
-      event.request.url.includes('.svg') || 
-      event.request.url.includes('.ico') ||
-      event.request.url.includes('.woff') ||
-      event.request.url.includes('.woff2') ||
-      event.request.url.includes('.ttf')) {
-    event.respondWith(
-      caches.match(event.request)
-        .then((response) => {
-          if (response) {
-            return response;
-          }
-          return fetch(event.request);
-        })
-    );
-  } else {
-    // For everything else, just fetch without caching
-    return fetch(event.request);
-  }
-});
-
-self.addEventListener('push', (event) => {
   const options = {
-    body: event.data ? event.data.text() : 'New delivery update!',
-    icon: 'https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png',
-    badge: 'https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png',
+    body: data.body || 'You have a new notification',
+    icon: data.icon || '/icon-192x192.png',
+    badge: data.badge || '/badge-72x72.png',
     vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
+    data: data.data || {},
+    actions: data.actions || [
       {
-        action: 'explore',
-        title: 'View Details',
-        icon: 'https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png'
+        action: 'view',
+        title: 'View',
+        icon: '/checkmark.png'
       },
       {
         action: 'close',
         title: 'Close',
-        icon: 'https://d64gsuwffb70l.cloudfront.net/682bb5704b7430be07455fed_1757470893428_bcb25c1b.png'
+        icon: '/xmark.png'
       }
-    ]
+    ],
+    requireInteraction: data.requireInteraction || false,
+    silent: data.silent || false
   };
 
   event.waitUntil(
-    self.registration.showNotification('MyPartsRunner', options)
+    self.registration.showNotification(data.title || 'MyPartsRunner', options)
   );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', function(event) {
+  console.log('Notification clicked:', event);
+
+  event.notification.close();
+
+  if (event.action === 'view') {
+    // Open the app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  } else if (event.action === 'close') {
+    // Just close the notification
+    return;
+  } else {
+    // Default action - open the app
+    event.waitUntil(
+      clients.openWindow('/')
+    );
+  }
+});
+
+// Background sync for offline functionality
+self.addEventListener('sync', function(event) {
+  if (event.tag === 'background-sync') {
+    event.waitUntil(
+      // Handle background sync
+      console.log('Background sync triggered')
+    );
+  }
+});
+
+// Message event for communication with main thread
+self.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
