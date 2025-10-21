@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 
 const MyOrdersPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -170,7 +171,11 @@ const MyOrdersPage: React.FC = () => {
 
                 <div className="mt-4 flex justify-end space-x-2">
                   {(order.status === 'in_transit' || order.status === 'picked_up') && (
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/track/${order.id}`)}
+                    >
                       <Clock className="mr-2 h-4 w-4" />
                       Track Order
                     </Button>
