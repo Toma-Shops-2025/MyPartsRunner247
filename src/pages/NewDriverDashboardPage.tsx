@@ -580,7 +580,7 @@ const NewDriverDashboardPage: React.FC = () => {
                                         alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
                                       }
 
-                                      window.open(smsUrl, '_blank');
+                                      // Email sent automatically - no need for SMS
                                       await fetchDriverData();
                                     };
                                     reader.readAsDataURL(file);
