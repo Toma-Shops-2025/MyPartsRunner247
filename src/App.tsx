@@ -24,6 +24,7 @@ import UpdateUserTypePage from "./pages/UpdateUserTypePage";
 import DriverApplicationPage from "./pages/DriverApplicationPage";
 import TestDriverPage from "./pages/TestDriverPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
+import PhotoViewerPage from "./pages/PhotoViewerPage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/update-user-type" element={<UpdateUserTypePage />} />
             <Route path="/driver-application" element={<DriverApplicationPage />} />
             <Route path="/track/:orderId" element={<CustomerTrackingPage />} />
+            <Route path="/photo-viewer" element={<PhotoViewerPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
