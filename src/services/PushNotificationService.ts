@@ -1,7 +1,7 @@
 // FREE Push Notification Service using Web Push API
 // ================================================
 
-interface PushSubscription {
+interface CustomPushSubscription {
   endpoint: string;
   keys: {
     p256dh: string;
@@ -15,11 +15,6 @@ interface NotificationPayload {
   icon?: string;
   badge?: string;
   data?: any;
-  actions?: Array<{
-    action: string;
-    title: string;
-    icon?: string;
-  }>;
 }
 
 class PushNotificationService {
@@ -47,7 +42,7 @@ class PushNotificationService {
   }
 
   // Subscribe to push notifications
-  async subscribe(): Promise<PushSubscription | null> {
+  async subscribe(): Promise<CustomPushSubscription | null> {
     if (!this.isSupported) {
       console.warn('Push notifications not supported');
       return null;
@@ -61,13 +56,22 @@ class PushNotificationService {
       // Subscribe to push notifications
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+        applicationServerKey: this.vapidPublicKey
       });
 
-      // Save subscription to database
-      await this.saveSubscription(subscription);
+      // Convert to our custom interface
+      const customSubscription: CustomPushSubscription = {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
+          auth: this.arrayBufferToBase64(subscription.getKey('auth')!)
+        }
+      };
 
-      return subscription;
+      // Save subscription to database
+      await this.saveSubscription(customSubscription);
+
+      return customSubscription;
     } catch (error) {
       console.error('Error subscribing to push notifications:', error);
       return null;
@@ -82,7 +86,14 @@ class PushNotificationService {
         const subscription = await registration.pushManager.getSubscription();
         if (subscription) {
           await subscription.unsubscribe();
-          await this.deleteSubscription(subscription);
+          const customSubscription: CustomPushSubscription = {
+            endpoint: subscription.endpoint,
+            keys: {
+              p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
+              auth: this.arrayBufferToBase64(subscription.getKey('auth')!)
+            }
+          };
+          await this.deleteSubscription(customSubscription);
           return true;
         }
       }
@@ -97,13 +108,14 @@ class PushNotificationService {
   async sendNotification(payload: NotificationPayload): Promise<void> {
     try {
       if (Notification.permission === 'granted') {
-        const notification = new Notification(payload.title, {
+        const notificationOptions: NotificationOptions = {
           body: payload.body,
           icon: payload.icon || '/icon-192x192.png',
           badge: payload.badge || '/badge-72x72.png',
-          data: payload.data,
-          actions: payload.actions
-        });
+          data: payload.data
+        };
+
+        const notification = new Notification(payload.title, notificationOptions);
 
         // Auto-close after 5 seconds
         setTimeout(() => {
@@ -116,7 +128,7 @@ class PushNotificationService {
   }
 
   // Save subscription to database
-  private async saveSubscription(subscription: PushSubscription): Promise<void> {
+  private async saveSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
       const response = await fetch('/.netlify/functions/save-push-subscription', {
         method: 'POST',
@@ -138,7 +150,7 @@ class PushNotificationService {
   }
 
   // Delete subscription from database
-  private async deleteSubscription(subscription: PushSubscription): Promise<void> {
+  private async deleteSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
       const response = await fetch('/.netlify/functions/delete-push-subscription', {
         method: 'POST',
@@ -179,6 +191,16 @@ class PushNotificationService {
       outputArray[i] = rawData.charCodeAt(i);
     }
     return outputArray;
+  }
+
+  // Convert ArrayBuffer to base64
+  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
   }
 }
 
