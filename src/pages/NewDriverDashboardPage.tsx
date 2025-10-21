@@ -508,8 +508,31 @@ const NewDriverDashboardPage: React.FC = () => {
 
                                       // Use phone number from order placement
                                       const customerPhone = order.contact_phone || '502-555-0123';
-                                      const smsMessage = `Your delivery has been completed! 📦 Photo proof attached. Order #${order.id}`;
-                                      const smsUrl = `sms:${customerPhone}?body=${encodeURIComponent(smsMessage)}`;
+                                      
+                                      // Send photo to customer via SMS/MMS
+                                      try {
+                                        const photoResponse = await fetch('/.netlify/functions/send-delivery-photo', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: JSON.stringify({
+                                            orderId: order.id,
+                                            customerPhone: customerPhone,
+                                            photoData: base64Image,
+                                            driverName: profile?.full_name || 'Driver'
+                                          })
+                                        });
+
+                                        if (photoResponse.ok) {
+                                          console.log('Photo sent to customer successfully!');
+                                        } else {
+                                          console.log('Failed to send photo to customer, but continuing...');
+                                        }
+                                      } catch (photoError) {
+                                        console.error('Error sending photo to customer:', photoError);
+                                        // Don't fail the whole process if photo sending fails
+                                      }
                                       
                                       const { error } = await supabase
                                         .from('orders')
