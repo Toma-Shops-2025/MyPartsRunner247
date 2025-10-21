@@ -146,8 +146,12 @@ const NewDriverDashboardPage: React.FC = () => {
         console.log('Order created_at:', availableOrdersData[0].created_at);
       }
 
-      // Calculate earnings from completed orders
-      const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
+      // Calculate earnings from completed orders (including tips)
+      const totalEarnings = completedOrders?.reduce((sum, order) => {
+        const baseAmount = parseFloat(order.total || 0) - parseFloat(order.tip_amount || 0);
+        const tipAmount = parseFloat(order.tip_amount || 0);
+        return sum + baseAmount + tipAmount; // Driver gets full amount including tips
+      }, 0) || 0;
       const completedDeliveries = completedOrders?.length || 0;
       const activeDeliveries = activeOrdersData?.length || 0;
 
@@ -394,6 +398,11 @@ const NewDriverDashboardPage: React.FC = () => {
                           <span>Customer: {order.customer_id}</span>
                           <span>•</span>
                           <span>Total: ${order.total}</span>
+                          {order.tip_amount > 0 && (
+                            <span className="text-pink-400 font-semibold">
+                              💝 Tip: ${order.tip_amount}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="mt-4 space-y-2">
@@ -703,7 +712,14 @@ const NewDriverDashboardPage: React.FC = () => {
                         </div>
                         <div className="flex justify-between">
                           <span>Status: {order.status}</span>
-                          <span className="font-bold text-green-400">Total: ${order.total}</span>
+                          <div className="text-right">
+                            <span className="font-bold text-green-400">Total: ${order.total}</span>
+                            {order.tip_amount > 0 && (
+                              <div className="text-pink-400 text-sm">
+                                💝 Tip: ${order.tip_amount}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-2">

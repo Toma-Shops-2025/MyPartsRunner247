@@ -11,6 +11,8 @@ const EarningsPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
   const [earningsData, setEarningsData] = useState({
     totalEarnings: 0,
+    totalTips: 0,
+    totalBaseEarnings: 0,
     totalTrips: 0,
     totalHours: 0,
     avgPerHour: 0,
@@ -41,8 +43,13 @@ const EarningsPage: React.FC = () => {
         return;
       }
 
-      // Calculate earnings
-      const totalEarnings = completedOrders?.reduce((sum, order) => sum + parseFloat(order.total || 0), 0) || 0;
+      // Calculate earnings with tip breakdown
+      const totalTips = completedOrders?.reduce((sum, order) => sum + parseFloat(order.tip_amount || 0), 0) || 0;
+      const totalBaseEarnings = completedOrders?.reduce((sum, order) => {
+        const baseAmount = parseFloat(order.total || 0) - parseFloat(order.tip_amount || 0);
+        return sum + baseAmount;
+      }, 0) || 0;
+      const totalEarnings = totalBaseEarnings + totalTips;
       const totalTrips = completedOrders?.length || 0;
       
       // Estimate hours worked (assuming 30 minutes per delivery on average)
@@ -74,6 +81,8 @@ const EarningsPage: React.FC = () => {
 
       setEarningsData({
         totalEarnings,
+        totalTips,
+        totalBaseEarnings,
         totalTrips,
         totalHours,
         avgPerHour,
@@ -151,6 +160,29 @@ const EarningsPage: React.FC = () => {
                 <div className="text-2xl font-bold">${earningsData.avgPerHour.toFixed(2)}</div>
                 <p className="text-xs text-muted-foreground">Hourly rate</p>
               </CardContent>
+          </Card>
+        </div>
+
+        {/* Tip Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-green-600">Base Earnings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-600">${earningsData.totalBaseEarnings.toFixed(2)}</div>
+              <p className="text-sm text-gray-500">From delivery fees</p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-pink-600">Tips Received</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-pink-600">${earningsData.totalTips.toFixed(2)}</div>
+              <p className="text-sm text-gray-500">From customer tips</p>
+            </CardContent>
           </Card>
         </div>
 

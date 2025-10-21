@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import TipSelector from '@/components/TipSelector';
 import { CreditCard, Lock } from 'lucide-react';
 
 interface PaymentModalProps {
@@ -38,6 +39,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     cvv: '',
     cardholderName: ''
   });
+  const [tipAmount, setTipAmount] = useState<number>(0);
+  const [tipType, setTipType] = useState<string>('none');
 
   if (!isOpen) return null;
 
@@ -56,6 +59,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     setLoading(true);
     try {
       // Create order in database directly (simplified for demo)
+      const totalAmount = amount + tipAmount;
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -63,10 +67,12 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           pickup_address: orderDetails.pickupAddress,
           delivery_address: orderDetails.deliveryAddress,
           item_description: orderDetails.itemDescription,
-          total: amount,
+          total: totalAmount,
+          tip_amount: tipAmount,
+          tip_type: tipType,
           status: 'pending',
-            special_instructions: orderDetails.specialInstructions,
-            contact_phone: profile?.phone || orderDetails.contactPhone
+          special_instructions: orderDetails.specialInstructions,
+          contact_phone: profile?.phone || orderDetails.contactPhone
         }])
         .select()
         .single();
@@ -130,10 +136,20 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               <div>To: {orderDetails.deliveryAddress}</div>
               <div>Item: {orderDetails.itemDescription}</div>
             </div>
-            <div className="border-t mt-2 pt-2">
-              <div className="flex justify-between font-bold">
-                <span>Total:</span>
+            <div className="border-t mt-2 pt-2 space-y-1">
+              <div className="flex justify-between text-sm">
+                <span>Base Amount:</span>
                 <span>${amount.toFixed(2)}</span>
+              </div>
+              {tipAmount > 0 && (
+                <div className="flex justify-between text-sm text-pink-300">
+                  <span>Tip ({tipType === 'percentage' ? '15%' : 'Custom'}):</span>
+                  <span>${tipAmount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold border-t pt-1">
+                <span>Total:</span>
+                <span>${(amount + tipAmount).toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -181,6 +197,16 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </div>
 
+          {/* Tip Selector */}
+          <TipSelector
+            baseAmount={amount}
+            onTipChange={(tipAmount, tipType) => {
+              setTipAmount(tipAmount);
+              setTipType(tipType);
+            }}
+            className="bg-gray-50"
+          />
+
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Lock className="w-4 h-4" />
             Your payment information is secure and encrypted
@@ -192,7 +218,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               disabled={loading}
               className="w-full"
             >
-              {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
+              {loading ? 'Processing...' : `Pay $${(amount + tipAmount).toFixed(2)}`}
             </Button>
             
             <Button 
