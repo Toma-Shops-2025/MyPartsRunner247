@@ -37,7 +37,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<number>();
 
-  const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
   const searchAddresses = async (query: string) => {
     if (!query.trim() || query.length < 3) {
@@ -46,8 +46,8 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       return;
     }
 
-    if (!googleMapsKey) {
-      console.warn('Google Maps API key not configured');
+    if (!mapboxToken) {
+      console.warn('Mapbox access token not configured');
       // Provide helpful fallback suggestions
       const fallbackSuggestions: AddressSuggestion[] = [
         {
@@ -78,31 +78,23 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     console.log('Searching for addresses:', query);
 
     try {
-      // Use server-side proxy to avoid CORS issues
-      const url = `/.netlify/functions/google-places-proxy?input=${encodeURIComponent(query)}&key=${googleMapsKey}`;
-      console.log('Making Google Places request via proxy to:', url);
-      
-      const response = await fetch(url);
-      
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&types=address&country=us&limit=5`
+      );
+
       if (!response.ok) {
-        console.error('Google Places API error:', response.status, response.statusText);
-        throw new Error(`Google Places API error: ${response.status}`);
+        throw new Error(`Mapbox API error: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      console.log('Google Places response:', data);
-      
-      if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
-        console.error('Google Places API error:', data.status, data.error_message);
-        throw new Error(`Google Places API error: ${data.status} - ${data.error_message}`);
-      }
-      
-      // Convert Google Places format to our format
-      const suggestions: AddressSuggestion[] = data.predictions?.map((prediction: any, index: number) => ({
-        id: prediction.place_id || `google-${index}`,
-        text: prediction.structured_formatting?.main_text || prediction.description,
-        place_name: prediction.description,
-        center: [0, 0] as [number, number] // We'll get coordinates when user selects
+      console.log('Mapbox response:', data);
+
+      // Convert Mapbox format to our format
+      const suggestions: AddressSuggestion[] = data.features?.map((feature: any, index: number) => ({
+        id: feature.id || `mapbox-${index}`,
+        text: feature.text,
+        place_name: feature.place_name,
+        center: feature.center as [number, number]
       })) || [];
       
       setSuggestions(suggestions);
@@ -159,7 +151,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const handleSuggestionClick = async (suggestion: AddressSuggestion) => {
     const address = suggestion.place_name;
     
-    // If we have coordinates, use them
+    // If we have coordinates from Mapbox, use them
     if (suggestion.center[0] !== 0 && suggestion.center[1] !== 0) {
       const [lng, lat] = suggestion.center;
       onChange(address);
@@ -168,13 +160,13 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       return;
     }
     
-    // Otherwise, geocode the place_id to get coordinates
-    if (suggestion.id.startsWith('google-') || suggestion.id.includes('place_id')) {
+    // If no coordinates, try to geocode using Google Maps
+    const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (googleMapsKey) {
       try {
-        const placeId = suggestion.id.replace('google-', '');
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?place_id=${placeId}&key=${googleMapsKey}`;
-        
-        const response = await fetch(geocodeUrl);
+        const response = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${googleMapsKey}`
+        );
         const data = await response.json();
         
         if (data.status === 'OK' && data.results[0]) {
@@ -264,8 +256,6 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     };
   }, []);
 
-  // Debug logging
-  console.log('AddressAutocomplete render:', { showSuggestions, suggestions: suggestions.length, loading });
 
   return (
     <div className="relative">
