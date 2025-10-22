@@ -18,7 +18,6 @@ import AdminDashboard from './AdminDashboard';
 import DriverRegistration from './DriverRegistration';
 import PaymentModal from './PaymentModal';
 import NewAuthModal from './NewAuthModal';
-import ProfileDebug from './ProfileDebug';
 
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
@@ -32,7 +31,6 @@ const AppLayout: React.FC = () => {
   // For the main landing page, show the full homepage regardless of user type
   return (
      <div className="min-h-screen bg-gray-900">
-      <ProfileDebug />
       <NewHeader />
       <main>
         {user && showOrderTracker ? (
