@@ -28,12 +28,18 @@ import PhotoViewerPage from "./pages/PhotoViewerPage";
 import PushNotificationManager from "./components/PushNotificationManager";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
+import ErrorBoundary from "./components/ErrorBoundary";
+import PerformanceMonitor from "./components/PerformanceMonitor";
 import { pwaService } from "./services/PWAService";
+import { errorMonitoringService } from "./services/ErrorMonitoringService";
 
 const queryClient = new QueryClient();
 
 // Initialize PWA service
 pwaService.initialize();
+
+// Initialize error monitoring
+errorMonitoringService.initialize();
 
 const App = () => (
   <ThemeProvider defaultTheme="light">
@@ -46,7 +52,9 @@ const App = () => (
           <PushNotificationManager />
           <PWAInstallPrompt />
           <OfflineIndicator />
-          <Routes>
+          <PerformanceMonitor />
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
             <Route path="/test-driver" element={<TestDriverPage />} />
@@ -67,7 +75,8 @@ const App = () => (
             <Route path="/track/:orderId" element={<CustomerTrackingPage />} />
             <Route path="/photo-viewer" element={<PhotoViewerPage />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
+            </Routes>
+          </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
