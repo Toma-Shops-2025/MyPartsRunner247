@@ -26,8 +26,14 @@ import TestDriverPage from "./pages/TestDriverPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import PhotoViewerPage from "./pages/PhotoViewerPage";
 import PushNotificationManager from "./components/PushNotificationManager";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import OfflineIndicator from "./components/OfflineIndicator";
+import { pwaService } from "./services/PWAService";
 
 const queryClient = new QueryClient();
+
+// Initialize PWA service
+pwaService.initialize();
 
 const App = () => (
   <ThemeProvider defaultTheme="light">
@@ -38,6 +44,8 @@ const App = () => (
         <BrowserRouter>
           <ScrollToTop />
           <PushNotificationManager />
+          <PWAInstallPrompt />
+          <OfflineIndicator />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
