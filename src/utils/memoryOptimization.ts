@@ -2,18 +2,18 @@
 // =============================
 
 export class MemoryOptimizer {
-  private static intervals: Set<NodeJS.Timeout> = new Set();
-  private static timeouts: Set<NodeJS.Timeout> = new Set();
+  private static intervals: Set<number> = new Set();
+  private static timeouts: Set<number> = new Set();
   private static eventListeners: Map<string, EventListener[]> = new Map();
 
   // Track intervals for cleanup
-  static trackInterval(interval: NodeJS.Timeout): NodeJS.Timeout {
+  static trackInterval(interval: number): number {
     this.intervals.add(interval);
     return interval;
   }
 
   // Track timeouts for cleanup
-  static trackTimeout(timeout: NodeJS.Timeout): NodeJS.Timeout {
+  static trackTimeout(timeout: number): number {
     this.timeouts.add(timeout);
     return timeout;
   }
@@ -108,7 +108,7 @@ export class MemoryOptimizer {
   // Optimize performance monitoring
   static optimizePerformanceMonitoring(): void {
     // Reduce monitoring frequency in production
-    if (process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
       // Disable detailed performance monitoring in production
       localStorage.setItem('disable-detailed-monitoring', 'true');
     }

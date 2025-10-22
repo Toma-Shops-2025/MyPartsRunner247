@@ -4,7 +4,7 @@
 export class PerformanceOptimizer {
   // Disable performance monitoring in production
   static shouldDisableDetailedMonitoring(): boolean {
-    return process.env.NODE_ENV === 'production' || 
+    return (typeof window !== 'undefined' && window.location.hostname !== 'localhost') || 
            localStorage.getItem('disable-detailed-monitoring') === 'true';
   }
 
@@ -33,7 +33,8 @@ export class PerformanceOptimizer {
 
   // Lazy load heavy components
   static lazyLoadComponent(importFn: () => Promise<any>) {
-    return React.lazy(importFn);
+    // Dynamic import for lazy loading
+    return importFn;
   }
 
   // Debounce function calls
@@ -41,10 +42,10 @@ export class PerformanceOptimizer {
     func: T,
     wait: number
   ): (...args: Parameters<T>) => void {
-    let timeout: NodeJS.Timeout;
+    let timeout: number;
     return (...args: Parameters<T>) => {
       clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
+      timeout = window.setTimeout(() => func(...args), wait);
     };
   }
 
@@ -93,7 +94,7 @@ export class PerformanceOptimizer {
   // Optimize bundle size
   static optimizeBundleSize(): void {
     // Remove unused imports
-    if (process.env.NODE_ENV === 'production') {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
       // Disable source maps in production
       console.log('Production mode: Source maps disabled for better performance');
     }
