@@ -229,6 +229,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       const { latitude, longitude } = position.coords;
       
       // Reverse geocode to get address using Google Maps
+      const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsKey}`
       );
