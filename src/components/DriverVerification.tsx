@@ -16,8 +16,7 @@ import {
   CreditCard,
   User,
   AlertTriangle,
-  Camera,
-  IdCard
+  Camera
 } from 'lucide-react';
 
 interface VerificationStep {
@@ -348,7 +347,7 @@ const DriverVerification: React.FC = () => {
       <Card className="bg-gray-800 border-gray-700">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
-            <IdCard className="w-5 h-5" />
+            <CreditCard className="w-5 h-5" />
             Verification Status
           </CardTitle>
         </CardHeader>

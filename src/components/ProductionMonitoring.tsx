@@ -96,7 +96,7 @@ const ProductionMonitoring: React.FC = () => {
       if (dbError) {
         newAlerts.push({
           id: `db-error-${Date.now()}`,
-          type: 'error',
+          type: 'error' as const,
           message: `Database connectivity issue: ${dbError.message}`,
           timestamp: new Date().toISOString(),
           resolved: false
@@ -106,7 +106,7 @@ const ProductionMonitoring: React.FC = () => {
       if (health.errorRate > 2) {
         newAlerts.push({
           id: `high-error-rate-${Date.now()}`,
-          type: 'warning',
+          type: 'warning' as const,
           message: `High error rate detected: ${health.errorRate.toFixed(1)}%`,
           timestamp: new Date().toISOString(),
           resolved: false
@@ -116,25 +116,25 @@ const ProductionMonitoring: React.FC = () => {
       if (health.responseTime > 200) {
         newAlerts.push({
           id: `slow-response-${Date.now()}`,
-          type: 'warning',
+          type: 'warning' as const,
           message: `Slow response time: ${health.responseTime.toFixed(0)}ms`,
           timestamp: new Date().toISOString(),
           resolved: false
         });
       }
 
-      setAlerts(prev => [...newAlerts, ...prev].slice(0, 10)); // Keep last 10 alerts
+      setAlerts(prev => [...newAlerts, ...prev].slice(0, 10) as AlertItem[]); // Keep last 10 alerts
       setLastRefresh(new Date());
 
     } catch (error) {
       console.error('Error fetching system health:', error);
       setAlerts(prev => [{
         id: `monitoring-error-${Date.now()}`,
-        type: 'error',
+        type: 'error' as const,
         message: `Monitoring system error: ${error}`,
         timestamp: new Date().toISOString(),
         resolved: false
-      }, ...prev].slice(0, 10));
+      }, ...prev].slice(0, 10) as AlertItem[]);
     } finally {
       setLoading(false);
     }
