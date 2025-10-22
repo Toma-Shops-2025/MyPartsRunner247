@@ -49,18 +49,18 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     if (!googleMapsKey) {
       console.warn('Google Maps API key not configured');
       // Provide basic fallback suggestions
-      const fallbackSuggestions = [
+      const fallbackSuggestions: AddressSuggestion[] = [
         {
           id: 'manual-entry',
           text: 'Enter address manually',
           place_name: 'Type the complete address without autocomplete',
-          center: [0, 0]
+          center: [0, 0] as [number, number]
         },
         {
           id: 'current-location',
           text: 'Use current location',
           place_name: 'Click the location button to use GPS',
-          center: [0, 0]
+          center: [0, 0] as [number, number]
         }
       ];
       setSuggestions(fallbackSuggestions);
@@ -92,11 +92,11 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       }
       
       // Convert Google Places format to our format
-      const suggestions = data.predictions?.map((prediction: any, index: number) => ({
+      const suggestions: AddressSuggestion[] = data.predictions?.map((prediction: any, index: number) => ({
         id: prediction.place_id || `google-${index}`,
         text: prediction.structured_formatting?.main_text || prediction.description,
         place_name: prediction.description,
-        center: [0, 0] // We'll get coordinates when user selects
+        center: [0, 0] as [number, number] // We'll get coordinates when user selects
       })) || [];
       
       setSuggestions(suggestions);
@@ -109,7 +109,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         id: 'error',
         text: 'Error loading suggestions',
         place_name: 'Please check your internet connection and try again',
-        center: [0, 0]
+        center: [0, 0] as [number, number]
       }]);
       setShowSuggestions(true);
     } finally {
