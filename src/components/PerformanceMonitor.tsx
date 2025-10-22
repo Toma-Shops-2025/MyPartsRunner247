@@ -29,7 +29,7 @@ const PerformanceMonitor: React.FC = () => {
 
   useEffect(() => {
     // Only show in development or if user is admin
-    const shouldShow = process.env.NODE_ENV === 'development' || 
+    const shouldShow = (typeof window !== 'undefined' && window.location.hostname === 'localhost') || 
                       localStorage.getItem('show-performance-monitor') === 'true';
     setIsVisible(shouldShow);
 

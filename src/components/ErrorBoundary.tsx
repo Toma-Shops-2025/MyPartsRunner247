@@ -96,7 +96,7 @@ class ErrorBoundary extends Component<Props, State> {
                 </AlertDescription>
               </Alert>
 
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {typeof window !== 'undefined' && window.location.hostname === 'localhost' && this.state.error && (
                 <div className="bg-gray-100 p-3 rounded text-sm">
                   <p className="font-semibold">Error Details:</p>
                   <p className="text-red-600">{this.state.error.message}</p>

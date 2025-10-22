@@ -36,6 +36,9 @@ class ErrorMonitoringService {
 
   constructor() {
     this.sessionId = this.generateSessionId();
+  }
+
+  public initialize() {
     this.initializeErrorHandlers();
     this.initializePerformanceMonitoring();
     this.initializeNetworkMonitoring();
