@@ -71,7 +71,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onRequestPickup, onBecomeDriver
               </li>
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
-                70%
+                70% Commission
               </li>
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
