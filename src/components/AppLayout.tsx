@@ -20,6 +20,7 @@ import PaymentModal from './PaymentModal';
 import NewAuthModal from './NewAuthModal';
 import CustomerNotificationSystem from './CustomerNotificationSystem';
 import NotificationSystemTest from './NotificationSystemTest';
+import EndToEndTest from './EndToEndTest';
 
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
@@ -62,6 +63,13 @@ const AppLayout: React.FC = () => {
             {user && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <NotificationSystemTest />
+              </div>
+            )}
+            
+            {/* Show end-to-end testing for all authenticated users */}
+            {user && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <EndToEndTest />
               </div>
             )}
             
