@@ -11,7 +11,7 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
   const benefits = [
     { icon: "💰", title: "Earn More", description: "Competitive rates with instant payouts via Stripe" },
     { icon: "⏰", title: "Flexible Hours", description: "Work when you want, 24/7 availability" },
-    { icon: "📱", title: "Easy App", description: "Simple driver dashboard with Mapbox navigation" },
+    { icon: "📱", title: "Easy App", description: "Simple driver dashboard with Google Maps navigation" },
     { icon: "🚗", title: "Use Your Vehicle", description: "Car, bike, motorcycle - all welcome" }
   ];
 

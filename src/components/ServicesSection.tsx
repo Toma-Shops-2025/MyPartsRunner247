@@ -21,6 +21,12 @@ const ServicesSection: React.FC = () => {
       description: "Plan ahead with our flexible scheduling system.",
       icon: "📅",
       examples: ["Future pickups", "Recurring orders", "Event supplies", "Gift delivery"]
+    },
+    {
+      title: "CarryOut Orders",
+      description: "ANY establishment that ordinarily does not deliver",
+      icon: "🛍️",
+      examples: ["Tobacco Stores", "Liquor Stores", "Hardware Stores", "Any Store or Shop"]
     }
   ];
 

@@ -7,7 +7,7 @@ const FeaturesSection: React.FC = () => {
   const features = [
     {
       title: "Real-Time Tracking",
-      description: "Follow your delivery with live GPS tracking powered by Mapbox",
+      description: "Follow your delivery with live GPS tracking powered by Google Maps",
       icon: MapPin,
       color: "from-teal-500 to-blue-600"
     },
