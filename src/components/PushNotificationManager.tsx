@@ -90,14 +90,38 @@ const PushNotificationManager: React.FC = () => {
 
   const testNotification = async () => {
     try {
-      await pushNotificationService.sendNotification({
-        title: 'MyPartsRunner Test',
-        body: 'This is a test notification! 🚀',
-        icon: '/icon-192x192.png',
-        data: { test: true }
-      });
+      // Check if we're on mobile
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobile) {
+        // For mobile, try to show a local notification first
+        if (Notification.permission === 'granted') {
+          const notification = new Notification('MyPartsRunner Test', {
+            body: 'This is a test notification! 🚀',
+            icon: '/icon-192x192.png',
+            tag: 'test-notification'
+          });
+          
+          // Auto-close after 5 seconds
+          setTimeout(() => {
+            notification.close();
+          }, 5000);
+        } else {
+          alert('Please enable notifications in your browser settings first!');
+          return;
+        }
+      } else {
+        // For desktop, use the service
+        await pushNotificationService.sendNotification({
+          title: 'MyPartsRunner Test',
+          body: 'This is a test notification! 🚀',
+          icon: '/icon-192x192.png',
+          data: { test: true }
+        });
+      }
     } catch (error) {
       console.error('Error sending test notification:', error);
+      alert('Test notification failed. Please check your browser settings.');
     }
   };
 
@@ -221,6 +245,14 @@ const PushNotificationManager: React.FC = () => {
           <p>• Notifications help you stay updated on order status</p>
           <p>• You can customize which notifications to receive</p>
           <p>• Notifications work even when the app is closed</p>
+          {/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && (
+            <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+              <p className="text-blue-800 font-medium">📱 Mobile Tips:</p>
+              <p>• Make sure notifications are enabled in your browser</p>
+              <p>• On iOS: Go to Settings → Safari → Notifications</p>
+              <p>• On Android: Check browser notification settings</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
