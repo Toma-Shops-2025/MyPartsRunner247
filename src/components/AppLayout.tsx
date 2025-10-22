@@ -34,6 +34,7 @@ const AppLayout: React.FC = () => {
   const [showDriverRegistration, setShowDriverRegistration] = useState(false);
   const [paymentModal, setPaymentModal] = useState({ isOpen: false, amount: 0, orderDetails: {} });
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isDriverAuthModalOpen, setIsDriverAuthModalOpen] = useState(false);
 
   // For the main landing page, show the full homepage regardless of user type
   return (
@@ -117,8 +118,8 @@ const AppLayout: React.FC = () => {
                 if (user) {
                   setShowDriverRegistration(true);
                 } else {
-                  // Navigate to driver application page for unauthenticated users
-                  navigate('/driver-application');
+                  // Open driver auth modal for unauthenticated users
+                  setIsDriverAuthModalOpen(true);
                 }
               }}
             />
@@ -156,8 +157,8 @@ const AppLayout: React.FC = () => {
                 if (user) {
                   setShowDriverRegistration(true);
                 } else {
-                  // Navigate to driver application page for unauthenticated users
-                  navigate('/driver-application');
+                  // Open driver auth modal for unauthenticated users
+                  setIsDriverAuthModalOpen(true);
                 }
               }}
             />
@@ -183,6 +184,16 @@ const AppLayout: React.FC = () => {
           // After successful auth, open the pickup modal
           setIsPickupModalOpen(true);
         }}
+        defaultUserType="customer"
+      />
+      <NewAuthModal 
+        isOpen={isDriverAuthModalOpen}
+        onClose={() => setIsDriverAuthModalOpen(false)}
+        onSuccess={() => {
+          setIsDriverAuthModalOpen(false);
+          // Driver signup will redirect to application page automatically
+        }}
+        defaultUserType="driver"
       />
     </div>
   );

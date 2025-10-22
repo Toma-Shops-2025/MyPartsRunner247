@@ -12,16 +12,17 @@ interface NewAuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  defaultUserType?: 'customer' | 'driver';
 }
 
-const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess, defaultUserType = 'customer' }) => {
   const { createProfileManually } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [userType, setUserType] = useState<'customer' | 'driver'>('customer');
+  const [userType, setUserType] = useState<'customer' | 'driver'>(defaultUserType);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,6 +83,13 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
             title: "Account created!",
             description: `Welcome! You've been registered as a ${userType}. (Using fallback mode due to server issues)`,
           });
+          
+          // For drivers, redirect to application page immediately
+          if (userType === 'driver') {
+            setTimeout(() => {
+              window.location.href = '/driver-application';
+            }, 1000);
+          }
           
           onSuccess?.();
           onClose();
@@ -153,11 +161,24 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess 
           title: "Account created!",
           description: "Please check your email for a verification link from 'Supabase Auth'. Click the link to confirm your account before signing in.",
         });
+        
+        // For drivers, redirect to application page after email confirmation
+        if (userType === 'driver') {
+          // Store a flag to redirect to driver application after email confirmation
+          localStorage.setItem('redirect_after_auth', '/driver-application');
+        }
       } else {
         toast({
           title: "Account created!",
           description: `Welcome! You've been registered as a ${userType}.`,
         });
+        
+        // For drivers, redirect to application page immediately
+        if (userType === 'driver') {
+          setTimeout(() => {
+            window.location.href = '/driver-application';
+          }, 1000);
+        }
       }
       
       onSuccess?.();
