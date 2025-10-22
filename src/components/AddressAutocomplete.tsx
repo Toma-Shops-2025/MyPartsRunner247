@@ -37,7 +37,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<number>();
 
-  const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+  const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const searchAddresses = async (query: string) => {
     if (!query.trim() || query.length < 3) {
@@ -46,28 +46,72 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       return;
     }
 
-    if (!mapboxToken) {
-      console.warn('Mapbox access token not configured');
+    if (!googleMapsKey) {
+      console.warn('Google Maps API key not configured');
+      // Provide basic fallback suggestions
+      const fallbackSuggestions = [
+        {
+          id: 'manual-entry',
+          text: 'Enter address manually',
+          place_name: 'Type the complete address without autocomplete',
+          center: [0, 0]
+        },
+        {
+          id: 'current-location',
+          text: 'Use current location',
+          place_name: 'Click the location button to use GPS',
+          center: [0, 0]
+        }
+      ];
+      setSuggestions(fallbackSuggestions);
+      setShowSuggestions(true);
       return;
     }
 
     setLoading(true);
+    console.log('Searching for addresses:', query);
 
     try {
-      const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${mapboxToken}&country=US&types=address,poi&limit=5`
-      );
-
+      // Use Google Places Autocomplete API
+      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${googleMapsKey}&types=address&components=country:us`;
+      console.log('Making Google Places request to:', url);
+      
+      const response = await fetch(url);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch address suggestions');
+        console.error('Google Places API error:', response.status, response.statusText);
+        throw new Error(`Google Places API error: ${response.status}`);
       }
-
+      
       const data = await response.json();
-      setSuggestions(data.features || []);
+      console.log('Google Places response:', data);
+      
+      if (data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+        console.error('Google Places API error:', data.status, data.error_message);
+        throw new Error(`Google Places API error: ${data.status} - ${data.error_message}`);
+      }
+      
+      // Convert Google Places format to our format
+      const suggestions = data.predictions?.map((prediction: any, index: number) => ({
+        id: prediction.place_id || `google-${index}`,
+        text: prediction.structured_formatting?.main_text || prediction.description,
+        place_name: prediction.description,
+        center: [0, 0] // We'll get coordinates when user selects
+      })) || [];
+      
+      setSuggestions(suggestions);
       setShowSuggestions(true);
     } catch (error) {
       console.error('Address search error:', error);
       setSuggestions([]);
+      // Show error message to user
+      setSuggestions([{
+        id: 'error',
+        text: 'Error loading suggestions',
+        place_name: 'Please check your internet connection and try again',
+        center: [0, 0]
+      }]);
+      setShowSuggestions(true);
     } finally {
       setLoading(false);
     }
@@ -87,12 +131,48 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     }, 300);
   };
 
-  const handleSuggestionClick = (suggestion: AddressSuggestion) => {
+  const handleSuggestionClick = async (suggestion: AddressSuggestion) => {
     const address = suggestion.place_name;
-    const [lng, lat] = suggestion.center;
     
-    onChange(address);
-    onSelect(address, { lat, lng });
+    // If we have coordinates, use them
+    if (suggestion.center[0] !== 0 && suggestion.center[1] !== 0) {
+      const [lng, lat] = suggestion.center;
+      onChange(address);
+      onSelect(address, { lat, lng });
+      setShowSuggestions(false);
+      return;
+    }
+    
+    // Otherwise, geocode the place_id to get coordinates
+    if (suggestion.id.startsWith('google-') || suggestion.id.includes('place_id')) {
+      try {
+        const placeId = suggestion.id.replace('google-', '');
+        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?place_id=${placeId}&key=${googleMapsKey}`;
+        
+        const response = await fetch(geocodeUrl);
+        const data = await response.json();
+        
+        if (data.status === 'OK' && data.results[0]) {
+          const location = data.results[0].geometry.location;
+          onChange(address);
+          onSelect(address, { lat: location.lat, lng: location.lng });
+        } else {
+          // Fallback without coordinates
+          onChange(address);
+          onSelect(address, { lat: 0, lng: 0 });
+        }
+      } catch (error) {
+        console.error('Geocoding error:', error);
+        // Fallback without coordinates
+        onChange(address);
+        onSelect(address, { lat: 0, lng: 0 });
+      }
+    } else {
+      // Fallback without coordinates
+      onChange(address);
+      onSelect(address, { lat: 0, lng: 0 });
+    }
+    
     setShowSuggestions(false);
   };
 
@@ -131,17 +211,16 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
       const { latitude, longitude } = position.coords;
       
-      // Reverse geocode to get address
+      // Reverse geocode to get address using Google Maps
       const response = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${mapboxToken}&types=address,poi`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${googleMapsKey}`
       );
 
       if (response.ok) {
         const data = await response.json();
-        const feature = data.features[0];
         
-        if (feature) {
-          const address = feature.place_name;
+        if (data.status === 'OK' && data.results[0]) {
+          const address = data.results[0].formatted_address;
           onChange(address);
           onSelect(address, { lat: latitude, lng: longitude });
         }
