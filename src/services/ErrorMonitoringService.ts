@@ -32,7 +32,7 @@ class ErrorMonitoringService {
   private errorQueue: ErrorReport[] = [];
   private performanceQueue: PerformanceMetric[] = [];
   private isOnline: boolean = navigator.onLine;
-  private maxQueueSize: number = 50;
+  private maxQueueSize: number = 25; // Reduced from 50 to prevent memory issues
 
   constructor() {
     this.sessionId = this.generateSessionId();

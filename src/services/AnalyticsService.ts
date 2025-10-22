@@ -30,7 +30,7 @@ class AnalyticsService {
   private userId?: string;
   private eventQueue: AnalyticsEvent[] = [];
   private isOnline: boolean = navigator.onLine;
-  private maxQueueSize: number = 100;
+  private maxQueueSize: number = 50; // Reduced from 100 to prevent memory issues
 
   constructor() {
     this.sessionId = this.generateSessionId();

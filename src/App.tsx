@@ -30,10 +30,12 @@ import PushNotificationManager from "./components/PushNotificationManager";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
 import ErrorBoundary from "./components/ErrorBoundary";
-import PerformanceMonitor from "./components/PerformanceMonitor";
+import OptimizedPerformanceMonitor from "./components/OptimizedPerformanceMonitor";
+import MemoryCleanupButton from "./components/MemoryCleanupButton";
 import { pwaService } from "./services/PWAService";
 import { errorMonitoringService } from "./services/ErrorMonitoringService";
 import { analyticsService } from "./services/AnalyticsService";
+import { PerformanceOptimizer } from "./utils/performanceOptimization";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,10 @@ errorMonitoringService.initialize();
 // Initialize analytics service
 analyticsService.initialize();
 
+// Apply performance optimizations
+PerformanceOptimizer.optimizeAnalytics();
+PerformanceOptimizer.optimizeErrorMonitoring();
+
 const App = () => (
   <ThemeProvider defaultTheme="light">
     <QueryClientProvider client={queryClient}>
@@ -57,7 +63,8 @@ const App = () => (
           <PushNotificationManager />
           <PWAInstallPrompt />
           <OfflineIndicator />
-          <PerformanceMonitor />
+          <OptimizedPerformanceMonitor />
+          <MemoryCleanupButton />
           <ErrorBoundary>
             <Routes>
             <Route path="/" element={<Index />} />
