@@ -229,9 +229,11 @@ export const useAuth = () => {
         setLoading(false);
       } else if (data) {
         console.log('Profile found for user:', userId, '-', data.email, data.user_type);
+        console.log('🔍 AUTH DEBUG: Setting profile state with data:', data);
         // Timeout removed - no need to clear
         setProfile(data);
         setLoading(false);
+        console.log('🔍 AUTH DEBUG: Profile state should now be set');
       } else {
         console.log('No profile found for user:', userId);
         // Auto-create profile for existing users
@@ -575,6 +577,9 @@ export const useAuth = () => {
       alert('Stripe account ID cleared! Please refresh the page to see the Stripe Connect button.');
     };
   }
+
+  // Debug current state
+  console.log('🔍 AUTH HOOK DEBUG: Current profile state:', profile, 'user_type:', profile?.user_type);
 
   return {
     user,
