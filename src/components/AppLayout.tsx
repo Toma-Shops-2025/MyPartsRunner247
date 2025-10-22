@@ -85,12 +85,6 @@ const AppLayout: React.FC = () => {
               </div>
             )}
             
-            {/* Show customer support for all users except admins */}
-            {profile?.user_type !== 'admin' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <CustomerSupport />
-              </div>
-            )}
             
             {/* Show driver verification for drivers */}
             {user && profile?.user_type === 'driver' && (

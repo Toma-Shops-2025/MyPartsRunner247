@@ -153,6 +153,7 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-lg font-semibold mb-6">Support</h3>
             <ul className="space-y-3">
+              <li><button onClick={() => handleNavigation('/support')} className="text-gray-400 hover:text-white transition-colors text-left">Customer Support</button></li>
               <li><button onClick={() => handleNavigation('/faq')} className="text-gray-400 hover:text-white transition-colors text-left">Help Center</button></li>
               <li><button onClick={() => handleNavigation('/terms')} className="text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button></li>
               <li><button onClick={() => handleNavigation('/privacy')} className="text-gray-400 hover:text-white transition-colors text-left">Privacy Policy</button></li>
