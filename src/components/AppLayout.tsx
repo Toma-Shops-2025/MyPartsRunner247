@@ -18,6 +18,7 @@ import AdminDashboard from './AdminDashboard';
 import DriverRegistration from './DriverRegistration';
 import PaymentModal from './PaymentModal';
 import NewAuthModal from './NewAuthModal';
+import CustomerNotificationSystem from './CustomerNotificationSystem';
 
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
@@ -49,6 +50,13 @@ const AppLayout: React.FC = () => {
           </div>
         ) : (
           <>
+            {/* Show customer notifications if user is a customer */}
+            {user && profile?.user_type === 'customer' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <CustomerNotificationSystem />
+              </div>
+            )}
+            
             <HeroSection 
               onRequestPickup={() => {
                 if (user) {
