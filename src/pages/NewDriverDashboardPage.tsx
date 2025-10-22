@@ -5,6 +5,7 @@ import NewHeader from '@/components/NewHeader';
 import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
+import PushNotificationManager from '@/components/PushNotificationManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp } from 'lucide-react';
@@ -321,6 +322,11 @@ const NewDriverDashboardPage: React.FC = () => {
         {/* Driver Notifications */}
         <div className="mb-8">
           <DriverNotificationSystem />
+        </div>
+
+        {/* Push Notifications */}
+        <div className="mb-8">
+          <PushNotificationManager />
         </div>
 
         {/* Mapbox Navigation Section */}

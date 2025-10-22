@@ -25,6 +25,7 @@ import DriverApplicationPage from "./pages/DriverApplicationPage";
 import TestDriverPage from "./pages/TestDriverPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import PhotoViewerPage from "./pages/PhotoViewerPage";
+import PushNotificationManager from "./components/PushNotificationManager";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <PushNotificationManager />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
