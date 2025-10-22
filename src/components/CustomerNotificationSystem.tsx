@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, Package, Clock, CheckCircle, Truck, MapPin, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, Package, Clock, CheckCircle, Truck, MapPin, ChevronDown, ChevronUp, XCircle } from 'lucide-react';
 
 interface OrderNotification {
   id: string;
@@ -61,7 +61,7 @@ const CustomerNotificationSystem: React.FC = () => {
         orderId: order.id,
         type: 'status_update',
         title: getStatusTitle(order.status),
-        message: getStatusMessage(order.status, order.driver?.full_name),
+        message: getStatusMessage(order.status, (order.driver as any)?.full_name),
         status: order.status,
         timestamp: order.updated_at,
         is_read: false
