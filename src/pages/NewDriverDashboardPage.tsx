@@ -363,8 +363,29 @@ const NewDriverDashboardPage: React.FC = () => {
                   locationTrackingService.startLocationTracking(
                     user.id,
                     activeOrders[0].id,
-                    (location) => {
+                    async (location) => {
                       console.log('Location tracked:', location);
+                      
+                      // Update driver's location in database
+                      try {
+                        const { error: updateError } = await supabase
+                          .from('profiles')
+                          .update({
+                            current_lat: location.lat,
+                            current_lng: location.lng,
+                            updated_at: new Date().toISOString()
+                          })
+                          .eq('id', user.id);
+
+                        if (updateError) {
+                          console.error('Error updating driver location:', updateError);
+                        } else {
+                          console.log('Driver location updated in database');
+                        }
+                      } catch (error) {
+                        console.error('Error updating driver location:', error);
+                      }
+                      
                       // Update order tracking status
                       locationTrackingService.updateOrderStatus(
                         activeOrders[0].id,
