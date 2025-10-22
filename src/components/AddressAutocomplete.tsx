@@ -72,9 +72,9 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     console.log('Searching for addresses:', query);
 
     try {
-      // Use Google Places Autocomplete API
-      const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${googleMapsKey}&types=address&components=country:us`;
-      console.log('Making Google Places request to:', url);
+      // Use server-side proxy to avoid CORS issues
+      const url = `/.netlify/functions/google-places-proxy?input=${encodeURIComponent(query)}&key=${googleMapsKey}`;
+      console.log('Making Google Places request via proxy to:', url);
       
       const response = await fetch(url);
       

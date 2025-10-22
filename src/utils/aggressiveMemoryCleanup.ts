@@ -15,10 +15,10 @@ export class AggressiveMemoryCleanup {
     // Immediate cleanup
     this.performFullCleanup();
     
-    // Set up periodic cleanup every 30 seconds
+    // Set up periodic cleanup every 5 minutes (reduced frequency)
     this.cleanupInterval = window.setInterval(() => {
       this.performFullCleanup();
-    }, 30000);
+    }, 300000);
     
     // Cleanup on page visibility change
     document.addEventListener('visibilitychange', () => {
@@ -64,7 +64,10 @@ export class AggressiveMemoryCleanup {
       // 6. Optimize images
       this.optimizeImages();
       
-      console.log('✅ Memory cleanup completed');
+      // Only log in development
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        console.log('✅ Memory cleanup completed');
+      }
     } catch (error) {
       console.error('❌ Memory cleanup failed:', error);
     }
