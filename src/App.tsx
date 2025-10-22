@@ -25,6 +25,7 @@ import DriverApplicationPage from "./pages/DriverApplicationPage";
 import TestDriverPage from "./pages/TestDriverPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import PhotoViewerPage from "./pages/PhotoViewerPage";
+import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import PushNotificationManager from "./components/PushNotificationManager";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
@@ -32,6 +33,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PerformanceMonitor from "./components/PerformanceMonitor";
 import { pwaService } from "./services/PWAService";
 import { errorMonitoringService } from "./services/ErrorMonitoringService";
+import { analyticsService } from "./services/AnalyticsService";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,9 @@ pwaService.initialize();
 
 // Initialize error monitoring
 errorMonitoringService.initialize();
+
+// Initialize analytics service
+analyticsService.initialize();
 
 const App = () => (
   <ThemeProvider defaultTheme="light">
@@ -74,6 +79,7 @@ const App = () => (
             <Route path="/driver-application" element={<DriverApplicationPage />} />
             <Route path="/track/:orderId" element={<CustomerTrackingPage />} />
             <Route path="/photo-viewer" element={<PhotoViewerPage />} />
+            <Route path="/analytics" element={<AnalyticsDashboard />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
           </ErrorBoundary>
