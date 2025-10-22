@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock, MessageSquare } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const ContactPage = () => {
   const navigate = useNavigate();
