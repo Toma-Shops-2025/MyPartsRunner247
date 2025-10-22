@@ -24,7 +24,7 @@ const TermsPage = () => {
             Terms of Service
           </h1>
           <p className="text-gray-300">
-            Last updated: January 1, 2024
+            Last updated: January 22, 2025
           </p>
         </div>
 
@@ -33,6 +33,17 @@ const TermsPage = () => {
             <h2>1. Acceptance of Terms</h2>
             <p>
               By accessing and using MyPartsRunner's services, you accept and agree to be bound by the terms and provision of this agreement.
+            </p>
+
+            <h2>1.1. Company Information</h2>
+            <p>
+              <strong>MyPartsRunner</strong><br/>
+              Founder/Owner: Toma Adkins<br/>
+              Office Location: JeffersonTown, Kentucky<br/>
+              Legal Address: 5120 Cynthia Drive, 40291<br/>
+              Phone: 502-812-2456<br/>
+              Email: infomypartsrunner@gmail.com<br/>
+              Jurisdiction: Kentucky, United States
             </p>
 
             <h2>2. Service Description</h2>

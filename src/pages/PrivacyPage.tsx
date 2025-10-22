@@ -24,7 +24,7 @@ const PrivacyPage = () => {
             Privacy Policy
           </h1>
           <p className="text-gray-300">
-            Last updated: January 1, 2024
+            Last updated: January 22, 2025
           </p>
         </div>
 
@@ -33,6 +33,17 @@ const PrivacyPage = () => {
             <h2>1. Information We Collect</h2>
             <p>
               We collect information you provide directly to us, such as when you create an account, request a delivery, or contact us for support.
+            </p>
+
+            <h2>1.1. Company Information</h2>
+            <p>
+              <strong>MyPartsRunner</strong><br/>
+              Founder/Owner: Toma Adkins<br/>
+              Office Location: JeffersonTown, Kentucky<br/>
+              Legal Address: 5120 Cynthia Drive, 40291<br/>
+              Phone: 502-812-2456<br/>
+              Email: infomypartsrunner@gmail.com<br/>
+              Jurisdiction: Kentucky, United States
             </p>
 
             <h2>2. How We Use Your Information</h2>
