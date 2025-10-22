@@ -21,6 +21,9 @@ import NewAuthModal from './NewAuthModal';
 import CustomerNotificationSystem from './CustomerNotificationSystem';
 import NotificationSystemTest from './NotificationSystemTest';
 import EndToEndTest from './EndToEndTest';
+import ProductionMonitoring from './ProductionMonitoring';
+import CustomerSupport from './CustomerSupport';
+import DriverVerification from './DriverVerification';
 
 const AppLayout: React.FC = () => {
   const { user, profile } = useAuth();
@@ -70,6 +73,27 @@ const AppLayout: React.FC = () => {
             {user && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <EndToEndTest />
+              </div>
+            )}
+            
+            {/* Show production monitoring for all authenticated users */}
+            {user && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <ProductionMonitoring />
+              </div>
+            )}
+            
+            {/* Show customer support for all authenticated users */}
+            {user && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <CustomerSupport />
+              </div>
+            )}
+            
+            {/* Show driver verification for drivers */}
+            {user && profile?.user_type === 'driver' && (
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <DriverVerification />
               </div>
             )}
             
