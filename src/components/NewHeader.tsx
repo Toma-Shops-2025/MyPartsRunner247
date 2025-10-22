@@ -14,7 +14,10 @@ const NewHeader: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
-    console.log('Navigating to:', path, 'User:', !!user, 'Profile:', !!profile, 'User type:', profile?.user_type);
+    // Debug logging only in development
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.log('Navigating to:', path, 'User:', !!user, 'Profile:', !!profile, 'User type:', profile?.user_type);
+    }
     navigate(path);
     setIsMobileMenuOpen(false);
   };
@@ -31,8 +34,10 @@ const NewHeader: React.FC = () => {
     }
   };
 
-  // Debug logging
-  console.log('🔍 NAVIGATION DEBUG: profile?.user_type =', profile?.user_type, 'profile =', profile);
+  // Debug logging only in development
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    console.log('🔍 NAVIGATION DEBUG: profile?.user_type =', profile?.user_type, 'profile =', profile);
+  }
 
   const handleSwitchToDriver = async () => {
     try {

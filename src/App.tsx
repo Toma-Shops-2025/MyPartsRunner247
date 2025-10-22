@@ -78,9 +78,9 @@ const App = () => (
             <>
               <OptimizedPerformanceMonitor />
               <MemoryCleanupButton />
+              <EmergencyMemoryButton />
             </>
           )}
-          <EmergencyMemoryButton />
           <ErrorBoundary>
             <Routes>
             <Route path="/" element={<Index />} />

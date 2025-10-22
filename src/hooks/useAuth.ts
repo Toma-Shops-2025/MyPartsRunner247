@@ -584,7 +584,10 @@ export const useAuth = () => {
   }
 
   // Debug current state
-  console.log('🔍 AUTH HOOK DEBUG: Current profile state:', profile, 'user_type:', profile?.user_type);
+    // Debug logging only in development
+    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+      console.log('🔍 AUTH HOOK DEBUG: Current profile state:', profile, 'user_type:', profile?.user_type);
+    }
 
   return {
     user,
