@@ -142,6 +142,8 @@ export const useAuth = () => {
       return;
     }
     
+    console.log('🔍 PROFILE FETCH DEBUG: Starting profile fetch for user:', userId);
+    
     // Skip localStorage fallback - use database only
     console.log('Fetching profile from database for user:', userId);
     
@@ -228,9 +230,11 @@ export const useAuth = () => {
         setLoading(false);
       } else if (data) {
         console.log('Profile found for user:', userId, '-', data.email, data.user_type);
+        console.log('🔍 PROFILE FETCH DEBUG: Setting profile data:', data);
         // Timeout removed - no need to clear
         setProfile(data);
         setLoading(false);
+        console.log('🔍 PROFILE FETCH DEBUG: Profile set successfully');
       } else {
         console.log('No profile found for user:', userId);
         // Auto-create profile for existing users
