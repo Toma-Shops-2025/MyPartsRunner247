@@ -27,6 +27,7 @@ import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import PhotoViewerPage from "./pages/PhotoViewerPage";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import SupportPage from "./pages/SupportPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
 import PushNotificationManager from "./components/PushNotificationManager";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -96,6 +97,7 @@ const App = () => (
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/support" element={<SupportPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
