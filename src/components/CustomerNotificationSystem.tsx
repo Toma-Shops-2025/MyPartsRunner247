@@ -42,9 +42,7 @@ const CustomerNotificationSystem: React.FC = () => {
           id,
           status,
           updated_at,
-          driver:profiles!orders_driver_id_fkey(
-            full_name
-          )
+          driver_id
         `)
         .eq('customer_id', user?.id)
         .order('updated_at', { ascending: false })
@@ -61,7 +59,7 @@ const CustomerNotificationSystem: React.FC = () => {
         orderId: order.id,
         type: 'status_update',
         title: getStatusTitle(order.status),
-        message: getStatusMessage(order.status, (order.driver as any)?.full_name),
+        message: getStatusMessage(order.status), // Remove driver name for now
         status: order.status,
         timestamp: order.updated_at,
         is_read: false
@@ -132,12 +130,12 @@ const CustomerNotificationSystem: React.FC = () => {
     }
   };
 
-  const getStatusMessage = (status: string, driverName?: string): string => {
+  const getStatusMessage = (status: string): string => {
     switch (status) {
       case 'pending': return 'Your order has been placed and is being prepared.';
       case 'accepted': return 'A driver has accepted your order and is on their way to pick it up.';
-      case 'picked_up': return driverName ? `${driverName} has picked up your order and is on the way.` : 'Your order has been picked up and is on the way.';
-      case 'in_transit': return driverName ? `${driverName} is delivering your order.` : 'Your order is being delivered.';
+      case 'picked_up': return 'Your order has been picked up and is on the way.';
+      case 'in_transit': return 'Your order is being delivered.';
       case 'delivered': return 'Your order has been delivered successfully!';
       case 'cancelled': return 'Your order has been cancelled.';
       default: return 'Your order status has been updated.';

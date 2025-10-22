@@ -103,7 +103,7 @@ export const useAuth = () => {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, [lastProcessedUserId]);
+  }, []); // Remove lastProcessedUserId dependency to prevent infinite loops
 
   const fetchProfile = async (userId: string) => {
     // Clear any existing timeout

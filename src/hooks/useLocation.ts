@@ -43,11 +43,11 @@ export const useLocation = (): UseLocationReturn => {
       );
 
       if (!response.ok) {
-        throw new Error('Failed to reverse geocode location');
+        throw new Error(`Failed to reverse geocode location: ${response.status}`);
       }
 
       const data = await response.json();
-
+      
       if (data.status !== 'OK' || !data.results[0]) {
         console.warn('Google Maps API returned no results, using fallback location data');
         // Return fallback location data when API returns no results
