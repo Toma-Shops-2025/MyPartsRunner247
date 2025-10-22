@@ -189,7 +189,11 @@ export const logSecurityEvent = (event: string, details: any) => {
   console.warn(`🔒 SECURITY EVENT: ${event}`, details);
   
   // In production, you'd send this to a security monitoring service
-  if (process.env.NODE_ENV === 'production') {
+  // Check if we're in production by looking at the URL or other indicators
+  const isProduction = typeof window !== 'undefined' && 
+    (window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1'));
+  
+  if (isProduction) {
     // Send to monitoring service
     console.log('Security event logged:', { event, details, timestamp: new Date().toISOString() });
   }
