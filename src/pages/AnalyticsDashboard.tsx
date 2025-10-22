@@ -131,7 +131,7 @@ const AnalyticsDashboard: React.FC = () => {
       // Top drivers (mock data)
       const topDrivers = [
         { name: 'John Smith', orders: 45, earnings: 1250.00, rating: 4.9 },
-        { name: 'Sarah Johnson', orders: 38, earnings: 980.00, rating: 4.8 },
+        { name: 'Ryan Johnson', orders: 38, earnings: 980.00, rating: 4.8 },
         { name: 'Mike Wilson', orders: 32, earnings: 875.00, rating: 4.7 }
       ];
 

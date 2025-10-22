@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
+    name: "Ryan Johnson",
     role: "Small Business Owner",
     image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475059261_a399835e.webp",
     content: "MyPartsRunner saved my business when I needed urgent parts delivered. Their drivers are professional and reliable.",
