@@ -48,7 +48,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
 
     if (!googleMapsKey) {
       console.warn('Google Maps API key not configured');
-      // Provide basic fallback suggestions
+      // Provide helpful fallback suggestions
       const fallbackSuggestions: AddressSuggestion[] = [
         {
           id: 'manual-entry',
@@ -60,6 +60,12 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
           id: 'current-location',
           text: 'Use current location',
           place_name: 'Click the location button to use GPS',
+          center: [0, 0] as [number, number]
+        },
+        {
+          id: 'common-addresses',
+          text: 'Common Louisville addresses',
+          place_name: 'Try: 123 Main St, Louisville, KY or 456 Oak Ave, Louisville, KY',
           center: [0, 0] as [number, number]
         }
       ];
@@ -103,14 +109,30 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       setShowSuggestions(true);
     } catch (error) {
       console.error('Address search error:', error);
-      setSuggestions([]);
-      // Show error message to user
-      setSuggestions([{
-        id: 'error',
-        text: 'Error loading suggestions',
-        place_name: 'Please check your internet connection and try again',
-        center: [0, 0] as [number, number]
-      }]);
+      
+      // Show helpful fallback suggestions when API fails
+      const fallbackSuggestions: AddressSuggestion[] = [
+        {
+          id: 'manual-entry',
+          text: 'Enter address manually',
+          place_name: 'Type the complete address without autocomplete',
+          center: [0, 0] as [number, number]
+        },
+        {
+          id: 'current-location',
+          text: 'Use current location',
+          place_name: 'Click the location button to use GPS',
+          center: [0, 0] as [number, number]
+        },
+        {
+          id: 'common-addresses',
+          text: 'Common Louisville addresses',
+          place_name: 'Try: 123 Main St, Louisville, KY or 456 Oak Ave, Louisville, KY',
+          center: [0, 0] as [number, number]
+        }
+      ];
+      
+      setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
     } finally {
       setLoading(false);

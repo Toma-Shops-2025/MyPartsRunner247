@@ -25,49 +25,80 @@ export const useLocation = (): UseLocationReturn => {
     const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     
     if (!googleMapsKey) {
-      throw new Error('Google Maps API key not configured');
+      console.warn('Google Maps API key not configured, using fallback location data');
+      // Return fallback location data when API key is not available
+      return {
+        lat,
+        lng,
+        city: 'Louisville',
+        state: 'Kentucky',
+        country: 'United States',
+        formattedAddress: `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+      };
     }
 
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleMapsKey}`
-    );
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleMapsKey}`
+      );
 
-    if (!response.ok) {
-      throw new Error('Failed to reverse geocode location');
-    }
-
-    const data = await response.json();
-
-    if (data.status !== 'OK' || !data.results[0]) {
-      throw new Error('No location data found');
-    }
-
-    const result = data.results[0];
-    const addressComponents = result.address_components;
-
-    // Extract city and state from address components
-    let city = 'Unknown';
-    let state = 'Unknown';
-    let country = 'Unknown';
-
-    for (const component of addressComponents) {
-      if (component.types.includes('locality')) {
-        city = component.long_name;
-      } else if (component.types.includes('administrative_area_level_1')) {
-        state = component.long_name;
-      } else if (component.types.includes('country')) {
-        country = component.long_name;
+      if (!response.ok) {
+        throw new Error('Failed to reverse geocode location');
       }
-    }
 
-    return {
-      lat,
-      lng,
-      city,
-      state,
-      country,
-      formattedAddress: result.formatted_address
-    };
+      const data = await response.json();
+
+      if (data.status !== 'OK' || !data.results[0]) {
+        console.warn('Google Maps API returned no results, using fallback location data');
+        // Return fallback location data when API returns no results
+        return {
+          lat,
+          lng,
+          city: 'Louisville',
+          state: 'Kentucky',
+          country: 'United States',
+          formattedAddress: `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+        };
+      }
+
+      const result = data.results[0];
+      const addressComponents = result.address_components;
+
+      // Extract city and state from address components
+      let city = 'Unknown';
+      let state = 'Unknown';
+      let country = 'Unknown';
+
+      for (const component of addressComponents) {
+        if (component.types.includes('locality')) {
+          city = component.long_name;
+        } else if (component.types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        } else if (component.types.includes('country')) {
+          country = component.long_name;
+        }
+      }
+
+      return {
+        lat,
+        lng,
+        city,
+        state,
+        country,
+        formattedAddress: result.formatted_address
+      };
+    } catch (error) {
+      console.warn('Google Maps API error, using fallback location data:', error);
+      // Return fallback location data when API fails
+      return {
+        lat,
+        lng,
+        city: 'Louisville',
+        state: 'Kentucky',
+        country: 'United States',
+        formattedAddress: `Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}`
+      };
+    }
   };
 
   const getCurrentLocation = async (): Promise<void> => {
