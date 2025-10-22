@@ -32,25 +32,36 @@ import OfflineIndicator from "./components/OfflineIndicator";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OptimizedPerformanceMonitor from "./components/OptimizedPerformanceMonitor";
 import MemoryCleanupButton from "./components/MemoryCleanupButton";
+import EmergencyMemoryButton from "./components/EmergencyMemoryButton";
 import { pwaService } from "./services/PWAService";
 import { errorMonitoringService } from "./services/ErrorMonitoringService";
 import { analyticsService } from "./services/AnalyticsService";
 import { PerformanceOptimizer } from "./utils/performanceOptimization";
+import { AggressiveMemoryCleanup } from "./utils/aggressiveMemoryCleanup";
 
 const queryClient = new QueryClient();
 
 // Initialize PWA service
 pwaService.initialize();
 
-// Initialize error monitoring
-errorMonitoringService.initialize();
+// Initialize error monitoring (disabled in production for performance)
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  errorMonitoringService.initialize();
+}
 
-// Initialize analytics service
-analyticsService.initialize();
+// Initialize analytics service (disabled in production for performance)
+if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+  analyticsService.initialize();
+}
 
 // Apply performance optimizations
 PerformanceOptimizer.optimizeAnalytics();
 PerformanceOptimizer.optimizeErrorMonitoring();
+
+// Start aggressive memory cleanup in production
+if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+  AggressiveMemoryCleanup.startAggressiveCleanup();
+}
 
 const App = () => (
   <ThemeProvider defaultTheme="light">
@@ -63,8 +74,13 @@ const App = () => (
           <PushNotificationManager />
           <PWAInstallPrompt />
           <OfflineIndicator />
-          <OptimizedPerformanceMonitor />
-          <MemoryCleanupButton />
+          {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
+            <>
+              <OptimizedPerformanceMonitor />
+              <MemoryCleanupButton />
+            </>
+          )}
+          <EmergencyMemoryButton />
           <ErrorBoundary>
             <Routes>
             <Route path="/" element={<Index />} />

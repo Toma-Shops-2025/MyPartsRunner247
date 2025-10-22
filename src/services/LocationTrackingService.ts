@@ -106,9 +106,9 @@ class LocationTrackingService {
     const key = `${location.driverId}-${location.orderId}`;
     const updates = this.locationUpdates.get(key) || [];
     
-    // Keep only last 20 updates to prevent memory issues (reduced from 50)
+    // Keep only last 5 updates to prevent memory issues (aggressively reduced)
     updates.push(location);
-    if (updates.length > 20) {
+    if (updates.length > 5) {
       updates.shift();
     }
     
@@ -122,7 +122,7 @@ class LocationTrackingService {
   private startPeriodicUpdates() {
     this.updateInterval = setInterval(() => {
       this.sendLocationUpdatesToServer();
-    }, 60000); // Update every 60 seconds (reduced frequency)
+    }, 300000); // Update every 5 minutes (much reduced frequency)
   }
 
   // Send location updates to server
