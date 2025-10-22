@@ -130,7 +130,6 @@ const Footer: React.FC = () => {
             <ul className="space-y-3">
               <li><button onClick={() => handleNavigation('/about')} className="text-gray-400 hover:text-white transition-colors text-left">About Us</button></li>
               <li><button onClick={() => handleNavigation('/driver-application')} className="text-gray-400 hover:text-white transition-colors text-left">Drive with Us</button></li>
-              <li><button onClick={() => handleNavigation('/careers')} className="text-gray-400 hover:text-white transition-colors text-left">Careers</button></li>
             </ul>
           </div>
 
