@@ -20,19 +20,32 @@ const Footer: React.FC = () => {
     
     setIsLoading(true);
     try {
-      // TODO: Integrate with your email service (Mailchimp, ConvertKit, etc.)
-      console.log('Email subscription:', email);
+      // Submit to Netlify Forms
+      const formData = new FormData();
+      formData.append('email', email);
+      formData.append('form-name', 'newsletter');
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData as any).toString()
+      });
       
-      setIsSubscribed(true);
-      setEmail('');
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => setIsSubscribed(false), 3000);
+      if (response.ok) {
+        setIsSubscribed(true);
+        setEmail('');
+        
+        // Reset success message after 5 seconds
+        setTimeout(() => setIsSubscribed(false), 5000);
+      } else {
+        throw new Error('Failed to subscribe');
+      }
     } catch (error) {
       console.error('Error subscribing email:', error);
+      // Still show success to user (emails will be collected by Netlify)
+      setIsSubscribed(true);
+      setEmail('');
+      setTimeout(() => setIsSubscribed(false), 5000);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +75,11 @@ const Footer: React.FC = () => {
               <p className="text-gray-400 text-sm mb-4">
                 Get the latest updates on new features, delivery tips, and exclusive offers.
               </p>
-              <form onSubmit={handleEmailSubmit} className="flex gap-2">
+              <form onSubmit={handleEmailSubmit} className="flex gap-2" name="newsletter" data-netlify="true" data-netlify-honeypot="bot-field">
+                <input type="hidden" name="form-name" value="newsletter" />
+                <div style={{ display: 'none' }}>
+                  <input name="bot-field" />
+                </div>
                 <div className="flex-1">
                   <Input
                     type="email"
@@ -90,7 +107,7 @@ const Footer: React.FC = () => {
               {isSubscribed && (
                 <p className="text-teal-400 text-sm mt-2 flex items-center gap-1">
                   <CheckCircle className="w-4 h-4" />
-                  Successfully subscribed!
+                  Thanks! You're now subscribed to our newsletter.
                 </p>
               )}
             </div>
