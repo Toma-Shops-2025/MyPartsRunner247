@@ -109,6 +109,7 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       setShowSuggestions(true);
     } catch (error) {
       console.error('Address search error:', error);
+      console.log('Setting fallback suggestions due to API error');
       
       // Show helpful fallback suggestions when API fails
       const fallbackSuggestions: AddressSuggestion[] = [
@@ -132,8 +133,10 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         }
       ];
       
+      console.log('Fallback suggestions:', fallbackSuggestions);
       setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
+      console.log('Suggestions set, showSuggestions:', true);
     } finally {
       setLoading(false);
     }
@@ -260,6 +263,9 @@ const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       }
     };
   }, []);
+
+  // Debug logging
+  console.log('AddressAutocomplete render:', { showSuggestions, suggestions: suggestions.length, loading });
 
   return (
     <div className="relative">
