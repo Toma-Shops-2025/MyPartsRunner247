@@ -131,7 +131,15 @@ const AppLayout: React.FC = () => {
                 }
               }}
             />
-            <HowItWorksSection />
+            <HowItWorksSection 
+              onRequestPickup={() => {
+                if (user) {
+                  setIsPickupModalOpen(true);
+                } else {
+                  setIsAuthModalOpen(true);
+                }
+              }}
+            />
             <FeaturesSection />
             <StatsSection />
             <DriversSection />

@@ -1,8 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
-const HowItWorksSection: React.FC = () => {
+interface HowItWorksSectionProps {
+  onRequestPickup?: () => void;
+}
+
+const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({ onRequestPickup }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const steps = [
     {
@@ -72,7 +78,7 @@ const HowItWorksSection: React.FC = () => {
             <h3 className="text-2xl font-bold text-white mb-4">Ready to get started?</h3>
             <p className="text-gray-300 mb-6">Join thousands of satisfied customers nationwide.</p>
             <button 
-              onClick={() => navigate('/services')}
+              onClick={onRequestPickup || (() => navigate('/services'))}
               className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
             >
               Request Your First Pickup
