@@ -111,10 +111,15 @@ export const useAuth = () => {
       clearTimeout(profileFetchTimeout);
     }
     
-    // Prevent duplicate fetches for the same user
-    if (lastProcessedUserId === userId) {
+    // Only skip if we already have a profile for this user
+    if (lastProcessedUserId === userId && profile && profile.id === userId) {
       console.log('Skipping duplicate profile fetch for user:', userId);
       return;
+    }
+    
+    // If we don't have a profile yet, fetch it even if we've processed this user before
+    if (lastProcessedUserId === userId && (!profile || profile.id !== userId)) {
+      console.log('User processed before but no profile found, fetching again:', userId);
     }
     
     setLastProcessedUserId(userId);
