@@ -185,6 +185,16 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </div>
 
+          {/* Tip Selector */}
+          <TipSelector
+            baseAmount={amount}
+            onTipChange={(tipAmount, tipType) => {
+              setTipAmount(tipAmount);
+              setTipType(tipType);
+            }}
+            className="mb-4"
+          />
+
           <SecureForm onSubmit={handlePayment}>
             <div className="space-y-4">
               <SecureInput

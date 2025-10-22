@@ -101,7 +101,24 @@ const PlaceOrderPage: React.FC = () => {
 
   const handlePaymentSuccess = (orderId: string) => {
     setShowPaymentModal(false);
-    alert(`Order #${orderId} placed successfully! A driver will be assigned soon.`);
+    
+    // Show success message with tracking link
+    const trackingUrl = `${window.location.origin}/track/${orderId}`;
+    const successMessage = `Order #${orderId} placed successfully! 🎉\n\nTrack your order: ${trackingUrl}\n\nA driver will be assigned soon.`;
+    
+    alert(successMessage);
+    
+    // Store order data for tracking
+    localStorage.setItem(`order_tracking_${orderId}`, JSON.stringify({
+      id: orderId,
+      pickup_address: orderData.pickupAddress,
+      delivery_address: orderData.deliveryAddress,
+      item_description: orderData.itemDescription,
+      special_instructions: orderData.specialInstructions,
+      contact_phone: orderData.contactPhone,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    }));
     
     // Reset form
     setOrderData({
