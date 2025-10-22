@@ -48,15 +48,21 @@ exports.handler = async (event, context) => {
       throw new Error('Driver not found');
     }
 
-    // Calculate payment split after Stripe fees
+    // Calculate payment split with minimum driver payment
     const orderTotal = parseFloat(order.total) || 0;
     const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ processing fee
     const netAmount = orderTotal - stripeFee;
-    const driverPayment = netAmount * 0.70; // 70% of net amount
-    const platformFee = netAmount * 0.30; // 30% of net amount
+    
+    // Ensure driver gets at least 50% of order total (minimum commission)
+    const minimumDriverPayment = orderTotal * 0.50;
+    const calculatedDriverPayment = netAmount * 0.70;
+    const driverPayment = Math.max(calculatedDriverPayment, minimumDriverPayment);
+    
+    const platformFee = orderTotal - driverPayment;
 
     console.log(`Order total: $${orderTotal}, Stripe fee: $${stripeFee.toFixed(2)}, Net amount: $${netAmount.toFixed(2)}`);
-    console.log(`Driver payment: $${driverPayment.toFixed(2)}, Platform fee: $${platformFee.toFixed(2)}`);
+    console.log(`Minimum driver payment: $${minimumDriverPayment.toFixed(2)}, Calculated: $${calculatedDriverPayment.toFixed(2)}`);
+    console.log(`Final driver payment: $${driverPayment.toFixed(2)}, Platform fee: $${platformFee.toFixed(2)}`);
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
