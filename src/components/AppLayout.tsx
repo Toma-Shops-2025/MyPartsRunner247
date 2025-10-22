@@ -154,12 +154,8 @@ const AppLayout: React.FC = () => {
                 }
               }}
               onBecomeDriver={() => {
-                if (user) {
-                  setShowDriverRegistration(true);
-                } else {
-                  // Open driver auth modal for unauthenticated users
-                  setIsDriverAuthModalOpen(true);
-                }
+                // Always open driver auth modal for signup/signin
+                setIsDriverAuthModalOpen(true);
               }}
             />
           </>
