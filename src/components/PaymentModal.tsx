@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import TipSelector from '@/components/TipSelector';
+// TipSelector removed - using post-delivery tipping only
 import SecureForm, { SecureInput } from '@/components/SecureForm';
 import { sanitizeInput, isValidAddress, logSecurityEvent } from '@/utils/security';
 import { CreditCard, Lock, Shield } from 'lucide-react';
@@ -169,15 +169,9 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
                 <span>Base Amount:</span>
                 <span>${amount.toFixed(2)}</span>
               </div>
-              {tipAmount > 0 && (
-                <div className="flex justify-between text-sm text-pink-300">
-                  <span>Tip ({tipType === 'percentage' ? '15%' : 'Custom'}):</span>
-                  <span>${tipAmount.toFixed(2)}</span>
-                </div>
-              )}
               <div className="flex justify-between font-bold border-t pt-1">
                 <span>Total:</span>
-                <span>${(amount + tipAmount).toFixed(2)}</span>
+                <span>${amount.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -229,15 +223,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </SecureForm>
 
-          {/* Tip Selector */}
-          <TipSelector
-            baseAmount={amount}
-            onTipChange={(tipAmount, tipType) => {
-              setTipAmount(tipAmount);
-              setTipType(tipType);
-            }}
-            className="bg-gray-50"
-          />
+          {/* Tip functionality moved to post-delivery */}
 
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Lock className="w-4 h-4" />
@@ -250,7 +236,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
               disabled={loading}
               className="w-full"
             >
-              {loading ? 'Processing...' : `Pay $${(amount + tipAmount).toFixed(2)}`}
+              {loading ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
             </Button>
             
             <Button 
