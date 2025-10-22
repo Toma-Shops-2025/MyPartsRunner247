@@ -34,6 +34,9 @@ class AnalyticsService {
 
   constructor() {
     this.sessionId = this.generateSessionId();
+  }
+
+  public initialize() {
     this.initializeAnalytics();
   }
 
@@ -145,7 +148,7 @@ class AnalyticsService {
         loadTime: navigation.loadEventEnd - navigation.loadEventStart,
         domContentLoaded: navigation.domContentLoadedEventEnd - navigation.domContentLoadedEventStart,
         firstByte: navigation.responseStart - navigation.requestStart,
-        totalTime: navigation.loadEventEnd - navigation.navigationStart
+        totalTime: navigation.loadEventEnd - navigation.fetchStart
       });
     }
   }
