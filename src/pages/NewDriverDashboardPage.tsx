@@ -591,9 +591,14 @@ const NewDriverDashboardPage: React.FC = () => {
                                           const paymentData = await paymentResponse.json();
                                           console.log('Driver payment processed:', paymentData);
                                           
-                                          if (paymentData.driverPayment) {
+                                          if (paymentData.driverPayment && paymentData.success) {
                                             alert(`Delivery completed! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
                                           } else {
+                                            console.log('Payment skipped - Stripe account status:', {
+                                              stripeAccountId: paymentData.stripeAccountId,
+                                              stripeConnected: paymentData.stripeConnected,
+                                              message: paymentData.message
+                                            });
                                             alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
                                           }
                                         } else {

@@ -60,14 +60,19 @@ exports.handler = async (event, context) => {
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
+    const stripeConnected = driver.stripe_connected;
     
-    if (!stripeAccountId) {
-      console.log('Driver has no Stripe account, skipping payment');
+    if (!stripeAccountId || !stripeConnected) {
+      console.log('Driver has no Stripe account or not connected, skipping payment');
+      console.log('Stripe account ID:', stripeAccountId);
+      console.log('Stripe connected:', stripeConnected);
       return {
         statusCode: 200,
         body: JSON.stringify({
           message: 'Driver payment skipped - no Stripe account connected',
-          driverPayment: driverPayment
+          driverPayment: driverPayment,
+          stripeAccountId: stripeAccountId,
+          stripeConnected: stripeConnected
         })
       };
     }
