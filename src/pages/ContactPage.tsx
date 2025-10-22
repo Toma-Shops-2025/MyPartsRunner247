@@ -18,11 +18,42 @@ const ContactPage = () => {
     category: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Contact form submitted:', formData);
-    // Handle form submission
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate form submission (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success message
+      toast({
+        title: "Message sent successfully!",
+        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+      });
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        category: '',
+        message: ''
+      });
+      
+    } catch (error) {
+      console.error('Error submitting contact form:', error);
+      toast({
+        title: "Error sending message",
+        description: "Please try again or contact us directly at support@mypartsrunner.com",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,8 +149,8 @@ const ContactPage = () => {
                     />
                   </div>
 
-                  <Button type="submit" className="w-full">
-                    Send Message
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </Button>
                 </form>
               </CardContent>
