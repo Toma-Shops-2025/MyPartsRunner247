@@ -108,8 +108,11 @@ const AppLayout: React.FC = () => {
             
             <HeroSection 
               onRequestPickup={() => {
-                if (user) {
+                if (user && profile?.user_type === 'customer') {
                   setIsPickupModalOpen(true);
+                } else if (user && profile?.user_type === 'driver') {
+                  // If user is a driver, they need to switch to customer mode
+                  alert('Please switch to Customer Mode to place orders. Use the dropdown menu in the top right.');
                 } else {
                   setIsAuthModalOpen(true);
                 }
@@ -126,8 +129,11 @@ const AppLayout: React.FC = () => {
             />
             <ServicesSection 
               onRequestPickup={() => {
-                if (user) {
+                if (user && profile?.user_type === 'customer') {
                   setIsPickupModalOpen(true);
+                } else if (user && profile?.user_type === 'driver') {
+                  // If user is a driver, they need to switch to customer mode
+                  alert('Please switch to Customer Mode to place orders. Use the dropdown menu in the top right.');
                 } else {
                   setIsAuthModalOpen(true);
                 }
@@ -135,8 +141,11 @@ const AppLayout: React.FC = () => {
             />
             <HowItWorksSection 
               onRequestPickup={() => {
-                if (user) {
+                if (user && profile?.user_type === 'customer') {
                   setIsPickupModalOpen(true);
+                } else if (user && profile?.user_type === 'driver') {
+                  // If user is a driver, they need to switch to customer mode
+                  alert('Please switch to Customer Mode to place orders. Use the dropdown menu in the top right.');
                 } else {
                   setIsAuthModalOpen(true);
                 }
@@ -148,8 +157,11 @@ const AppLayout: React.FC = () => {
             <TestimonialsSection />
             <CTASection 
               onRequestPickup={() => {
-                if (user) {
+                if (user && profile?.user_type === 'customer') {
                   setIsPickupModalOpen(true);
+                } else if (user && profile?.user_type === 'driver') {
+                  // If user is a driver, they need to switch to customer mode
+                  alert('Please switch to Customer Mode to place orders. Use the dropdown menu in the top right.');
                 } else {
                   setIsAuthModalOpen(true);
                 }
