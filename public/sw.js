@@ -208,5 +208,22 @@ self.addEventListener('sync', function(event) {
 self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
+  } else if (event.data && event.data.type === 'SHOW_NOTIFICATION') {
+    // Handle notification test from main thread
+    const payload = event.data.payload;
+    const options = {
+      body: payload.body || 'Test notification',
+      icon: payload.icon || '/icon-192x192.png',
+      badge: payload.badge || '/badge-72x72.png',
+      tag: payload.tag || 'test-notification',
+      data: payload.data || {},
+      vibrate: [100, 50, 100],
+      requireInteraction: false,
+      silent: false
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(payload.title || 'MyPartsRunner Test', options)
+    );
   }
 });

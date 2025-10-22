@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Bell, BellOff, Settings } from 'lucide-react';
 import pushNotificationService from '@/services/PushNotificationService';
+import { MobileNotificationHelper } from '@/utils/mobileNotificationHelper';
 
 interface NotificationSettings {
   orderUpdates: boolean;
@@ -90,15 +91,51 @@ const PushNotificationManager: React.FC = () => {
 
   const testNotification = async () => {
     try {
-      // Check if we're on mobile
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isMobile) {
-        // For mobile, try to show a local notification first
-        if (Notification.permission === 'granted') {
+      // Use mobile-specific helper for better mobile support
+      if (MobileNotificationHelper.isMobile()) {
+        const success = await MobileNotificationHelper.testMobileNotification();
+        if (!success) {
+          const errorMessage = MobileNotificationHelper.getMobileErrorMessage(new Error('Mobile notification failed'));
+          alert(errorMessage);
+        }
+        return;
+      }
+
+      // Desktop notification handling
+      // First, ensure we have permission
+      if (Notification.permission !== 'granted') {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          alert('Please enable notifications in your browser settings first!');
+          return;
+        }
+      }
+
+      // For desktop, use the service worker approach
+      try {
+        // Register service worker if not already registered
+        const registration = await navigator.serviceWorker.register('/sw.js');
+        await navigator.serviceWorker.ready;
+
+        // Send message to service worker to show notification
+        if (registration.active) {
+          registration.active.postMessage({
+            type: 'SHOW_NOTIFICATION',
+            payload: {
+              title: 'MyPartsRunner Test',
+              body: 'This is a test notification! 🚀',
+              icon: '/icon-192x192.png',
+              badge: '/badge-72x72.png',
+              tag: 'test-notification',
+              data: { test: true }
+            }
+          });
+        } else {
+          // Fallback to direct notification
           const notification = new Notification('MyPartsRunner Test', {
             body: 'This is a test notification! 🚀',
             icon: '/icon-192x192.png',
+            badge: '/badge-72x72.png',
             tag: 'test-notification'
           });
           
@@ -106,22 +143,33 @@ const PushNotificationManager: React.FC = () => {
           setTimeout(() => {
             notification.close();
           }, 5000);
-        } else {
-          alert('Please enable notifications in your browser settings first!');
-          return;
         }
-      } else {
-        // For desktop, use the service
-        await pushNotificationService.sendNotification({
-          title: 'MyPartsRunner Test',
+      } catch (swError) {
+        console.warn('Service worker notification failed, trying direct approach:', swError);
+        
+        // Fallback to direct notification
+        const notification = new Notification('MyPartsRunner Test', {
           body: 'This is a test notification! 🚀',
           icon: '/icon-192x192.png',
-          data: { test: true }
+          badge: '/badge-72x72.png',
+          tag: 'test-notification'
         });
+        
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+          notification.close();
+        }, 5000);
       }
     } catch (error) {
       console.error('Error sending test notification:', error);
-      alert('Test notification failed. Please check your browser settings.');
+      
+      // Provide more helpful error message
+      if (MobileNotificationHelper.isMobile()) {
+        const errorMessage = MobileNotificationHelper.getMobileErrorMessage(error);
+        alert(errorMessage);
+      } else {
+        alert('Test notification failed. Please check your browser settings.');
+      }
     }
   };
 
