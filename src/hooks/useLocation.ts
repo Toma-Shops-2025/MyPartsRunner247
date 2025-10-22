@@ -22,14 +22,14 @@ export const useLocation = (): UseLocationReturn => {
   const [error, setError] = useState<string | null>(null);
 
   const reverseGeocode = async (lat: number, lng: number): Promise<LocationData> => {
-    const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+    const googleMapsKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     
-    if (!mapboxToken) {
-      throw new Error('Mapbox access token not configured');
+    if (!googleMapsKey) {
+      throw new Error('Google Maps API key not configured');
     }
 
     const response = await fetch(
-      `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}&types=place,locality,neighborhood,address`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${googleMapsKey}`
     );
 
     if (!response.ok) {
@@ -37,25 +37,36 @@ export const useLocation = (): UseLocationReturn => {
     }
 
     const data = await response.json();
-    const feature = data.features[0];
 
-    if (!feature) {
+    if (data.status !== 'OK' || !data.results[0]) {
       throw new Error('No location data found');
     }
 
-    // Extract city and state from context
-    const context = feature.context || [];
-    const place = context.find((c: any) => c.id.startsWith('place.'));
-    const region = context.find((c: any) => c.id.startsWith('region.'));
-    const country = context.find((c: any) => c.id.startsWith('country.'));
+    const result = data.results[0];
+    const addressComponents = result.address_components;
+
+    // Extract city and state from address components
+    let city = 'Unknown';
+    let state = 'Unknown';
+    let country = 'Unknown';
+
+    for (const component of addressComponents) {
+      if (component.types.includes('locality')) {
+        city = component.long_name;
+      } else if (component.types.includes('administrative_area_level_1')) {
+        state = component.long_name;
+      } else if (component.types.includes('country')) {
+        country = component.long_name;
+      }
+    }
 
     return {
       lat,
       lng,
-      city: place?.text || feature.text || 'Unknown',
-      state: region?.text || 'Unknown',
-      country: country?.text || 'Unknown',
-      formattedAddress: feature.place_name || `${place?.text || 'Unknown'}, ${region?.text || 'Unknown'}`
+      city,
+      state,
+      country,
+      formattedAddress: result.formatted_address
     };
   };
 

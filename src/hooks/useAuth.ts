@@ -58,25 +58,42 @@ export const useAuth = () => {
         if (!mounted) return;
         
         console.log('Auth state change:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
         
-        if (session?.user) {
+        // Only process meaningful state changes
+        if (event === 'SIGNED_IN' && session?.user) {
+          setSession(session);
+          setUser(session.user);
           setLoading(true);
+          
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
             console.log('Fetching profile for new user:', session.user.id);
             await fetchProfile(session.user.id);
           } else {
             console.log('Skipping profile fetch - already processed user:', session.user.id);
+            setLoading(false);
           }
-        } else {
-          // Clear profile and localStorage when signing out
+        } else if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
           setProfile(null);
           setLoading(false);
           setLastProcessedUserId(null);
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
+        } else if (event === 'INITIAL_SESSION' && session?.user) {
+          setSession(session);
+          setUser(session.user);
+          setLoading(true);
+          
+          // Only fetch profile if we don't already have it for this user
+          if (lastProcessedUserId !== session.user.id) {
+            console.log('Fetching profile for initial session:', session.user.id);
+            await fetchProfile(session.user.id);
+          } else {
+            console.log('Skipping profile fetch - already processed user:', session.user.id);
+            setLoading(false);
+          }
         }
       }
     );
@@ -86,7 +103,7 @@ export const useAuth = () => {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, []);
+  }, [lastProcessedUserId]);
 
   const fetchProfile = async (userId: string) => {
     // Clear any existing timeout
