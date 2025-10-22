@@ -96,11 +96,15 @@ const NewHeader: React.FC = () => {
                 <button onClick={() => handleNavigation('/about')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   About
                 </button>
-                {!user && (
-                  <button onClick={() => handleNavigation('/driver-application')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
-                    Become a Driver
-                  </button>
-                )}
+                <button onClick={() => {
+                  if (user) {
+                    handleNavigation('/driver-dashboard');
+                  } else {
+                    handleNavigation('/driver-application');
+                  }
+                }} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
+                  Become a Driver
+                </button>
               </nav>
             </div>
 

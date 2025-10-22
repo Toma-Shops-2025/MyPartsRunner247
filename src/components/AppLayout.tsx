@@ -116,9 +116,10 @@ const AppLayout: React.FC = () => {
               }}
               onBecomeDriver={() => {
                 if (user) {
-                  setShowDriverRegistration(true);
+                  // If already authenticated, go directly to driver dashboard
+                  navigate('/driver-dashboard');
                 } else {
-                  // Open driver auth modal for unauthenticated users
+                  // If not authenticated, open driver auth modal
                   setIsDriverAuthModalOpen(true);
                 }
               }}
@@ -154,8 +155,13 @@ const AppLayout: React.FC = () => {
                 }
               }}
               onBecomeDriver={() => {
-                // Always open driver auth modal for signup/signin
-                setIsDriverAuthModalOpen(true);
+                if (user) {
+                  // If already authenticated, go directly to driver dashboard
+                  navigate('/driver-dashboard');
+                } else {
+                  // If not authenticated, open driver auth modal
+                  setIsDriverAuthModalOpen(true);
+                }
               }}
             />
           </>
