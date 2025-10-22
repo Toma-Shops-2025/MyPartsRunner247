@@ -39,8 +39,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
     cvv: '',
     cardholderName: ''
   });
-  const [tipAmount, setTipAmount] = useState<number>(0);
-  const [tipType, setTipType] = useState<string>('none');
+  // Tip functionality moved to post-delivery
 
   if (!isOpen) return null;
 
@@ -73,12 +72,11 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       // Log security event
       logSecurityEvent('PAYMENT_ATTEMPT', {
         userId: user.id,
-        amount: amount + tipAmount,
+        amount: amount,
         timestamp: new Date().toISOString()
       });
       
-      // Create order in database with sanitized data
-      const totalAmount = amount + tipAmount;
+      // Create order in database with sanitized data (no tip at order creation)
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
@@ -86,9 +84,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
           pickup_address: sanitizedOrderDetails.pickupAddress,
           delivery_address: sanitizedOrderDetails.deliveryAddress,
           item_description: sanitizedOrderDetails.itemDescription,
-          total: totalAmount,
-          tip_amount: tipAmount,
-          tip_type: tipType,
+          total: amount,
+          tip_amount: 0, // No tip at order creation
           status: 'pending',
           special_instructions: sanitizedOrderDetails.specialInstructions,
           contact_phone: profile?.phone || sanitizedOrderDetails.contactPhone
@@ -119,7 +116,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       // Log successful payment
       logSecurityEvent('PAYMENT_SUCCESS', {
         orderId: order.id,
-        amount: totalAmount,
+        amount: amount,
         timestamp: new Date().toISOString()
       });
 
@@ -185,15 +182,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </div>
 
-          {/* Tip Selector */}
-          <TipSelector
-            baseAmount={amount}
-            onTipChange={(tipAmount, tipType) => {
-              setTipAmount(tipAmount);
-              setTipType(tipType);
-            }}
-            className="mb-4"
-          />
+          {/* Tip functionality moved to post-delivery */}
 
           <SecureForm onSubmit={handlePayment}>
             <div className="space-y-4">
