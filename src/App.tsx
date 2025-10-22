@@ -26,6 +26,7 @@ import TestDriverPage from "./pages/TestDriverPage";
 import CustomerTrackingPage from "./pages/CustomerTrackingPage";
 import PhotoViewerPage from "./pages/PhotoViewerPage";
 import AnalyticsDashboard from "./pages/AnalyticsDashboard";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
 import PushNotificationManager from "./components/PushNotificationManager";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -104,6 +105,7 @@ const App = () => (
             <Route path="/track/:orderId" element={<CustomerTrackingPage />} />
             <Route path="/photo-viewer" element={<PhotoViewerPage />} />
             <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
             <Route path="/production-readiness" element={<ProductionReadinessDashboard />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
