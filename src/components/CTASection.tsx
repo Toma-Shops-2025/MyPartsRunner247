@@ -71,11 +71,11 @@ const CTASection: React.FC<CTASectionProps> = ({ onRequestPickup, onBecomeDriver
               </li>
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
-                Competitive pay
+                70%
               </li>
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
-                Weekly payouts
+                Immediate Payouts
               </li>
             </ul>
             <button 
