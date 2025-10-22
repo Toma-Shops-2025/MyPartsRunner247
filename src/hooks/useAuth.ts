@@ -86,12 +86,12 @@ export const useAuth = () => {
           setUser(session.user);
           setLoading(true);
           
-          // Only fetch profile if we don't already have it for this user
-          if (lastProcessedUserId !== session.user.id) {
+          // Always fetch profile if we don't have it or if it's for a different user
+          if (!profile || profile.id !== session.user.id) {
             console.log('Fetching profile for initial session:', session.user.id);
             await fetchProfile(session.user.id);
           } else {
-            console.log('Skipping profile fetch - already processed user:', session.user.id);
+            console.log('Profile already available for user:', session.user.id);
             setLoading(false);
           }
         }

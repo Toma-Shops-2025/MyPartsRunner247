@@ -239,8 +239,18 @@ const NewDriverDashboardPage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
-  if (profile?.user_type !== 'driver') {
+  // Only redirect if we have a profile and it's not a driver
+  if (profile && profile.user_type !== 'driver') {
     return <Navigate to="/" replace />;
+  }
+  
+  // If we don't have a profile yet but we have a user, wait for it to load
+  if (user && !profile) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400"></div>
+      </div>
+    );
   }
 
   return (
