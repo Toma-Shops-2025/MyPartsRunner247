@@ -1,0 +1,15 @@
+# VAPID Keys for Push Notifications
+# =================================
+
+# Public Key (Safe to share)
+VITE_VAPID_PUBLIC_KEY=BIKAgfIV6XeDyuuJ6LQwg-n6pa9Cr2_NOszaVnyZwDd_WoOktrBxCp8hqKhSqTntHTS7eNL7c-ccMpUSis8coIk
+
+# Private Key (KEEP SECRET!)
+VAPID_PUBLIC_KEY=BIKAgfIV6XeDyuuJ6LQwg-n6pa9Cr2_NOszaVnyZwDd_WoOktrBxCp8hqKhSqTntHTS7eNL7c-ccMpUSis8coIk
+VAPID_PRIVATE_KEY=9m0SXDPg10032O4EMKwpo1TDgHm2qv3CHxtkWHu37rE
+
+# Instructions:
+# 1. Copy these keys to your .env.local file
+# 2. Add the same keys to Netlify environment variables
+# 3. Restart your development server
+# 4. Test push notifications in your app
