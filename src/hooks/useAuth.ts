@@ -153,9 +153,9 @@ export const useAuth = () => {
     
     // Skip fallback user logic - use database only
     
-    // Prevent multiple simultaneous fetches for the same user
-    if (lastProcessedUserId === userId && loading) {
-      console.log('Already processing profile for user:', userId);
+    // Only prevent if we already have a profile for this user
+    if (profile && profile.id === userId) {
+      console.log('Profile already exists for user:', userId);
       return;
     }
     
