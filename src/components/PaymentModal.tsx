@@ -3,10 +3,10 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import TipSelector from '@/components/TipSelector';
-import { CreditCard, Lock } from 'lucide-react';
+import SecureForm, { SecureInput } from '@/components/SecureForm';
+import { sanitizeInput, isValidAddress, logSecurityEvent } from '@/utils/security';
+import { CreditCard, Lock, Shield } from 'lucide-react';
 
 interface PaymentModalProps {
   isOpen?: boolean;
@@ -44,41 +44,61 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handlePayment = async () => {
+  const handlePayment = async (formData: any) => {
     if (!user) {
       alert('Please log in to complete payment.');
       return;
     }
     
-    // Validate payment form
-    if (!paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv || !paymentData.cardholderName) {
-      alert('Please fill in all payment details.');
-      return;
-    }
-    
     setLoading(true);
     try {
-      // Create order in database directly (simplified for demo)
+      // Security validation
+      const sanitizedOrderDetails = {
+        pickupAddress: sanitizeInput(orderDetails.pickupAddress),
+        deliveryAddress: sanitizeInput(orderDetails.deliveryAddress),
+        itemDescription: sanitizeInput(orderDetails.itemDescription),
+        specialInstructions: sanitizeInput(orderDetails.specialInstructions || ''),
+        contactPhone: sanitizeInput(orderDetails.contactPhone || '')
+      };
+      
+      // Validate addresses
+      if (!isValidAddress(sanitizedOrderDetails.pickupAddress)) {
+        throw new Error('Invalid pickup address');
+      }
+      
+      if (!isValidAddress(sanitizedOrderDetails.deliveryAddress)) {
+        throw new Error('Invalid delivery address');
+      }
+      
+      // Log security event
+      logSecurityEvent('PAYMENT_ATTEMPT', {
+        userId: user.id,
+        amount: amount + tipAmount,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Create order in database with sanitized data
       const totalAmount = amount + tipAmount;
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert([{
           customer_id: user.id,
-          pickup_address: orderDetails.pickupAddress,
-          delivery_address: orderDetails.deliveryAddress,
-          item_description: orderDetails.itemDescription,
+          pickup_address: sanitizedOrderDetails.pickupAddress,
+          delivery_address: sanitizedOrderDetails.deliveryAddress,
+          item_description: sanitizedOrderDetails.itemDescription,
           total: totalAmount,
           tip_amount: tipAmount,
           tip_type: tipType,
           status: 'pending',
-          special_instructions: orderDetails.specialInstructions,
-          contact_phone: profile?.phone || orderDetails.contactPhone
+          special_instructions: sanitizedOrderDetails.specialInstructions,
+          contact_phone: profile?.phone || sanitizedOrderDetails.contactPhone
         }])
         .select()
         .single();
 
       if (orderError) {
         console.error('Order creation error:', orderError);
+        logSecurityEvent('ORDER_CREATION_ERROR', { error: orderError.message });
         throw new Error('Failed to create order. Please try again.');
       }
 
@@ -96,6 +116,13 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
         throw new Error('Payment processed but failed to confirm order.');
       }
 
+      // Log successful payment
+      logSecurityEvent('PAYMENT_SUCCESS', {
+        orderId: order.id,
+        amount: totalAmount,
+        timestamp: new Date().toISOString()
+      });
+
       alert('Payment successful! Your order has been placed.');
       if (onSuccess) {
         onSuccess(order.id);
@@ -104,6 +131,10 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
       
     } catch (error) {
       console.error('Payment error:', error);
+      logSecurityEvent('PAYMENT_ERROR', { 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
       const errorMessage = error.message || 'Please try again.';
       alert(`Payment failed: ${errorMessage}`);
       if (onError) {
@@ -154,48 +185,50 @@ const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="cardholderName">Cardholder Name</Label>
-              <Input
-                id="cardholderName"
+          <SecureForm onSubmit={handlePayment}>
+            <div className="space-y-4">
+              <SecureInput
+                name="cardholderName"
+                label="Cardholder Name"
+                type="text"
                 placeholder="John Doe"
+                required={true}
                 value={paymentData.cardholderName}
-                onChange={(e) => setPaymentData({...paymentData, cardholderName: e.target.value})}
+                onChange={(value) => setPaymentData({...paymentData, cardholderName: value})}
               />
-            </div>
 
-            <div>
-              <Label htmlFor="cardNumber">Card Number</Label>
-              <Input
-                id="cardNumber"
+              <SecureInput
+                name="cardNumber"
+                label="Card Number"
+                type="card"
                 placeholder="1234 5678 9012 3456"
+                required={true}
                 value={paymentData.cardNumber}
-                onChange={(e) => setPaymentData({...paymentData, cardNumber: e.target.value})}
+                onChange={(value) => setPaymentData({...paymentData, cardNumber: value})}
               />
-            </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="expiryDate">Expiry Date</Label>
-                <Input
-                  id="expiryDate"
+              <div className="grid grid-cols-2 gap-4">
+                <SecureInput
+                  name="expiryDate"
+                  label="Expiry Date"
+                  type="expiry"
                   placeholder="MM/YY"
+                  required={true}
                   value={paymentData.expiryDate}
-                  onChange={(e) => setPaymentData({...paymentData, expiryDate: e.target.value})}
+                  onChange={(value) => setPaymentData({...paymentData, expiryDate: value})}
                 />
-              </div>
-              <div>
-                <Label htmlFor="cvv">CVV</Label>
-                <Input
-                  id="cvv"
+                <SecureInput
+                  name="cvv"
+                  label="CVV"
+                  type="cvv"
                   placeholder="123"
+                  required={true}
                   value={paymentData.cvv}
-                  onChange={(e) => setPaymentData({...paymentData, cvv: e.target.value})}
+                  onChange={(value) => setPaymentData({...paymentData, cvv: value})}
                 />
               </div>
             </div>
-          </div>
+          </SecureForm>
 
           {/* Tip Selector */}
           <TipSelector

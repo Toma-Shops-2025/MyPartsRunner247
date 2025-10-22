@@ -1,6 +1,20 @@
 const sgMail = require('@sendgrid/mail');
+const { securityMiddleware } = require('./rate-limit');
 
-exports.handler = async (event, context) => {
+// Apply security middleware
+const applySecurity = (handler) => {
+  return async (event, context) => {
+    // Apply security checks
+    for (const middleware of securityMiddleware) {
+      const result = middleware(event, null, () => {});
+      if (result) return result; // Middleware blocked the request
+    }
+    
+    return handler(event, context);
+  };
+};
+
+exports.handler = applySecurity(async (event, context) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -9,25 +23,49 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { orderId, customerEmail, photoData, driverName } = JSON.parse(event.body);
+    // Input validation and sanitization
+    const body = JSON.parse(event.body);
+    const { orderId, customerEmail, photoData, driverName } = body;
+    
+    // Validate required fields
+    if (!orderId || !customerEmail || !photoData || !driverName) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing required fields' })
+      };
+    }
+    
+    // Sanitize inputs
+    const sanitizedOrderId = orderId.toString().replace(/[<>]/g, '');
+    const sanitizedEmail = customerEmail.replace(/[<>]/g, '');
+    const sanitizedDriverName = driverName.replace(/[<>]/g, '');
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(sanitizedEmail)) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Invalid email format' })
+      };
+    }
 
     // Set SendGrid API key (FREE tier available)
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     const msg = {
-      to: customerEmail,
+      to: sanitizedEmail,
       from: {
         email: 'noreply@mypartsrunner.com',
         name: 'MyPartsRunner Delivery'
       },
-      subject: `🚚 Delivery Complete - Order #${orderId}`,
+      subject: `🚚 Delivery Complete - Order #${sanitizedOrderId}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #00BCD4;">🚚 Delivery Complete!</h2>
           
           <p>Hello!</p>
           
-          <p>Your order <strong>#${orderId}</strong> has been successfully delivered by <strong>${driverName}</strong>.</p>
+          <p>Your order <strong>#${sanitizedOrderId}</strong> has been successfully delivered by <strong>${sanitizedDriverName}</strong>.</p>
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #333; margin-top: 0;">📸 Delivery Photo Proof:</h3>
@@ -36,8 +74,8 @@ exports.handler = async (event, context) => {
           
           <p><strong>Order Details:</strong></p>
           <ul>
-            <li>Order Number: #${orderId}</li>
-            <li>Driver: ${driverName}</li>
+            <li>Order Number: #${sanitizedOrderId}</li>
+            <li>Driver: ${sanitizedDriverName}</li>
             <li>Delivery Time: ${new Date().toLocaleString()}</li>
           </ul>
           
