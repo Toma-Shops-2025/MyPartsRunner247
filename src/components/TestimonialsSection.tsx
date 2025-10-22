@@ -17,7 +17,7 @@ const testimonials = [
     rating: 5
   },
   {
-    name: "Lisa Rodriguez",
+    name: "Luis Rodriguez",
     role: "Event Coordinator",
     image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475062827_041bb1d4.webp",
     content: "From forgotten decorations to last-minute supplies, they've never let me down. Absolutely fantastic service!",
