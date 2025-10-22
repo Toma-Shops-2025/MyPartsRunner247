@@ -22,6 +22,14 @@ const NewHeader: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleScrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
   const handleSignOut = async () => {
     console.log('Sign out button clicked!');
     try {
@@ -82,9 +90,9 @@ const NewHeader: React.FC = () => {
                 <button onClick={() => handleNavigation('/services')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   Services
                 </button>
-                <a href="#how-it-works" className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
+                <button onClick={() => handleScrollToSection('how-it-works')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   How It Works
-                </a>
+                </button>
                 <button onClick={() => handleNavigation('/about')} className="text-gray-300 hover:text-teal-400 px-3 py-2 text-sm font-medium">
                   About
                 </button>
@@ -205,13 +213,12 @@ const NewHeader: React.FC = () => {
                 >
                   Services
                 </button>
-                <a 
-                  href="#how-it-works" 
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
+                <button 
+                  onClick={() => handleScrollToSection('how-it-works')}
+                  className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                 >
                   How It Works
-                </a>
+                </button>
                 <button 
                   onClick={() => handleNavigation('/about')}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
