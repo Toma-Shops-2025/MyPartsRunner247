@@ -62,13 +62,13 @@ const TipSelector: React.FC<TipSelectorProps> = ({
   const totalAmount = baseAmount + tipAmount;
 
   return (
-    <Card className={`bg-gray-800 border-gray-700 ${className}`}>
+    <Card className={`bg-white border-gray-200 ${className}`}>
       <CardHeader>
-        <CardTitle className="text-white flex items-center gap-2">
+        <CardTitle className="text-gray-900 flex items-center gap-2">
           <Heart className="w-5 h-5 text-pink-500" />
           Tip Your Driver
         </CardTitle>
-        <p className="text-gray-400 text-sm">
+        <p className="text-gray-600 text-sm">
           Show appreciation for great service! Tips go directly to your driver.
         </p>
       </CardHeader>
@@ -84,7 +84,7 @@ const TipSelector: React.FC<TipSelectorProps> = ({
               className={`text-sm ${
                 selectedTip === option.value
                   ? 'bg-teal-600 hover:bg-teal-700 text-white'
-                  : 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
               }`}
             >
               {option.label}
@@ -100,11 +100,11 @@ const TipSelector: React.FC<TipSelectorProps> = ({
         {/* Custom Tip Input */}
         {selectedTip === 'custom' && (
           <div className="space-y-2">
-            <Label htmlFor="customTip" className="text-white">
+            <Label htmlFor="customTip" className="text-gray-900">
               Custom Tip Amount
             </Label>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-gray-400" />
+              <DollarSign className="w-4 h-4 text-gray-500" />
               <Input
                 id="customTip"
                 type="number"
@@ -113,7 +113,7 @@ const TipSelector: React.FC<TipSelectorProps> = ({
                 placeholder="0.00"
                 value={customTip}
                 onChange={(e) => handleCustomTipChange(e.target.value)}
-                className="bg-gray-700 border-gray-600 text-white"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
           </div>
@@ -137,15 +137,15 @@ const TipSelector: React.FC<TipSelectorProps> = ({
         )}
 
         {/* Total Amount */}
-        <div className="border-t border-gray-600 pt-3">
+        <div className="border-t border-gray-300 pt-3">
           <div className="flex justify-between items-center">
-            <span className="text-white font-semibold">Total Amount:</span>
-            <span className="text-white font-bold text-lg">
+            <span className="text-gray-900 font-semibold">Total Amount:</span>
+            <span className="text-gray-900 font-bold text-lg">
               ${totalAmount.toFixed(2)}
             </span>
           </div>
           {tipAmount > 0 && (
-            <div className="text-xs text-gray-400 mt-1">
+            <div className="text-xs text-gray-600 mt-1">
               Base: ${baseAmount.toFixed(2)} + Tip: ${tipAmount.toFixed(2)}
             </div>
           )}
