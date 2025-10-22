@@ -139,6 +139,7 @@ const NewHeader: React.FC = () => {
                     {/* Temporary: Show driver options for testing */}
                     
                     {/* Customer menu items */}
+                    {console.log('🔍 NAVIGATION DEBUG: profile?.user_type =', profile?.user_type, 'profile =', profile)}
                     {profile?.user_type === 'customer' && (
                       <>
                         <DropdownMenuItem onClick={() => handleNavigation('/my-orders')}>
@@ -243,6 +244,7 @@ const NewHeader: React.FC = () => {
                         </button>
                       </>
                     )}
+                    {console.log('🔍 MOBILE NAVIGATION DEBUG: profile?.user_type =', profile?.user_type, 'profile =', profile)}
                     {profile?.user_type === 'customer' && (
                       <>
                         <button 
