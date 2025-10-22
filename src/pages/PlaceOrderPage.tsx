@@ -102,11 +102,14 @@ const PlaceOrderPage: React.FC = () => {
   const handlePaymentSuccess = (orderId: string) => {
     setShowPaymentModal(false);
     
-    // Show success message with tracking link
-    const trackingUrl = `${window.location.origin}/track/${orderId}`;
-    const successMessage = `Order #${orderId} placed successfully! 🎉\n\nTrack your order: ${trackingUrl}\n\nA driver will be assigned soon.`;
+    // Show success message with navigation option
+    const successMessage = `Order #${orderId} placed successfully! 🎉\n\nYou can track your order in the "My Orders" section.\n\nA driver will be assigned soon.`;
     
-    alert(successMessage);
+    const shouldGoToOrders = confirm(successMessage + '\n\nWould you like to go to "My Orders" now?');
+    
+    if (shouldGoToOrders) {
+      window.location.href = '/my-orders';
+    }
     
     // Store order data for tracking
     localStorage.setItem(`order_tracking_${orderId}`, JSON.stringify({

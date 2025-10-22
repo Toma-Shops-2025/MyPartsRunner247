@@ -170,9 +170,10 @@ const MyOrdersPage: React.FC = () => {
                 )}
 
                 <div className="mt-4 flex justify-end space-x-2">
-                  {(order.status === 'in_transit' || order.status === 'picked_up') && (
+                  {/* Show Track Order button for all active orders */}
+                  {(order.status === 'pending' || order.status === 'accepted' || order.status === 'picked_up' || order.status === 'in_transit') && (
                     <Button 
-                      variant="outline" 
+                      className="bg-teal-600 hover:bg-teal-700 text-white"
                       size="sm"
                       onClick={() => navigate(`/track/${order.id}`)}
                     >
