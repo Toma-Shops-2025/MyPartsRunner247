@@ -1,8 +1,14 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
-const ServicesSection: React.FC = () => {
+interface ServicesSectionProps {
+  onRequestPickup?: () => void;
+}
+
+const ServicesSection: React.FC<ServicesSectionProps> = ({ onRequestPickup }) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const services = [
     {
       title: "Personal Pickups",
@@ -63,7 +69,7 @@ const ServicesSection: React.FC = () => {
 
         <div className="text-center mt-12">
           <button 
-            onClick={() => navigate('/services')}
+            onClick={onRequestPickup || (() => navigate('/services'))}
             className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:from-teal-600 hover:to-blue-700 transform hover:scale-105 transition-all shadow-lg"
           >
             Start Your Delivery
