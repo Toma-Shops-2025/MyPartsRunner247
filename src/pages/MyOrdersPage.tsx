@@ -5,7 +5,9 @@ import NewHeader from '@/components/NewHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Package, MapPin, Clock, DollarSign, User, Phone, MessageCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Package, MapPin, Clock, DollarSign, User, Phone, MessageCircle, Heart, Plus } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const MyOrdersPage: React.FC = () => {
@@ -14,6 +16,9 @@ const MyOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showTipModal, setShowTipModal] = useState(false);
+  const [tipAmount, setTipAmount] = useState<string>('');
+  const [isAddingTip, setIsAddingTip] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -79,6 +84,50 @@ const MyOrdersPage: React.FC = () => {
       case 'delivered': return 'Your order has been successfully delivered.';
       case 'cancelled': return 'This order has been cancelled.';
       default: return 'Order status unknown.';
+    }
+  };
+
+  const handleAddTip = (order: any) => {
+    setSelectedOrder(order);
+    setShowTipModal(true);
+    setTipAmount('');
+  };
+
+  const handleSubmitTip = async () => {
+    if (!selectedOrder || !tipAmount || parseFloat(tipAmount) <= 0) {
+      alert('Please enter a valid tip amount.');
+      return;
+    }
+
+    setIsAddingTip(true);
+    try {
+      const additionalTip = parseFloat(tipAmount);
+      const newTotal = parseFloat(selectedOrder.total) + additionalTip;
+      const newTipAmount = (parseFloat(selectedOrder.tip_amount) || 0) + additionalTip;
+
+      // Update the order with the additional tip
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          total: newTotal,
+          tip_amount: newTipAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', selectedOrder.id);
+
+      if (error) {
+        throw error;
+      }
+
+      alert(`Thank you for the $${additionalTip.toFixed(2)} tip! Your driver will appreciate it. 💝`);
+      setShowTipModal(false);
+      setSelectedOrder(null);
+      fetchOrders(); // Refresh orders
+    } catch (error) {
+      console.error('Error adding tip:', error);
+      alert('Failed to add tip. Please try again.');
+    } finally {
+      setIsAddingTip(false);
     }
   };
 
@@ -179,6 +228,17 @@ const MyOrdersPage: React.FC = () => {
                     >
                       <Clock className="mr-2 h-4 w-4" />
                       Track Order
+                    </Button>
+                  )}
+                  {/* Show Add Tip button for delivered orders */}
+                  {order.status === 'delivered' && (
+                    <Button 
+                      className="bg-pink-600 hover:bg-pink-700 text-white"
+                      size="sm"
+                      onClick={() => handleAddTip(order)}
+                    >
+                      <Heart className="mr-2 h-4 w-4" />
+                      Add Tip
                     </Button>
                   )}
                   <Button 
@@ -282,6 +342,79 @@ const MyOrdersPage: React.FC = () => {
                       </div>
                     )}
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Tip Modal */}
+        {showTipModal && selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Heart className="w-5 h-5 text-pink-500" />
+                      Add Tip for Driver
+                    </CardTitle>
+                    <p className="text-sm text-gray-500">Order #{selectedOrder.id.slice(0, 8)}</p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setShowTipModal(false)}
+                  >
+                    ×
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600 mb-2">Current order total: ${parseFloat(selectedOrder.total).toFixed(2)}</p>
+                  {selectedOrder.tip_amount > 0 && (
+                    <p className="text-sm text-pink-600">Current tip: ${parseFloat(selectedOrder.tip_amount).toFixed(2)}</p>
+                  )}
+                </div>
+                
+                <div>
+                  <Label htmlFor="tipAmount" className="text-gray-900">
+                    Additional Tip Amount
+                  </Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <DollarSign className="w-4 h-4 text-gray-500" />
+                    <Input
+                      id="tipAmount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      value={tipAmount}
+                      onChange={(e) => setTipAmount(e.target.value)}
+                      className="bg-white border-gray-300 text-gray-900"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Tips go directly to your driver and are greatly appreciated!
+                  </p>
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowTipModal(false)}
+                    disabled={isAddingTip}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    className="bg-pink-600 hover:bg-pink-700 text-white"
+                    onClick={handleSubmitTip}
+                    disabled={isAddingTip}
+                  >
+                    {isAddingTip ? 'Adding Tip...' : 'Add Tip'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
