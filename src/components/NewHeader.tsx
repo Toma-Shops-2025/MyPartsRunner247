@@ -110,6 +110,19 @@ const NewHeader: React.FC = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
+              {/* Admin Dashboard Button - Always visible for admins */}
+              {user && profile?.user_type === 'admin' && (
+                <Button
+                  onClick={() => handleNavigation('/admin-dashboard')}
+                  variant="outline"
+                  size="sm"
+                  className="bg-green-600 text-white hover:bg-green-700 border-green-600"
+                >
+                  <Settings className="mr-2 h-4 w-4" />
+                  Admin Dashboard
+                </Button>
+              )}
+              
               {loading ? (
                 <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse"></div>
               ) : user ? (
