@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS automation_logs (
 -- 5. Driver Availability Table
 CREATE TABLE IF NOT EXISTS driver_availability (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  driver_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  driver_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
   is_online BOOLEAN DEFAULT FALSE,
   is_available BOOLEAN DEFAULT FALSE,
   max_orders INTEGER DEFAULT 3,
