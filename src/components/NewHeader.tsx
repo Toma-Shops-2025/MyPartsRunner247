@@ -218,7 +218,7 @@ const NewHeader: React.FC = () => {
                       className="bg-blue-50 text-blue-700 hover:bg-blue-100"
                     >
                       <Settings className="mr-2 h-4 w-4" />
-                      Admin Dashboard (Debug)
+                      Admin Dashboard
                     </DropdownMenuItem>
                     
                     <DropdownMenuItem onClick={handleSignOut}>
