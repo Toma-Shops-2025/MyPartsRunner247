@@ -69,12 +69,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           </div>
 
           <div className="relative">
-            {/* Live Orders Card */}
-            <div className="absolute -top-4 -right-4 bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg">
-              <div className="text-sm text-gray-600">Live Orders</div>
-              <div className="text-2xl font-bold text-teal-600">1,247</div>
-            </div>
-            
             {/* Hero Logo */}
             <div className="relative w-full h-96 flex items-center justify-center">
               <img 
