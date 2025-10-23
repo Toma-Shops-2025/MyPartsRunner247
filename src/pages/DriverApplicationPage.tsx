@@ -164,7 +164,7 @@ const DriverApplicationPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-blue-100 mb-2">ATTENTION:</h3>
                 <p className="text-blue-200 text-sm leading-relaxed">
                   All drivers are immediately approved with access to the Driver Dashboard and able to start accepting and delivering orders. 
-                  Please submit/upload your Vehicle Registration and Insurance Verification or provide your mode of delivery in Vehicle Settings in the dropdown menu.
+                  Please complete your driver verification process including background check, document uploads, and vehicle information in the Driver Verification section.
                 </p>
               </div>
             </div>

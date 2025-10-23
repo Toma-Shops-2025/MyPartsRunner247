@@ -176,9 +176,9 @@ const NewHeader: React.FC = () => {
                           <BarChart3 className="mr-2 h-4 w-4" />
                           Earnings
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleNavigation('/vehicle-settings')}>
+                        <DropdownMenuItem onClick={() => handleNavigation('/driver-verification')}>
                           <Settings className="mr-2 h-4 w-4" />
-                          Vehicle Settings
+                          Driver Verification
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSwitchToCustomer}>
@@ -293,10 +293,10 @@ const NewHeader: React.FC = () => {
                           💰 Earnings
                         </button>
                         <button 
-                          onClick={() => handleNavigation('/vehicle-settings')}
+                          onClick={() => handleNavigation('/driver-verification')}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
-                          🚙 Vehicle Settings
+                          🚙 Driver Verification
                         </button>
                         <hr className="my-2 border-gray-600" />
                         <button 

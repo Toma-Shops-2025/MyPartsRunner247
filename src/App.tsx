@@ -12,6 +12,7 @@ import PlaceOrderPage from "./pages/PlaceOrderPage";
 import ProfilePage from "./pages/ProfilePage";
 import EarningsPage from "./pages/EarningsPage";
 import VehicleSettingsPage from "./pages/VehicleSettingsPage";
+import DriverVerificationPage from "./pages/DriverVerificationPage";
 import MyOrdersPage from "./pages/MyOrdersPage";
 import ServicesPage from "./pages/ServicesPage";
 import AboutPage from "./pages/AboutPage";
@@ -93,6 +94,7 @@ const App = () => (
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/earnings" element={<EarningsPage />} />
             <Route path="/vehicle-settings" element={<VehicleSettingsPage />} />
+            <Route path="/driver-verification" element={<DriverVerificationPage />} />
             <Route path="/my-orders" element={<MyOrdersPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/about" element={<AboutPage />} />
