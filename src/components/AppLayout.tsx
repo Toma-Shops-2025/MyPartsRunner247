@@ -23,7 +23,6 @@ import NotificationSystemTest from './NotificationSystemTest';
 import EndToEndTest from './EndToEndTest';
 import ProductionMonitoring from './ProductionMonitoring';
 import CustomerSupport from './CustomerSupport';
-import DriverVerification from './DriverVerification';
 import DisputeResolutionSystem from './DisputeResolutionSystem';
 
 const AppLayout: React.FC = () => {
@@ -82,14 +81,6 @@ const AppLayout: React.FC = () => {
             {user && profile?.user_type === 'admin' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <ProductionMonitoring />
-              </div>
-            )}
-            
-            
-            {/* Show driver verification for drivers */}
-            {user && profile?.user_type === 'driver' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <DriverVerification />
               </div>
             )}
             
