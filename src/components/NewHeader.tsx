@@ -133,6 +133,17 @@ const NewHeader: React.FC = () => {
                       </div>
                     </DropdownMenuItem>
                     
+                    {/* Admin-specific menu items */}
+                    {profile?.user_type === 'admin' && (
+                      <>
+                        <DropdownMenuItem onClick={() => handleNavigation('/admin-dashboard')}>
+                          <Settings className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    
                     {/* Driver-specific menu items */}
                     {profile?.user_type === 'driver' && (
                       <>
