@@ -1,3 +1,4 @@
+import { supabase } from '@/lib/supabase';
 import { realTimeOrderService } from './RealTimeOrderService';
 import { orderAutomationService } from './OrderAutomationService';
 import { driverNotificationService } from './DriverNotificationService';
@@ -153,7 +154,7 @@ export class AutomationController {
   getStatus() {
     return {
       isRunning: this.isRunning,
-      realTimeService: realTimeOrderService.isListening,
+      realTimeService: (realTimeOrderService as any).isListening,
       timestamp: new Date().toISOString()
     };
   }

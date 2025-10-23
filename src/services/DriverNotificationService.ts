@@ -157,7 +157,7 @@ export class DriverNotificationService {
           <li>Delivery: ${message.data.deliveryAddress}</li>
           <li>Estimated Earnings: $${message.data.estimatedEarnings}</li>
         </ul>
-        <p><a href="${process.env.REACT_APP_URL}/driver-dashboard">View in Dashboard</a></p>
+        <p><a href="${import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com'}/driver-dashboard">View in Dashboard</a></p>
       `;
       
       // Store email in database
