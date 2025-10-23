@@ -209,17 +209,19 @@ const NewHeader: React.FC = () => {
                       Profile Settings
                     </DropdownMenuItem>
                     
-                    {/* Temporary admin dashboard link for debugging */}
-                    <DropdownMenuItem 
-                      onClick={() => {
-                        console.log('Direct Admin Dashboard clicked');
-                        handleNavigation('/admin-dashboard');
-                      }}
-                      className="bg-blue-50 text-blue-700 hover:bg-blue-100"
-                    >
-                      <Settings className="mr-2 h-4 w-4" />
-                      Admin Dashboard
-                    </DropdownMenuItem>
+                    {/* Admin Dashboard - Only visible to admins */}
+                    {profile?.user_type === 'admin' && (
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          console.log('Direct Admin Dashboard clicked');
+                          handleNavigation('/admin-dashboard');
+                        }}
+                        className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+                      >
+                        <Settings className="mr-2 h-4 w-4" />
+                        Admin Dashboard
+                      </DropdownMenuItem>
+                    )}
                     
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
