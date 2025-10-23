@@ -69,7 +69,9 @@ const DriverVerificationPage: React.FC = () => {
     insurance_company: '',
     insurance_policy_number: '',
     insurance_expiry: '',
-    vehicle_type: 'sedan'
+    vehicle_type: 'sedan',
+    alternative_transportation: '',
+    transportation_type: 'vehicle' // 'vehicle' or 'alternative'
   });
 
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
@@ -345,12 +347,12 @@ const DriverVerificationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <NewHeader />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Driver Onboarding</h1>
-          <p className="text-gray-600">Complete your driver onboarding to start accepting orders</p>
+          <h1 className="text-3xl font-bold text-white">Driver Onboarding</h1>
+          <p className="text-gray-300">Complete your driver onboarding to start accepting orders</p>
           
           {/* Deadline Alert */}
           {verificationDeadline && (
@@ -372,10 +374,10 @@ const DriverVerificationPage: React.FC = () => {
         </div>
 
         {/* Verification Status Overview */}
-        <Card className="mb-6">
+        <Card className="mb-6 bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Shield className="mr-2 h-5 w-5" />
+            <CardTitle className="flex items-center text-white">
+              <Shield className="mr-2 h-5 w-5 text-teal-400" />
               Onboarding Status
             </CardTitle>
           </CardHeader>
@@ -418,33 +420,35 @@ const DriverVerificationPage: React.FC = () => {
 
         <div className="space-y-6">
           {/* Personal Information */}
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <User className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-white">
+                <User className="mr-2 h-5 w-5 text-teal-400" />
                 Personal Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="full_name">Full Name *</Label>
+                  <Label htmlFor="full_name" className="text-white">Full Name *</Label>
                   <Input 
                     id="full_name" 
                     value={verificationData.full_name}
                     onChange={(e) => setVerificationData({...verificationData, full_name: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="date_of_birth">Date of Birth *</Label>
+                  <Label htmlFor="date_of_birth" className="text-white">Date of Birth *</Label>
                   <Input 
                     id="date_of_birth" 
                     type="date"
                     value={verificationData.date_of_birth}
                     onChange={(e) => setVerificationData({...verificationData, date_of_birth: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
@@ -627,79 +631,147 @@ const DriverVerificationPage: React.FC = () => {
           </Card>
 
           {/* Vehicle Information */}
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Car className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-white">
+                <Car className="mr-2 h-5 w-5 text-teal-400" />
                 Vehicle Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Transportation Type Selection */}
+              <div className="space-y-4">
+                <Label className="text-white">Transportation Type *</Label>
+                <div className="flex space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="vehicle"
+                      name="transportation_type"
+                      value="vehicle"
+                      checked={vehicleData.transportation_type === 'vehicle'}
+                      onChange={(e) => setVehicleData({...vehicleData, transportation_type: e.target.value})}
+                      className="text-teal-500"
+                    />
+                    <Label htmlFor="vehicle" className="text-white">Vehicle (Car, Truck, Van, etc.)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      id="alternative"
+                      name="transportation_type"
+                      value="alternative"
+                      checked={vehicleData.transportation_type === 'alternative'}
+                      onChange={(e) => setVehicleData({...vehicleData, transportation_type: e.target.value})}
+                      className="text-teal-500"
+                    />
+                    <Label htmlFor="alternative" className="text-white">Alternative Transportation</Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alternative Transportation Field */}
+              {vehicleData.transportation_type === 'alternative' && (
+                <div className="space-y-2">
+                  <Label htmlFor="alternative_transportation" className="text-white">Alternative Transportation Method *</Label>
+                  <Select value={vehicleData.alternative_transportation} onValueChange={(value) => setVehicleData({...vehicleData, alternative_transportation: value})}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
+                      <SelectValue placeholder="Select your transportation method" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="bicycle">Bicycle</SelectItem>
+                      <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                      <SelectItem value="scooter">Electric Scooter</SelectItem>
+                      <SelectItem value="walking">Walking</SelectItem>
+                      <SelectItem value="public_transport">Public Transportation</SelectItem>
+                      <SelectItem value="other">Other (Please specify in notes)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {vehicleData.alternative_transportation === 'other' && (
+                    <Textarea
+                      placeholder="Please describe your transportation method..."
+                      value={vehicleData.alternative_transportation}
+                      onChange={(e) => setVehicleData({...vehicleData, alternative_transportation: e.target.value})}
+                      className="bg-gray-700 border-gray-600 text-white"
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* Vehicle Details - Only show if vehicle is selected */}
+              {vehicleData.transportation_type === 'vehicle' && (
+                <>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="make">Make *</Label>
+                  <Label htmlFor="make" className="text-white">Make *</Label>
                   <Input 
                     id="make" 
                     value={vehicleData.make}
                     onChange={(e) => setVehicleData({...vehicleData, make: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="model">Model *</Label>
+                  <Label htmlFor="model" className="text-white">Model *</Label>
                   <Input 
                     id="model" 
                     value={vehicleData.model}
                     onChange={(e) => setVehicleData({...vehicleData, model: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="year">Year *</Label>
+                  <Label htmlFor="year" className="text-white">Year *</Label>
                   <Input 
                     id="year" 
                     value={vehicleData.year}
                     onChange={(e) => setVehicleData({...vehicleData, year: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="color">Color *</Label>
+                  <Label htmlFor="color" className="text-white">Color *</Label>
                   <Input 
                     id="color" 
                     value={vehicleData.color}
                     onChange={(e) => setVehicleData({...vehicleData, color: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="license_plate">License Plate *</Label>
+                  <Label htmlFor="license_plate" className="text-white">License Plate *</Label>
                   <Input 
                     id="license_plate" 
                     value={vehicleData.license_plate}
                     onChange={(e) => setVehicleData({...vehicleData, license_plate: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="vin">VIN Number *</Label>
+                  <Label htmlFor="vin" className="text-white">VIN Number *</Label>
                   <Input 
                     id="vin" 
                     value={vehicleData.vin}
                     onChange={(e) => setVehicleData({...vehicleData, vin: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="vehicle_type">Vehicle Type *</Label>
+                  <Label htmlFor="vehicle_type" className="text-white">Vehicle Type *</Label>
                   <Select value={vehicleData.vehicle_type} onValueChange={(value) => setVehicleData({...vehicleData, vehicle_type: value})}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-white">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -716,44 +788,49 @@ const DriverVerificationPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="insurance_company">Insurance Company *</Label>
+                  <Label htmlFor="insurance_company" className="text-white">Insurance Company *</Label>
                   <Input 
                     id="insurance_company" 
                     value={vehicleData.insurance_company}
                     onChange={(e) => setVehicleData({...vehicleData, insurance_company: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="insurance_policy_number">Policy Number *</Label>
+                  <Label htmlFor="insurance_policy_number" className="text-white">Policy Number *</Label>
                   <Input 
                     id="insurance_policy_number" 
                     value={vehicleData.insurance_policy_number}
                     onChange={(e) => setVehicleData({...vehicleData, insurance_policy_number: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="insurance_expiry">Insurance Expiry Date *</Label>
+                  <Label htmlFor="insurance_expiry" className="text-white">Insurance Expiry Date *</Label>
                   <Input 
                     id="insurance_expiry" 
                     type="date"
                     value={vehicleData.insurance_expiry}
                     onChange={(e) => setVehicleData({...vehicleData, insurance_expiry: e.target.value})}
                     required
+                    className="bg-gray-700 border-gray-600 text-white"
                   />
                 </div>
               </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
           {/* Document Uploads */}
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <FileText className="mr-2 h-5 w-5" />
+              <CardTitle className="flex items-center text-white">
+                <FileText className="mr-2 h-5 w-5 text-teal-400" />
                 Required Documents
               </CardTitle>
             </CardHeader>
@@ -761,10 +838,10 @@ const DriverVerificationPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Driver License Upload */}
                 <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  uploadStatus.driver_license === 'success' ? 'border-green-300 bg-green-50' :
-                  uploadStatus.driver_license === 'error' ? 'border-red-300 bg-red-50' :
-                  uploadStatus.driver_license === 'uploading' ? 'border-blue-300 bg-blue-50' :
-                  'border-gray-300'
+                  uploadStatus.driver_license === 'success' ? 'border-green-400 bg-green-900/20' :
+                  uploadStatus.driver_license === 'error' ? 'border-red-400 bg-red-900/20' :
+                  uploadStatus.driver_license === 'uploading' ? 'border-blue-400 bg-blue-900/20' :
+                  'border-gray-600 bg-gray-800'
                 }`}>
                   {uploadStatus.driver_license === 'success' ? (
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
@@ -775,8 +852,8 @@ const DriverVerificationPage: React.FC = () => {
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Driver's License (Front)</p>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-sm font-medium text-white">Driver's License (Front)</p>
+                  <p className="text-xs text-gray-300 mb-4">
                     {uploadStatus.driver_license === 'success' ? 'Uploaded successfully!' :
                      uploadStatus.driver_license === 'error' ? 'Upload failed. Please try again.' :
                      uploadStatus.driver_license === 'uploading' ? 'Uploading...' :
@@ -801,10 +878,10 @@ const DriverVerificationPage: React.FC = () => {
 
                 {/* Insurance Certificate Upload */}
                 <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  uploadStatus.insurance_certificate === 'success' ? 'border-green-300 bg-green-50' :
-                  uploadStatus.insurance_certificate === 'error' ? 'border-red-300 bg-red-50' :
-                  uploadStatus.insurance_certificate === 'uploading' ? 'border-blue-300 bg-blue-50' :
-                  'border-gray-300'
+                  uploadStatus.insurance_certificate === 'success' ? 'border-green-400 bg-green-900/20' :
+                  uploadStatus.insurance_certificate === 'error' ? 'border-red-400 bg-red-900/20' :
+                  uploadStatus.insurance_certificate === 'uploading' ? 'border-blue-400 bg-blue-900/20' :
+                  'border-gray-600 bg-gray-800'
                 }`}>
                   {uploadStatus.insurance_certificate === 'success' ? (
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
@@ -815,8 +892,8 @@ const DriverVerificationPage: React.FC = () => {
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Insurance Certificate</p>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-sm font-medium text-white">Insurance Certificate</p>
+                  <p className="text-xs text-gray-300 mb-4">
                     {uploadStatus.insurance_certificate === 'success' ? 'Uploaded successfully!' :
                      uploadStatus.insurance_certificate === 'error' ? 'Upload failed. Please try again.' :
                      uploadStatus.insurance_certificate === 'uploading' ? 'Uploading...' :
@@ -841,10 +918,10 @@ const DriverVerificationPage: React.FC = () => {
 
                 {/* Vehicle Registration Upload */}
                 <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  uploadStatus.vehicle_registration === 'success' ? 'border-green-300 bg-green-50' :
-                  uploadStatus.vehicle_registration === 'error' ? 'border-red-300 bg-red-50' :
-                  uploadStatus.vehicle_registration === 'uploading' ? 'border-blue-300 bg-blue-50' :
-                  'border-gray-300'
+                  uploadStatus.vehicle_registration === 'success' ? 'border-green-400 bg-green-900/20' :
+                  uploadStatus.vehicle_registration === 'error' ? 'border-red-400 bg-red-900/20' :
+                  uploadStatus.vehicle_registration === 'uploading' ? 'border-blue-400 bg-blue-900/20' :
+                  'border-gray-600 bg-gray-800'
                 }`}>
                   {uploadStatus.vehicle_registration === 'success' ? (
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
@@ -855,8 +932,8 @@ const DriverVerificationPage: React.FC = () => {
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Vehicle Registration</p>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-sm font-medium text-white">Vehicle Registration</p>
+                  <p className="text-xs text-gray-300 mb-4">
                     {uploadStatus.vehicle_registration === 'success' ? 'Uploaded successfully!' :
                      uploadStatus.vehicle_registration === 'error' ? 'Upload failed. Please try again.' :
                      uploadStatus.vehicle_registration === 'uploading' ? 'Uploading...' :
@@ -881,10 +958,10 @@ const DriverVerificationPage: React.FC = () => {
 
                 {/* Driver's License Back Upload */}
                 <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  uploadStatus.driver_license_back === 'success' ? 'border-green-300 bg-green-50' :
-                  uploadStatus.driver_license_back === 'error' ? 'border-red-300 bg-red-50' :
-                  uploadStatus.driver_license_back === 'uploading' ? 'border-blue-300 bg-blue-50' :
-                  'border-gray-300'
+                  uploadStatus.driver_license_back === 'success' ? 'border-green-400 bg-green-900/20' :
+                  uploadStatus.driver_license_back === 'error' ? 'border-red-400 bg-red-900/20' :
+                  uploadStatus.driver_license_back === 'uploading' ? 'border-blue-400 bg-blue-900/20' :
+                  'border-gray-600 bg-gray-800'
                 }`}>
                   {uploadStatus.driver_license_back === 'success' ? (
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
@@ -895,8 +972,8 @@ const DriverVerificationPage: React.FC = () => {
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Driver's License (Back)</p>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-sm font-medium text-white">Driver's License (Back)</p>
+                  <p className="text-xs text-gray-300 mb-4">
                     {uploadStatus.driver_license_back === 'success' ? 'Uploaded successfully!' :
                      uploadStatus.driver_license_back === 'error' ? 'Upload failed. Please try again.' :
                      uploadStatus.driver_license_back === 'uploading' ? 'Uploading...' :
