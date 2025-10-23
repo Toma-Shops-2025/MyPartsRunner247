@@ -30,6 +30,7 @@ import { toast } from '@/hooks/use-toast';
 interface VerificationStatus {
   background_check: 'pending' | 'in_progress' | 'approved' | 'rejected' | 'not_started';
   driver_license: 'pending' | 'uploaded' | 'verified' | 'rejected';
+  driver_license_back: 'pending' | 'uploaded' | 'verified' | 'rejected';
   insurance: 'pending' | 'uploaded' | 'verified' | 'rejected';
   vehicle_registration: 'pending' | 'uploaded' | 'verified' | 'rejected';
   overall: 'incomplete' | 'pending_review' | 'approved' | 'rejected';
@@ -74,6 +75,7 @@ const DriverVerificationPage: React.FC = () => {
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
     background_check: 'not_started',
     driver_license: 'pending',
+    driver_license_back: 'pending',
     insurance: 'pending',
     vehicle_registration: 'pending',
     overall: 'incomplete'
@@ -81,16 +83,16 @@ const DriverVerificationPage: React.FC = () => {
 
   const [uploadedFiles, setUploadedFiles] = useState({
     driver_license: null as File | null,
+    driver_license_back: null as File | null,
     insurance_certificate: null as File | null,
-    vehicle_registration: null as File | null,
-    profile_photo: null as File | null
+    vehicle_registration: null as File | null
   });
 
   const [uploadStatus, setUploadStatus] = useState({
     driver_license: 'pending' as 'pending' | 'uploading' | 'success' | 'error',
+    driver_license_back: 'pending' as 'pending' | 'uploading' | 'success' | 'error',
     insurance_certificate: 'pending' as 'pending' | 'uploading' | 'success' | 'error',
-    vehicle_registration: 'pending' as 'pending' | 'uploading' | 'success' | 'error',
-    profile_photo: 'pending' as 'pending' | 'uploading' | 'success' | 'error'
+    vehicle_registration: 'pending' as 'pending' | 'uploading' | 'success' | 'error'
   });
 
   const [saving, setSaving] = useState(false);
@@ -100,9 +102,9 @@ const DriverVerificationPage: React.FC = () => {
 
   // File input refs
   const driverLicenseRef = useRef<HTMLInputElement>(null);
+  const driverLicenseBackRef = useRef<HTMLInputElement>(null);
   const insuranceRef = useRef<HTMLInputElement>(null);
   const registrationRef = useRef<HTMLInputElement>(null);
-  const profilePhotoRef = useRef<HTMLInputElement>(null);
 
   // Load existing data and deadline
   useEffect(() => {
@@ -213,9 +215,9 @@ const DriverVerificationPage: React.FC = () => {
   const handleFileSelect = (type: string) => {
     const refs = {
       driver_license: driverLicenseRef,
+      driver_license_back: driverLicenseBackRef,
       insurance_certificate: insuranceRef,
-      vehicle_registration: registrationRef,
-      profile_photo: profilePhotoRef
+      vehicle_registration: registrationRef
     };
     
     const input = refs[type as keyof typeof refs]?.current;
@@ -272,9 +274,9 @@ const DriverVerificationPage: React.FC = () => {
         verification_status: verificationStatus,
         documents_uploaded: {
           driver_license: uploadStatus.driver_license === 'success',
+          driver_license_back: uploadStatus.driver_license_back === 'success',
           insurance_certificate: uploadStatus.insurance_certificate === 'success',
-          vehicle_registration: uploadStatus.vehicle_registration === 'success',
-          profile_photo: uploadStatus.profile_photo === 'success'
+          vehicle_registration: uploadStatus.vehicle_registration === 'success'
         },
         updated_at: new Date().toISOString()
       };
@@ -403,12 +405,12 @@ const DriverVerificationPage: React.FC = () => {
                 <p className="text-sm mt-1 capitalize">{verificationStatus.insurance.replace('_', ' ')}</p>
               </div>
               
-              <div className={`p-4 rounded-lg border ${getStatusColor(verificationStatus.vehicle_registration)}`}>
+              <div className={`p-4 rounded-lg border ${getStatusColor(verificationStatus.driver_license_back)}`}>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Vehicle Registration</span>
-                  {getStatusIcon(verificationStatus.vehicle_registration)}
+                  <span className="font-medium">Driver's License (Back)</span>
+                  {getStatusIcon(verificationStatus.driver_license_back)}
                 </div>
-                <p className="text-sm mt-1 capitalize">{verificationStatus.vehicle_registration.replace('_', ' ')}</p>
+                <p className="text-sm mt-1 capitalize">{verificationStatus.driver_license_back.replace('_', ' ')}</p>
               </div>
             </div>
           </CardContent>
@@ -773,7 +775,7 @@ const DriverVerificationPage: React.FC = () => {
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Driver License</p>
+                  <p className="text-sm font-medium">Driver's License (Front)</p>
                   <p className="text-xs text-gray-500 mb-4">
                     {uploadStatus.driver_license === 'success' ? 'Uploaded successfully!' :
                      uploadStatus.driver_license === 'error' ? 'Upload failed. Please try again.' :
@@ -877,43 +879,43 @@ const DriverVerificationPage: React.FC = () => {
                   </Button>
                 </div>
 
-                {/* Profile Photo Upload */}
+                {/* Driver's License Back Upload */}
                 <div className={`border-2 border-dashed rounded-lg p-6 text-center ${
-                  uploadStatus.profile_photo === 'success' ? 'border-green-300 bg-green-50' :
-                  uploadStatus.profile_photo === 'error' ? 'border-red-300 bg-red-50' :
-                  uploadStatus.profile_photo === 'uploading' ? 'border-blue-300 bg-blue-50' :
+                  uploadStatus.driver_license_back === 'success' ? 'border-green-300 bg-green-50' :
+                  uploadStatus.driver_license_back === 'error' ? 'border-red-300 bg-red-50' :
+                  uploadStatus.driver_license_back === 'uploading' ? 'border-blue-300 bg-blue-50' :
                   'border-gray-300'
                 }`}>
-                  {uploadStatus.profile_photo === 'success' ? (
+                  {uploadStatus.driver_license_back === 'success' ? (
                     <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
-                  ) : uploadStatus.profile_photo === 'error' ? (
+                  ) : uploadStatus.driver_license_back === 'error' ? (
                     <X className="mx-auto h-12 w-12 text-red-500 mb-4" />
-                  ) : uploadStatus.profile_photo === 'uploading' ? (
+                  ) : uploadStatus.driver_license_back === 'uploading' ? (
                     <div className="mx-auto h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                   ) : (
                     <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   )}
-                  <p className="text-sm font-medium">Profile Photo</p>
+                  <p className="text-sm font-medium">Driver's License (Back)</p>
                   <p className="text-xs text-gray-500 mb-4">
-                    {uploadStatus.profile_photo === 'success' ? 'Uploaded successfully!' :
-                     uploadStatus.profile_photo === 'error' ? 'Upload failed. Please try again.' :
-                     uploadStatus.profile_photo === 'uploading' ? 'Uploading...' :
-                     'Upload a professional photo of yourself'}
+                    {uploadStatus.driver_license_back === 'success' ? 'Uploaded successfully!' :
+                     uploadStatus.driver_license_back === 'error' ? 'Upload failed. Please try again.' :
+                     uploadStatus.driver_license_back === 'uploading' ? 'Uploading...' :
+                     'Upload the back of your driver license'}
                   </p>
                   <input
-                    ref={profilePhotoRef}
+                    ref={driverLicenseBackRef}
                     type="file"
-                    accept=".jpg,.jpeg,.png"
-                    onChange={(e) => handleFileChange('profile_photo', e)}
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={(e) => handleFileChange('driver_license_back', e)}
                     className="hidden"
                   />
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => handleFileSelect('profile_photo')}
-                    disabled={uploadStatus.profile_photo === 'uploading'}
+                    onClick={() => handleFileSelect('driver_license_back')}
+                    disabled={uploadStatus.driver_license_back === 'uploading'}
                   >
-                    {uploadStatus.profile_photo === 'uploading' ? 'Uploading...' : 'Upload Photo'}
+                    {uploadStatus.driver_license_back === 'uploading' ? 'Uploading...' : 'Upload License Back'}
                   </Button>
                 </div>
               </div>
