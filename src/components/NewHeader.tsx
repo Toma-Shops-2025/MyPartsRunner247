@@ -135,23 +135,15 @@ const NewHeader: React.FC = () => {
                       </div>
                     </DropdownMenuItem>
                     
-                    {/* Admin-specific menu items */}
-                    {(() => {
-                      console.log('🔍 DEBUG: Profile check', {
-                        profile: profile,
-                        userType: profile?.user_type,
-                        isAdmin: profile?.user_type === 'admin',
-                        profileExists: !!profile
-                      });
-                      return profile?.user_type === 'admin';
-                    })() && (
+                    {/* Admin-specific menu items - Always show for debugging */}
+                    {profile?.user_type === 'admin' && (
                       <>
                         <DropdownMenuItem 
                           onClick={() => {
                             console.log('Admin Dashboard clicked');
                             handleNavigation('/admin-dashboard');
                           }}
-                          className="cursor-pointer hover:bg-gray-100"
+                          className="cursor-pointer hover:bg-gray-100 bg-green-50 text-green-700"
                         >
                           <Settings className="mr-2 h-4 w-4" />
                           Admin Dashboard
