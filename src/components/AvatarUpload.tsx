@@ -89,32 +89,58 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     try {
       setIsUploading(true);
 
-      // Compress the image first
-      const compressedBase64 = await compressImage(file, 200, 0.7);
-      
-      // Update profile in database with compressed base64 data
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: compressedBase64 })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+      // Try different compression levels until one works
+      const compressionLevels = [
+        { size: 150, quality: 0.5 },
+        { size: 120, quality: 0.4 },
+        { size: 100, quality: 0.3 },
+        { size: 80, quality: 0.2 }
+      ];
 
-      if (updateError) {
-        throw updateError;
+      let success = false;
+      let lastError = null;
+
+      for (const level of compressionLevels) {
+        try {
+          const compressedBase64 = await compressImage(file, level.size, level.quality);
+          
+          // Check if the base64 string is small enough
+          if (compressedBase64.length < 8000) {
+            const { error: updateError } = await supabase
+              .from('profiles')
+              .update({ avatar_url: compressedBase64 })
+              .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+            if (updateError) {
+              throw updateError;
+            }
+
+            onAvatarUpdate(compressedBase64);
+            setPreviewUrl(null);
+
+            toast({
+              title: "Profile picture updated!",
+              description: "Your new avatar has been saved successfully.",
+            });
+
+            success = true;
+            break;
+          }
+        } catch (error) {
+          lastError = error;
+          console.log(`Compression level ${level.size}x${level.quality} failed, trying next...`);
+        }
       }
 
-      onAvatarUpdate(compressedBase64);
-      setPreviewUrl(null);
-
-      toast({
-        title: "Profile picture updated!",
-        description: "Your new avatar has been saved successfully.",
-      });
+      if (!success) {
+        throw lastError || new Error('All compression levels failed');
+      }
 
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
         title: "Upload failed",
-        description: "There was an error uploading your profile picture. Please try again.",
+        description: "The image is too large. Please try a smaller image or different format.",
         variant: "destructive",
       });
     } finally {
