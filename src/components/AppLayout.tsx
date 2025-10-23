@@ -64,22 +64,22 @@ const AppLayout: React.FC = () => {
               </div>
             )}
             
-            {/* Show notification system test for all authenticated users */}
-            {user && (
+            {/* Show notification system test for admins only */}
+            {user && profile?.user_type === 'admin' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <NotificationSystemTest />
               </div>
             )}
             
-            {/* Show end-to-end testing for all authenticated users */}
-            {user && (
+            {/* Show end-to-end testing for admins only */}
+            {user && profile?.user_type === 'admin' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <EndToEndTest />
               </div>
             )}
             
-            {/* Show production monitoring for all authenticated users */}
-            {user && (
+            {/* Show production monitoring for admins only */}
+            {user && profile?.user_type === 'admin' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <ProductionMonitoring />
               </div>
@@ -93,8 +93,8 @@ const AppLayout: React.FC = () => {
               </div>
             )}
             
-            {/* Show dispute resolution system for all authenticated users */}
-            {user && (
+            {/* Show dispute resolution system for admins only */}
+            {user && profile?.user_type === 'admin' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <DisputeResolutionSystem />
               </div>
