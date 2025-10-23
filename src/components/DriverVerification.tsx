@@ -80,14 +80,6 @@ const DriverVerification: React.FC = () => {
       icon: <Car className="w-5 h-5" />
     },
     {
-      id: 'payment_setup',
-      title: 'Payment Setup',
-      description: 'Connect your bank account for payments',
-      status: 'pending',
-      required: true,
-      icon: <CreditCard className="w-5 h-5" />
-    },
-    {
       id: 'training',
       title: 'Safety Training',
       description: 'Complete driver safety training course',

@@ -28,13 +28,6 @@ const DriverOnboardingPage = () => {
     },
     {
       id: 3,
-      title: 'Payment Setup',
-      description: 'Add bank account for earnings deposits',
-      icon: CreditCard,
-      required: ['Bank Account', 'Tax Information']
-    },
-    {
-      id: 4,
       title: 'Training',
       description: 'Complete driver training modules',
       icon: Upload,
