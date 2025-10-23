@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
+import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot } from 'lucide-react';
+import AutomationStatus from './AutomationStatus';
 
 interface AdminStats {
   totalOrders: number;
@@ -188,6 +189,10 @@ const AdminDashboard: React.FC = () => {
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="drivers">Drivers</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="automation">
+            <Bot className="w-4 h-4 mr-2" />
+            Automation
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="orders" className="space-y-4">
@@ -345,6 +350,10 @@ const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="automation" className="space-y-4">
+          <AutomationStatus />
         </TabsContent>
       </Tabs>
     </div>
