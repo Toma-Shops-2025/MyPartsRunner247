@@ -115,12 +115,17 @@ const DriverApplicationPage: React.FC = () => {
       }
 
       // Create driver application record for tracking
+      const verificationDeadline = new Date();
+      verificationDeadline.setDate(verificationDeadline.getDate() + 7); // 7 days from now
+      
       const { error: applicationError } = await supabase
         .from('driver_applications')
         .insert([{
           user_id: user?.id,
           status: 'approved',
-          approved_at: new Date().toISOString()
+          approved_at: new Date().toISOString(),
+          verification_deadline: verificationDeadline.toISOString(),
+          verification_status: 'pending'
         }]);
 
       if (applicationError) {
@@ -129,7 +134,7 @@ const DriverApplicationPage: React.FC = () => {
       }
 
       // Show success message and redirect to driver dashboard
-      alert('Congratulations! You are now approved as a driver. You are automatically set to ONLINE and ready to accept deliveries!');
+      alert('Congratulations! You are now approved as a driver and automatically set to ONLINE. You have 7 days to complete your driver verification process. You can start accepting deliveries immediately!');
       
       // Force page reload to update auth state
       window.location.href = '/driver-dashboard';

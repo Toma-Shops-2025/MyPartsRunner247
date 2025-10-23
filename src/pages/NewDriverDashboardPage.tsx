@@ -8,7 +8,7 @@ import DriverNavigation from '@/components/DriverNavigation';
 import PushNotificationManager from '@/components/PushNotificationManager';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp } from 'lucide-react';
+import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { locationTrackingService } from '@/services/LocationTrackingService';
 
@@ -25,12 +25,64 @@ const NewDriverDashboardPage: React.FC = () => {
   const [activeOrders, setActiveOrders] = useState<any[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [hasStripeAccount, setHasStripeAccount] = useState(false);
+  const [verificationDeadline, setVerificationDeadline] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
       fetchDriverData();
+      loadVerificationDeadline();
     }
   }, [user, profile]);
+
+  const loadVerificationDeadline = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('driver_applications')
+        .select('verification_deadline')
+        .eq('user_id', user?.id)
+        .single();
+      
+      if (data?.verification_deadline) {
+        const deadline = new Date(data.verification_deadline);
+        setVerificationDeadline(deadline);
+      }
+    } catch (error) {
+      console.error('Error loading verification deadline:', error);
+    }
+  };
+
+  // Countdown timer
+  useEffect(() => {
+    if (!verificationDeadline) return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const timeLeft = verificationDeadline.getTime() - now.getTime();
+      
+      if (timeLeft <= 0) {
+        setTimeRemaining('Deadline passed');
+        return;
+      }
+      
+      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (days > 0) {
+        setTimeRemaining(`${days} days, ${hours} hours remaining`);
+      } else if (hours > 0) {
+        setTimeRemaining(`${hours} hours, ${minutes} minutes remaining`);
+      } else {
+        setTimeRemaining(`${minutes} minutes remaining`);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [verificationDeadline]);
 
   useEffect(() => {
     // Check if driver has Stripe account connected
@@ -262,6 +314,34 @@ const NewDriverDashboardPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
             <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
           </div>
+          
+          {/* Verification Deadline Alert */}
+          {verificationDeadline && (
+            <div className={`mt-4 p-4 rounded-lg border ${
+              timeRemaining === 'Deadline passed' 
+                ? 'border-red-500 bg-red-900/20 text-red-200' 
+                : timeRemaining.includes('days') && parseInt(timeRemaining) <= 1
+                ? 'border-yellow-500 bg-yellow-900/20 text-yellow-200'
+                : 'border-blue-500 bg-blue-900/20 text-blue-200'
+            }`}>
+              <div className="flex items-center">
+                <AlertTriangle className="h-5 w-5 mr-2" />
+                <div>
+                  <strong>Driver Verification Deadline:</strong> {timeRemaining === 'Deadline passed' 
+                    ? 'Your verification deadline has passed. Complete verification immediately to continue driving.'
+                    : `You have ${timeRemaining} to complete your driver verification.`}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="ml-4"
+                    onClick={() => navigate('/driver-verification')}
+                  >
+                    Complete Verification
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Cards */}

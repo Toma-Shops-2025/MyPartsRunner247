@@ -95,6 +95,8 @@ const DriverVerificationPage: React.FC = () => {
 
   const [saving, setSaving] = useState(false);
   const [checkrConnected, setCheckrConnected] = useState(false);
+  const [verificationDeadline, setVerificationDeadline] = useState<Date | null>(null);
+  const [timeRemaining, setTimeRemaining] = useState<string>('');
 
   // File input refs
   const driverLicenseRef = useRef<HTMLInputElement>(null);
@@ -102,7 +104,7 @@ const DriverVerificationPage: React.FC = () => {
   const registrationRef = useRef<HTMLInputElement>(null);
   const profilePhotoRef = useRef<HTMLInputElement>(null);
 
-  // Load existing data
+  // Load existing data and deadline
   useEffect(() => {
     if (profile) {
       setVerificationData(prev => ({
@@ -111,7 +113,59 @@ const DriverVerificationPage: React.FC = () => {
         phone: profile.phone || ''
       }));
     }
+    
+    // Load verification deadline
+    loadVerificationDeadline();
   }, [profile]);
+
+  const loadVerificationDeadline = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('driver_applications')
+        .select('verification_deadline')
+        .eq('user_id', user?.id)
+        .single();
+      
+      if (data?.verification_deadline) {
+        const deadline = new Date(data.verification_deadline);
+        setVerificationDeadline(deadline);
+      }
+    } catch (error) {
+      console.error('Error loading verification deadline:', error);
+    }
+  };
+
+  // Countdown timer
+  useEffect(() => {
+    if (!verificationDeadline) return;
+
+    const updateCountdown = () => {
+      const now = new Date();
+      const timeLeft = verificationDeadline.getTime() - now.getTime();
+      
+      if (timeLeft <= 0) {
+        setTimeRemaining('Deadline passed');
+        return;
+      }
+      
+      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      
+      if (days > 0) {
+        setTimeRemaining(`${days} days, ${hours} hours remaining`);
+      } else if (hours > 0) {
+        setTimeRemaining(`${hours} hours, ${minutes} minutes remaining`);
+      } else {
+        setTimeRemaining(`${minutes} minutes remaining`);
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [verificationDeadline]);
 
   if (loading) {
     return (
@@ -295,6 +349,24 @@ const DriverVerificationPage: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Driver Verification</h1>
           <p className="text-gray-600">Complete your driver verification to start accepting orders</p>
+          
+          {/* Deadline Alert */}
+          {verificationDeadline && (
+            <Alert className={`mt-4 ${
+              timeRemaining === 'Deadline passed' 
+                ? 'border-red-200 bg-red-50' 
+                : timeRemaining.includes('days') && parseInt(timeRemaining) <= 1
+                ? 'border-yellow-200 bg-yellow-50'
+                : 'border-blue-200 bg-blue-50'
+            }`}>
+              <Clock className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Verification Deadline:</strong> {timeRemaining === 'Deadline passed' 
+                  ? 'Your verification deadline has passed. Please complete verification immediately to continue driving.'
+                  : `You have ${timeRemaining} to complete your driver verification.`}
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         {/* Verification Status Overview */}
