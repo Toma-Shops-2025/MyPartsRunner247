@@ -84,7 +84,7 @@ export class OrderAutomationService {
         );
         
         const distanceScore = Math.max(0, 1 - (distance / 15)); // 0-1 scale
-        const ratingScore = (driver.rating || 4.0) / 5.0; // 0-1 scale
+        const ratingScore = 4.0 / 5.0; // 0-1 scale (default 4.0 rating)
         const availabilityScore = driver.is_online ? 1.0 : 0.5;
         
         // Get current order count
@@ -107,7 +107,7 @@ export class OrderAutomationService {
           driver,
           score: totalScore,
           distance,
-          rating: driver.rating || 4.0
+          rating: 4.0
         };
       })
     );

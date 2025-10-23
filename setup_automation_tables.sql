@@ -190,7 +190,7 @@ BEGIN
         sin(radians(p.current_latitude))
       )) * 0.621371, 2
     ) as distance_miles,
-    COALESCE(p.rating, 4.0) as rating,
+    4.0 as rating,
     COALESCE(da.is_online, FALSE) as is_online,
     COALESCE(da.is_available, FALSE) as is_available,
     COALESCE(da.current_orders, 0) as current_orders
