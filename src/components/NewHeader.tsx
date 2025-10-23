@@ -178,7 +178,7 @@ const NewHeader: React.FC = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => handleNavigation('/driver-verification')}>
                           <Settings className="mr-2 h-4 w-4" />
-                          Driver Verification
+                          Driver Onboarding
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleSwitchToCustomer}>
@@ -298,7 +298,7 @@ const NewHeader: React.FC = () => {
                           onClick={() => handleNavigation('/driver-verification')}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
                         >
-                          🚙 Driver Verification
+                          🚙 Driver Onboarding
                         </button>
                         <hr className="my-2 border-gray-600" />
                         <button 

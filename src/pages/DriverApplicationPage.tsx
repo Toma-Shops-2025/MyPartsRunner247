@@ -134,7 +134,7 @@ const DriverApplicationPage: React.FC = () => {
       }
 
       // Show success message and redirect to driver dashboard
-      alert('Congratulations! You are now approved as a driver and automatically set to ONLINE. You have 7 days to complete your driver verification process. You can start accepting deliveries immediately!');
+      alert('Congratulations! You are now approved as a driver and automatically set to ONLINE. You have 7 days to complete your driver onboarding process. You can start accepting deliveries immediately!');
       
       // Force page reload to update auth state
       window.location.href = '/driver-dashboard';
@@ -169,7 +169,7 @@ const DriverApplicationPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-blue-100 mb-2">ATTENTION:</h3>
                 <p className="text-blue-200 text-sm leading-relaxed">
                   All drivers are immediately approved with access to the Driver Dashboard and able to start accepting and delivering orders. 
-                  Please complete your driver verification process including background check, document uploads, and vehicle information in the Driver Verification section.
+                  Please complete your driver onboarding process including background check, document uploads, and vehicle information in the Driver Onboarding section.
                 </p>
               </div>
             </div>

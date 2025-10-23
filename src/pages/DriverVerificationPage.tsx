@@ -347,8 +347,8 @@ const DriverVerificationPage: React.FC = () => {
       <NewHeader />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Driver Verification</h1>
-          <p className="text-gray-600">Complete your driver verification to start accepting orders</p>
+          <h1 className="text-3xl font-bold text-gray-900">Driver Onboarding</h1>
+          <p className="text-gray-600">Complete your driver onboarding to start accepting orders</p>
           
           {/* Deadline Alert */}
           {verificationDeadline && (
@@ -361,9 +361,9 @@ const DriverVerificationPage: React.FC = () => {
             }`}>
               <Clock className="h-4 w-4" />
               <AlertDescription>
-                <strong>Verification Deadline:</strong> {timeRemaining === 'Deadline passed' 
-                  ? 'Your verification deadline has passed. Please complete verification immediately to continue driving.'
-                  : `You have ${timeRemaining} to complete your driver verification.`}
+                <strong>Onboarding Deadline:</strong> {timeRemaining === 'Deadline passed' 
+                  ? 'Your onboarding deadline has passed. Please complete onboarding immediately to continue driving.'
+                  : `You have ${timeRemaining} to complete your driver onboarding.`}
               </AlertDescription>
             </Alert>
           )}
@@ -374,7 +374,7 @@ const DriverVerificationPage: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Shield className="mr-2 h-5 w-5" />
-              Verification Status
+              Onboarding Status
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -964,7 +964,7 @@ const DriverVerificationPage: React.FC = () => {
               ) : (
                 <>
                   <Save className="mr-2 h-4 w-4" />
-                  Save Verification Information
+                  Save Onboarding Information
                 </>
               )}
             </Button>

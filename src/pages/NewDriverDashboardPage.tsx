@@ -327,16 +327,16 @@ const NewDriverDashboardPage: React.FC = () => {
               <div className="flex items-center">
                 <AlertTriangle className="h-5 w-5 mr-2" />
                 <div>
-                  <strong>Driver Verification Deadline:</strong> {timeRemaining === 'Deadline passed' 
-                    ? 'Your verification deadline has passed. Complete verification immediately to continue driving.'
-                    : `You have ${timeRemaining} to complete your driver verification.`}
+                  <strong>Driver Onboarding Deadline:</strong> {timeRemaining === 'Deadline passed' 
+                    ? 'Your onboarding deadline has passed. Complete onboarding immediately to continue driving.'
+                    : `You have ${timeRemaining} to complete your driver onboarding.`}
                   <Button 
                     variant="outline" 
                     size="sm" 
                     className="ml-4"
                     onClick={() => navigate('/driver-verification')}
                   >
-                    Complete Verification
+                    Complete Onboarding
                   </Button>
                 </div>
               </div>
