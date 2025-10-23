@@ -51,47 +51,64 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     setPreviewUrl(url);
   };
 
+  const compressImage = (file: File, maxWidth: number = 200, quality: number = 0.8): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxWidth) {
+            width = (width * maxWidth) / height;
+            height = maxWidth;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx?.drawImage(img, 0, 0, width, height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(compressedDataUrl);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const uploadAvatar = async (file: File) => {
     try {
       setIsUploading(true);
 
-      // Convert file to base64 for simple storage
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const base64String = e.target?.result as string;
-          
-          // Update profile in database with base64 data
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({ avatar_url: base64String })
-            .eq('id', (await supabase.auth.getUser()).data.user?.id);
-
-          if (updateError) {
-            throw updateError;
-          }
-
-          onAvatarUpdate(base64String);
-          setPreviewUrl(null);
-
-          toast({
-            title: "Profile picture updated!",
-            description: "Your new avatar has been saved successfully.",
-          });
-
-        } catch (error) {
-          console.error('Error uploading avatar:', error);
-          toast({
-            title: "Upload failed",
-            description: "There was an error uploading your profile picture. Please try again.",
-            variant: "destructive",
-          });
-        } finally {
-          setIsUploading(false);
-        }
-      };
+      // Compress the image first
+      const compressedBase64 = await compressImage(file, 200, 0.7);
       
-      reader.readAsDataURL(file);
+      // Update profile in database with compressed base64 data
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: compressedBase64 })
+        .eq('id', (await supabase.auth.getUser()).data.user?.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      onAvatarUpdate(compressedBase64);
+      setPreviewUrl(null);
+
+      toast({
+        title: "Profile picture updated!",
+        description: "Your new avatar has been saved successfully.",
+      });
 
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -100,6 +117,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         description: "There was an error uploading your profile picture. Please try again.",
         variant: "destructive",
       });
+    } finally {
       setIsUploading(false);
     }
   };
