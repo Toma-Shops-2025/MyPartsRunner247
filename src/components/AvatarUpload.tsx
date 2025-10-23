@@ -55,55 +55,43 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
     try {
       setIsUploading(true);
 
-      // Generate unique filename
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      // Convert file to base64 for simple storage
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const base64String = e.target?.result as string;
+          
+          // Update profile in database with base64 data
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({ avatar_url: base64String })
+            .eq('id', (await supabase.auth.getUser()).data.user?.id);
 
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+          if (updateError) {
+            throw updateError;
+          }
 
-      if (error) {
-        throw error;
-      }
+          onAvatarUpdate(base64String);
+          setPreviewUrl(null);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
+          toast({
+            title: "Profile picture updated!",
+            description: "Your new avatar has been saved successfully.",
+          });
 
-      // Update profile in database
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ avatar_url: publicUrl })
-        .eq('id', (await supabase.auth.getUser()).data.user?.id);
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Clean up old avatar if it exists
-      if (currentAvatarUrl) {
-        const oldPath = currentAvatarUrl.split('/').pop();
-        if (oldPath) {
-          await supabase.storage
-            .from('avatars')
-            .remove([`avatars/${oldPath}`]);
+        } catch (error) {
+          console.error('Error uploading avatar:', error);
+          toast({
+            title: "Upload failed",
+            description: "There was an error uploading your profile picture. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsUploading(false);
         }
-      }
-
-      onAvatarUpdate(publicUrl);
-      setPreviewUrl(null);
-
-      toast({
-        title: "Profile picture updated!",
-        description: "Your new avatar has been saved successfully.",
-      });
+      };
+      
+      reader.readAsDataURL(file);
 
     } catch (error) {
       console.error('Error uploading avatar:', error);
@@ -112,7 +100,6 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         description: "There was an error uploading your profile picture. Please try again.",
         variant: "destructive",
       });
-    } finally {
       setIsUploading(false);
     }
   };
@@ -129,16 +116,6 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
 
       if (error) {
         throw error;
-      }
-
-      // Clean up old avatar from storage
-      if (currentAvatarUrl) {
-        const oldPath = currentAvatarUrl.split('/').pop();
-        if (oldPath) {
-          await supabase.storage
-            .from('avatars')
-            .remove([`avatars/${oldPath}`]);
-        }
       }
 
       onAvatarUpdate(null);
