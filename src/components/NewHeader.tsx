@@ -136,7 +136,15 @@ const NewHeader: React.FC = () => {
                     </DropdownMenuItem>
                     
                     {/* Admin-specific menu items */}
-                    {profile?.user_type === 'admin' && (
+                    {(() => {
+                      console.log('🔍 DEBUG: Profile check', {
+                        profile: profile,
+                        userType: profile?.user_type,
+                        isAdmin: profile?.user_type === 'admin',
+                        profileExists: !!profile
+                      });
+                      return profile?.user_type === 'admin';
+                    })() && (
                       <>
                         <DropdownMenuItem 
                           onClick={() => {
@@ -195,6 +203,19 @@ const NewHeader: React.FC = () => {
                       <User className="mr-2 h-4 w-4" />
                       Profile Settings
                     </DropdownMenuItem>
+                    
+                    {/* Temporary admin dashboard link for debugging */}
+                    <DropdownMenuItem 
+                      onClick={() => {
+                        console.log('Direct Admin Dashboard clicked');
+                        handleNavigation('/admin-dashboard');
+                      }}
+                      className="bg-blue-50 text-blue-700 hover:bg-blue-100"
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      Admin Dashboard (Debug)
+                    </DropdownMenuItem>
+                    
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
