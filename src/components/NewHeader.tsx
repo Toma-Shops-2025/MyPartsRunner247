@@ -136,7 +136,13 @@ const NewHeader: React.FC = () => {
                     {/* Admin-specific menu items */}
                     {profile?.user_type === 'admin' && (
                       <>
-                        <DropdownMenuItem onClick={() => handleNavigation('/admin-dashboard')}>
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            console.log('Admin Dashboard clicked');
+                            handleNavigation('/admin-dashboard');
+                          }}
+                          className="cursor-pointer hover:bg-gray-100"
+                        >
                           <Settings className="mr-2 h-4 w-4" />
                           Admin Dashboard
                         </DropdownMenuItem>
