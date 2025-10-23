@@ -398,14 +398,28 @@ const NewDriverDashboardPage: React.FC = () => {
           </Card>
         </div>
 
-        {/* Stripe Connect Setup - Show if driver hasn't connected payment method */}
-        {!hasStripeAccount && (
+        {/* Payment Setup Section */}
+        {!hasStripeAccount ? (
           <div className="mb-8">
             <DriverOnboarding onComplete={() => {
               setHasStripeAccount(true);
               // Refresh the page to update the UI
               window.location.reload();
             }} />
+          </div>
+        ) : (
+          <div className="mb-8">
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-800">Payment Account Connected!</h3>
+                    <p className="text-green-700">You'll receive automatic payments for completed deliveries.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
