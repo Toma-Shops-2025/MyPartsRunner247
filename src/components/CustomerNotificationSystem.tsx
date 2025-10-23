@@ -59,10 +59,10 @@ const CustomerNotificationSystem: React.FC = () => {
         orderId: order.id,
         type: 'status_update',
         title: getStatusTitle(order.status),
-        message: getStatusMessage(order.status), // Remove driver name for now
+        message: getStatusMessage(order.status),
         status: order.status,
         timestamp: order.updated_at,
-        is_read: false
+        is_read: order.status === 'delivered' || order.status === 'cancelled' // Mark completed orders as read
       })) || [];
 
       setNotifications(orderNotifications);
@@ -132,12 +132,12 @@ const CustomerNotificationSystem: React.FC = () => {
 
   const getStatusMessage = (status: string): string => {
     switch (status) {
-      case 'pending': return 'Your order has been placed and is being prepared.';
+      case 'pending': return 'Your order has been placed and is being prepared. We\'re looking for a driver.';
       case 'accepted': return 'A driver has accepted your order and is on their way to pick it up.';
-      case 'picked_up': return 'Your order has been picked up and is on the way.';
-      case 'in_transit': return 'Your order is being delivered.';
-      case 'delivered': return 'Your order has been delivered successfully!';
-      case 'cancelled': return 'Your order has been cancelled.';
+      case 'picked_up': return 'Your order has been picked up and is on the way to you.';
+      case 'in_transit': return 'Your order is being delivered. Track your driver in real-time.';
+      case 'delivered': return 'Your order has been delivered successfully! Thank you for choosing MyPartsRunner.';
+      case 'cancelled': return 'Your order has been cancelled. Contact support if you have questions.';
       default: return 'Your order status has been updated.';
     }
   };
@@ -235,7 +235,7 @@ const CustomerNotificationSystem: React.FC = () => {
                           {notification.title}
                         </h4>
                         <span className="text-xs text-gray-400">
-                          {new Date(notification.timestamp).toLocaleTimeString()}
+                          {new Date(notification.timestamp).toLocaleDateString()} at {new Date(notification.timestamp).toLocaleTimeString()}
                         </span>
                       </div>
                       <p className="text-sm text-gray-300 mt-1">
