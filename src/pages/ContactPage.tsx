@@ -49,7 +49,7 @@ const ContactPage = () => {
       console.error('Error submitting contact form:', error);
       toast({
         title: "Error sending message",
-        description: "Please try again or contact us directly at support@mypartsrunner.com",
+        description: "Please try again or contact us directly at infomypartsrunner@gmail.com",
         variant: "destructive",
       });
     } finally {
@@ -176,7 +176,7 @@ const ContactPage = () => {
                   <Mail className="w-5 h-5 text-blue-400 mr-3 mt-0.5" />
                   <div>
                     <p className="font-medium text-white">Email Support</p>
-                    <p className="text-gray-300">support@mypartsrunner.com</p>
+                    <p className="text-gray-300">infomypartsrunner@gmail.com</p>
                   </div>
                 </div>
 

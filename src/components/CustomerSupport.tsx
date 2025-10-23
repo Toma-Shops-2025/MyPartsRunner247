@@ -285,7 +285,7 @@ const CustomerSupport: React.FC = () => {
                 <Mail className="w-8 h-8 text-green-400 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-white mb-2">Email Support</h3>
                 <p className="text-gray-300 mb-3">Send us a detailed message</p>
-                <p className="text-teal-400 font-semibold">support@mypartsrunner.com</p>
+                <p className="text-teal-400 font-semibold">infomypartsrunner@gmail.com</p>
                 <p className="text-sm text-gray-400">Response within 2 hours</p>
               </CardContent>
             </Card>
