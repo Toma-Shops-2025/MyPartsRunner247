@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import NewAuthModal from './NewAuthModal';
+import AvatarUpload from './AvatarUpload';
 import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -119,6 +120,7 @@ const NewHeader: React.FC = () => {
                       className="relative h-10 w-10 sm:h-8 sm:w-8 rounded-full p-0 hover:bg-gray-100"
                     >
                       <Avatar className="h-8 w-8 sm:h-8 sm:w-8">
+                        <AvatarImage src={profile?.avatar_url} alt="Profile" />
                         <AvatarFallback className="text-sm">
                           {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
                         </AvatarFallback>
@@ -191,7 +193,7 @@ const NewHeader: React.FC = () => {
                     
                     <DropdownMenuItem onClick={() => handleNavigation('/profile')}>
                       <User className="mr-2 h-4 w-4" />
-                      Profile
+                      Profile Settings
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="mr-2 h-4 w-4" />

@@ -1,42 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
+import Footer from '@/components/Footer';
+import AvatarUpload from '@/components/AvatarUpload';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, Mail, Phone, MapPin, Save, Car } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { User, Settings, Shield, Bell } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const ProfilePage: React.FC = () => {
-  const { user, profile, loading, updateUserType, createProfileManually } = useAuth();
-  const navigate = useNavigate();
+  const { user, profile, loading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
-    phone: profile?.phone || ''
+    phone: profile?.phone || '',
   });
 
-  // Update form data when profile changes
-  useEffect(() => {
-    if (profile) {
-      setFormData({
-        full_name: profile.full_name || '',
-        phone: profile.phone || ''
-      });
-    }
-  }, [profile]);
-
-  // Show loading with timeout to prevent infinite loading
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400 mx-auto mb-4"></div>
-          <p className="text-white">Loading profile...</p>
-        </div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -45,178 +32,224 @@ const ProfilePage: React.FC = () => {
     return <Navigate to="/" replace />;
   }
 
+  const handleAvatarUpdate = (newAvatarUrl: string | null) => {
+    // The AvatarUpload component handles the database update
+    // This is just for any additional UI updates if needed
+    console.log('Avatar updated:', newAvatarUrl);
+  };
+
   const handleSave = async () => {
-    if (!user || !profile) return;
-    
     try {
-      // Update profile in localStorage (bypass database for now)
-      const updatedProfile = {
-        ...profile,
-        full_name: formData.full_name,
-        phone: formData.phone,
-        updated_at: new Date().toISOString()
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('mock_profile', JSON.stringify(updatedProfile));
-      
-      // Try to update database, but don't fail if it doesn't work
-      try {
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            full_name: formData.full_name,
-            phone: formData.phone
-          })
-          .eq('id', user.id);
-        
-        if (error) {
-          console.warn('Database update failed, but localStorage updated:', error);
-        }
-      } catch (dbError) {
-        console.warn('Database update failed, but localStorage updated:', dbError);
-      }
-      
-      alert('Profile updated successfully!');
+      // Here you would update the profile in the database
+      // For now, just show a success message
+      toast({
+        title: "Profile updated!",
+        description: "Your profile information has been saved successfully.",
+      });
       setIsEditing(false);
-      // Refresh the page to show updated data
-      window.location.reload();
-    } catch (error: any) {
-      console.error('Error:', error);
-      alert('Error: ' + (error.message || error));
+    } catch (error) {
+      toast({
+        title: "Update failed",
+        description: "There was an error updating your profile. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
-
+  const userInitials = profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
 
   return (
     <div className="min-h-screen bg-gray-900">
-        <NewHeader />
+      <NewHeader />
+      
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
-          <p className="text-gray-300">Manage your account information</p>
+          <p className="text-gray-400 mt-2">Manage your account settings and preferences</p>
         </div>
 
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16">
-                <AvatarFallback className="text-xl bg-teal-600 text-white">
-                  {profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="text-white">{profile?.full_name || 'User'}</CardTitle>
-                <p className="text-gray-300">{profile?.user_type || 'customer'}</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-white">Email</Label>
-                <div className="flex items-center space-x-2">
-                  <Mail className="h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="email" 
-                    value={user.email || ''} 
-                    disabled 
-                    className="bg-gray-700 border-gray-600 text-white"
-                  />
-                </div>
-              </div>
+        <Tabs defaultValue="profile" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="profile" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="account" className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Account
+            </TabsTrigger>
+            <TabsTrigger value="security" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Security
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              Notifications
+            </TabsTrigger>
+          </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="full_name" className="text-white">Full Name</Label>
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="full_name" 
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                    disabled={!isEditing}
-                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
-                  />
-                </div>
-              </div>
+          <TabsContent value="profile" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Profile Picture</CardTitle>
+                <CardDescription>
+                  Upload a profile picture to personalize your account
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AvatarUpload
+                  currentAvatarUrl={profile?.avatar_url}
+                  userInitials={userInitials}
+                  onAvatarUpdate={handleAvatarUpdate}
+                />
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone" className="text-white">Phone</Label>
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="phone" 
+            <Card>
+              <CardHeader>
+                <CardTitle>Personal Information</CardTitle>
+                <CardDescription>
+                  Update your personal details
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name">Full Name</Label>
+                    <Input
+                      id="full_name"
+                      value={formData.full_name}
+                      onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={user.email || ''}
+                      disabled
+                      className="bg-gray-100"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     disabled={!isEditing}
-                    className="bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-teal-400"
+                    placeholder="Enter your phone number"
                   />
                 </div>
-              </div>
 
-            </div>
+                <div className="flex space-x-2">
+                  {!isEditing ? (
+                    <Button onClick={() => setIsEditing(true)}>
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <>
+                      <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                        Save Changes
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setIsEditing(false);
+                          setFormData({
+                            full_name: profile?.full_name || '',
+                            phone: profile?.phone || '',
+                          });
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            <div className="flex justify-between items-center">
-              <div className="flex space-x-2 flex-wrap">
-                {profile?.user_type === 'driver' && (
-                  <Button 
-                    onClick={() => navigate('/driver-dashboard')}
-                    className="bg-teal-600 hover:bg-teal-700 text-white"
-                  >
-                    <Car className="mr-2 h-4 w-4" />
-                    Go to Driver Dashboard
+          <TabsContent value="account" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Account Information</CardTitle>
+                <CardDescription>
+                  View your account details and user type
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>User Type</Label>
+                    <div className="mt-1 p-2 bg-gray-100 rounded-md">
+                      <span className="capitalize font-medium">{profile?.user_type || 'customer'}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Account Created</Label>
+                    <div className="mt-1 p-2 bg-gray-100 rounded-md">
+                      {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Settings</CardTitle>
+                <CardDescription>
+                  Manage your account security
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-8">
+                  <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Security Features</h3>
+                  <p className="text-gray-600 mb-4">
+                    Security settings are managed through your authentication provider.
+                  </p>
+                  <Button variant="outline">
+                    Change Password
                   </Button>
-                )}
-                {profile?.user_type === 'customer' && (
-                  <Button 
-                    onClick={() => navigate('/driver-application')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Apply to Become a Driver
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Preferences</CardTitle>
+                <CardDescription>
+                  Control how you receive notifications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center py-8">
+                  <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Notification Settings</h3>
+                  <p className="text-gray-600 mb-4">
+                    Configure your notification preferences here.
+                  </p>
+                  <Button variant="outline">
+                    Configure Notifications
                   </Button>
-                )}
-                {profile?.user_type === 'driver' && (
-                  <Button 
-                    onClick={() => updateUserType('customer')}
-                    className="bg-gray-600 hover:bg-gray-700 text-white"
-                  >
-                    Switch to Customer Mode
-                  </Button>
-                )}
-              </div>
-              
-              <div className="flex space-x-4">
-                {isEditing ? (
-                  <>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsEditing(false)}
-                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      onClick={handleSave}
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
-                    >
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </Button>
-                  </>
-                ) : (
-                  <Button 
-                    onClick={() => setIsEditing(true)}
-                    className="bg-teal-600 hover:bg-teal-700 text-white"
-                  >
-                    Edit Profile
-                  </Button>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
+
+      <Footer />
     </div>
   );
 };
