@@ -239,16 +239,26 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess,
         className="w-full h-full max-w-none max-h-none p-0 overflow-hidden bg-transparent border-none shadow-none m-0 rounded-none"
         aria-describedby="auth-modal-description"
       >
-        {/* Full Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url("/auth-modal-background.png?v=${Date.now()}")`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
-        />
+        {/* Full Background Video */}
+        <video 
+          className="absolute inset-0 w-full h-full object-cover"
+          autoPlay
+          loop
+          muted
+          playsInline
+        >
+          <source src="/auth-modal-background-mp4" type="video/mp4" />
+          {/* Fallback to image if video doesn't load */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url("/auth-modal-background.png?v=${Date.now()}")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          />
+        </video>
         
         {/* Dark Overlay for better text readability */}
         <div className="absolute inset-0 bg-black/30"></div>
