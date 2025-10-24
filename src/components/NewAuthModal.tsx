@@ -246,8 +246,9 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess,
           loop
           muted
           playsInline
+          preload="auto"
         >
-          <source src="/auth-modal-background-mp4" type="video/mp4" />
+          <source src="/auth-modal-background-mp4.mp4" type="video/mp4" />
           {/* Fallback to image if video doesn't load */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
