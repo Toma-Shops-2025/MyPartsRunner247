@@ -8,7 +8,7 @@ const PromotionalVideo: React.FC = () => {
           Discover MyPartsRunner: Your Ultimate Delivery Solution
         </h2>
         <div 
-          className="relative overflow-hidden rounded-lg"
+          className="relative overflow-hidden rounded-lg bg-gray-700"
           style={{ paddingTop: '56.25%' }}
         >
           <iframe 
@@ -16,7 +16,8 @@ const PromotionalVideo: React.FC = () => {
             loading="lazy" 
             title="Synthesia video player - Discover MyPartsRunner: Your Ultimate Delivery Solution" 
             allowFullScreen 
-            allow="encrypted-media; fullscreen; microphone;" 
+            allow="encrypted-media; fullscreen; microphone; autoplay;" 
+            frameBorder="0"
             style={{
               position: 'absolute',
               width: '100%',
@@ -29,6 +30,13 @@ const PromotionalVideo: React.FC = () => {
               overflow: 'hidden'
             }}
           />
+          {/* Fallback content if video fails to load */}
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-700">
+            <div className="text-center text-gray-400">
+              <div className="text-4xl mb-2">🎬</div>
+              <p className="text-sm">Loading promotional video...</p>
+            </div>
+          </div>
         </div>
         <p className="text-gray-300 text-center mt-4">
           Watch our introduction video to learn more about MyPartsRunner's delivery services
