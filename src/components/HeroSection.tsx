@@ -23,7 +23,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           console.error('Video error:', e);
         }}
         onLoadStart={() => console.log('Video loading started')}
-        onCanPlay={() => console.log('Video can play')}
+        onCanPlay={(e) => {
+          console.log('Video can play');
+          // Slow down the video to 0.5x speed
+          e.currentTarget.playbackRate = 0.5;
+        }}
       >
         <source src="/auth-modal-background-mp4.mp4" type="video/mp4" />
         {/* Fallback to image if video doesn't load */}
@@ -39,7 +43,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
       </video>
       
       {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-black/75"></div>
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
