@@ -24,6 +24,14 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   customerPhone,
   customerEmail
 }) => {
+  // Debug props
+  console.log('DriverNavigation props:', {
+    pickupLocation,
+    deliveryLocation,
+    orderId,
+    customerPhone,
+    customerEmail
+  });
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any | null>(null);
   const directionsService = useRef<any | null>(null);
@@ -112,6 +120,9 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   }, [pickupLocation, deliveryLocation, onLocationUpdate]);
 
   const navigateToPickup = () => {
+    console.log('Navigate to Pickup clicked');
+    console.log('Pickup location:', pickupLocation);
+    console.log('Current location:', currentLocation);
     setIsNavigating(true);
     
     // Check if user is on mobile device for native app navigation
@@ -181,6 +192,9 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   };
 
   const navigateToDelivery = () => {
+    console.log('Navigate to Delivery clicked');
+    console.log('Delivery location:', deliveryLocation);
+    console.log('Pickup location:', pickupLocation);
     setIsNavigating(true);
     
     // Check if user is on mobile device for native app navigation
@@ -336,11 +350,14 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
               variant="outline"
               className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
               onClick={() => {
+                console.log('Call button clicked');
+                console.log('Customer phone:', customerPhone);
                 if (customerPhone) {
                   const callUrl = `tel:${customerPhone}`;
-                  console.log('Calling customer:', customerPhone);
+                  console.log('Opening call URL:', callUrl);
                   window.open(callUrl, '_blank');
                 } else {
+                  console.warn('No customer phone number available');
                   alert('Customer phone number not available. Please contact support.');
                 }
               }}
@@ -352,11 +369,14 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
               variant="outline"
               className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
               onClick={() => {
+                console.log('Text button clicked');
+                console.log('Customer phone:', customerPhone);
                 if (customerPhone) {
                   const smsUrl = `sms:${customerPhone}`;
-                  console.log('Texting customer:', customerPhone);
+                  console.log('Opening SMS URL:', smsUrl);
                   window.open(smsUrl, '_blank');
                 } else {
+                  console.warn('No customer phone number available');
                   alert('Customer phone number not available. Please contact support.');
                 }
               }}

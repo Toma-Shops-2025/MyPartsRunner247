@@ -544,6 +544,7 @@ const NewDriverDashboardPage: React.FC = () => {
                             size="sm" 
                             className="bg-orange-600 hover:bg-orange-700 flex-1"
                             onClick={() => {
+                              console.log('Photo & Deliver button clicked for order:', order.id);
                               const input = document.createElement('input');
                               input.type = 'file';
                               input.accept = 'image/*';
@@ -674,6 +675,7 @@ const NewDriverDashboardPage: React.FC = () => {
                             variant="outline" 
                             className="border-gray-600 text-gray-300 flex-1"
                             onClick={async () => {
+                              console.log('Delivered button clicked for order:', order.id);
                               try {
                                 const { error } = await supabase
                                   .from('orders')
