@@ -330,91 +330,39 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className="space-y-2">
-            {/* Communication Buttons */}
-            <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
-                onClick={() => {
-                  if (customerPhone) {
-                    const callUrl = `tel:${customerPhone}`;
-                    console.log('Calling customer:', customerPhone);
-                    window.open(callUrl, '_blank');
-                  } else {
-                    alert('Customer phone number not available. Please contact support.');
-                  }
-                }}
-              >
-                📞 Call
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
-                onClick={() => {
-                  if (customerPhone) {
-                    const smsUrl = `sms:${customerPhone}`;
-                    console.log('Texting customer:', customerPhone);
-                    window.open(smsUrl, '_blank');
-                  } else {
-                    alert('Customer phone number not available. Please contact support.');
-                  }
-                }}
-              >
-                💬 Text
-              </Button>
-            </div>
-            
-            {/* Delivery Completion Buttons */}
-            <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                className="bg-orange-600 hover:bg-orange-700 flex-1"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.capture = 'environment';
-                  
-                  input.onchange = async (e) => {
-                    const target = e.target as HTMLInputElement;
-                    const file = target.files?.[0];
-                    if (file) {
-                      try {
-                        const reader = new FileReader();
-                        reader.onload = async (event) => {
-                          const base64Image = event.target.result;
-                          console.log('Photo captured for delivery:', orderId);
-                          alert('Photo saved! Delivery marked as complete.');
-                          onDeliveryComplete();
-                        };
-                        reader.readAsDataURL(file);
-                      } catch (error) {
-                        console.error('Error processing photo:', error);
-                        alert('Error processing photo: ' + error);
-                      }
-                    }
-                  };
-                  input.click();
-                }}
-              >
-                📸 Photo & Deliver
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="border-gray-600 text-gray-300 flex-1"
-                onClick={() => {
-                  console.log('Delivered button clicked for order:', orderId);
-                  alert('Order marked as delivered!');
-                  onDeliveryComplete();
-                }}
-              >
-                ✅ Delivered
-              </Button>
-            </div>
+          <div className="flex gap-2">
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
+              onClick={() => {
+                if (customerPhone) {
+                  const callUrl = `tel:${customerPhone}`;
+                  console.log('Calling customer:', customerPhone);
+                  window.open(callUrl, '_blank');
+                } else {
+                  alert('Customer phone number not available. Please contact support.');
+                }
+              }}
+            >
+              📞 Call
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
+              onClick={() => {
+                if (customerPhone) {
+                  const smsUrl = `sms:${customerPhone}`;
+                  console.log('Texting customer:', customerPhone);
+                  window.open(smsUrl, '_blank');
+                } else {
+                  alert('Customer phone number not available. Please contact support.');
+                }
+              }}
+            >
+              💬 Text
+            </Button>
           </div>
         </CardContent>
       </Card>

@@ -537,6 +537,198 @@ const NewDriverDashboardPage: React.FC = () => {
                             </span>
                           )}
                         </div>
+                        
+                        {/* Delivery Completion Buttons */}
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            className="bg-orange-600 hover:bg-orange-700 flex-1"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.capture = 'environment';
+                              
+                              input.onchange = async (e) => {
+                                const target = e.target as HTMLInputElement;
+                                const file = target.files?.[0];
+                                if (file) {
+                                  try {
+                                    const reader = new FileReader();
+                                    reader.onload = async (event) => {
+                                      const base64Image = event.target.result;
+                                      
+                                      const { error: photoError } = await supabase
+                                        .from('delivery_photos')
+                                        .insert([{
+                                          order_id: order.id,
+                                          driver_id: user?.id,
+                                          photo_data: base64Image,
+                                          created_at: new Date().toISOString()
+                                        }]);
+
+                                      if (photoError) {
+                                        console.error('Error saving photo:', photoError);
+                                        alert('Failed to save delivery photo. Please try again.');
+                                        return;
+                                      }
+                                      
+                                      console.log('Photo saved successfully for order:', order.id);
+
+                                      // Use phone number from order placement
+                                      const customerPhone = order.contact_phone || '502-555-0123';
+                                      
+                                      // Send photo to customer via EMAIL (FREE!)
+                                      try {
+                                        const emailResponse = await fetch('/.netlify/functions/send-delivery-email', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: JSON.stringify({
+                                            orderId: order.id,
+                                            customerEmail: order.customer_email || 'customer@example.com',
+                                            photoData: base64Image,
+                                            driverName: profile?.full_name || 'Driver'
+                                          })
+                                        });
+
+                                        if (emailResponse.ok) {
+                                          console.log('Delivery email sent to customer successfully!');
+                                        } else {
+                                          console.log('Failed to send email to customer, but continuing...');
+                                        }
+                                      } catch (emailError) {
+                                        console.error('Error sending email to customer:', emailError);
+                                        // Don't fail the whole process if email sending fails
+                                      }
+                                      
+                                      const { error } = await supabase
+                                        .from('orders')
+                                        .update({ 
+                                          status: 'delivered',
+                                          updated_at: new Date().toISOString()
+                                        })
+                                        .eq('id', order.id);
+
+                                      if (error) {
+                                        console.error('Error marking delivered:', error);
+                                        alert('Photo saved but failed to mark delivery as completed. Please try again.');
+                                        return;
+                                      }
+                                      
+                                      console.log('Order marked as delivered:', order.id);
+
+                                      // Process automatic driver payment
+                                      try {
+                                        const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
+                                          method: 'POST',
+                                          headers: {
+                                            'Content-Type': 'application/json',
+                                          },
+                                          body: JSON.stringify({
+                                            orderId: order.id
+                                          })
+                                        });
+
+                                        if (paymentResponse.ok) {
+                                          const paymentData = await paymentResponse.json();
+                                          console.log('Driver payment processed:', paymentData);
+                                          
+                                          if (paymentData.driverPayment && paymentData.success) {
+                                            alert(`Delivery completed! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
+                                          } else {
+                                            console.log('Payment skipped - Stripe account status:', {
+                                              stripeAccountId: paymentData.stripeAccountId,
+                                              stripeConnected: paymentData.stripeConnected,
+                                              message: paymentData.message
+                                            });
+                                            alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                          }
+                                        } else {
+                                          console.log('Payment processing failed, but delivery marked as completed');
+                                          alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                        }
+                                      } catch (paymentError) {
+                                        console.error('Payment processing error:', paymentError);
+                                        alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
+                                      }
+
+                                      // Email sent automatically - no need for SMS
+                                      await fetchDriverData();
+                                    };
+                                    reader.readAsDataURL(file);
+                                  } catch (error) {
+                                    console.error('Error processing photo:', error);
+                                    alert('Error processing photo: ' + error);
+                                  }
+                                }
+                              };
+                              input.click();
+                            }}
+                          >
+                            📸 Photo & Deliver
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="border-gray-600 text-gray-300 flex-1"
+                            onClick={async () => {
+                              try {
+                                const { error } = await supabase
+                                  .from('orders')
+                                  .update({ 
+                                    status: 'delivered',
+                                    updated_at: new Date().toISOString()
+                                  })
+                                  .eq('id', order.id);
+
+                                if (error) {
+                                  console.error('Error marking delivered:', error);
+                                  alert('Failed to mark as delivered: ' + error.message);
+                                  return;
+                                }
+
+                                // Process automatic driver payment
+                                try {
+                                  const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
+                                    method: 'POST',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                      orderId: order.id
+                                    })
+                                  });
+
+                                  if (paymentResponse.ok) {
+                                    const paymentData = await paymentResponse.json();
+                                    console.log('Driver payment processed:', paymentData);
+                                    
+                                    if (paymentData.driverPayment) {
+                                      alert(`Order delivered! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
+                                    } else {
+                                      alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                    }
+                                  } else {
+                                    console.log('Payment processing failed, but delivery marked as completed');
+                                    alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                  }
+                                } catch (paymentError) {
+                                  console.error('Payment processing error:', paymentError);
+                                  alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
+                                }
+
+                                await fetchDriverData();
+                              } catch (error) {
+                                console.error('Error marking delivered:', error);
+                                alert('Error marking delivered: ' + error);
+                              }
+                            }}
+                          >
+                            ✅ Delivered
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
