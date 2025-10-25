@@ -18,8 +18,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
         muted
         playsInline
         preload="auto"
+        onError={(e) => {
+          console.log('Video failed to load, falling back to image');
+          console.error('Video error:', e);
+        }}
+        onLoadStart={() => console.log('Video loading started')}
+        onCanPlay={() => console.log('Video can play')}
       >
-        <source src="/auth-modal-background-video.mp4" type="video/mp4" />
+        <source src="/auth-modal-background-mp4.mp4" type="video/mp4" />
         {/* Fallback to image if video doesn't load */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
