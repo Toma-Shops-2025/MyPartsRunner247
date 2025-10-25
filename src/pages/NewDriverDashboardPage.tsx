@@ -440,6 +440,8 @@ const NewDriverDashboardPage: React.FC = () => {
               pickupLocation={activeOrders[0].pickup_address}
               deliveryLocation={activeOrders[0].delivery_address}
               orderId={activeOrders[0].id}
+              customerPhone={activeOrders[0].contact_phone}
+              customerEmail={activeOrders[0].customer_email}
               onPickupComplete={() => {
                 console.log('Pickup completed for order:', activeOrders[0].id);
                 // Update order status in database
