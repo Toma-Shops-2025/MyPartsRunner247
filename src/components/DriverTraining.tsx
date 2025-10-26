@@ -24,7 +24,7 @@ const DriverTraining: React.FC = () => {
       title: "Welcome to MyPartsRunner",
       description: "Welcome to the MyPartsRunner family! Learn about our platform, driver benefits, and how to get started on your journey to success.",
       duration: "1-2 minutes",
-      youtubeUrl: "https://youtu.be/zXXTd81HXg4",
+      youtubeUrl: "https://www.youtube.com/embed/zXXTd81HXg4",
       completed: completedVideos.includes(1)
     },
     {
@@ -32,7 +32,7 @@ const DriverTraining: React.FC = () => {
       title: "Driver Dashboard Overview",
       description: "Master the driver dashboard, learn how to go online/offline, accept orders, and navigate to pickup locations efficiently.",
       duration: "2-3 minutes",
-      youtubeUrl: "https://youtu.be/z6vBcxe4a1Y",
+      youtubeUrl: "https://www.youtube.com/embed/z6vBcxe4a1Y",
       completed: completedVideos.includes(2)
     },
     {
@@ -40,7 +40,7 @@ const DriverTraining: React.FC = () => {
       title: "Maximizing Your Earnings",
       description: "Discover peak hours, high-demand areas, order selection strategies, and tips to maximize your earnings as a MyPartsRunner driver.",
       duration: "3-4 minutes",
-      youtubeUrl: "https://youtu.be/7vOyfgpVHLU",
+      youtubeUrl: "https://www.youtube.com/embed/7vOyfgpVHLU",
       completed: completedVideos.includes(3)
     },
     {
@@ -48,7 +48,7 @@ const DriverTraining: React.FC = () => {
       title: "Customer Service Excellence",
       description: "Learn professional communication, handling difficult situations, building customer relationships, and providing exceptional service.",
       duration: "2-3 minutes",
-      youtubeUrl: "https://youtu.be/wq0bbatXx7A",
+      youtubeUrl: "https://www.youtube.com/embed/wq0bbatXx7A",
       completed: completedVideos.includes(4)
     },
     {
@@ -56,7 +56,7 @@ const DriverTraining: React.FC = () => {
       title: "Safety First",
       description: "Understand personal safety protocols, vehicle safety checks, emergency procedures, and maintaining safety standards while driving.",
       duration: "2-3 minutes",
-      youtubeUrl: "https://youtu.be/YnN2n1Ek5z8",
+      youtubeUrl: "https://www.youtube.com/embed/YnN2n1Ek5z8",
       completed: completedVideos.includes(5)
     }
   ];
@@ -187,14 +187,14 @@ const DriverTraining: React.FC = () => {
                   <div className="bg-gray-700 rounded-lg h-32 flex items-center justify-center relative">
                     <Play className="w-12 h-12 text-teal-400" />
                     <div className="absolute top-2 right-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => window.open(video.youtubeUrl, '_blank')}
-                        className="text-white hover:text-teal-400 p-1"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => window.open(video.youtubeUrl.replace('/embed/', '/watch?v='), '_blank')}
+                      className="text-white hover:text-teal-400 p-1"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </Button>
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -217,7 +217,7 @@ const DriverTraining: React.FC = () => {
                     </Button>
                     <Button 
                       variant="outline"
-                      onClick={() => window.open(video.youtubeUrl, '_blank')}
+                      onClick={() => window.open(video.youtubeUrl.replace('/embed/', '/watch?v='), '_blank')}
                       className="w-full text-gray-300 border-gray-600 hover:border-teal-400"
                       size="sm"
                     >

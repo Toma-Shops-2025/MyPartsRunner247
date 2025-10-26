@@ -317,11 +317,11 @@
 ### **🎬 PRODUCTION VIDEOS COMPLETED**
 
 **YouTube Training Videos:**
-1. **Welcome to MyPartsRunner** - https://youtu.be/zXXTd81HXg4
-2. **Driver Dashboard Overview** - https://youtu.be/z6vBcxe4a1Y  
-3. **Maximizing Your Earnings** - https://youtu.be/7vOyfgpVHLU
-4. **Customer Service Excellence** - https://youtu.be/wq0bbatXx7A
-5. **Safety First** - https://youtu.be/YnN2n1Ek5z8
+1. **Welcome to MyPartsRunner** - https://www.youtube.com/watch?v=zXXTd81HXg4
+2. **Driver Dashboard Overview** - https://www.youtube.com/watch?v=z6vBcxe4a1Y  
+3. **Maximizing Your Earnings** - https://www.youtube.com/watch?v=7vOyfgpVHLU
+4. **Customer Service Excellence** - https://www.youtube.com/watch?v=wq0bbatXx7A
+5. **Safety First** - https://www.youtube.com/watch?v=YnN2n1Ek5z8
 
 **Status:** ✅ All videos integrated into MyPartsRunner driver training system
 
