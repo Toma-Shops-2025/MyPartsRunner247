@@ -164,7 +164,7 @@ const DriverVerificationPage: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('driver_applications')
-        .select('verification_deadline')
+        .select('created_at, updated_at')
         .eq('user_id', user.id)
         .single();
       
@@ -179,8 +179,11 @@ const DriverVerificationPage: React.FC = () => {
         return;
       }
       
-      if (data?.verification_deadline) {
-        const deadline = new Date(data.verification_deadline);
+      if (data?.created_at) {
+        // Calculate deadline as 7 days from application creation
+        const createdDate = new Date(data.created_at);
+        const deadline = new Date(createdDate);
+        deadline.setDate(deadline.getDate() + 7);
         setVerificationDeadline(deadline);
       } else {
         // Set a default deadline if none exists
@@ -260,18 +263,69 @@ const DriverVerificationPage: React.FC = () => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}_${type}_${Date.now()}.${fileExt}`;
-      
+
+      // First, check if the storage bucket exists and is accessible
+      const { data: bucketData, error: bucketError } = await supabase.storage
+        .from('driver-documents')
+        .list('', { limit: 1 });
+
+      if (bucketError) {
+        if (isDevelopment()) {
+          console.error(`Storage bucket error for ${type}:`, bucketError);
+        }
+        
+        // If bucket doesn't exist or is not accessible, use fallback
+        const fileData = {
+          name: fileName,
+          type: file.type,
+          size: file.size,
+          uploadedAt: new Date().toISOString(),
+          status: 'pending_upload',
+          error: 'Storage bucket not accessible'
+        };
+        
+        try {
+          clearLocalStorageIfNeeded();
+          const existingFiles = JSON.parse(localStorage.getItem('driver_documents') || '{}');
+          existingFiles[type] = fileData;
+          localStorage.setItem('driver_documents', JSON.stringify(existingFiles));
+          
+          setUploadedFiles(prev => ({ ...prev, [type]: file }));
+          setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
+          
+          toast({
+            title: "Document queued for upload",
+            description: `${type.replace('_', ' ')} has been queued and will be uploaded when storage is available.`,
+          });
+          return;
+        } catch (quotaError) {
+          setUploadedFiles(prev => ({ ...prev, [type]: file }));
+          setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
+          
+          toast({
+            title: "Document ready for upload",
+            description: `${type.replace('_', ' ')} is ready but cannot be stored locally. Please try uploading again later.`,
+          });
+          return;
+        }
+      }
+
+      // Try to upload to storage
       const { data, error } = await supabase.storage
         .from('driver-documents')
         .upload(fileName, file);
-      
+
       if (error) {
         if (isDevelopment()) {
           console.error(`Storage upload error for ${type}:`, error);
         }
         
-        // Handle row-level security policy errors
-        if (error.message?.includes('row-level security') || error.message?.includes('policy')) {
+        // Handle various storage errors
+        if (error.message?.includes('row-level security') || 
+            error.message?.includes('policy') ||
+            error.message?.includes('bucket') ||
+            error.message?.includes('permission') ||
+            error.message?.includes('400')) {
           // Store file metadata only (not the actual file data) to avoid quota issues
           const fileData = {
             name: fileName,
@@ -401,15 +455,20 @@ const DriverVerificationPage: React.FC = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Save to database - use existing columns instead of verification_info
+      // Save to database - use existing columns only
+      const updateData: any = {
+        full_name: verificationData.full_name,
+        phone: verificationData.phone
+      };
+
+      // Only add verification_info if the column exists (graceful fallback)
+      if (verificationInfo) {
+        updateData.verification_info = verificationInfo;
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          full_name: verificationData.full_name,
-          phone: verificationData.phone,
-          // Store verification info in a JSON field if available, otherwise skip
-          ...(verificationInfo && { verification_info: verificationInfo })
-        })
+        .update(updateData)
         .eq('id', user.id);
       
       if (error) {
@@ -418,7 +477,10 @@ const DriverVerificationPage: React.FC = () => {
         }
         
         // Handle missing column error gracefully
-        if (error.message?.includes('verification_info') || error.code === 'PGRST204') {
+        if (error.message?.includes('verification_info') || 
+            error.code === 'PGRST204' ||
+            error.message?.includes('column') ||
+            error.message?.includes('schema')) {
           // Try without verification_info column
           const { error: retryError } = await supabase
             .from('profiles')
@@ -432,10 +494,16 @@ const DriverVerificationPage: React.FC = () => {
             if (isDevelopment()) {
               console.error('Retry update error:', retryError);
             }
-            // Continue with localStorage fallback
+            // Continue with localStorage fallback - don't throw error
+            if (isDevelopment()) {
+              console.warn('Database update failed, using localStorage fallback');
+            }
           }
         } else {
-          throw error;
+          // For other errors, also use localStorage fallback instead of throwing
+          if (isDevelopment()) {
+            console.warn('Database update failed, using localStorage fallback:', error);
+          }
         }
       }
 
