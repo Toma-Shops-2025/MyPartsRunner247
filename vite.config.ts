@@ -36,6 +36,10 @@ export default defineConfig(({ mode }) => ({
       }
     }
   },
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@supabase/supabase-js'],
+    exclude: ['@vite/client', '@vite/env']
+  },
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
   },
