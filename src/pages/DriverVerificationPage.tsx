@@ -157,25 +157,64 @@ const DriverVerificationPage: React.FC = () => {
 
   const loadVerificationDeadline = async () => {
     if (!user?.id) {
-      console.log('No user ID available for verification deadline query');
+      if (isDevelopment()) {
+        console.log('No user ID available for verification deadline query');
+      }
+      // Set a default deadline even without user ID
+      const defaultDeadline = new Date();
+      defaultDeadline.setDate(defaultDeadline.getDate() + 7);
+      setVerificationDeadline(defaultDeadline);
       return;
     }
     
+    // First, try to get deadline from localStorage
     try {
-      const { data, error } = await supabase
+      const storedDeadline = localStorage.getItem('verification_deadline');
+      if (storedDeadline) {
+        const deadline = new Date(storedDeadline);
+        if (deadline > new Date()) {
+          setVerificationDeadline(deadline);
+          return;
+        }
+      }
+    } catch (error) {
+      if (isDevelopment()) {
+        console.warn('Error reading deadline from localStorage:', error);
+      }
+    }
+    
+    // Try to get deadline from database, but don't fail if it doesn't work
+    try {
+      // Add timeout to prevent hanging
+      const queryPromise = supabase
         .from('driver_applications')
         .select('created_at, updated_at')
         .eq('user_id', user.id)
         .single();
       
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database query timeout')), 5000)
+      );
+      
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any;
+      
       if (error) {
         if (isDevelopment()) {
-          console.log('Error loading verification deadline:', error);
+          console.log('Database query failed, using fallback deadline:', error);
         }
-        // Set a default deadline if none exists
+        // Set a default deadline if database query fails
         const defaultDeadline = new Date();
         defaultDeadline.setDate(defaultDeadline.getDate() + 7);
         setVerificationDeadline(defaultDeadline);
+        
+        // Store in localStorage for future use
+        try {
+          localStorage.setItem('verification_deadline', defaultDeadline.toISOString());
+        } catch (quotaError) {
+          if (isDevelopment()) {
+            console.warn('Could not store deadline in localStorage:', quotaError);
+          }
+        }
         return;
       }
       
@@ -185,11 +224,29 @@ const DriverVerificationPage: React.FC = () => {
         const deadline = new Date(createdDate);
         deadline.setDate(deadline.getDate() + 7);
         setVerificationDeadline(deadline);
+        
+        // Store in localStorage for future use
+        try {
+          localStorage.setItem('verification_deadline', deadline.toISOString());
+        } catch (quotaError) {
+          if (isDevelopment()) {
+            console.warn('Could not store deadline in localStorage:', quotaError);
+          }
+        }
       } else {
         // Set a default deadline if none exists
         const defaultDeadline = new Date();
         defaultDeadline.setDate(defaultDeadline.getDate() + 7);
         setVerificationDeadline(defaultDeadline);
+        
+        // Store in localStorage for future use
+        try {
+          localStorage.setItem('verification_deadline', defaultDeadline.toISOString());
+        } catch (quotaError) {
+          if (isDevelopment()) {
+            console.warn('Could not store deadline in localStorage:', quotaError);
+          }
+        }
       }
     } catch (error) {
       if (isDevelopment()) {
@@ -199,6 +256,15 @@ const DriverVerificationPage: React.FC = () => {
       const defaultDeadline = new Date();
       defaultDeadline.setDate(defaultDeadline.getDate() + 7);
       setVerificationDeadline(defaultDeadline);
+      
+      // Store in localStorage for future use
+      try {
+        localStorage.setItem('verification_deadline', defaultDeadline.toISOString());
+      } catch (quotaError) {
+        if (isDevelopment()) {
+          console.warn('Could not store deadline in localStorage:', quotaError);
+        }
+      }
     }
   };
 
