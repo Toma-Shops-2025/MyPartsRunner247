@@ -25,6 +25,11 @@ export const useAuth = () => {
   const [profileFetchTimeout, setProfileFetchTimeout] = useState<number | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
 
+  // Helper function to check if we're in development mode
+  const isDevelopment = () => {
+    return typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  };
+
   useEffect(() => {
     let mounted = true;
     let isProcessing = false;
@@ -57,7 +62,10 @@ export const useAuth = () => {
       async (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state change:', event, session?.user?.email);
+        // Only log in development
+        if (isDevelopment()) {
+          console.log('Auth state change:', event, session?.user?.email);
+        }
         
         // Only process meaningful state changes
         if (event === 'SIGNED_IN' && session?.user) {
@@ -67,10 +75,14 @@ export const useAuth = () => {
           
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
-            console.log('Fetching profile for new user:', session.user.id);
+            if (isDevelopment()) {
+              console.log('Fetching profile for new user:', session.user.id);
+            }
             await fetchProfile(session.user.id);
           } else {
-            console.log('Skipping profile fetch - already processed user:', session.user.id);
+            if (isDevelopment()) {
+              console.log('Skipping profile fetch - already processed user:', session.user.id);
+            }
             setLoading(false);
           }
         } else if (event === 'SIGNED_OUT') {
@@ -88,10 +100,14 @@ export const useAuth = () => {
           
           // Always fetch profile if we don't have it or if it's for a different user
           if (!profile || profile.id !== session.user.id) {
-            console.log('Fetching profile for initial session:', session.user.id);
+            if (isDevelopment()) {
+              console.log('Fetching profile for initial session:', session.user.id);
+            }
             await fetchProfile(session.user.id);
           } else {
-            console.log('Profile already available for user:', session.user.id);
+            if (isDevelopment()) {
+              console.log('Profile already available for user:', session.user.id);
+            }
             setLoading(false);
           }
         }
@@ -103,7 +119,7 @@ export const useAuth = () => {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, []); // Remove lastProcessedUserId dependency to prevent infinite loops
+  }, [lastProcessedUserId, profile]); // Add proper dependencies
 
   const fetchProfile = async (userId: string) => {
     // Clear any existing timeout
@@ -113,13 +129,17 @@ export const useAuth = () => {
     
     // Only skip if we already have a profile for this user
     if (lastProcessedUserId === userId && profile && profile.id === userId) {
-      console.log('Skipping duplicate profile fetch for user:', userId);
+      if (isDevelopment()) {
+        console.log('Skipping duplicate profile fetch for user:', userId);
+      }
       return;
     }
     
     // If we don't have a profile yet, fetch it even if we've processed this user before
     if (lastProcessedUserId === userId && (!profile || profile.id !== userId)) {
-      console.log('User processed before but no profile found, fetching again:', userId);
+      if (isDevelopment()) {
+        console.log('User processed before but no profile found, fetching again:', userId);
+      }
     }
     
     setLastProcessedUserId(userId);
@@ -127,7 +147,7 @@ export const useAuth = () => {
     // Debounce profile fetches to prevent rapid-fire requests
     const timeout = setTimeout(async () => {
       await performProfileFetch(userId);
-    }, 500); // Increased debounce time
+    }, 1000); // Increased debounce time to 1 second
     
     setProfileFetchTimeout(timeout);
   };
@@ -135,35 +155,39 @@ export const useAuth = () => {
   const performProfileFetch = async (userId: string) => {
     // Check if userId is provided
     if (!userId) {
-      console.log('No userId provided, skipping profile fetch');
+      if (isDevelopment()) {
+        console.log('No userId provided, skipping profile fetch');
+      }
       setLoading(false);
       return;
     }
     
     // Check if we already have a profile for this user
     if (profile && profile.id === userId) {
-      console.log('Profile already loaded for user:', userId, '- skipping fetch');
+      if (isDevelopment()) {
+        console.log('Profile already loaded for user:', userId, '- skipping fetch');
+      }
       setLoading(false);
       return;
     }
     
-    
     // Skip localStorage fallback - use database only
-    console.log('Fetching profile from database for user:', userId);
-    
-    // Skip fallback user logic - use database only
+    if (isDevelopment()) {
+      console.log('Fetching profile from database for user:', userId);
+    }
     
     // Only prevent if we already have a profile for this user
     if (profile && profile.id === userId) {
-      console.log('Profile already exists for user:', userId);
+      if (isDevelopment()) {
+        console.log('Profile already exists for user:', userId);
+      }
       return;
     }
     
-    // Remove timeout fallback - use database only
-    
-    
     try {
-      console.log('Fetching profile for user:', userId);
+      if (isDevelopment()) {
+        console.log('Fetching profile for user:', userId);
+      }
       
       // Create a timeout promise for the database query
       const queryTimeout = new Promise((_, reject) => 
@@ -179,14 +203,17 @@ export const useAuth = () => {
       const { data, error } = await Promise.race([queryPromise, queryTimeout]) as any;
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Profile fetch error:', error);
-        console.log('Error details:', { code: error.code, message: error.message, status: error.status });
-        // Timeout removed - no need to clear
+        if (isDevelopment()) {
+          console.error('Profile fetch error:', error);
+          console.log('Error details:', { code: error.code, message: error.message, status: error.status });
+        }
         
         // Handle 406 error specifically - database access issue
         if (error.code === 'PGRST204' || error.message?.includes('406') || error.status === 406 || 
             (error.message && error.message.includes('Not Acceptable'))) {
-          console.log('Database access issue detected, checking for stored profile');
+          if (isDevelopment()) {
+            console.log('Database access issue detected, checking for stored profile');
+          }
           
           // First check if there's a stored mock profile
           const mockProfile = localStorage.getItem('mock_profile');
@@ -194,7 +221,9 @@ export const useAuth = () => {
             try {
               const parsedProfile = JSON.parse(mockProfile);
               if (parsedProfile.id === userId) {
-                console.log('Using stored mock profile:', parsedProfile);
+                if (isDevelopment()) {
+                  console.log('Using stored mock profile:', parsedProfile);
+                }
                 setProfile(parsedProfile);
                 setLoading(false);
                 return;
@@ -218,12 +247,14 @@ export const useAuth = () => {
             updated_at: new Date().toISOString()
           };
           
-          console.log('🔍 DATABASE ACCESS ISSUE FALLBACK PROFILE:', {
-            userId,
-            userType: fallbackProfile.user_type,
-            isApproved: fallbackProfile.is_approved,
-            email: fallbackProfile.email
-          });
+          if (isDevelopment()) {
+            console.log('🔍 DATABASE ACCESS ISSUE FALLBACK PROFILE:', {
+              userId,
+              userType: fallbackProfile.user_type,
+              isApproved: fallbackProfile.is_approved,
+              email: fallbackProfile.email
+            });
+          }
           setProfile(fallbackProfile);
           setLoading(false);
           return;
@@ -233,17 +264,24 @@ export const useAuth = () => {
         setProfile(null);
         setLoading(false);
       } else if (data) {
-        console.log('Profile found for user:', userId, '-', data.email, data.user_type);
-        console.log('🔍 AUTH DEBUG: Setting profile state with data:', data);
-        // Timeout removed - no need to clear
+        if (isDevelopment()) {
+          console.log('Profile found for user:', userId, '-', data.email, data.user_type);
+          console.log('🔍 AUTH DEBUG: Setting profile state with data:', data);
+        }
         setProfile(data);
         setLoading(false);
-        console.log('🔍 AUTH DEBUG: Profile state should now be set');
+        if (isDevelopment()) {
+          console.log('🔍 AUTH DEBUG: Profile state should now be set');
+        }
       } else {
-        console.log('No profile found for user:', userId);
+        if (isDevelopment()) {
+          console.log('No profile found for user:', userId);
+        }
         // Auto-create profile for existing users
         try {
-          console.log('Auto-creating profile for user:', userId);
+          if (isDevelopment()) {
+            console.log('Auto-creating profile for user:', userId);
+          }
           const profileData = await createProfileManually();
           // Timeout removed - no need to clear
           setProfile(profileData);

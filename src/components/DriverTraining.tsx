@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Pause, RotateCcw, CheckCircle, Clock, BookOpen } from 'lucide-react';
+import { Play, Pause, RotateCcw, CheckCircle, Clock, BookOpen, ExternalLink } from 'lucide-react';
 
 interface TrainingVideo {
   id: number;
   title: string;
   description: string;
   duration: string;
-  filename: string;
+  youtubeUrl: string;
   completed: boolean;
 }
 
@@ -21,42 +21,42 @@ const DriverTraining: React.FC = () => {
   const trainingVideos: TrainingVideo[] = [
     {
       id: 1,
-      title: "Getting Started with MyPartsRunner",
-      description: "Learn the basics of the MyPartsRunner platform, how to accept orders, and navigate the driver dashboard.",
-      duration: "5-7 minutes",
-      filename: "Driver Training 1.mp4",
+      title: "Welcome to MyPartsRunner",
+      description: "Welcome to the MyPartsRunner family! Learn about our platform, driver benefits, and how to get started on your journey to success.",
+      duration: "1-2 minutes",
+      youtubeUrl: "https://youtu.be/zXXTd81HXg4",
       completed: completedVideos.includes(1)
     },
     {
       id: 2,
-      title: "Order Acceptance & Navigation",
-      description: "Master the order acceptance process, use Google Maps navigation, and understand pickup procedures.",
-      duration: "6-8 minutes",
-      filename: "Driver Training 2.mp4",
+      title: "Driver Dashboard Overview",
+      description: "Master the driver dashboard, learn how to go online/offline, accept orders, and navigate to pickup locations efficiently.",
+      duration: "2-3 minutes",
+      youtubeUrl: "https://youtu.be/z6vBcxe4a1Y",
       completed: completedVideos.includes(2)
     },
     {
       id: 3,
-      title: "Customer Communication",
-      description: "Learn how to communicate effectively with customers, handle special requests, and maintain professionalism.",
-      duration: "4-6 minutes",
-      filename: "Driver Training 3.mp4",
+      title: "Maximizing Your Earnings",
+      description: "Discover peak hours, high-demand areas, order selection strategies, and tips to maximize your earnings as a MyPartsRunner driver.",
+      duration: "3-4 minutes",
+      youtubeUrl: "https://youtu.be/7vOyfgpVHLU",
       completed: completedVideos.includes(3)
     },
     {
       id: 4,
-      title: "Delivery Best Practices",
-      description: "Master delivery procedures, photo documentation, and ensuring customer satisfaction.",
-      duration: "5-7 minutes",
-      filename: "Driver Training 4.mp4",
+      title: "Customer Service Excellence",
+      description: "Learn professional communication, handling difficult situations, building customer relationships, and providing exceptional service.",
+      duration: "2-3 minutes",
+      youtubeUrl: "https://youtu.be/wq0bbatXx7A",
       completed: completedVideos.includes(4)
     },
     {
       id: 5,
-      title: "Safety & Professional Standards",
-      description: "Understand safety protocols, vehicle maintenance, and maintaining professional standards while driving.",
-      duration: "6-8 minutes",
-      filename: "Driver Training 5.mp4",
+      title: "Safety First",
+      description: "Understand personal safety protocols, vehicle safety checks, emergency procedures, and maintaining safety standards while driving.",
+      duration: "2-3 minutes",
+      youtubeUrl: "https://youtu.be/YnN2n1Ek5z8",
       completed: completedVideos.includes(5)
     }
   ];
@@ -149,26 +149,29 @@ const DriverTraining: React.FC = () => {
               {currentVideo === video.id ? (
                 <div className="space-y-4">
                   <div className="bg-black rounded-lg overflow-hidden">
-                    <video
-                      id={video.id.toString()}
-                      className="w-full h-48 object-cover"
-                      controls
-                      autoPlay
-                      onEnded={() => {
+                    <iframe
+                      width="100%"
+                      height="270"
+                      src={`${video.youtubeUrl}?autoplay=1&rel=0&modestbranding=1`}
+                      title={video.title}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="rounded-lg"
+                    ></iframe>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => {
                         handleVideoComplete(video.id);
                         setCurrentVideo(null);
                       }}
-                      onTimeUpdate={(e) => {
-                        const video = e.target as HTMLVideoElement;
-                        const progress = (video.currentTime / video.duration) * 100;
-                        handleVideoProgress(parseInt(video.id), progress);
-                      }}
+                      className="flex-1"
                     >
-                      <source src={`/${video.filename}`} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <div className="flex gap-2">
+                      Mark as Complete
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
@@ -181,26 +184,47 @@ const DriverTraining: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="bg-gray-700 rounded-lg h-32 flex items-center justify-center">
+                  <div className="bg-gray-700 rounded-lg h-32 flex items-center justify-center relative">
                     <Play className="w-12 h-12 text-teal-400" />
+                    <div className="absolute top-2 right-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.open(video.youtubeUrl, '_blank')}
+                        className="text-white hover:text-teal-400 p-1"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Button 
-                    onClick={() => setCurrentVideo(video.id)}
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white"
-                    size="sm"
-                  >
-                    {video.completed ? (
-                      <>
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        Watch Again
-                      </>
-                    ) : (
-                      <>
-                        <Play className="w-4 h-4 mr-2" />
-                        Start Training
-                      </>
-                    )}
-                  </Button>
+                  <div className="space-y-2">
+                    <Button 
+                      onClick={() => setCurrentVideo(video.id)}
+                      className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                      size="sm"
+                    >
+                      {video.completed ? (
+                        <>
+                          <RotateCcw className="w-4 h-4 mr-2" />
+                          Watch Again
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-2" />
+                          Start Training
+                        </>
+                      )}
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      onClick={() => window.open(video.youtubeUrl, '_blank')}
+                      className="w-full text-gray-300 border-gray-600 hover:border-teal-400"
+                      size="sm"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Open in YouTube
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>
