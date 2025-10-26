@@ -150,6 +150,7 @@ const DriverTraining: React.FC = () => {
                 <div className="space-y-4">
                   <div className="bg-black rounded-lg overflow-hidden">
                     <video
+                      id={video.id.toString()}
                       className="w-full h-48 object-cover"
                       controls
                       autoPlay
@@ -160,7 +161,7 @@ const DriverTraining: React.FC = () => {
                       onTimeUpdate={(e) => {
                         const video = e.target as HTMLVideoElement;
                         const progress = (video.currentTime / video.duration) * 100;
-                        handleVideoProgress(video.id, progress);
+                        handleVideoProgress(parseInt(video.id), progress);
                       }}
                     >
                       <source src={`/${video.filename}`} type="video/mp4" />
