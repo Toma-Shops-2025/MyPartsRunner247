@@ -263,49 +263,46 @@ const DriverVerificationPage: React.FC = () => {
 
     setUploadStatus(prev => ({ ...prev, [type]: 'uploading' }));
     
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}_${type}_${Date.now()}.${fileExt}`;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}_${type}_${Date.now()}.${fileExt}`;
 
-      // Skip storage upload entirely and use localStorage fallback
-      // This prevents 400 Bad Request errors and improves performance
-      if (isDevelopment()) {
-        console.log(`Skipping storage upload for ${type}, using localStorage fallback`);
-      }
+    // Skip storage upload entirely and use localStorage fallback
+    // This prevents 400 Bad Request errors and improves performance
+    if (isDevelopment()) {
+      console.log(`Skipping storage upload for ${type}, using localStorage fallback`);
+    }
+    
+    const fileData = {
+      name: fileName,
+      type: file.type,
+      size: file.size,
+      uploadedAt: new Date().toISOString(),
+      status: 'pending_upload',
+      error: 'Storage not accessible - using local fallback'
+    };
+    
+    try {
+      clearLocalStorageIfNeeded();
+      const existingFiles = JSON.parse(localStorage.getItem('driver_documents') || '{}');
+      existingFiles[type] = fileData;
+      localStorage.setItem('driver_documents', JSON.stringify(existingFiles));
       
-      const fileData = {
-        name: fileName,
-        type: file.type,
-        size: file.size,
-        uploadedAt: new Date().toISOString(),
-        status: 'pending_upload',
-        error: 'Storage not accessible - using local fallback'
-      };
+      setUploadedFiles(prev => ({ ...prev, [type]: file }));
+      setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
       
-      try {
-        clearLocalStorageIfNeeded();
-        const existingFiles = JSON.parse(localStorage.getItem('driver_documents') || '{}');
-        existingFiles[type] = fileData;
-        localStorage.setItem('driver_documents', JSON.stringify(existingFiles));
-        
-        setUploadedFiles(prev => ({ ...prev, [type]: file }));
-        setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
-        
-        toast({
-          title: "Document queued for upload",
-          description: `${type.replace('_', ' ')} has been queued and will be uploaded when storage is available.`,
-        });
-        return;
-      } catch (quotaError) {
-        setUploadedFiles(prev => ({ ...prev, [type]: file }));
-        setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
-        
-        toast({
-          title: "Document ready for upload",
-          description: `${type.replace('_', ' ')} is ready but cannot be stored locally. Please try uploading again later.`,
-        });
-        return;
-      }
+      toast({
+        title: "Document queued for upload",
+        description: `${type.replace('_', ' ')} has been queued and will be uploaded when storage is available.`,
+      });
+    } catch (quotaError) {
+      setUploadedFiles(prev => ({ ...prev, [type]: file }));
+      setUploadStatus(prev => ({ ...prev, [type]: 'success' }));
+      
+      toast({
+        title: "Document ready for upload",
+        description: `${type.replace('_', ' ')} is ready but cannot be stored locally. Please try uploading again later.`,
+      });
+    }
   };
 
   const handleFileSelect = (type: string) => {
