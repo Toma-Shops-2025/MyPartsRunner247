@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot } from 'lucide-react';
+import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot, FileText } from 'lucide-react';
 import AutomationStatus from './AutomationStatus';
+import AdminDocumentReview from './AdminDocumentReview';
 
 interface AdminStats {
   totalOrders: number;
@@ -188,6 +189,10 @@ const AdminDashboard: React.FC = () => {
         <TabsList>
           <TabsTrigger value="orders">Orders</TabsTrigger>
           <TabsTrigger value="drivers">Drivers</TabsTrigger>
+          <TabsTrigger value="documents">
+            <FileText className="w-4 h-4 mr-2" />
+            Documents
+          </TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="automation">
             <Bot className="w-4 h-4 mr-2" />
@@ -316,6 +321,10 @@ const AdminDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="documents" className="space-y-4">
+          <AdminDocumentReview onDocumentReviewed={fetchDashboardData} />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
