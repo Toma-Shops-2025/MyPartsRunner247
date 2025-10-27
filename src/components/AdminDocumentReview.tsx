@@ -51,30 +51,66 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
   const fetchPendingDocuments = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // First try the view
+      let { data, error } = await supabase
         .from('pending_document_reviews')
         .select('*')
         .order('uploaded_at', { ascending: true });
 
       if (error) {
-        console.error('Error fetching pending documents:', error);
+        console.error('Error fetching from view:', error);
         
-        // Check if it's a table/view doesn't exist error
-        if (error.message.includes('relation "pending_document_reviews" does not exist') || 
-            error.message.includes('relation "driver_documents" does not exist')) {
-          toast({
-            title: "Database Setup Required",
-            description: "Driver documents tables need to be created. Please run the database migration.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "Failed to fetch pending documents",
-            variant: "destructive",
-          });
+        // If view doesn't exist or fails, try direct query
+        console.log('Trying direct query to driver_documents...');
+        const { data: directData, error: directError } = await supabase
+          .from('driver_documents')
+          .select(`
+            id,
+            user_id,
+            document_type,
+            file_name,
+            file_size,
+            uploaded_at,
+            admin_notes,
+            profiles!inner(full_name, email)
+          `)
+          .in('status', ['pending_review', 'uploaded'])
+          .eq('is_current', true)
+          .order('uploaded_at', { ascending: true });
+
+        if (directError) {
+          console.error('Direct query also failed:', directError);
+          
+          // Check if it's a table/view doesn't exist error
+          if (directError.message.includes('relation "driver_documents" does not exist')) {
+            toast({
+              title: "Database Setup Required",
+              description: "Driver documents tables need to be created. Please run the database migration.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch pending documents",
+              variant: "destructive",
+            });
+          }
+          return;
         }
-        return;
+
+        // Transform direct data to match expected format
+        data = directData?.map(doc => ({
+          id: doc.id,
+          user_id: doc.user_id,
+          full_name: doc.profiles?.full_name || 'Unknown',
+          email: doc.profiles?.email || 'Unknown',
+          document_type: doc.document_type,
+          file_name: doc.file_name,
+          file_size: doc.file_size,
+          uploaded_at: doc.uploaded_at,
+          admin_notes: doc.admin_notes
+        })) || [];
       }
 
       setPendingDocuments(data || []);
