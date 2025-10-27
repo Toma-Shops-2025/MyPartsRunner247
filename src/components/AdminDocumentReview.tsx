@@ -58,11 +58,22 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
 
       if (error) {
         console.error('Error fetching pending documents:', error);
-        toast({
-          title: "Error",
-          description: "Failed to fetch pending documents",
-          variant: "destructive",
-        });
+        
+        // Check if it's a table/view doesn't exist error
+        if (error.message.includes('relation "pending_document_reviews" does not exist') || 
+            error.message.includes('relation "driver_documents" does not exist')) {
+          toast({
+            title: "Database Setup Required",
+            description: "Driver documents tables need to be created. Please run the database migration.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch pending documents",
+            variant: "destructive",
+          });
+        }
         return;
       }
 
@@ -267,9 +278,13 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
             <h3 className="text-lg font-semibold text-white mb-2">
               No documents pending review
             </h3>
-            <p className="text-gray-300">
+            <p className="text-gray-300 mb-4">
               All driver documents have been reviewed.
             </p>
+            <div className="text-sm text-gray-400 bg-gray-700 p-3 rounded-lg">
+              <p className="font-medium mb-1">Note:</p>
+              <p>If drivers are showing "documents pending review" but you don't see them here, the database tables may need to be set up. Run the database migration script to create the required tables.</p>
+            </div>
           </CardContent>
         </Card>
       ) : (
