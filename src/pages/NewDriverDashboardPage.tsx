@@ -52,7 +52,77 @@ const NewDriverDashboardPage: React.FC = () => {
     }
   };
 
-  // Countdown timer
+  const fetchDriverData = async () => {
+    if (!user?.id) return;
+
+    try {
+      setStatsLoading(true);
+
+      // Fetch available orders
+      const { data: availableOrdersData, error: availableError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (availableError) {
+        console.error('Error fetching available orders:', availableError);
+      } else {
+        setAvailableOrders(availableOrdersData || []);
+      }
+
+      // Fetch active orders
+      const { data: activeOrdersData, error: activeError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('driver_id', user.id)
+        .in('status', ['accepted', 'picked_up'])
+        .order('created_at', { ascending: false });
+
+      if (activeError) {
+        console.error('Error fetching active orders:', activeError);
+      } else {
+        setActiveOrders(activeOrdersData || []);
+      }
+
+      // Fetch completed orders for stats
+      const { data: completedOrdersData, error: completedError } = await supabase
+        .from('orders')
+        .select('total')
+        .eq('driver_id', user.id)
+        .eq('status', 'delivered');
+
+      if (completedError) {
+        console.error('Error fetching completed orders:', completedError);
+      } else {
+        const totalEarnings = completedOrdersData?.reduce((sum, order) => sum + (order.total || 0), 0) || 0;
+        const completedDeliveries = completedOrdersData?.length || 0;
+        
+        setDriverStats(prev => ({
+          ...prev,
+          totalEarnings,
+          completedDeliveries,
+          activeDeliveries: activeOrdersData?.length || 0
+        }));
+      }
+
+      // Check Stripe account status
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('stripe_connected')
+        .eq('id', user.id)
+        .single();
+
+      setHasStripeAccount(profileData?.stripe_connected || false);
+
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  // Countdown timer for verification deadline
   useEffect(() => {
     if (!verificationDeadline) return;
 
@@ -79,741 +149,274 @@ const NewDriverDashboardPage: React.FC = () => {
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 60000); // Update every minute
+    const interval = setInterval(updateCountdown, 60000);
 
     return () => clearInterval(interval);
   }, [verificationDeadline]);
 
-  useEffect(() => {
-    // Check if driver has Stripe account connected
-    const stripeAccountId = localStorage.getItem('stripe_account_id');
-    setHasStripeAccount(!!stripeAccountId);
-  }, []);
+  const acceptOrder = async (orderId: string) => {
+    if (!user?.id) return;
 
-  const fetchDriverData = async () => {
     try {
-      // First, let's check if ANY orders exist in the database
-      console.log('Checking if any orders exist in database...');
-      const { data: allOrders, error: allOrdersError } = await supabase
-        .from('orders')
-        .select('*')
-        .limit(5);
-      
-      console.log('All orders in database:', { allOrders, allOrdersError });
-      console.log('🔍 DEBUGGING: All orders details:', allOrders);
-      
-      // Debug: Check if the specific order ID exists
-      const { data: specificOrder } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', '79051d23-f7fd-4529-b8f8-011f3d0fdd7a');
-      
-      console.log('🔍 DEBUGGING: Specific order lookup:', specificOrder);
-      
-      // Debug: Check total count of orders
-      const { count: totalOrderCount } = await supabase
-        .from('orders')
-        .select('*', { count: 'exact', head: true });
-      
-      console.log('🔍 DEBUGGING: Total order count in database:', totalOrderCount);
-      
-      // Debug: Log each order's details
-      if (allOrders && allOrders.length > 0) {
-        console.log('=== DETAILED ORDER DEBUG ===');
-        allOrders.forEach((order, index) => {
-          console.log(`Order ${index + 1}:`, {
-            id: order.id,
-            status: order.status,
-            customer_id: order.customer_id,
-            driver_id: order.driver_id,
-            created_at: order.created_at,
-            total: order.total
-          });
-        });
-        console.log('=== END DETAILED ORDER DEBUG ===');
-      }
-      
-      // Debug: Log each order's status and details
-      if (allOrders && allOrders.length > 0) {
-        console.log('=== ORDER DEBUG INFO ===');
-        allOrders.forEach((order, index) => {
-          console.log(`Order ${index + 1}:`, {
-            id: order.id,
-            status: order.status,
-            customer_id: order.customer_id,
-            driver_id: order.driver_id,
-            created_at: order.created_at,
-            pickup_address: order.pickup_address,
-            delivery_address: order.delivery_address,
-            total: order.total
-          });
-        });
-        console.log('=== END ORDER DEBUG ===');
-      }
-
-      // Fetch driver earnings
-
-      // Fetch completed orders
-      const { data: completedOrders } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('driver_id', user?.id)
-        .eq('status', 'delivered');
-
-      // Fetch active orders
-      console.log('Fetching active orders for driver:', user?.id);
-      const { data: activeOrdersData } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('driver_id', user?.id)
-        .in('status', ['accepted', 'picked_up', 'in_transit']);
-
-      const { data: availableOrdersData, error: availableOrdersError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('status', 'pending')
-        .neq('status', 'cancelled')
-        .neq('status', 'deleted')
-        .limit(10)
-        .order('created_at', { ascending: false });
-
-      console.log('Available orders query result:', { availableOrdersData, availableOrdersError });
-      
-      // Debug: Let's also try a simpler query to see what orders exist with pending status
-      const { data: pendingOrdersDebug } = await supabase
-        .from('orders')
-        .select('id, status, created_at, customer_id, driver_id')
-        .eq('status', 'pending');
-      
-      console.log('=== PENDING ORDERS DEBUG ===');
-      console.log('Pending orders query result:', pendingOrdersDebug);
-      console.log('=== END PENDING ORDERS DEBUG ===');
-      console.log('Active orders query result:', { activeOrdersData });
-      console.log('Completed orders query result:', { completedOrders });
-
-      // Log the actual order data
-      if (availableOrdersData && availableOrdersData.length > 0) {
-        console.log('Available order details:', availableOrdersData[0]);
-        console.log('Order status:', availableOrdersData[0].status);
-        console.log('Order driver_id:', availableOrdersData[0].driver_id);
-        console.log('Order created_at:', availableOrdersData[0].created_at);
-      }
-
-      // Calculate earnings from completed orders (including tips)
-      const totalEarnings = completedOrders?.reduce((sum, order) => {
-        const baseAmount = parseFloat(order.total || 0) - parseFloat(order.tip_amount || 0);
-        const tipAmount = parseFloat(order.tip_amount || 0);
-        return sum + baseAmount + tipAmount; // Driver gets full amount including tips
-      }, 0) || 0;
-      const completedDeliveries = completedOrders?.length || 0;
-      const activeDeliveries = activeOrdersData?.length || 0;
-
-      console.log('Driver stats calculated:', { totalEarnings, completedDeliveries, activeDeliveries });
-      console.log('Setting available orders to state:', availableOrdersData);
-      
-      // Debug: Check driver profile status
-      console.log('🔍 DEBUGGING: Driver profile status:', {
-        status: profile?.status,
-        is_approved: profile?.is_approved,
-        user_type: profile?.user_type,
-        full_name: profile?.full_name
-      });
-
-      setDriverStats({
-        totalEarnings,
-        completedDeliveries,
-        activeDeliveries,
-        rating: completedDeliveries > 0 ? 4.5 : 0.0 // Mock rating
-      });
-
-      setActiveOrders(activeOrdersData || []);
-      setAvailableOrders(availableOrdersData || []);
-    } catch (error) {
-      console.error('Error fetching driver data:', error);
-    } finally {
-      setStatsLoading(false);
-    }
-  };
-
-  const handleAcceptOrder = async (orderId: string) => {
-    try {
-      const { data: updateResult, error } = await supabase
+      const { error } = await supabase
         .from('orders')
         .update({ 
-          driver_id: user?.id,
-          status: 'accepted'
+          driver_id: user.id, 
+          status: 'accepted',
+          accepted_at: new Date().toISOString()
         })
-        .eq('id', orderId)
-        .select();
+        .eq('id', orderId);
 
       if (error) {
         console.error('Error accepting order:', error);
-        throw error;
+        return;
       }
 
-      if (!updateResult || updateResult.length === 0) {
-        console.error('No rows were updated - order might not exist or match criteria');
-        throw new Error('No rows were updated');
-      }
-      
       // Refresh data
       await fetchDriverData();
-      alert('Order accepted successfully! You can now navigate to pickup location.');
     } catch (error) {
       console.error('Error accepting order:', error);
-      alert('Failed to accept order. Please try again.');
     }
   };
 
-  const handleViewEarnings = () => {
-    navigate('/earnings');
+  const startLocationTracking = async () => {
+    try {
+      await locationTrackingService.startTracking();
+    } catch (error) {
+      console.error('Error starting location tracking:', error);
+    }
   };
 
-  const handleViewCompleted = () => {
-    navigate('/my-orders');
+  const stopLocationTracking = async () => {
+    try {
+      await locationTrackingService.stopTracking();
+    } catch (error) {
+      console.error('Error stopping location tracking:', error);
+    }
   };
-
-  const handleViewRating = () => {
-    // For now, show an alert. In the future, this could navigate to a dedicated ratings page
-    alert('Driver ratings and reviews feature coming soon! This will show your customer feedback and ratings.');
-  };
-
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
       </div>
     );
   }
 
-  if (!user) {
+  if (!user || profile?.user_type !== 'driver') {
     return <Navigate to="/" replace />;
-  }
-
-  // Only redirect if we have a profile and it's not a driver
-  if (profile && profile.user_type !== 'driver') {
-    return <Navigate to="/" replace />;
-  }
-  
-  // If we don't have a profile yet but we have a user, wait for it to load
-  if (user && !profile) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400"></div>
-      </div>
-    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gray-50">
       <NewHeader />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <DriverNotificationSystem />
+      <PushNotificationManager />
+      
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Driver Dashboard</h1>
-            <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
-          </div>
-          
-          {/* Verification Deadline Alert */}
-          {verificationDeadline && (
-            <div className={`mt-4 p-4 rounded-lg border ${
-              timeRemaining === 'Deadline passed' 
-                ? 'border-red-500 bg-red-900/20 text-red-200' 
-                : timeRemaining.includes('days') && parseInt(timeRemaining) <= 1
-                ? 'border-yellow-500 bg-yellow-900/20 text-yellow-200'
-                : 'border-blue-500 bg-blue-900/20 text-blue-200'
-            }`}>
-              <div className="flex items-center">
-                <AlertTriangle className="h-5 w-5 mr-2" />
-                <div>
-                  <strong>Driver Onboarding Deadline:</strong> {timeRemaining === 'Deadline passed' 
-                    ? 'Your onboarding deadline has passed. Complete onboarding immediately to continue driving.'
-                    : `You have ${timeRemaining} to complete your driver onboarding.`}
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="ml-4"
-                    onClick={() => navigate('/driver-verification')}
-                  >
-                    Complete Onboarding
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Driver Dashboard</h1>
+          <p className="text-gray-600">Welcome back, {profile?.full_name || 'Driver'}!</p>
         </div>
+
+        {/* Verification Deadline Alert */}
+        {verificationDeadline && (
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+              <span className="text-yellow-800 font-medium">
+                Verification Deadline: {timeRemaining}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Driver Onboarding */}
+        {!hasStripeAccount && (
+          <div className="mb-8">
+            <DriverOnboarding onComplete={() => setHasStripeAccount(true)} />
+          </div>
+        )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewEarnings}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <DollarSign className="w-8 h-8 text-green-600 mr-4" />
                 <div>
-                  <p className="text-gray-400 text-sm">Total Earnings</p>
-                  <p className="text-2xl font-bold text-white">${driverStats.totalEarnings.toFixed(2)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Click to view details</p>
+                  <p className="text-sm font-medium text-gray-600">Total Earnings</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    ${driverStats.totalEarnings.toFixed(2)}
+                  </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-green-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewCompleted}>
+          <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Package className="w-8 h-8 text-blue-600 mr-4" />
                 <div>
-                  <p className="text-gray-400 text-sm">Completed</p>
-                  <p className="text-2xl font-bold text-white">{driverStats.completedDeliveries}</p>
-                  <p className="text-xs text-gray-500 mt-1">Click to view history</p>
+                  <p className="text-sm font-medium text-gray-600">Completed</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {driverStats.completedDeliveries}
+                  </p>
                 </div>
-                <CheckCircle className="w-8 h-8 text-blue-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Clock className="w-8 h-8 text-orange-600 mr-4" />
                 <div>
-                  <p className="text-gray-400 text-sm">Active</p>
-                  <p className="text-2xl font-bold text-white">{driverStats.activeDeliveries}</p>
+                  <p className="text-sm font-medium text-gray-600">Active</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {driverStats.activeDeliveries}
+                  </p>
                 </div>
-                <AlertCircle className="w-8 h-8 text-yellow-400" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700 hover:border-teal-400 cursor-pointer transition-colors" onClick={handleViewRating}>
+          <Card>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Star className="w-8 h-8 text-yellow-600 mr-4" />
                 <div>
-                  <p className="text-gray-400 text-sm">Rating</p>
-                  <p className="text-2xl font-bold text-white">{driverStats.rating.toFixed(1)}</p>
-                  <p className="text-xs text-gray-500 mt-1">Click to view reviews</p>
+                  <p className="text-sm font-medium text-gray-600">Rating</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {driverStats.rating.toFixed(1)}
+                  </p>
                 </div>
-                <Star className="w-8 h-8 text-purple-400" />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Payment Setup Section */}
-        {!hasStripeAccount ? (
-          <div className="mb-8">
-            <DriverOnboarding onComplete={() => {
-              setHasStripeAccount(true);
-              // Refresh the page to update the UI
-              window.location.reload();
-            }} />
-          </div>
-        ) : (
-          <div className="mb-8">
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-800">Payment Account Connected!</h3>
-                    <p className="text-green-700">You'll receive automatic payments for completed deliveries.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Driver Notifications */}
-        <div className="mb-8">
-          <DriverNotificationSystem />
-        </div>
-
-        {/* Push Notifications */}
-        <div className="mb-8">
-          <PushNotificationManager />
-        </div>
-
-        {/* Mapbox Navigation Section */}
+        {/* Active Orders */}
         {activeOrders.length > 0 && (
-          <div className="mb-8">
-            <DriverNavigation
-              pickupLocation={activeOrders[0].pickup_address}
-              deliveryLocation={activeOrders[0].delivery_address}
-              orderId={activeOrders[0].id}
-              customerPhone={activeOrders[0].contact_phone}
-              customerEmail={activeOrders[0].customer_email}
-              onPickupComplete={() => {
-                console.log('Pickup completed for order:', activeOrders[0].id);
-                // Update order status in database
-                // You can add database update logic here
-              }}
-              onDeliveryComplete={() => {
-                console.log('Delivery completed for order:', activeOrders[0].id);
-                // Update order status in database
-                // You can add database update logic here
-              }}
-              onLocationUpdate={(lat, lng) => {
-                console.log('Driver location updated:', { lat, lng });
-                // Start location tracking
-                if (user?.id) {
-                  locationTrackingService.startLocationTracking(
-                    user.id,
-                    activeOrders[0].id,
-                    async (location) => {
-                      console.log('Location tracked:', location);
-                      
-                      // Update driver's location in database
-                      try {
-                        const { error: updateError } = await supabase
-                          .from('profiles')
-                          .update({
-                            current_lat: location.lat,
-                            current_lng: location.lng,
-                            updated_at: new Date().toISOString()
-                          })
-                          .eq('id', user.id);
-
-                        if (updateError) {
-                          console.error('Error updating driver location:', updateError);
-                        } else {
-                          console.log('Driver location updated in database');
-                        }
-                      } catch (error) {
-                        console.error('Error updating driver location:', error);
-                      }
-                      
-                      // Update order tracking status
-                      locationTrackingService.updateOrderStatus(
-                        activeOrders[0].id,
-                        'in_transit',
-                        { lat: location.lat, lng: location.lng }
-                      );
-                    }
-                  );
-                }
-              }}
-            />
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Active Orders */}
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="mb-8">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Package className="w-5 h-5" />
+              <CardTitle className="flex items-center">
+                <Package className="w-6 h-6 text-teal-600 mr-2" />
                 Active Deliveries
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {activeOrders.length > 0 ? (
-                <div className="space-y-4">
-                  {activeOrders.map((order) => (
-                    <div key={order.id} className="bg-gray-700 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-white">Order #{order.id}</span>
-                        <span className="text-xs bg-yellow-600 text-white px-2 py-1 rounded">{order.status}</span>
+              <div className="space-y-4">
+                {activeOrders.map((order) => (
+                  <div key={order.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>
+                        <p className="text-sm text-gray-600">
+                          {order.pickup_address} → {order.delivery_address}
+                        </p>
+                        <p className="text-sm font-medium text-green-600">
+                          ${order.total}
+                        </p>
                       </div>
-                      <div className="space-y-2 text-sm text-gray-300">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>From: {order.pickup_address}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>To: {order.delivery_address}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Package className="w-4 h-4" />
-                          <span>Item: {order.item_description}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span>Customer: {order.customer_id}</span>
-                          <span>•</span>
-                          <span>Total: ${order.total}</span>
-                          {order.tip_amount > 0 && (
-                            <span className="text-pink-400 font-semibold">
-                              💝 Tip: ${order.tip_amount}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {/* Delivery Completion Buttons */}
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            className="bg-orange-600 hover:bg-orange-700 flex-1"
-                            onClick={() => {
-                              console.log('Photo & Deliver button clicked for order:', order.id);
-                              const input = document.createElement('input');
-                              input.type = 'file';
-                              input.accept = 'image/*';
-                              input.capture = 'environment';
-                              
-                              input.onchange = async (e) => {
-                                const target = e.target as HTMLInputElement;
-                                const file = target.files?.[0];
-                                if (file) {
-                                  try {
-                                    const reader = new FileReader();
-                                    reader.onload = async (event) => {
-                                      const base64Image = event.target.result;
-                                      
-                                      const { error: photoError } = await supabase
-                                        .from('delivery_photos')
-                                        .insert([{
-                                          order_id: order.id,
-                                          driver_id: user?.id,
-                                          photo_data: base64Image,
-                                          created_at: new Date().toISOString()
-                                        }]);
-
-                                      if (photoError) {
-                                        console.error('Error saving photo:', photoError);
-                                        alert('Failed to save delivery photo. Please try again.');
-                                        return;
-                                      }
-                                      
-                                      console.log('Photo saved successfully for order:', order.id);
-
-                                      // Use phone number from order placement
-                                      const customerPhone = order.contact_phone || '502-555-0123';
-                                      
-                                      // Send photo to customer via EMAIL (FREE!)
-                                      try {
-                                        const emailResponse = await fetch('/.netlify/functions/send-delivery-email', {
-                                          method: 'POST',
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                          },
-                                          body: JSON.stringify({
-                                            orderId: order.id,
-                                            customerEmail: order.customer_email || 'customer@example.com',
-                                            photoData: base64Image,
-                                            driverName: profile?.full_name || 'Driver'
-                                          })
-                                        });
-
-                                        if (emailResponse.ok) {
-                                          console.log('Delivery email sent to customer successfully!');
-                                        } else {
-                                          console.log('Failed to send email to customer, but continuing...');
-                                        }
-                                      } catch (emailError) {
-                                        console.error('Error sending email to customer:', emailError);
-                                        // Don't fail the whole process if email sending fails
-                                      }
-                                      
-                                      const { error } = await supabase
-                                        .from('orders')
-                                        .update({ 
-                                          status: 'delivered',
-                                          updated_at: new Date().toISOString()
-                                        })
-                                        .eq('id', order.id);
-
-                                      if (error) {
-                                        console.error('Error marking delivered:', error);
-                                        alert('Photo saved but failed to mark delivery as completed. Please try again.');
-                                        return;
-                                      }
-                                      
-                                      console.log('Order marked as delivered:', order.id);
-
-                                      // Process automatic driver payment
-                                      try {
-                                        const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
-                                          method: 'POST',
-                                          headers: {
-                                            'Content-Type': 'application/json',
-                                          },
-                                          body: JSON.stringify({
-                                            orderId: order.id
-                                          })
-                                        });
-
-                                        if (paymentResponse.ok) {
-                                          const paymentData = await paymentResponse.json();
-                                          console.log('Driver payment processed:', paymentData);
-                                          
-                                          if (paymentData.driverPayment && paymentData.success) {
-                                            alert(`Delivery completed! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
-                                          } else {
-                                            console.log('Payment skipped - Stripe account status:', {
-                                              stripeAccountId: paymentData.stripeAccountId,
-                                              stripeConnected: paymentData.stripeConnected,
-                                              message: paymentData.message
-                                            });
-                                            alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
-                                          }
-                                        } else {
-                                          console.log('Payment processing failed, but delivery marked as completed');
-                                          alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
-                                        }
-                                      } catch (paymentError) {
-                                        console.error('Payment processing error:', paymentError);
-                                        alert('Delivery completed! 📸 (Payment will be processed when you connect your payment method)');
-                                      }
-
-                                      // Email sent automatically - no need for SMS
-                                      await fetchDriverData();
-                                    };
-                                    reader.readAsDataURL(file);
-                                  } catch (error) {
-                                    console.error('Error processing photo:', error);
-                                    alert('Error processing photo: ' + error);
-                                  }
-                                }
-                              };
-                              input.click();
-                            }}
-                          >
-                            📸 Photo & Deliver
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="border-gray-600 text-gray-300 flex-1"
-                            onClick={async () => {
-                              console.log('Delivered button clicked for order:', order.id);
-                              try {
-                                const { error } = await supabase
-                                  .from('orders')
-                                  .update({ 
-                                    status: 'delivered',
-                                    updated_at: new Date().toISOString()
-                                  })
-                                  .eq('id', order.id);
-
-                                if (error) {
-                                  console.error('Error marking delivered:', error);
-                                  alert('Failed to mark as delivered: ' + error.message);
-                                  return;
-                                }
-
-                                // Process automatic driver payment
-                                try {
-                                  const paymentResponse = await fetch('/.netlify/functions/process-order-completion', {
-                                    method: 'POST',
-                                    headers: {
-                                      'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({
-                                      orderId: order.id
-                                    })
-                                  });
-
-                                  if (paymentResponse.ok) {
-                                    const paymentData = await paymentResponse.json();
-                                    console.log('Driver payment processed:', paymentData);
-                                    
-                                    if (paymentData.driverPayment) {
-                                      alert(`Order delivered! 💰 You earned $${paymentData.driverPayment.toFixed(2)} (70% commission) - Payment sent automatically!`);
-                                    } else {
-                                      alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
-                                    }
-                                  } else {
-                                    console.log('Payment processing failed, but delivery marked as completed');
-                                    alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
-                                  }
-                                } catch (paymentError) {
-                                  console.error('Payment processing error:', paymentError);
-                                  alert('Order delivered! 🎉 (Payment will be processed when you connect your payment method)');
-                                }
-
-                                await fetchDriverData();
-                              } catch (error) {
-                                console.error('Error marking delivered:', error);
-                                alert('Error marking delivered: ' + error);
-                              }
-                            }}
-                          >
-                            ✅ Delivered
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Package className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-400">No active deliveries</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    You'll see your active deliveries here when you accept an order.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Available Orders */}
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Available Orders
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {availableOrders.length > 0 ? (
-                <div className="space-y-4">
-                  {availableOrders.map((order) => (
-                    <div key={order.id} className="bg-gray-700 rounded-lg p-4 relative">
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-sm font-medium text-white">Order #{order.id}</span>
-                        <span className="text-xs text-gray-400">{new Date(order.created_at).toLocaleTimeString()}</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-300 mb-4">
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>From: {order.pickup_address}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          <span>To: {order.delivery_address}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Package className="w-4 h-4" />
-                          <span>Item: {order.item_description}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Status: {order.status}</span>
-                          <div className="text-right">
-                            <span className="font-bold text-green-400">Total: ${order.total}</span>
-                            {order.tip_amount > 0 && (
-                              <div className="text-pink-400 text-sm">
-                                💝 Tip: ${order.tip_amount}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
-                          className="flex-1 bg-teal-600 hover:bg-teal-700"
-                          onClick={() => handleAcceptOrder(order.id)}
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => navigate(`/driver/orders/${order.id}`)}
+                          size="sm"
                         >
-                        Accept Order
-                      </Button>
+                          View Details
+                        </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <Clock className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                  <p className="text-gray-400">No available orders</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    New orders will appear here when customers place them.
-                  </p>
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
-        </div>
-      </main>
+        )}
+
+        {/* Available Orders */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MapPin className="w-6 h-6 text-teal-600 mr-2" />
+              Available Orders
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {availableOrders.length === 0 ? (
+              <div className="text-center py-8">
+                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders available</h3>
+                <p className="text-gray-600">Check back later for new delivery opportunities</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {availableOrders.map((order) => (
+                  <div key={order.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>
+                        <p className="text-sm text-gray-600">
+                          {order.pickup_address} → {order.delivery_address}
+                        </p>
+                        <p className="text-sm font-medium text-green-600">
+                          ${order.total}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => acceptOrder(order.id)}
+                          size="sm"
+                          className="bg-teal-600 hover:bg-teal-700"
+                        >
+                          Accept Order
+                        </Button>
+                        <Button
+                          onClick={() => navigate(`/driver/orders/${order.id}`)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Location Tracking Controls */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <MapPin className="w-6 h-6 text-teal-600 mr-2" />
+              Location Tracking
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex space-x-4">
+              <Button
+                onClick={startLocationTracking}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Start Tracking
+              </Button>
+              <Button
+                onClick={stopLocationTracking}
+                variant="outline"
+              >
+                Stop Tracking
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <DriverNavigation />
     </div>
   );
 };

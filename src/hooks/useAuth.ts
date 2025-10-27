@@ -62,11 +62,6 @@ export const useAuth = () => {
       async (event, session) => {
         if (!mounted) return;
         
-        // Only log in development
-        if (isDevelopment()) {
-          console.log('Auth state change:', event, session?.user?.email);
-        }
-        
         // Only process meaningful state changes
         if (event === 'SIGNED_IN' && session?.user) {
           setSession(session);
@@ -75,14 +70,8 @@ export const useAuth = () => {
           
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
-            if (isDevelopment()) {
-              console.log('Fetching profile for new user:', session.user.id);
-            }
             await fetchProfile(session.user.id);
           } else {
-            if (isDevelopment()) {
-              console.log('Skipping profile fetch - already processed user:', session.user.id);
-            }
             setLoading(false);
           }
         } else if (event === 'SIGNED_OUT') {
@@ -98,17 +87,18 @@ export const useAuth = () => {
           setUser(session.user);
           setLoading(true);
           
-          // Always fetch profile if we don't have it or if it's for a different user
-          if (!profile || profile.id !== session.user.id) {
-            if (isDevelopment()) {
-              console.log('Fetching profile for initial session:', session.user.id);
-            }
+          // Only fetch profile if we don't already have it for this user
+          if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
           } else {
-            if (isDevelopment()) {
-              console.log('Profile already available for user:', session.user.id);
-            }
             setLoading(false);
+          }
+        } else if (event === 'TOKEN_REFRESHED' && session?.user) {
+          setSession(session);
+          setUser(session.user);
+          // Don't fetch profile on token refresh unless we don't have one
+          if (!profile || profile.id !== session.user.id) {
+            await fetchProfile(session.user.id);
           }
         }
       }
@@ -119,513 +109,77 @@ export const useAuth = () => {
       clearTimeout(timeout);
       subscription.unsubscribe();
     };
-  }, [lastProcessedUserId, profile]); // Add proper dependencies
+  }, [lastProcessedUserId, profile]);
 
   const fetchProfile = async (userId: string) => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+
     // Clear any existing timeout
     if (profileFetchTimeout) {
       clearTimeout(profileFetchTimeout);
     }
-    
-    // Only skip if we already have a profile for this user
-    if (lastProcessedUserId === userId && profile && profile.id === userId) {
-      if (isDevelopment()) {
-        console.log('Skipping duplicate profile fetch for user:', userId);
-      }
-      return;
-    }
-    
-    // If we don't have a profile yet, fetch it even if we've processed this user before
-    if (lastProcessedUserId === userId && (!profile || profile.id !== userId)) {
-      if (isDevelopment()) {
-        console.log('User processed before but no profile found, fetching again:', userId);
-      }
-    }
-    
-    setLastProcessedUserId(userId);
-    
-    // Debounce profile fetches to prevent rapid-fire requests
+
+    // Debounce profile fetches to prevent excessive API calls
     const timeout = setTimeout(async () => {
       await performProfileFetch(userId);
-    }, 1000); // Increased debounce time to 1 second
-    
+    }, 1000); // 1 second debounce
     setProfileFetchTimeout(timeout);
   };
 
   const performProfileFetch = async (userId: string) => {
-    // Check if userId is provided
     if (!userId) {
-      if (isDevelopment()) {
-        console.log('No userId provided, skipping profile fetch');
-      }
       setLoading(false);
       return;
     }
-    
-    // Check if we already have a profile for this user
+
+    // Skip if we already have the profile for this user
     if (profile && profile.id === userId) {
-      if (isDevelopment()) {
-        console.log('Profile already loaded for user:', userId, '- skipping fetch');
-      }
       setLoading(false);
       return;
     }
-    
-    // Skip localStorage fallback - use database only
-    if (isDevelopment()) {
-      console.log('Fetching profile from database for user:', userId);
-    }
-    
-    // Only prevent if we already have a profile for this user
-    if (profile && profile.id === userId) {
-      if (isDevelopment()) {
-        console.log('Profile already exists for user:', userId);
-      }
-      return;
-    }
-    
+
     try {
-      if (isDevelopment()) {
-        console.log('Fetching profile for user:', userId);
-      }
-      
-      // Create a timeout promise for the database query
-      const queryTimeout = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Database query timeout')), 8000) // Increased to 8 seconds
-      );
-      
-      const queryPromise = supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
-      
-      const { data, error } = await Promise.race([queryPromise, queryTimeout]) as any;
 
-      if (error && error.code !== 'PGRST116') {
-        if (isDevelopment()) {
-          console.error('Profile fetch error:', error);
-          console.log('Error details:', { code: error.code, message: error.message, status: error.status });
-        }
-        
-        // Handle 406 error specifically - database access issue
-        if (error.code === 'PGRST204' || error.message?.includes('406') || error.status === 406 || 
-            (error.message && error.message.includes('Not Acceptable'))) {
-          if (isDevelopment()) {
-            console.log('Database access issue detected, checking for stored profile');
-          }
-          
-          // First check if there's a stored mock profile
-          const mockProfile = localStorage.getItem('mock_profile');
-          if (mockProfile) {
-            try {
-              const parsedProfile = JSON.parse(mockProfile);
-              if (parsedProfile.id === userId) {
-                if (isDevelopment()) {
-                  console.log('Using stored mock profile:', parsedProfile);
-                }
-                setProfile(parsedProfile);
-                setLoading(false);
-                return;
-              }
-            } catch (error) {
-              console.error('Error parsing mock profile:', error);
-            }
-          }
-          
-          // If no mock profile, create fallback
-          const currentUser = user || session?.user;
-          const fallbackProfile = {
-            id: userId,
-            email: currentUser?.email || 'unknown@example.com',
-            full_name: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'User',
-            phone: currentUser?.user_metadata?.phone || '',
-            user_type: (currentUser?.email?.includes('driver') || currentUser?.email?.includes('taxi')) ? 'driver' as const : 'customer' as const,
-            is_approved: false,
-            status: 'inactive',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          
-          if (isDevelopment()) {
-            console.log('🔍 DATABASE ACCESS ISSUE FALLBACK PROFILE:', {
-              userId,
-              userType: fallbackProfile.user_type,
-              isApproved: fallbackProfile.is_approved,
-              email: fallbackProfile.email
-            });
-          }
-          setProfile(fallbackProfile);
-          setLoading(false);
-          return;
-        }
-        
-        // Don't auto-create profile, just set loading to false
-        setProfile(null);
+      if (error) {
+        console.error('Error fetching profile:', error);
         setLoading(false);
-      } else if (data) {
-        if (isDevelopment()) {
-          console.log('Profile found for user:', userId, '-', data.email, data.user_type);
-          console.log('🔍 AUTH DEBUG: Setting profile state with data:', data);
-        }
+        return;
+      }
+
+      if (data) {
         setProfile(data);
-        setLoading(false);
-        if (isDevelopment()) {
-          console.log('🔍 AUTH DEBUG: Profile state should now be set');
-        }
-      } else {
-        if (isDevelopment()) {
-          console.log('No profile found for user:', userId);
-        }
-        // Auto-create profile for existing users
-        try {
-          if (isDevelopment()) {
-            console.log('Auto-creating profile for user:', userId);
-          }
-          const profileData = await createProfileManually();
-          // Timeout removed - no need to clear
-          setProfile(profileData);
-          setLoading(false);
-        } catch (createError) {
-          console.error('Failed to auto-create profile:', createError);
-          // Timeout removed - no need to clear
-          setProfile(null);
-          setLoading(false);
-        }
+        setLastProcessedUserId(userId);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      // Timeout removed - no need to clear
-      
-      // Check for stored mock profile first
-      const mockProfile = localStorage.getItem('mock_profile');
-      if (mockProfile) {
-        try {
-          const parsedProfile = JSON.parse(mockProfile);
-          if (parsedProfile.id === userId) {
-            console.log('Using stored mock profile due to error:', parsedProfile);
-            setProfile(parsedProfile);
-            setLoading(false);
-            return;
-          }
-        } catch (parseError) {
-          console.error('Error parsing mock profile:', parseError);
-        }
-      }
-      
-      // Create a fallback profile based on the user ID and email
-      const currentUser = user || session?.user;
-      const email = currentUser?.email || 'unknown@example.com';
-      let userType: 'customer' | 'driver' | 'merchant' | 'admin' = 'customer';
-      
-      // First, try to get user_type from user_metadata (set during signup)
-      if (currentUser?.user_metadata?.user_type) {
-        userType = currentUser.user_metadata.user_type;
-        console.log('Using user_type from signup metadata in error fallback:', userType);
-      }
-      // If no metadata, check for existing profile in localStorage
-      else {
-        const existingProfile = localStorage.getItem('mock_profile');
-        if (existingProfile) {
-          try {
-            const parsed = JSON.parse(existingProfile);
-            if (parsed.id === userId && parsed.user_type) {
-              userType = parsed.user_type;
-              console.log('Preserving existing user type from localStorage in error fallback:', userType);
-            }
-          } catch (error) {
-            console.log('Could not parse existing profile, using default');
-          }
-        }
-      }
-      
-      const fallbackProfile = {
-        id: userId,
-        email: email,
-        full_name: currentUser?.user_metadata?.full_name || currentUser?.user_metadata?.name || 'User',
-        phone: currentUser?.user_metadata?.phone || '',
-        user_type: userType,
-        is_approved: false, // New drivers should not be auto-approved
-        status: userType === 'driver' ? 'inactive' : 'inactive',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      
-      console.log('🔍 FALLBACK PROFILE CREATED:', {
-        userId,
-        userType,
-        isApproved: fallbackProfile.is_approved,
-        email: fallbackProfile.email
-      });
-      
-      // Store the fallback profile in localStorage to prevent repeated database calls
-      localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
-      console.log('Using fallback profile due to error and storing in localStorage:', fallbackProfile);
-      setProfile(fallbackProfile);
+    } finally {
       setLoading(false);
-    }
-  };
-
-
-  const updateUserType = async (newUserType: 'customer' | 'driver' | 'merchant') => {
-    if (!user) return;
-    
-    try {
-      // Start with basic user_type update only
-      const updateData: any = { user_type: newUserType };
-      
-      console.log('Updating user type to:', newUserType, 'for user:', user.id);
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', user.id);
-      
-      if (error) {
-        console.error('Error updating user type:', error);
-        
-        // If database fails, use localStorage fallback
-        if (error.code === 'PGRST204' || error.message?.includes('406')) {
-          console.log('Database access issue - using localStorage fallback');
-          const fallbackProfile = {
-            id: user.id,
-            email: user.email || 'unknown@example.com',
-            full_name: profile?.full_name || user?.user_metadata?.full_name || 'User',
-            phone: profile?.phone || user?.user_metadata?.phone || '',
-            user_type: newUserType,
-            is_approved: newUserType === 'driver',
-            status: newUserType === 'driver' ? 'active' : 'inactive',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          };
-          localStorage.setItem('mock_profile', JSON.stringify(fallbackProfile));
-          setProfile(fallbackProfile);
-          console.log('Updated profile in localStorage and state');
-          return;
-        }
-        
-        throw error;
-      }
-      
-      console.log('User type updated successfully to:', newUserType);
-      
-      // Try to update additional fields if they exist
-      try {
-        const additionalData: any = {};
-        
-        if (newUserType === 'driver') {
-          additionalData.status = 'active';
-          additionalData.is_approved = true;
-        } else {
-          additionalData.status = 'inactive';
-          additionalData.is_approved = false;
-        }
-        
-        const { error: additionalError } = await supabase
-          .from('profiles')
-          .update(additionalData)
-          .eq('id', user.id);
-        
-        if (additionalError) {
-          console.warn('Could not update additional fields:', additionalError);
-          // Don't throw - the main user_type update succeeded
-        }
-      } catch (additionalError) {
-        console.warn('Additional fields update failed:', additionalError);
-        // Don't throw - the main user_type update succeeded
-      }
-      
-      // Refresh profile data
-      await fetchProfile(user.id);
-      console.log('Profile refreshed after user type update');
-      
-    } catch (error) {
-      console.error('Error updating user type:', error);
-      throw error;
-    }
-  };
-
-  const createProfileManually = async () => {
-    if (!user) return;
-    
-    try {
-      const { data: userData } = await supabase.auth.getUser();
-      const userEmail = userData.user?.email || '';
-      
-      // Determine user type from signup metadata first, then fallback to email patterns
-      let userType = 'customer';
-      
-      // First priority: user_metadata from signup
-      if (userData.user?.user_metadata?.user_type) {
-        userType = userData.user.user_metadata.user_type;
-        console.log('Using user_type from signup metadata:', userType);
-      }
-      // Second priority: check for existing profile in localStorage
-      else {
-        const existingProfile = localStorage.getItem('mock_profile');
-        if (existingProfile) {
-          try {
-            const parsed = JSON.parse(existingProfile);
-            if (parsed.id === user.id && parsed.user_type) {
-              userType = parsed.user_type;
-              console.log('Using user_type from existing localStorage profile:', userType);
-            }
-          } catch (error) {
-            console.log('Could not parse existing profile, using default');
-          }
-        }
-      }
-      
-      console.log('Creating profile with user type:', userType, 'for email:', userEmail);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .insert({
-          id: user.id,
-          email: userEmail,
-          full_name: userData.user?.user_metadata?.full_name || userData.user?.user_metadata?.name || '',
-          phone: userData.user?.user_metadata?.phone || '',
-          user_type: userType,
-          status: userType === 'driver' ? 'active' : 'inactive',
-          is_approved: false
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating profile:', error);
-        throw new Error(error.message || 'Failed to create profile');
-      } else {
-        console.log('Profile created successfully:', data);
-        setProfile(data);
-        return data;
-      }
-    } catch (error: any) {
-      console.error('Error creating profile:', error);
-      throw new Error(error.message || 'Failed to create profile');
     }
   };
 
   const signOut = async () => {
+    if (isSigningOut) return;
+    
+    setIsSigningOut(true);
     try {
-      console.log('Starting sign out process...');
-      setIsSigningOut(true);
-      
-      // Clear local state immediately to prevent loops
-      setUser(null);
-      setProfile(null);
-      setSession(null);
-      setLoading(false);
-      setLastProcessedUserId(null);
-      
-      // Clear any stored auth data
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.removeItem('mock_profile');
-      localStorage.removeItem('stripe_account_id');
-      sessionStorage.removeItem('supabase.auth.token');
-      sessionStorage.removeItem('sw-updated');
-      
-      // Try Supabase sign out with shorter timeout
-      try {
-        const signOutPromise = supabase.auth.signOut();
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Sign out timeout')), 2000)
-        );
-        
-        await Promise.race([signOutPromise, timeoutPromise]);
-        console.log('Supabase signOut successful');
-      } catch (supabaseError) {
-        console.warn('Supabase signOut failed, but continuing with local logout:', supabaseError);
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error signing out:', error);
       }
-      
-      // Small delay to ensure state is cleared before redirect
-      setTimeout(() => {
-        console.log('Redirecting to home page...');
-        window.location.href = '/';
-      }, 100);
-      
     } catch (error) {
       console.error('Error signing out:', error);
-      // Force logout even if everything fails
-      setUser(null);
-      setProfile(null);
-      setSession(null);
-      setLoading(false);
-      setLastProcessedUserId(null);
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
+    } finally {
+      setIsSigningOut(false);
     }
   };
-
-  const forceLogout = () => {
-    console.log('Force logout - bypassing Supabase entirely');
-    setUser(null);
-    setProfile(null);
-    setSession(null);
-    setLoading(false);
-    // Clear any stored auth data
-    localStorage.removeItem('supabase.auth.token');
-    sessionStorage.removeItem('supabase.auth.token');
-    window.location.href = '/';
-  };
-
-  // Function to manually create a driver profile (for debugging)
-  const createDriverProfileManually = () => {
-    if (!user) return;
-    
-    const driverProfile = {
-      id: user.id,
-      email: user.email || 'unknown@example.com',
-      full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
-      phone: user.user_metadata?.phone || '',
-      user_type: 'driver' as const,
-      is_approved: false,
-      status: 'inactive',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-    
-    localStorage.setItem('mock_profile', JSON.stringify(driverProfile));
-    setProfile(driverProfile);
-    setLoading(false);
-    console.log('Created driver profile manually:', driverProfile);
-  };
-
-  // Make the function available globally for debugging
-  if (typeof window !== 'undefined') {
-    (window as any).createDriverProfile = createDriverProfileManually;
-    (window as any).forceDriverProfile = () => {
-      if (!user) return;
-      const driverProfile = {
-        id: user.id,
-        email: user.email || 'unknown@example.com',
-        full_name: user.user_metadata?.full_name || user.user_metadata?.name || 'Driver',
-        phone: user.user_metadata?.phone || '',
-        user_type: 'driver' as const,
-        is_approved: false,
-        status: 'inactive',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
-      localStorage.setItem('mock_profile', JSON.stringify(driverProfile));
-      setProfile(driverProfile);
-      setLoading(false);
-      console.log('Forced driver profile created:', driverProfile);
-      alert('Driver profile created! Please refresh the page.');
-    };
-    (window as any).clearStripeAccount = () => {
-      localStorage.removeItem('stripe_account_id');
-      console.log('Stripe account ID cleared from localStorage');
-      alert('Stripe account ID cleared! Please refresh the page to see the Stripe Connect button.');
-    };
-  }
-
-  // Debug current state
-    // Debug logging only in development
-    if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-      console.log('🔍 AUTH HOOK DEBUG: Current profile state:', profile, 'user_type:', profile?.user_type);
-    }
 
   return {
     user,
@@ -633,10 +187,6 @@ export const useAuth = () => {
     session,
     loading,
     signOut,
-    forceLogout,
-    updateUserType,
-    createProfileManually,
-    createDriverProfileManually,
-    isAuthenticated: !!user,
+    isSigningOut
   };
 };
