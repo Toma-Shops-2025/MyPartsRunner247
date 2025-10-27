@@ -125,13 +125,13 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
 
   if (isConnected) {
     return (
-      <Card className="bg-green-50 border-green-200">
+      <Card className="bg-gray-800 border-gray-700 text-white">
         <CardContent className="p-6">
           <div className="flex items-center space-x-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <CheckCircle className="w-6 h-6 text-green-400" />
             <div>
-              <h3 className="font-semibold text-green-800">Payment Account Connected!</h3>
-              <p className="text-sm text-green-600">
+              <h3 className="font-semibold text-green-400">Payment Account Connected!</h3>
+              <p className="text-sm text-gray-300">
                 You'll receive automatic payments for completed deliveries.
               </p>
             </div>
@@ -142,27 +142,27 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
   }
 
   return (
-    <Card className="bg-blue-50 border-blue-200">
+    <Card className="bg-gray-800 border-gray-700 text-white">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2">
-          <CreditCard className="w-5 h-5 text-blue-600" />
+        <CardTitle className="flex items-center space-x-2 text-teal-400">
+          <CreditCard className="w-5 h-5" />
           <span>Set Up Automatic Payments</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <h3 className="font-semibold text-blue-800">Get Paid Automatically!</h3>
-          <p className="text-sm text-blue-600">
+          <h3 className="font-semibold text-teal-400">Get Paid Automatically!</h3>
+          <p className="text-sm text-gray-300">
             Connect your payment method to receive 70% of each delivery automatically.
           </p>
-          <p className="text-xs text-blue-500">
+          <p className="text-xs text-gray-400">
             Note: If you encounter an error, the platform may need to complete Stripe Connect setup first.
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-lg border">
-          <h4 className="font-medium text-gray-800 mb-2">Supported Payment Methods:</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
+        <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
+          <h4 className="font-medium text-white mb-2">Supported Payment Methods:</h4>
+          <ul className="text-sm text-gray-300 space-y-1">
             <li>• PayPal</li>
             <li>• Venmo</li>
             <li>• Cash App</li>
@@ -171,8 +171,8 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
           </ul>
         </div>
 
-        <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
-          <p className="text-sm text-yellow-800">
+        <div className="bg-yellow-900 p-3 rounded-lg border border-yellow-700">
+          <p className="text-sm text-yellow-300">
             <strong>Example:</strong> $50 delivery → You get $35 instantly!
           </p>
         </div>
@@ -181,18 +181,18 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
           <Button 
             onClick={handleCreateAccount}
             disabled={isCreating}
-            className="w-full bg-blue-600 hover:bg-blue-700"
+            className="w-full bg-teal-600 hover:bg-teal-700 text-white"
           >
             {isCreating ? 'Creating Account...' : 'Connect Payment Method'}
           </Button>
         ) : (
           <div className="space-y-3">
-            <p className="text-sm text-blue-600">
+            <p className="text-sm text-gray-300">
               Click below to complete your payment setup:
             </p>
             <Button 
               onClick={() => window.open(onboardingUrl, '_blank')}
-              className="w-full bg-green-600 hover:bg-green-700"
+              className="w-full bg-green-600 hover:bg-green-700 text-white"
             >
               <ExternalLink className="w-4 h-4 mr-2" />
               Complete Payment Setup
@@ -200,7 +200,7 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
             <Button 
               onClick={handleCompleteOnboarding}
               variant="outline"
-              className="w-full"
+              className="w-full border-gray-600 text-gray-300 hover:bg-gray-700"
             >
               I've Completed Setup
             </Button>

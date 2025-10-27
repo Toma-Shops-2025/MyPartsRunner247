@@ -254,20 +254,20 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Document Review</h2>
-        <Badge variant="outline" className="text-sm">
+        <h2 className="text-2xl font-bold text-teal-400">Document Review</h2>
+        <Badge variant="outline" className="text-sm border-teal-600 text-teal-400">
           {pendingDocuments.length} pending review
         </Badge>
       </div>
 
       {pendingDocuments.length === 0 ? (
-        <Card>
+        <Card className="bg-gray-800 border-gray-700 text-white">
           <CardContent className="p-8 text-center">
-            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-white mb-2">
               No documents pending review
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-300">
               All driver documents have been reviewed.
             </p>
           </CardContent>
@@ -275,16 +275,16 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
       ) : (
         <div className="grid gap-4">
           {pendingDocuments.map((document) => (
-            <Card key={document.id} className="border-l-4 border-l-yellow-500">
+            <Card key={document.id} className="bg-gray-800 border-gray-700 text-white border-l-4 border-l-yellow-500">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <FileText className="w-5 h-5 text-gray-600" />
+                    <FileText className="w-5 h-5 text-teal-400" />
                     <div>
-                      <CardTitle className="text-lg">
+                      <CardTitle className="text-lg text-white">
                         {formatDocumentType(document.document_type)}
                       </CardTitle>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
+                      <div className="flex items-center space-x-4 text-sm text-gray-300">
                         <div className="flex items-center space-x-1">
                           <User className="w-4 h-4" />
                           <span>{document.full_name}</span>
@@ -303,6 +303,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
                       variant="outline"
                       size="sm"
                       onClick={() => handleViewDocument(document)}
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View
@@ -311,6 +312,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
                       variant="outline"
                       size="sm"
                       onClick={() => setSelectedDocument(document)}
+                      className="border-teal-600 text-teal-400 hover:bg-teal-900"
                     >
                       Review
                     </Button>
@@ -320,20 +322,20 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
               <CardContent className="pt-0">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <Label className="text-gray-600">File Name</Label>
-                    <p className="font-medium">{document.file_name}</p>
+                    <Label className="text-gray-400">File Name</Label>
+                    <p className="font-medium text-white">{document.file_name}</p>
                   </div>
                   <div>
-                    <Label className="text-gray-600">File Size</Label>
-                    <p className="font-medium">{formatFileSize(document.file_size)}</p>
+                    <Label className="text-gray-400">File Size</Label>
+                    <p className="font-medium text-white">{formatFileSize(document.file_size)}</p>
                   </div>
                   <div>
-                    <Label className="text-gray-600">Driver Email</Label>
-                    <p className="font-medium">{document.email}</p>
+                    <Label className="text-gray-400">Driver Email</Label>
+                    <p className="font-medium text-white">{document.email}</p>
                   </div>
                   <div>
-                    <Label className="text-gray-600">Status</Label>
-                    <Badge variant="outline" className="text-yellow-600 border-yellow-600">
+                    <Label className="text-gray-400">Status</Label>
+                    <Badge variant="outline" className="text-yellow-400 border-yellow-500">
                       <Clock className="w-3 h-3 mr-1" />
                       Pending Review
                     </Badge>
@@ -348,29 +350,30 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
       {/* Review Modal */}
       {selectedDocument && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
+          <Card className="w-full max-w-md bg-gray-800 border-gray-700 text-white">
             <CardHeader>
-              <CardTitle>Review Document</CardTitle>
+              <CardTitle className="text-teal-400">Review Document</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label className="text-gray-600">Document Type</Label>
-                <p className="font-medium">
+                <Label className="text-gray-400">Document Type</Label>
+                <p className="font-medium text-white">
                   {formatDocumentType(selectedDocument.document_type)}
                 </p>
               </div>
               <div>
-                <Label className="text-gray-600">Driver</Label>
-                <p className="font-medium">{selectedDocument.full_name}</p>
+                <Label className="text-gray-400">Driver</Label>
+                <p className="font-medium text-white">{selectedDocument.full_name}</p>
               </div>
               <div>
-                <Label htmlFor="review-notes">Review Notes</Label>
+                <Label htmlFor="review-notes" className="text-gray-400">Review Notes</Label>
                 <Textarea
                   id="review-notes"
                   placeholder="Add notes about this document..."
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   rows={3}
+                  className="bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                 />
               </div>
               <div className="flex space-x-2">
@@ -380,7 +383,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
                     setSelectedDocument(null);
                     setReviewNotes('');
                   }}
-                  className="flex-1"
+                  className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
                 >
                   Cancel
                 </Button>
@@ -400,7 +403,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
                 <Button
                   onClick={() => handleApprove(selectedDocument.id)}
                   disabled={actionLoading === selectedDocument.id}
-                  className="flex-1"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                 >
                   {actionLoading === selectedDocument.id ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
