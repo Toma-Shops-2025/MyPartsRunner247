@@ -100,17 +100,20 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
         }
 
         // Transform direct data to match expected format
-        data = directData?.map(doc => ({
-          id: doc.id,
-          user_id: doc.user_id,
-          full_name: doc.profiles?.full_name || 'Unknown',
-          email: doc.profiles?.email || 'Unknown',
-          document_type: doc.document_type,
-          file_name: doc.file_name,
-          file_size: doc.file_size,
-          uploaded_at: doc.uploaded_at,
-          admin_notes: doc.admin_notes
-        })) || [];
+        data = directData?.map(doc => {
+          const profile = Array.isArray(doc.profiles) ? doc.profiles[0] : (doc.profiles as any);
+          return {
+            id: doc.id,
+            user_id: doc.user_id,
+            full_name: profile?.full_name || 'Unknown',
+            email: profile?.email || 'Unknown',
+            document_type: doc.document_type,
+            file_name: doc.file_name,
+            file_size: doc.file_size,
+            uploaded_at: doc.uploaded_at,
+            admin_notes: doc.admin_notes
+          };
+        }) || [];
       }
 
       setPendingDocuments(data || []);
