@@ -130,6 +130,15 @@ class PushNotificationService {
   // Save subscription to database
   private async saveSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
+      const userId = this.getCurrentUserId();
+      
+      if (!userId) {
+        console.warn('No user ID available, skipping push subscription save');
+        // Store subscription locally as fallback
+        this.saveSubscriptionLocally(subscription);
+        return;
+      }
+
       const response = await fetch('/.netlify/functions/save-push-subscription', {
         method: 'POST',
         headers: {
@@ -137,21 +146,53 @@ class PushNotificationService {
         },
         body: JSON.stringify({
           subscription: subscription,
-          userId: this.getCurrentUserId()
+          userId: userId
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save subscription');
+        const errorText = await response.text();
+        console.error('Failed to save subscription:', response.status, errorText);
+        // Store subscription locally as fallback
+        this.saveSubscriptionLocally(subscription);
+        return;
       }
+
+      console.log('Push subscription saved successfully');
     } catch (error) {
       console.error('Error saving subscription:', error);
+      // Store subscription locally as fallback
+      this.saveSubscriptionLocally(subscription);
+    }
+  }
+
+  // Save subscription locally as fallback
+  private saveSubscriptionLocally(subscription: CustomPushSubscription): void {
+    try {
+      const existingSubscriptions = JSON.parse(localStorage.getItem('push_subscriptions') || '[]');
+      const newSubscriptions = existingSubscriptions.filter((sub: any) => sub.endpoint !== subscription.endpoint);
+      newSubscriptions.push({
+        ...subscription,
+        savedAt: new Date().toISOString()
+      });
+      localStorage.setItem('push_subscriptions', JSON.stringify(newSubscriptions));
+      console.log('Push subscription saved locally as fallback');
+    } catch (error) {
+      console.error('Error saving subscription locally:', error);
     }
   }
 
   // Delete subscription from database
   private async deleteSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
+      const userId = this.getCurrentUserId();
+      
+      if (!userId) {
+        console.warn('No user ID available, deleting subscription locally only');
+        this.deleteSubscriptionLocally(subscription);
+        return;
+      }
+
       const response = await fetch('/.netlify/functions/delete-push-subscription', {
         method: 'POST',
         headers: {
@@ -159,22 +200,64 @@ class PushNotificationService {
         },
         body: JSON.stringify({
           endpoint: subscription.endpoint,
-          userId: this.getCurrentUserId()
+          userId: userId
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete subscription');
+        console.error('Failed to delete subscription from server, deleting locally');
+        this.deleteSubscriptionLocally(subscription);
+        return;
       }
+
+      console.log('Push subscription deleted successfully');
     } catch (error) {
       console.error('Error deleting subscription:', error);
+      this.deleteSubscriptionLocally(subscription);
+    }
+  }
+
+  // Delete subscription locally
+  private deleteSubscriptionLocally(subscription: CustomPushSubscription): void {
+    try {
+      const existingSubscriptions = JSON.parse(localStorage.getItem('push_subscriptions') || '[]');
+      const filteredSubscriptions = existingSubscriptions.filter((sub: any) => sub.endpoint !== subscription.endpoint);
+      localStorage.setItem('push_subscriptions', JSON.stringify(filteredSubscriptions));
+      console.log('Push subscription deleted locally');
+    } catch (error) {
+      console.error('Error deleting subscription locally:', error);
     }
   }
 
   // Get current user ID
   private getCurrentUserId(): string | null {
-    // This should be replaced with your actual user ID logic
-    return localStorage.getItem('user_id') || null;
+    // Try to get user ID from various sources
+    try {
+      // First try to get from localStorage
+      const storedUserId = localStorage.getItem('user_id');
+      if (storedUserId) {
+        return storedUserId;
+      }
+
+      // Try to get from mock profile
+      const mockProfile = localStorage.getItem('mock_profile');
+      if (mockProfile) {
+        const profile = JSON.parse(mockProfile);
+        if (profile.id) {
+          return profile.id;
+        }
+      }
+
+      // Try to get from auth context (if available)
+      if (typeof window !== 'undefined' && (window as any).authUser) {
+        return (window as any).authUser.id;
+      }
+
+      return null;
+    } catch (error) {
+      console.warn('Error getting user ID:', error);
+      return null;
+    }
   }
 
   // Convert VAPID key
