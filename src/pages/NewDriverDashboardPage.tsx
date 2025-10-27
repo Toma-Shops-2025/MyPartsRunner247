@@ -416,7 +416,28 @@ const NewDriverDashboardPage: React.FC = () => {
         </Card>
       </div>
 
-      <DriverNavigation />
+      {/* DriverNavigation component - only shown when there's an active order */}
+      {activeOrders.length > 0 && (
+        <DriverNavigation
+          pickupLocation={activeOrders[0].pickup_address || 'Pickup location'}
+          deliveryLocation={activeOrders[0].delivery_address || 'Delivery location'}
+          orderId={activeOrders[0].id || 'unknown'}
+          onPickupComplete={() => {
+            console.log('Pickup completed');
+            // Handle pickup completion
+          }}
+          onDeliveryComplete={() => {
+            console.log('Delivery completed');
+            // Handle delivery completion
+          }}
+          onLocationUpdate={(lat, lng) => {
+            console.log('Location updated:', lat, lng);
+            // Handle location update
+          }}
+          customerPhone={activeOrders[0].customer_phone}
+          customerEmail={activeOrders[0].customer_email}
+        />
+      )}
     </div>
   );
 };

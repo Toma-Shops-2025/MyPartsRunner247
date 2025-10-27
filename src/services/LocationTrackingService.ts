@@ -275,6 +275,29 @@ class LocationTrackingService {
       }
     }
   }
+
+  // Start tracking (simplified method for dashboard)
+  startTracking() {
+    // This is a simplified method that can be called from the dashboard
+    // The actual tracking logic is handled by startLocationTracking with specific order details
+    console.log('Location tracking service started');
+  }
+
+  // Stop tracking (simplified method for dashboard)
+  stopTracking() {
+    // Stop all active tracking
+    if (this.watchId !== null) {
+      navigator.geolocation.clearWatch(this.watchId);
+      this.watchId = null;
+    }
+    
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+      this.updateInterval = null;
+    }
+    
+    console.log('Location tracking service stopped');
+  }
 }
 
 // Export singleton instance

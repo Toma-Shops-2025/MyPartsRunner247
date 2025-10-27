@@ -181,12 +181,80 @@ export const useAuth = () => {
     }
   };
 
+  // Create profile manually (for admin use)
+  const createProfileManually = async (profileData: Partial<Profile>) => {
+    if (!user?.id) {
+      throw new Error('No user ID available');
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...profileData,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Error creating profile manually:', error);
+        throw error;
+      }
+
+      // Refresh profile data
+      await fetchProfile(user.id);
+    } catch (error) {
+      console.error('Error in createProfileManually:', error);
+      throw error;
+    }
+  };
+
+  // Force logout (for admin use)
+  const forceLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error in forceLogout:', error);
+    }
+  };
+
+  // Update user type (for admin use)
+  const updateUserType = async (newType: string) => {
+    if (!user?.id) {
+      throw new Error('No user ID available');
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          user_type: newType,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating user type:', error);
+        throw error;
+      }
+
+      // Refresh profile data
+      await fetchProfile(user.id);
+    } catch (error) {
+      console.error('Error in updateUserType:', error);
+      throw error;
+    }
+  };
+
   return {
     user,
     profile,
     session,
     loading,
     signOut,
-    isSigningOut
+    isSigningOut,
+    createProfileManually,
+    forceLogout,
+    updateUserType
   };
 };
