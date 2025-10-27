@@ -38,16 +38,78 @@ exports.handler = async (event, context) => {
       throw new Error('Stripe connection failed: ' + accountError.message);
     }
 
-    // Create payment intent
+    // Create payment intent with driver payout
     console.log('Creating payment intent with amount:', Math.round(amount * 100));
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
-      currency: 'usd',
-      metadata: metadata || {},
-      automatic_payment_methods: {
-        enabled: true,
-      },
-    });
+    
+    // Extract driver ID from metadata
+    const driverId = metadata?.driverId;
+    let paymentIntent;
+    
+    if (driverId) {
+      // Get driver's Stripe Connect account ID
+      const { createClient } = require('@supabase/supabase-js');
+      const supabase = createClient(
+        process.env.VITE_SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
+      
+      const { data: driverProfile } = await supabase
+        .from('profiles')
+        .select('stripe_account_id')
+        .eq('id', driverId)
+        .single();
+      
+      if (driverProfile?.stripe_account_id) {
+        // Create payment intent with transfer to driver
+        const platformFee = Math.round(amount * 100 * 0.30); // 30% platform fee
+        const driverAmount = Math.round(amount * 100 * 0.70); // 70% to driver
+        
+        paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100),
+          currency: 'usd',
+          application_fee_amount: platformFee,
+          transfer_data: {
+            destination: driverProfile.stripe_account_id
+          },
+          metadata: {
+            ...metadata,
+            driver_stripe_account: driverProfile.stripe_account_id,
+            platform_fee: platformFee,
+            driver_amount: driverAmount
+          },
+          automatic_payment_methods: {
+            enabled: true,
+          },
+        });
+        
+        console.log(`Payment intent created with transfer to driver ${driverId}: ${driverProfile.stripe_account_id}`);
+      } else {
+        console.warn(`Driver ${driverId} has no Stripe Connect account, creating payment to platform account`);
+        // Fallback: create payment to platform account
+        paymentIntent = await stripe.paymentIntents.create({
+          amount: Math.round(amount * 100),
+          currency: 'usd',
+          metadata: {
+            ...metadata,
+            warning: 'Driver has no Stripe Connect account - payment to platform'
+          },
+          automatic_payment_methods: {
+            enabled: true,
+          },
+        });
+      }
+    } else {
+      // No driver specified, create payment to platform account
+      console.log('No driver ID provided, creating payment to platform account');
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(amount * 100),
+        currency: 'usd',
+        metadata: metadata || {},
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+    }
     console.log('Payment intent created successfully:', paymentIntent.id);
 
     return {
