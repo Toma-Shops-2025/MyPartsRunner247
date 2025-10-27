@@ -383,17 +383,15 @@ const DriverVerificationPage: React.FC = () => {
         .update({
           full_name: formData.fullName,
           phone: formData.phone,
-          verification_info: {
-            dateOfBirth: formData.dateOfBirth,
-            ssnLastFour: formData.ssnLastFour,
-            driverLicense: formData.driverLicense,
-            driverLicenseExp: formData.driverLicenseExp,
-            vehicleInfo: formData.vehicleInfo,
-            insuranceInfo: formData.insuranceInfo,
-            bankingInfo: formData.bankingInfo,
-            address: formData.address,
-            emergencyContact: formData.emergencyContact
-          }
+          date_of_birth: formData.dateOfBirth,
+          ssn_last_four: formData.ssnLastFour,
+          driver_license: formData.driverLicense,
+          driver_license_exp: formData.driverLicenseExp,
+          vehicle_info: formData.vehicleInfo,
+          insurance_info: formData.insuranceInfo,
+          banking_info: formData.bankingInfo,
+          address: formData.address,
+          emergency_contact: formData.emergencyContact
         })
         .eq('id', user.id);
 
