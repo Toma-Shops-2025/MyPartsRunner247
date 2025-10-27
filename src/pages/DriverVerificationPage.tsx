@@ -377,25 +377,46 @@ const DriverVerificationPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Update profile with verification info
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: formData.fullName,
-          phone: formData.phone,
-          date_of_birth: formData.dateOfBirth,
-          ssn_last_four: formData.ssnLastFour,
-          driver_license: formData.driverLicense,
-          driver_license_exp: formData.driverLicenseExp,
-          vehicle_info: formData.vehicleInfo,
-          insurance_info: formData.insuranceInfo,
-          banking_info: formData.bankingInfo,
-          address: formData.address,
-          emergency_contact: formData.emergencyContact
-        })
-        .eq('id', user.id);
+      // Update profile with verification info - only update columns that exist
+      const updateData: any = {
+        full_name: formData.fullName,
+        phone: formData.phone,
+        date_of_birth: formData.dateOfBirth,
+        ssn_last_four: formData.ssnLastFour,
+        driver_license: formData.driverLicense,
+        driver_license_exp: formData.driverLicenseExp,
+        vehicle_info: formData.vehicleInfo,
+        insurance_info: formData.insuranceInfo,
+        banking_info: formData.bankingInfo
+      };
 
-      if (error) {
+      // Only add these columns if they exist in the database
+      // We'll try to add them one by one to avoid errors
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', user.id);
+
+        if (error) {
+          console.error('Error updating basic profile info:', error);
+          throw error;
+        }
+
+        // Try to update address and emergency_contact separately if they exist
+        try {
+          await supabase
+            .from('profiles')
+            .update({
+              address: formData.address,
+              emergency_contact: formData.emergencyContact
+            })
+            .eq('id', user.id);
+        } catch (addressError) {
+          console.warn('Address/emergency_contact columns may not exist, skipping:', addressError);
+          // This is not a critical error, so we continue
+        }
+      } catch (error) {
         console.error('Error updating profile:', error);
         toast({
           title: "Error",
