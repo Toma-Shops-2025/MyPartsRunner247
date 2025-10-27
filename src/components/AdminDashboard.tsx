@@ -128,57 +128,57 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+      <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
+        <Card className="bg-gray-800 border-gray-700 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalOrders}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.totalOrders}</div>
+            <p className="text-xs text-gray-400">
               {stats.pendingOrders} pending
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Drivers</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Active Drivers</CardTitle>
+            <Users className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.activeDrivers}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">{stats.activeDrivers}</div>
+            <p className="text-xs text-gray-400">
               {drivers.length} total drivers
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-white">${stats.totalRevenue.toFixed(2)}</div>
+            <p className="text-xs text-gray-400">
               Platform fee included
             </p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-gray-800 border-gray-700 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-white">Pending Orders</CardTitle>
+            <AlertCircle className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.pendingOrders}</div>
-            <p className="text-xs text-muted-foreground">
+            <div className="text-2xl font-bold text-orange-400">{stats.pendingOrders}</div>
+            <p className="text-xs text-gray-400">
               Need driver assignment
             </p>
           </CardContent>
@@ -201,20 +201,20 @@ const AdminDashboard: React.FC = () => {
         </TabsList>
 
         <TabsContent value="orders" className="space-y-4">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700 text-white">
             <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
+              <CardTitle className="text-white">Recent Orders</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {orders.slice(0, 10).map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={order.id} className="flex items-center justify-between p-4 border border-gray-600 rounded-lg bg-gray-700">
                     <div className="space-y-1">
                       <div className="font-medium">#{order.id.slice(0, 8)}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-300">
                         {new Date(order.created_at).toLocaleDateString()}
                       </div>
-                      <div className="text-lg font-bold">${order.total.toFixed(2)}</div>
+                      <div className="text-lg font-bold text-white">${order.total.toFixed(2)}</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={
@@ -242,17 +242,17 @@ const AdminDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="drivers" className="space-y-4">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700 text-white">
             <CardHeader>
-              <CardTitle>Driver Management & Approval</CardTitle>
+              <CardTitle className="text-white">Driver Management & Approval</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {drivers.map((driver) => (
-                  <div key={driver.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={driver.id} className="flex items-center justify-between p-4 border border-gray-600 rounded-lg bg-gray-700">
                     <div className="space-y-1">
-                      <div className="font-medium">{driver.full_name}</div>
-                      <div className="text-sm text-gray-600">{driver.email}</div>
+                      <div className="font-medium text-white">{driver.full_name}</div>
+                      <div className="text-sm text-gray-300">{driver.email}</div>
                       <div className="text-sm">
                         {driver.total_deliveries || 0} deliveries • {driver.rating || 0} ⭐
                       </div>
@@ -314,7 +314,7 @@ const AdminDashboard: React.FC = () => {
                 ))}
                 
                 {drivers.filter(d => d.status === 'pending').length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-400">
                     No pending driver applications
                   </div>
                 )}
@@ -328,9 +328,9 @@ const AdminDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700 text-white">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-white">
                 <BarChart3 className="w-5 h-5" />
                 Platform Analytics
               </CardTitle>
@@ -352,7 +352,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="text-center text-gray-600">
+                <div className="text-center text-gray-400">
                   <TrendingUp className="w-12 h-12 mx-auto mb-2 opacity-50" />
                   <p>Detailed analytics charts would appear here</p>
                 </div>
