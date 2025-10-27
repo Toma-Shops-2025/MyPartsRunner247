@@ -455,20 +455,20 @@ const DriverVerificationPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <NewHeader />
       
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Driver Verification</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Verification</h1>
+          <p className="text-gray-300">
             Complete your verification to start accepting deliveries
           </p>
           {verificationDeadline && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="mt-4 p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
               <div className="flex items-center">
-                <Clock className="w-5 h-5 text-yellow-600 mr-2" />
-                <span className="text-yellow-800 font-medium">
+                <Clock className="w-5 h-5 text-yellow-400 mr-2" />
+                <span className="text-yellow-300 font-medium">
                   Verification Deadline: {timeRemaining}
                 </span>
               </div>
@@ -477,10 +477,10 @@ const DriverVerificationPage: React.FC = () => {
         </div>
 
         {/* Overall Status */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 border-gray-700 text-white">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Shield className="w-6 h-6 text-teal-600 mr-2" />
+            <CardTitle className="flex items-center text-teal-400">
+              <Shield className="w-6 h-6 mr-2" />
               Verification Status
             </CardTitle>
           </CardHeader>
@@ -490,59 +490,59 @@ const DriverVerificationPage: React.FC = () => {
                 <div className="flex justify-center mb-2">
                   {getStatusIcon(verificationStatus.driver_license)}
                 </div>
-                <p className="text-sm font-medium">Driver License</p>
-                <p className="text-xs text-gray-500">{getStatusText(verificationStatus.driver_license)}</p>
+                <p className="text-sm font-medium text-white">Driver License</p>
+                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.driver_license)}</p>
               </div>
               <div className="text-center">
                 <div className="flex justify-center mb-2">
                   {getStatusIcon(verificationStatus.insurance)}
                 </div>
-                <p className="text-sm font-medium">Insurance</p>
-                <p className="text-xs text-gray-500">{getStatusText(verificationStatus.insurance)}</p>
+                <p className="text-sm font-medium text-white">Insurance</p>
+                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.insurance)}</p>
               </div>
               <div className="text-center">
                 <div className="flex justify-center mb-2">
                   {getStatusIcon(verificationStatus.background_check)}
                 </div>
-                <p className="text-sm font-medium">Background Check</p>
-                <p className="text-xs text-gray-500">{getStatusText(verificationStatus.background_check)}</p>
+                <p className="text-sm font-medium text-white">Background Check</p>
+                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.background_check)}</p>
               </div>
               <div className="text-center">
                 <div className="flex justify-center mb-2">
                   {getStatusIcon(verificationStatus.overall)}
                 </div>
-                <p className="text-sm font-medium">Overall Status</p>
-                <p className="text-xs text-gray-500">{getStatusText(verificationStatus.overall)}</p>
+                <p className="text-sm font-medium text-white">Overall Status</p>
+                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.overall)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Document Upload Section */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 border-gray-700 text-white">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="w-6 h-6 text-teal-600 mr-2" />
+            <CardTitle className="flex items-center text-teal-400">
+              <FileText className="w-6 h-6 mr-2" />
               Required Documents
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Driver License Front */}
-            <div className="border rounded-lg p-4">
+            <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">Driver's License (Front)</h3>
-                  <p className="text-sm text-gray-600">Upload a clear photo of the front of your driver's license</p>
+                  <h3 className="font-semibold text-white">Driver's License (Front)</h3>
+                  <p className="text-sm text-gray-300">Upload a clear photo of the front of your driver's license</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(verificationStatus.driver_license)}
-                  <span className="text-sm">{getStatusText(verificationStatus.driver_license)}</span>
+                  <span className="text-sm text-gray-300">{getStatusText(verificationStatus.driver_license)}</span>
                 </div>
               </div>
               <Button
                 onClick={() => handleFileSelect('driver_license')}
                 disabled={uploadStatus.driver_license === 'uploading'}
-                className="w-full"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
               >
                 {uploadStatus.driver_license === 'uploading' ? (
                   <>
@@ -566,21 +566,21 @@ const DriverVerificationPage: React.FC = () => {
             </div>
 
             {/* Driver License Back */}
-            <div className="border rounded-lg p-4">
+            <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">Driver's License (Back)</h3>
-                  <p className="text-sm text-gray-600">Upload a clear photo of the back of your driver's license</p>
+                  <h3 className="font-semibold text-white">Driver's License (Back)</h3>
+                  <p className="text-sm text-gray-300">Upload a clear photo of the back of your driver's license</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(verificationStatus.driver_license_back)}
-                  <span className="text-sm">{getStatusText(verificationStatus.driver_license_back)}</span>
+                  <span className="text-sm text-gray-300">{getStatusText(verificationStatus.driver_license_back)}</span>
                 </div>
               </div>
               <Button
                 onClick={() => handleFileSelect('driver_license_back')}
                 disabled={uploadStatus.driver_license_back === 'uploading'}
-                className="w-full"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
               >
                 {uploadStatus.driver_license_back === 'uploading' ? (
                   <>
@@ -604,21 +604,21 @@ const DriverVerificationPage: React.FC = () => {
             </div>
 
             {/* Insurance Certificate */}
-            <div className="border rounded-lg p-4">
+            <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">Insurance Certificate</h3>
-                  <p className="text-sm text-gray-600">Upload your current auto insurance certificate</p>
+                  <h3 className="font-semibold text-white">Insurance Certificate</h3>
+                  <p className="text-sm text-gray-300">Upload your current auto insurance certificate</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(verificationStatus.insurance)}
-                  <span className="text-sm">{getStatusText(verificationStatus.insurance)}</span>
+                  <span className="text-sm text-gray-300">{getStatusText(verificationStatus.insurance)}</span>
                 </div>
               </div>
               <Button
                 onClick={() => handleFileSelect('insurance_certificate')}
                 disabled={uploadStatus.insurance_certificate === 'uploading'}
-                className="w-full"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
               >
                 {uploadStatus.insurance_certificate === 'uploading' ? (
                   <>
@@ -642,21 +642,21 @@ const DriverVerificationPage: React.FC = () => {
             </div>
 
             {/* Vehicle Registration */}
-            <div className="border rounded-lg p-4">
+            <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">Vehicle Registration</h3>
-                  <p className="text-sm text-gray-600">Upload your vehicle registration document</p>
+                  <h3 className="font-semibold text-white">Vehicle Registration</h3>
+                  <p className="text-sm text-gray-300">Upload your vehicle registration document</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(verificationStatus.vehicle_registration)}
-                  <span className="text-sm">{getStatusText(verificationStatus.vehicle_registration)}</span>
+                  <span className="text-sm text-gray-300">{getStatusText(verificationStatus.vehicle_registration)}</span>
                 </div>
               </div>
               <Button
                 onClick={() => handleFileSelect('vehicle_registration')}
                 disabled={uploadStatus.vehicle_registration === 'uploading'}
-                className="w-full"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
               >
                 {uploadStatus.vehicle_registration === 'uploading' ? (
                   <>
@@ -682,18 +682,18 @@ const DriverVerificationPage: React.FC = () => {
         </Card>
 
         {/* Background Check Section */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 border-gray-700 text-white">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Shield className="w-6 h-6 text-teal-600 mr-2" />
+            <CardTitle className="flex items-center text-teal-400">
+              <Shield className="w-6 h-6 mr-2" />
               Background Check
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold">Criminal Background Check</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-semibold text-white">Criminal Background Check</h3>
+                <p className="text-sm text-gray-300">
                   We'll run a background check to ensure driver safety
                 </p>
               </div>
@@ -701,6 +701,7 @@ const DriverVerificationPage: React.FC = () => {
                 onClick={initiateBackgroundCheck}
                 disabled={verificationStatus.background_check === 'in_progress' || verificationStatus.background_check === 'approved'}
                 variant={verificationStatus.background_check === 'approved' ? 'outline' : 'default'}
+                className={verificationStatus.background_check === 'approved' ? 'border-gray-600 text-gray-300' : 'bg-teal-600 hover:bg-teal-700 text-white'}
               >
                 {verificationStatus.background_check === 'in_progress' ? (
                   <>
