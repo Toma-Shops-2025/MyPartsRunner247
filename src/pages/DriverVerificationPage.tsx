@@ -377,45 +377,66 @@ const DriverVerificationPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      // Update profile with verification info - only update columns that exist
-      const updateData: any = {
+      // Update profile with verification info - only update basic columns that definitely exist
+      // Start with the most basic columns that should exist in any profiles table
+      const basicUpdateData: any = {
         full_name: formData.fullName,
-        phone: formData.phone,
-        date_of_birth: formData.dateOfBirth,
-        ssn_last_four: formData.ssnLastFour,
-        driver_license: formData.driverLicense,
-        driver_license_exp: formData.driverLicenseExp,
-        vehicle_info: formData.vehicleInfo,
-        insurance_info: formData.insuranceInfo,
-        banking_info: formData.bankingInfo
+        phone: formData.phone
       };
 
-      // Only add these columns if they exist in the database
-      // We'll try to add them one by one to avoid errors
       try {
-        const { error } = await supabase
+        // First, try to update only the most basic columns
+        const { error: basicError } = await supabase
           .from('profiles')
-          .update(updateData)
+          .update(basicUpdateData)
           .eq('id', user.id);
 
-        if (error) {
-          console.error('Error updating basic profile info:', error);
-          throw error;
+        if (basicError) {
+          console.error('Error updating basic profile info:', basicError);
+          throw basicError;
         }
 
-        // Try to update address and emergency_contact separately if they exist
-        try {
-          await supabase
-            .from('profiles')
-            .update({
-              address: formData.address,
-              emergency_contact: formData.emergencyContact
-            })
-            .eq('id', user.id);
-        } catch (addressError) {
-          console.warn('Address/emergency_contact columns may not exist, skipping:', addressError);
-          // This is not a critical error, so we continue
+        // Try to update additional columns one by one to avoid schema issues
+        const additionalFields = [
+          { field: 'date_of_birth', value: formData.dateOfBirth },
+          { field: 'ssn_last_four', value: formData.ssnLastFour },
+          { field: 'driver_license', value: formData.driverLicense },
+          { field: 'driver_license_exp', value: formData.driverLicenseExp }
+        ];
+
+        for (const { field, value } of additionalFields) {
+          try {
+            await supabase
+              .from('profiles')
+              .update({ [field]: value })
+              .eq('id', user.id);
+          } catch (fieldError) {
+            console.warn(`Column ${field} may not exist, skipping:`, fieldError);
+            // Continue with other fields
+          }
         }
+
+        // Try to update JSONB fields separately
+        const jsonbFields = [
+          { field: 'vehicle_info', value: formData.vehicleInfo },
+          { field: 'insurance_info', value: formData.insuranceInfo },
+          { field: 'banking_info', value: formData.bankingInfo },
+          { field: 'address', value: formData.address },
+          { field: 'emergency_contact', value: formData.emergencyContact }
+        ];
+
+        for (const { field, value } of jsonbFields) {
+          try {
+            await supabase
+              .from('profiles')
+              .update({ [field]: value })
+              .eq('id', user.id);
+          } catch (fieldError) {
+            console.warn(`JSONB column ${field} may not exist, skipping:`, fieldError);
+            // Continue with other fields
+          }
+        }
+
       } catch (error) {
         console.error('Error updating profile:', error);
         toast({
