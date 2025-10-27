@@ -172,14 +172,31 @@ const DriverVerificationPage: React.FC = () => {
       };
 
       documents.forEach(doc => {
-        if (doc.document_type === 'driver_license' && doc.status === 'approved') {
-          status.driver_license = 'verified';
-        } else if (doc.document_type === 'driver_license_back' && doc.status === 'approved') {
-          status.driver_license_back = 'verified';
-        } else if (doc.document_type === 'insurance_certificate' && doc.status === 'approved') {
-          status.insurance = 'verified';
-        } else if (doc.document_type === 'vehicle_registration' && doc.status === 'approved') {
-          status.vehicle_registration = 'verified';
+        console.log('Processing document:', doc.document_type, 'status:', doc.status);
+        if (doc.document_type === 'driver_license') {
+          if (doc.status === 'approved') {
+            status.driver_license = 'verified';
+          } else if (doc.status === 'uploaded' || doc.status === 'pending_review') {
+            status.driver_license = 'uploaded';
+          }
+        } else if (doc.document_type === 'driver_license_back') {
+          if (doc.status === 'approved') {
+            status.driver_license_back = 'verified';
+          } else if (doc.status === 'uploaded' || doc.status === 'pending_review') {
+            status.driver_license_back = 'uploaded';
+          }
+        } else if (doc.document_type === 'insurance_certificate') {
+          if (doc.status === 'approved') {
+            status.insurance = 'verified';
+          } else if (doc.status === 'uploaded' || doc.status === 'pending_review') {
+            status.insurance = 'uploaded';
+          }
+        } else if (doc.document_type === 'vehicle_registration') {
+          if (doc.status === 'approved') {
+            status.vehicle_registration = 'verified';
+          } else if (doc.status === 'uploaded' || doc.status === 'pending_review') {
+            status.vehicle_registration = 'uploaded';
+          }
         }
       });
 
@@ -195,6 +212,7 @@ const DriverVerificationPage: React.FC = () => {
         status.overall = 'pending_review';
       }
 
+      console.log('Updated verification status:', status);
       setVerificationStatus(status);
     } catch (error) {
       console.error('Error loading driver documents:', error);
