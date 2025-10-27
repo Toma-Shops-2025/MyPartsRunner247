@@ -18,7 +18,12 @@ ADD COLUMN IF NOT EXISTS vehicle_info JSONB,
 ADD COLUMN IF NOT EXISTS insurance_info JSONB,
 ADD COLUMN IF NOT EXISTS banking_info JSONB,
 ADD COLUMN IF NOT EXISTS address JSONB,
-ADD COLUMN IF NOT EXISTS emergency_contact JSONB;
+ADD COLUMN IF NOT EXISTS emergency_contact JSONB,
+-- Geographic columns for 50-state scalability
+ADD COLUMN IF NOT EXISTS state TEXT,
+ADD COLUMN IF NOT EXISTS city TEXT,
+ADD COLUMN IF NOT EXISTS zip_code TEXT,
+ADD COLUMN IF NOT EXISTS timezone TEXT DEFAULT 'America/New_York';
 
 -- 2. CREATE DRIVER_APPLICATIONS TABLE
 -- Create the driver_applications table if it doesn't exist
@@ -161,7 +166,39 @@ CREATE TRIGGER update_orders_updated_at
 -- VALUES (auth.uid(), 'customer', 'Test User', 'active')
 -- ON CONFLICT (id) DO NOTHING;
 
--- 10. GRANT PERMISSIONS
+-- 10. CREATE STATE MANAGEMENT TABLES FOR 50-STATE SCALABILITY
+-- State settings table for managing state-specific configurations
+CREATE TABLE IF NOT EXISTS state_settings (
+    state_code TEXT PRIMARY KEY,
+    state_name TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT true,
+    regulations JSONB,
+    pricing_rules JSONB,
+    service_areas JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Regional pricing table for state-specific pricing
+CREATE TABLE IF NOT EXISTS regional_pricing (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    state_code TEXT REFERENCES state_settings(state_code),
+    base_rate DECIMAL(10,2) NOT NULL DEFAULT 5.00,
+    per_mile_rate DECIMAL(10,2) NOT NULL DEFAULT 1.50,
+    minimum_fare DECIMAL(10,2) NOT NULL DEFAULT 8.00,
+    surge_multiplier DECIMAL(3,2) DEFAULT 1.0,
+    is_active BOOLEAN DEFAULT true,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Add geographic indexes for performance
+CREATE INDEX IF NOT EXISTS idx_profiles_state ON profiles(state);
+CREATE INDEX IF NOT EXISTS idx_profiles_city ON profiles(city);
+CREATE INDEX IF NOT EXISTS idx_orders_pickup_state ON orders(pickup_address);
+CREATE INDEX IF NOT EXISTS idx_orders_delivery_state ON orders(delivery_address);
+
+-- 11. GRANT PERMISSIONS
 -- Grant necessary permissions to authenticated users
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
