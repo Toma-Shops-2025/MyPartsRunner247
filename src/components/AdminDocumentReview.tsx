@@ -288,6 +288,12 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
             description: "The driver-documents storage bucket needs to be created. Please run the storage setup script.",
             variant: "destructive",
           });
+        } else if (urlError.message.includes('Object not found')) {
+          toast({
+            title: "File Missing from Storage",
+            description: "This document file is missing from storage. The driver needs to re-upload the document.",
+            variant: "destructive",
+          });
         } else {
           toast({
             title: "Error",
