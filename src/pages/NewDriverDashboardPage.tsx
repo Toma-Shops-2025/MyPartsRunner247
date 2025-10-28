@@ -27,13 +27,44 @@ const NewDriverDashboardPage: React.FC = () => {
   const [hasStripeAccount, setHasStripeAccount] = useState(false);
   const [verificationDeadline, setVerificationDeadline] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
+      checkOnboardingCompletion();
       fetchDriverData();
       loadVerificationDeadline();
     }
   }, [user, profile]);
+
+  const checkOnboardingCompletion = async () => {
+    if (!user?.id) return;
+
+    try {
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('onboarding_completed, status')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error checking onboarding status:', error);
+        return;
+      }
+
+      const isCompleted = profileData?.onboarding_completed === true;
+      setOnboardingCompleted(isCompleted);
+
+      // If onboarding is not completed, redirect to verification page
+      if (!isCompleted) {
+        console.log('Driver onboarding not completed, redirecting to verification');
+        navigate('/driver-verification');
+        return;
+      }
+    } catch (error) {
+      console.error('Error checking onboarding completion:', error);
+    }
+  };
 
   const loadVerificationDeadline = async () => {
     try {
@@ -205,6 +236,18 @@ const NewDriverDashboardPage: React.FC = () => {
 
   if (!user || profile?.user_type !== 'driver') {
     return <Navigate to="/" replace />;
+  }
+
+  // If onboarding is not completed, show loading while redirecting
+  if (!onboardingCompleted) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to onboarding...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

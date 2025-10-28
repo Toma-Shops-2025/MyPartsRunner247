@@ -48,8 +48,13 @@ const DriverApplicationPage: React.FC = () => {
   }
 
   // Check if driver has already completed their application
-  if (profile?.user_type === 'driver' && profile?.is_approved) {
+  if (profile?.user_type === 'driver' && profile?.onboarding_completed) {
     return <Navigate to="/driver-dashboard" replace />;
+  }
+  
+  // If driver is approved but hasn't completed onboarding, redirect to verification
+  if (profile?.user_type === 'driver' && profile?.is_approved && !profile?.onboarding_completed) {
+    return <Navigate to="/driver-verification" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -133,11 +138,11 @@ const DriverApplicationPage: React.FC = () => {
         // Don't throw - profile update succeeded
       }
 
-      // Show success message and redirect to driver dashboard
-      alert('Congratulations! You are now approved as a driver and automatically set to ONLINE. You have 7 days to complete your driver onboarding process. You can start accepting deliveries immediately!');
+      // Show success message and redirect to driver onboarding
+      alert('Congratulations! You are now approved as a driver. Please complete your onboarding process including document uploads, background check, and vehicle information. You have 7 days to complete all requirements.');
       
-      // Force page reload to update auth state
-      window.location.href = '/driver-dashboard';
+      // Redirect to driver verification/onboarding
+      window.location.href = '/driver-verification';
     } catch (error) {
       console.error('Error submitting application:', error);
       alert('Error submitting application. Please try again.');

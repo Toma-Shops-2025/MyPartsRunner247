@@ -66,13 +66,13 @@ const AuthCallbackPage: React.FC = () => {
           });
           
           if (finalUserType === 'driver') {
-            // Check if driver is already approved
-            if (profile?.is_approved) {
-              console.log('🚗 Redirecting approved driver to dashboard');
+            // Check if driver has completed onboarding
+            if (profile?.onboarding_completed) {
+              console.log('🚗 Redirecting completed driver to dashboard');
               navigate('/driver-dashboard');
             } else {
-              console.log('📝 Redirecting unapproved driver to application');
-              navigate('/driver-application');
+              console.log('📝 Redirecting new driver to onboarding');
+              navigate('/driver-verification');
             }
           } else {
             console.log('🏠 Redirecting non-driver to home');

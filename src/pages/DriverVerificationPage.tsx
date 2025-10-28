@@ -453,10 +453,15 @@ const DriverVerificationPage: React.FC = () => {
 
       toast({
         title: "Verification submitted",
-        description: "Your verification information has been submitted and automatically approved!",
+        description: "Your verification information has been submitted and automatically approved! Redirecting to dashboard...",
       });
 
       setVerificationStatus(prev => ({ ...prev, overall: 'approved' }));
+
+      // Redirect to dashboard after successful completion
+      setTimeout(() => {
+        window.location.href = '/driver-dashboard';
+      }, 2000);
     } catch (error) {
       console.error('Error submitting verification:', error);
       toast({
