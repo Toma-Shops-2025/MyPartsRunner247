@@ -28,14 +28,26 @@ const NewDriverDashboardPage: React.FC = () => {
   const [verificationDeadline, setVerificationDeadline] = useState<Date | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
+  const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
       checkOnboardingCompletion();
       fetchDriverData();
       loadVerificationDeadline();
+      
+      // Set a timeout to prevent infinite loading
+      const timeout = setTimeout(() => {
+        if (!onboardingCompleted) {
+          console.log('Loading timeout reached, assuming onboarding completed');
+          setLoadingTimeout(true);
+          setOnboardingCompleted(true);
+        }
+      }, 10000); // 10 second timeout
+      
+      return () => clearTimeout(timeout);
     }
-  }, [user, profile]);
+  }, [user, profile, onboardingCompleted]);
 
   const checkOnboardingCompletion = async () => {
     if (!user?.id) return;
@@ -52,6 +64,9 @@ const NewDriverDashboardPage: React.FC = () => {
 
       if (error) {
         console.error('Error checking onboarding status:', error);
+        // If there's an error, assume onboarding is completed to avoid infinite loading
+        console.log('Database error, assuming onboarding completed to prevent infinite loading');
+        setOnboardingCompleted(true);
         return;
       }
 
@@ -66,6 +81,9 @@ const NewDriverDashboardPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error checking onboarding completion:', error);
+      // If there's an error, assume onboarding is completed to avoid infinite loading
+      console.log('Exception occurred, assuming onboarding completed to prevent infinite loading');
+      setOnboardingCompleted(true);
     }
   };
 
@@ -247,7 +265,9 @@ const NewDriverDashboardPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading driver dashboard...</p>
+          <p className="text-gray-600">
+            {loadingTimeout ? 'Loading driver dashboard... (timeout reached)' : 'Loading driver dashboard...'}
+          </p>
         </div>
       </div>
     );
