@@ -71,6 +71,7 @@ const DriverVerificationPage: React.FC = () => {
     ssnLastFour: '',
     driverLicense: '',
     driverLicenseExp: '',
+    transportationType: '',
     vehicleInfo: {
       make: '',
       model: '',
@@ -377,7 +378,8 @@ const DriverVerificationPage: React.FC = () => {
           { field: 'date_of_birth', value: formData.dateOfBirth },
           { field: 'ssn_last_four', value: formData.ssnLastFour },
           { field: 'driver_license', value: formData.driverLicense },
-          { field: 'driver_license_exp', value: formData.driverLicenseExp }
+          { field: 'driver_license_exp', value: formData.driverLicenseExp },
+          { field: 'transportation_type', value: formData.transportationType }
         ];
 
         for (const { field, value } of additionalFields) {
@@ -799,16 +801,50 @@ const DriverVerificationPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Vehicle Information */}
+        {/* Transportation & Vehicle Information */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Car className="w-6 h-6 text-teal-600 mr-2" />
-              Vehicle Information
+              Transportation & Vehicle Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Transportation Type Selection */}
+            <div>
+              <Label htmlFor="transportationType">Transportation Method *</Label>
+              <Select
+                value={formData.transportationType}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, transportationType: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your transportation method" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="truck">Truck</SelectItem>
+                  <SelectItem value="van">Van</SelectItem>
+                  <SelectItem value="suv">SUV</SelectItem>
+                  <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                  <SelectItem value="bicycle">Bicycle</SelectItem>
+                  <SelectItem value="scooter">Scooter</SelectItem>
+                  <SelectItem value="walking">Walking</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Vehicle Information - Only show for vehicle-based transportation */}
+            {(formData.transportationType === 'car' || 
+              formData.transportationType === 'truck' || 
+              formData.transportationType === 'van' || 
+              formData.transportationType === 'suv' || 
+              formData.transportationType === 'motorcycle') && (
+              <>
+                <div className="border-t border-gray-600 pt-4">
+                  <h4 className="text-lg font-semibold text-white mb-4">Vehicle Details</h4>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="make">Make</Label>
                 <Input
@@ -885,6 +921,8 @@ const DriverVerificationPage: React.FC = () => {
                 />
               </div>
             </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
