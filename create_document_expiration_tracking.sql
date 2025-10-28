@@ -63,7 +63,7 @@ SELECT
     END as expiration_status,
     CASE 
         WHEN dd.expiration_date IS NULL THEN NULL
-        ELSE EXTRACT(DAYS FROM (dd.expiration_date - CURRENT_DATE))::INTEGER
+        ELSE (dd.expiration_date - CURRENT_DATE)::INTEGER
     END as days_until_expiry
 FROM driver_documents dd
 WHERE dd.status = 'approved';
@@ -88,7 +88,7 @@ BEGIN
         NEW.expiration_date,
         CASE 
             WHEN NEW.expiration_date IS NULL THEN NULL
-            ELSE EXTRACT(DAYS FROM (NEW.expiration_date - CURRENT_DATE))::INTEGER
+            ELSE (NEW.expiration_date - CURRENT_DATE)::INTEGER
         END,
         CASE 
             WHEN NEW.expiration_date IS NULL THEN 'no_expiration'
@@ -101,7 +101,7 @@ BEGIN
         expiration_date = NEW.expiration_date,
         days_until_expiry = CASE 
             WHEN NEW.expiration_date IS NULL THEN NULL
-            ELSE EXTRACT(DAYS FROM (NEW.expiration_date - CURRENT_DATE))::INTEGER
+            ELSE (NEW.expiration_date - CURRENT_DATE)::INTEGER
         END,
         status = CASE 
             WHEN NEW.expiration_date IS NULL THEN 'no_expiration'
