@@ -272,7 +272,7 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess,
         </video>
         
         {/* Dark Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="absolute inset-0 bg-black/75"></div>
         
         {/* Dark Sign-in/Sign-up Box */}
         <div className="relative z-10 p-8 bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg mx-auto my-auto max-w-md w-full">
