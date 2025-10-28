@@ -29,6 +29,7 @@ const NewDriverDashboardPage: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
   const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
+  const [isTracking, setIsTracking] = useState<boolean>(false);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
@@ -246,6 +247,8 @@ const NewDriverDashboardPage: React.FC = () => {
   const startLocationTracking = async () => {
     try {
       await locationTrackingService.startTracking();
+      setIsTracking(true);
+      console.log('Location tracking started - UI updated');
     } catch (error) {
       console.error('Error starting location tracking:', error);
     }
@@ -254,6 +257,8 @@ const NewDriverDashboardPage: React.FC = () => {
   const stopLocationTracking = async () => {
     try {
       await locationTrackingService.stopTracking();
+      setIsTracking(false);
+      console.log('Location tracking stopped - UI updated');
     } catch (error) {
       console.error('Error stopping location tracking:', error);
     }
@@ -495,23 +500,49 @@ const NewDriverDashboardPage: React.FC = () => {
             <CardTitle className="flex items-center text-white">
               <MapPin className="w-6 h-6 text-teal-400 mr-2" />
               Location Tracking
+              {isTracking && (
+                <div className="ml-3 flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                  <span className="text-green-400 text-sm font-medium">Active</span>
+                </div>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex space-x-4">
-              <Button
-                onClick={startLocationTracking}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Start Tracking
-              </Button>
-              <Button
-                onClick={stopLocationTracking}
-                variant="outline"
-                className="border-gray-600 text-gray-300 hover:bg-gray-700"
-              >
-                Stop Tracking
-              </Button>
+            <div className="space-y-4">
+              {isTracking ? (
+                <div className="flex items-center justify-between p-4 bg-green-900 border border-green-700 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
+                    <div>
+                      <p className="text-green-300 font-medium">Location tracking is active</p>
+                      <p className="text-green-200 text-sm">Your location is being shared with the platform</p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={stopLocationTracking}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Stop Tracking
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
+                    <div>
+                      <p className="text-gray-300 font-medium">Location tracking is inactive</p>
+                      <p className="text-gray-400 text-sm">Start tracking to share your location</p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={startLocationTracking}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    Start Tracking
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
