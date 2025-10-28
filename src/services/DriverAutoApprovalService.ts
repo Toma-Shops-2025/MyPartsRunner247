@@ -131,7 +131,7 @@ export class DriverAutoApprovalService {
       }
 
       // Check if all required documents are approved
-      const requiredDocuments = ['driver_license', 'insurance_certificate', 'vehicle_registration', 'background_check'];
+      const requiredDocuments = ['driver_license', 'insurance_certificate', 'background_check'];
       const approvedDocuments = documents?.filter(doc => doc.status === 'approved') || [];
       
       const hasAllDocuments = requiredDocuments.every(requiredType => 
@@ -193,7 +193,7 @@ export class DriverAutoApprovalService {
         return { error: 'Error fetching documents' };
       }
 
-      const requiredDocuments = ['driver_license', 'insurance_certificate', 'vehicle_registration', 'background_check'];
+      const requiredDocuments = ['driver_license', 'insurance_certificate', 'background_check'];
       const approvedDocuments = documents?.filter(doc => doc.status === 'approved') || [];
       
       const documentStatus = requiredDocuments.map(requiredType => ({

@@ -312,7 +312,7 @@ export class DocumentUploadService {
       }
 
       // Check if all required documents are approved
-      const requiredDocuments = ['driver_license', 'insurance_certificate', 'vehicle_registration'];
+      const requiredDocuments = ['driver_license', 'insurance_certificate'];
       const approvedDocuments = documents?.filter(doc => doc.status === 'approved') || [];
       
       const hasAllDocuments = requiredDocuments.every(requiredType => 

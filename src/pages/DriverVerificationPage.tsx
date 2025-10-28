@@ -204,8 +204,7 @@ const DriverVerificationPage: React.FC = () => {
       // Check if all required documents are verified
       const allVerified = status.driver_license === 'verified' && 
                          status.driver_license_back === 'verified' && 
-                         status.insurance === 'verified' && 
-                         status.vehicle_registration === 'verified';
+                         status.insurance === 'verified';
 
       if (allVerified) {
         status.overall = 'approved';
