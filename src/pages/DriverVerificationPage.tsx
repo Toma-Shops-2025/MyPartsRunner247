@@ -347,30 +347,6 @@ const DriverVerificationPage: React.FC = () => {
     }
   };
 
-  const initiateBackgroundCheck = async () => {
-    if (!user?.id) return;
-
-    try {
-      setVerificationStatus(prev => ({ ...prev, background_check: 'in_progress' }));
-      
-      // Auto-approve background check immediately
-      await DriverAutoApprovalService.autoApproveBackgroundCheck(user.id);
-      
-      setVerificationStatus(prev => ({ ...prev, background_check: 'approved' }));
-      toast({
-        title: "Background check completed",
-        description: "Your background check has been automatically approved!",
-      });
-    } catch (error) {
-      console.error('Error initiating background check:', error);
-      setVerificationStatus(prev => ({ ...prev, background_check: 'not_started' }));
-      toast({
-        title: "Error",
-        description: "Failed to initiate background check. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleSubmit = async () => {
     if (!user?.id) return;
@@ -565,7 +541,7 @@ const DriverVerificationPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="flex justify-center mb-2">
                   {getStatusIcon(verificationStatus.driver_license)}
@@ -579,20 +555,6 @@ const DriverVerificationPage: React.FC = () => {
                 </div>
                 <p className="text-sm font-medium text-white">Insurance</p>
                 <p className="text-xs text-gray-400">{getStatusText(verificationStatus.insurance)}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  {getStatusIcon(verificationStatus.background_check)}
-                </div>
-                <p className="text-sm font-medium text-white">Background Check</p>
-                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.background_check)}</p>
-              </div>
-              <div className="text-center">
-                <div className="flex justify-center mb-2">
-                  {getStatusIcon(verificationStatus.overall)}
-                </div>
-                <p className="text-sm font-medium text-white">Overall Status</p>
-                <p className="text-xs text-gray-400">{getStatusText(verificationStatus.overall)}</p>
               </div>
             </div>
           </CardContent>
@@ -721,12 +683,12 @@ const DriverVerificationPage: React.FC = () => {
               />
             </div>
 
-            {/* Vehicle Registration */}
+            {/* Vehicle Registration - Optional */}
             <div className="border border-gray-600 rounded-lg p-4 bg-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold text-white">Vehicle Registration</h3>
-                  <p className="text-sm text-gray-300">Upload your vehicle registration document</p>
+                  <h3 className="font-semibold text-white">Vehicle Registration <span className="text-yellow-400 text-sm">(OPTIONAL)</span></h3>
+                  <p className="text-sm text-gray-300">Upload your vehicle registration document (optional)</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   {getStatusIcon(verificationStatus.vehicle_registration)}
@@ -736,7 +698,7 @@ const DriverVerificationPage: React.FC = () => {
               <Button
                 onClick={() => handleFileSelect('vehicle_registration')}
                 disabled={uploadStatus.vehicle_registration === 'uploading'}
-                className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                className="w-full bg-gray-600 hover:bg-gray-700 text-white"
               >
                 {uploadStatus.vehicle_registration === 'uploading' ? (
                   <>
@@ -746,7 +708,7 @@ const DriverVerificationPage: React.FC = () => {
                 ) : (
                   <>
                     <Upload className="w-4 h-4 mr-2" />
-                    Upload Registration
+                    Upload Registration (Optional)
                   </>
                 )}
               </Button>
@@ -761,48 +723,6 @@ const DriverVerificationPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Background Check Section */}
-        <Card className="mb-8 bg-gray-800 border-gray-700 text-white">
-          <CardHeader>
-            <CardTitle className="flex items-center text-teal-400">
-              <Shield className="w-6 h-6 mr-2" />
-              Background Check
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-white">Criminal Background Check</h3>
-                <p className="text-sm text-gray-300">
-                  We'll run a background check to ensure driver safety
-                </p>
-              </div>
-              <Button
-                onClick={initiateBackgroundCheck}
-                disabled={verificationStatus.background_check === 'in_progress' || verificationStatus.background_check === 'approved'}
-                variant={verificationStatus.background_check === 'approved' ? 'outline' : 'default'}
-                className={verificationStatus.background_check === 'approved' ? 'border-gray-600 text-gray-300' : 'bg-teal-600 hover:bg-teal-700 text-white'}
-              >
-                {verificationStatus.background_check === 'in_progress' ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Processing...
-                  </>
-                ) : verificationStatus.background_check === 'approved' ? (
-                  <>
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Approved
-                  </>
-                ) : (
-                  <>
-                    <Shield className="w-4 h-4 mr-2" />
-                    Start Background Check
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
 
         {/* Personal Information Form */}
         <Card className="mb-8">
