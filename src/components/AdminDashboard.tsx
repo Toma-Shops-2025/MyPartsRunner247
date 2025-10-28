@@ -8,12 +8,15 @@ import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot, Fi
 import AutomationStatus from './AutomationStatus';
 import AdminDocumentReview from './AdminDocumentReview';
 import AdminDocumentExpirationManager from './AdminDocumentExpirationManager';
+import { orderQueueService } from '@/services/OrderQueueService';
 
 interface AdminStats {
   totalOrders: number;
   activeDrivers: number;
   totalRevenue: number;
   pendingOrders: number;
+  queuedOrders: number;
+  waitingForDrivers: number;
 }
 
 interface Order {
@@ -71,6 +74,9 @@ const AdminDashboard: React.FC = () => {
       if (driversError) throw driversError;
       setDrivers(driversData || []);
 
+      // Get order queue statistics
+      const queueStats = await orderQueueService.getQueueStats();
+
       // Calculate stats
       const totalOrders = ordersData?.length || 0;
       const activeDrivers = driversData?.filter(d => d.status === 'active').length || 0;
@@ -81,7 +87,9 @@ const AdminDashboard: React.FC = () => {
         totalOrders,
         activeDrivers,
         totalRevenue,
-        pendingOrders
+        pendingOrders,
+        queuedOrders: queueStats.total,
+        waitingForDrivers: queueStats.waiting
       });
 
     } catch (error) {
@@ -132,7 +140,7 @@ const AdminDashboard: React.FC = () => {
       <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <Card className="bg-gray-800 border-gray-700 text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
@@ -181,6 +189,34 @@ const AdminDashboard: React.FC = () => {
             <div className="text-2xl font-bold text-orange-400">{stats.pendingOrders}</div>
             <p className="text-xs text-gray-400">
               Need driver assignment
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Queued Orders</CardTitle>
+            <AlertCircle className="h-4 w-4 text-yellow-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-400">{stats.queuedOrders}</div>
+            <p className="text-xs text-gray-400">
+              {stats.waitingForDrivers} waiting for drivers
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-white">Driver Status</CardTitle>
+            <Users className="h-4 w-4 text-green-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {stats.activeDrivers > 0 ? 'Available' : 'None Online'}
+            </div>
+            <p className="text-xs text-gray-400">
+              {stats.activeDrivers} drivers online
             </p>
           </CardContent>
         </Card>

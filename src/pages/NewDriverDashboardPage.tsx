@@ -6,6 +6,7 @@ import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
 import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
+import { orderQueueService } from '@/services/OrderQueueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp, AlertTriangle } from 'lucide-react';
@@ -285,6 +286,9 @@ const NewDriverDashboardPage: React.FC = () => {
           })
           .eq('id', user.id);
         console.log('Driver marked as online and active');
+
+        // Check for queued orders when driver comes online
+        await orderQueueService.checkQueuedOrdersForDriver(user.id);
       }
       
       console.log('Location tracking started - UI updated');

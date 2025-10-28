@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { orderQueueService } from './OrderQueueService';
 
 export class OrderAutomationService {
   private static instance: OrderAutomationService;
@@ -226,7 +227,111 @@ export class OrderAutomationService {
   // Notify admin when no drivers available
   private async notifyAdminNoDrivers(order: any) {
     console.log(`🚨 ADMIN ALERT: No drivers available for order ${order.id}`);
-    // Send email/SMS to admin
+    
+    try {
+      // 1. Create admin notification
+      await supabase
+        .from('admin_notifications')
+        .insert({
+          type: 'no_drivers_available',
+          title: 'No Drivers Available',
+          message: `Order #${order.id.slice(-8)} needs a driver. Customer: ${order.customer_name || 'Unknown'}. Pickup: ${order.pickup_address}`,
+          priority: 'high',
+          metadata: {
+            order_id: order.id,
+            customer_id: order.customer_id,
+            pickup_address: order.pickup_address,
+            delivery_address: order.delivery_address,
+            total: order.total
+          }
+        });
+
+      // 2. Update order status to indicate no drivers available
+      await supabase
+        .from('orders')
+        .update({ 
+          status: 'no_drivers_available',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', order.id);
+
+      // 3. Add order to queue
+      await orderQueueService.addToQueue(order.id);
+
+      // 4. Broadcast to all drivers (even offline ones)
+      await this.broadcastToAllDrivers(order);
+
+      console.log(`📢 Broadcast sent to all drivers for order ${order.id}`);
+    } catch (error) {
+      console.error('Error notifying admin and broadcasting to drivers:', error);
+    }
+  }
+
+  // Broadcast to all drivers when no drivers are online
+  private async broadcastToAllDrivers(order: any) {
+    try {
+      // Get all drivers (regardless of online status)
+      const { data: allDrivers, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, is_online, status')
+        .eq('user_type', 'driver')
+        .eq('is_approved', true)
+        .eq('onboarding_completed', true);
+
+      if (error) {
+        console.error('Error fetching all drivers for broadcast:', error);
+        return;
+      }
+
+      if (!allDrivers || allDrivers.length === 0) {
+        console.log('No drivers found for broadcast');
+        return;
+      }
+
+      console.log(`📢 Broadcasting to ${allDrivers.length} drivers (${allDrivers.filter(d => d.is_online).length} online, ${allDrivers.filter(d => !d.is_online).length} offline)`);
+
+      // Send notifications to all drivers
+      for (const driver of allDrivers) {
+        try {
+          // Create in-app notification
+          await supabase
+            .from('driver_notifications')
+            .insert({
+              user_id: driver.id,
+              type: 'order_available',
+              title: 'New Order Available!',
+              message: `Order #${order.id.slice(-8)} is waiting for a driver. Pickup: ${order.pickup_address}. Total: $${order.total}`,
+              severity: 'info',
+              action_required: true,
+              metadata: {
+                order_id: order.id,
+                pickup_address: order.pickup_address,
+                delivery_address: order.delivery_address,
+                total: order.total,
+                is_broadcast: true
+              }
+            });
+
+          // Send push notification if driver has push enabled
+          await this.sendPushNotification(driver.id, {
+            title: 'New Order Available!',
+            body: `Order #${order.id.slice(-8)} - $${order.total} - ${order.pickup_address}`,
+            icon: '/icon-192x192.png',
+            badge: '/badge-72x72.png',
+            data: {
+              orderId: order.id,
+              type: 'order_available'
+            }
+          });
+
+        } catch (driverError) {
+          console.error(`Error notifying driver ${driver.id}:`, driverError);
+        }
+      }
+
+    } catch (error) {
+      console.error('Error broadcasting to all drivers:', error);
+    }
   }
 
   // Notify admin of errors
