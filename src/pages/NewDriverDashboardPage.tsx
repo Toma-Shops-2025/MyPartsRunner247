@@ -41,6 +41,9 @@ const NewDriverDashboardPage: React.FC = () => {
     if (!user?.id) return;
 
     try {
+      // Add a small delay to allow database updates to propagate
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const { data: profileData, error } = await supabase
         .from('profiles')
         .select('onboarding_completed, status')
@@ -244,7 +247,7 @@ const NewDriverDashboardPage: React.FC = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting to onboarding...</p>
+          <p className="text-gray-600">Loading driver dashboard...</p>
         </div>
       </div>
     );
