@@ -12,6 +12,8 @@ export interface Profile {
   is_approved?: boolean;
   status?: string;
   vehicle_info?: any;
+  onboarding_completed?: boolean;
+  onboarding_completed_at?: string;
   created_at?: string;
   updated_at?: string;
 }

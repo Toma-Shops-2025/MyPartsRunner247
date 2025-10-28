@@ -20,7 +20,7 @@ const AuthCallbackPage: React.FC = () => {
           // User is authenticated, check their profile to determine redirect
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
-            .select('id, user_type, is_approved, status, email')
+            .select('id, user_type, is_approved, status, email, onboarding_completed')
             .eq('id', data.session.user.id)
             .single();
 
