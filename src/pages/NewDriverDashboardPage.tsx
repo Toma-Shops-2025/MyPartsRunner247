@@ -5,7 +5,6 @@ import NewHeader from '@/components/NewHeader';
 import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
-import PushNotificationManager from '@/components/PushNotificationManager';
 import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -278,7 +277,6 @@ const NewDriverDashboardPage: React.FC = () => {
     <div className="min-h-screen bg-gray-900">
       <NewHeader />
       <DriverNotificationSystem />
-      <PushNotificationManager />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
