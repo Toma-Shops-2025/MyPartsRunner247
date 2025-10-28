@@ -244,6 +244,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
         .single();
 
       if (error || !docData) {
+        console.error('Error fetching document path:', error);
         toast({
           title: "Error",
           description: "Failed to get document path",
@@ -252,20 +253,43 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
         return;
       }
 
+      console.log('Attempting to create signed URL for path:', docData.file_path);
+
       // Create signed URL for viewing
       const { data: urlData, error: urlError } = await supabase.storage
         .from('driver-documents')
         .createSignedUrl(docData.file_path, 3600);
 
-      if (urlError || !urlData) {
+      if (urlError) {
+        console.error('Storage error:', urlError);
+        
+        // Check if it's a bucket doesn't exist error
+        if (urlError.message.includes('Bucket not found') || urlError.message.includes('does not exist')) {
+          toast({
+            title: "Storage Setup Required",
+            description: "The driver-documents storage bucket needs to be created. Please run the storage setup script.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to generate document URL: ${urlError.message}`,
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      if (!urlData) {
         toast({
           title: "Error",
-          description: "Failed to generate document URL",
+          description: "No URL data returned from storage",
           variant: "destructive",
         });
         return;
       }
 
+      console.log('Successfully created signed URL:', urlData.signedUrl);
       // Open document in new tab
       window.open(urlData.signedUrl, '_blank');
     } catch (error) {
