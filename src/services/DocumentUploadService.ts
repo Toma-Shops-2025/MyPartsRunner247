@@ -89,7 +89,7 @@ export class DocumentUploadService {
 
       console.log('File uploaded successfully:', uploadData.path);
 
-      // Store metadata in database
+      // Store metadata in database with automatic approval
       const { data: documentData, error: dbError } = await supabase
         .from('driver_documents')
         .insert({
@@ -99,7 +99,9 @@ export class DocumentUploadService {
           file_name: metadata.fileName,
           file_size: metadata.fileSize,
           mime_type: metadata.mimeType,
-          status: 'pending_review'
+          status: 'approved',
+          verified_at: new Date().toISOString(),
+          admin_notes: 'Automatically approved upon upload'
         })
         .select()
         .single();
@@ -113,6 +115,9 @@ export class DocumentUploadService {
         
         return this.handleUploadFailure(file, metadata, dbError.message);
       }
+
+      // Check if driver should be automatically activated
+      await this.checkAndActivateDriver(metadata.userId);
 
       return {
         success: true,
@@ -202,7 +207,7 @@ export class DocumentUploadService {
 
       console.log('File uploaded successfully:', uploadData.path);
 
-      // Create new version record
+      // Create new version record with automatic approval
       const { data: documentData, error: dbError } = await supabase
         .from('driver_documents')
         .insert({
@@ -212,7 +217,9 @@ export class DocumentUploadService {
           file_name: metadata.fileName,
           file_size: metadata.fileSize,
           mime_type: metadata.mimeType,
-          status: 'pending_review',
+          status: 'approved',
+          verified_at: new Date().toISOString(),
+          admin_notes: 'Automatically approved upon upload',
           is_current: true
         })
         .select()
@@ -227,6 +234,9 @@ export class DocumentUploadService {
         
         return this.handleUploadFailure(file, metadata, dbError.message);
       }
+
+      // Check if driver should be automatically activated
+      await this.checkAndActivateDriver(metadata.userId);
 
       return {
         success: true,
@@ -282,6 +292,52 @@ export class DocumentUploadService {
     } catch (error) {
       console.error('Error fetching driver documents:', error);
       return [];
+    }
+  }
+
+  /**
+   * Check if all driver requirements are met and activate driver if so
+   */
+  static async checkAndActivateDriver(userId: string) {
+    try {
+      // Get all current documents for the driver
+      const { data: documents, error } = await supabase
+        .from('current_driver_documents')
+        .select('document_type, status')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error checking driver documents:', error);
+        return;
+      }
+
+      // Check if all required documents are approved
+      const requiredDocuments = ['driver_license', 'insurance_certificate', 'vehicle_registration'];
+      const approvedDocuments = documents?.filter(doc => doc.status === 'approved') || [];
+      
+      const hasAllDocuments = requiredDocuments.every(requiredType => 
+        approvedDocuments.some(doc => doc.document_type === requiredType)
+      );
+
+      if (hasAllDocuments) {
+        // Update driver status to active
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId)
+          .eq('user_type', 'driver');
+
+        if (updateError) {
+          console.error('Error activating driver:', updateError);
+        } else {
+          console.log('Driver automatically activated:', userId);
+        }
+      }
+    } catch (error) {
+      console.error('Error in checkAndActivateDriver:', error);
     }
   }
 

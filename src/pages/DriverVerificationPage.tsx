@@ -27,6 +27,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import { DocumentUploadService, DocumentMetadata } from '@/services/DocumentUploadService';
+import { DriverAutoApprovalService } from '@/services/DriverAutoApprovalService';
 
 interface VerificationStatus {
   background_check: 'pending' | 'in_progress' | 'approved' | 'rejected' | 'not_started';
@@ -353,14 +354,14 @@ const DriverVerificationPage: React.FC = () => {
     try {
       setVerificationStatus(prev => ({ ...prev, background_check: 'in_progress' }));
       
-      // Simulate background check process
-      setTimeout(() => {
-        setVerificationStatus(prev => ({ ...prev, background_check: 'approved' }));
-        toast({
-          title: "Background check initiated",
-          description: "Your background check is being processed. You'll be notified when it's complete.",
-        });
-      }, 2000);
+      // Auto-approve background check immediately
+      await DriverAutoApprovalService.autoApproveBackgroundCheck(user.id);
+      
+      setVerificationStatus(prev => ({ ...prev, background_check: 'approved' }));
+      toast({
+        title: "Background check completed",
+        description: "Your background check has been automatically approved!",
+      });
     } catch (error) {
       console.error('Error initiating background check:', error);
       setVerificationStatus(prev => ({ ...prev, background_check: 'not_started' }));
@@ -447,12 +448,15 @@ const DriverVerificationPage: React.FC = () => {
         return;
       }
 
+      // Auto-approve onboarding completion
+      await DriverAutoApprovalService.autoApproveOnboarding(user.id);
+
       toast({
         title: "Verification submitted",
-        description: "Your verification information has been submitted for review.",
+        description: "Your verification information has been submitted and automatically approved!",
       });
 
-      setVerificationStatus(prev => ({ ...prev, overall: 'pending_review' }));
+      setVerificationStatus(prev => ({ ...prev, overall: 'approved' }));
     } catch (error) {
       console.error('Error submitting verification:', error);
       toast({
