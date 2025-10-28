@@ -53,8 +53,33 @@ const NewDriverDashboardPage: React.FC = () => {
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
       loadVerificationDeadline();
+      checkTrackingStatus();
     }
   }, [user, profile, onboardingCompleted]);
+
+  // Check if driver is currently tracking/online
+  const checkTrackingStatus = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('is_online, status')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) {
+        console.error('Error checking tracking status:', error);
+        return;
+      }
+      
+      // Set tracking state based on database status
+      setIsTracking(data.is_online === true);
+      console.log('Tracking status loaded from database:', data.is_online);
+    } catch (error) {
+      console.error('Error checking tracking status:', error);
+    }
+  };
 
   const checkOnboardingCompletion = async () => {
     if (!user?.id) return;
@@ -248,6 +273,20 @@ const NewDriverDashboardPage: React.FC = () => {
     try {
       await locationTrackingService.startTracking();
       setIsTracking(true);
+      
+      // Update driver online status in database
+      if (user?.id) {
+        await supabase
+          .from('profiles')
+          .update({ 
+            is_online: true,
+            status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        console.log('Driver marked as online and active');
+      }
+      
       console.log('Location tracking started - UI updated');
     } catch (error) {
       console.error('Error starting location tracking:', error);
@@ -258,6 +297,20 @@ const NewDriverDashboardPage: React.FC = () => {
     try {
       await locationTrackingService.stopTracking();
       setIsTracking(false);
+      
+      // Update driver offline status in database
+      if (user?.id) {
+        await supabase
+          .from('profiles')
+          .update({ 
+            is_online: false,
+            status: 'inactive',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', user.id);
+        console.log('Driver marked as offline and inactive');
+      }
+      
       console.log('Location tracking stopped - UI updated');
     } catch (error) {
       console.error('Error stopping location tracking:', error);
