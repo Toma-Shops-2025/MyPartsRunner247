@@ -43,7 +43,9 @@ const AdminDashboard: React.FC = () => {
     totalOrders: 0,
     activeDrivers: 0,
     totalRevenue: 0,
-    pendingOrders: 0
+    pendingOrders: 0,
+    queuedOrders: 0,
+    waitingForDrivers: 0
   });
   const [orders, setOrders] = useState<Order[]>([]);
   const [drivers, setDrivers] = useState<Driver[]>([]);
