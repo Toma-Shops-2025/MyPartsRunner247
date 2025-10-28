@@ -34,7 +34,6 @@ const NewDriverDashboardPage: React.FC = () => {
     if (user && profile?.user_type === 'driver') {
       checkOnboardingCompletion();
       fetchDriverData();
-      loadVerificationDeadline();
       
       // Set a timeout to prevent infinite loading
       const timeout = setTimeout(() => {
@@ -46,6 +45,13 @@ const NewDriverDashboardPage: React.FC = () => {
       }, 10000); // 10 second timeout
       
       return () => clearTimeout(timeout);
+    }
+  }, [user, profile, onboardingCompleted]);
+
+  // Load verification deadline after onboarding status is determined
+  useEffect(() => {
+    if (user && profile?.user_type === 'driver') {
+      loadVerificationDeadline();
     }
   }, [user, profile, onboardingCompleted]);
 
@@ -89,6 +95,12 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const loadVerificationDeadline = async () => {
     try {
+      // Only load verification deadline if onboarding is not completed
+      if (onboardingCompleted) {
+        setVerificationDeadline(null);
+        return;
+      }
+
       const { data, error } = await supabase
         .from('driver_applications')
         .select('verification_deadline')
