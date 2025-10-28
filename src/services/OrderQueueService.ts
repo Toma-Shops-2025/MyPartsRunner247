@@ -44,9 +44,10 @@ export class OrderQueueService {
           *,
           orders (
             id,
-            customer_name,
+            customer_id,
             pickup_address,
             delivery_address,
+            item_description,
             total,
             created_at
           )

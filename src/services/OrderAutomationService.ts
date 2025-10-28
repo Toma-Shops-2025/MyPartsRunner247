@@ -235,7 +235,7 @@ export class OrderAutomationService {
         .insert({
           type: 'no_drivers_available',
           title: 'No Drivers Available',
-          message: `Order #${order.id.slice(-8)} needs a driver. Customer: ${order.customer_name || 'Unknown'}. Pickup: ${order.pickup_address}`,
+          message: `Order #${order.id.slice(-8)} needs a driver. Pickup: ${order.pickup_address}`,
           priority: 'high',
           metadata: {
             order_id: order.id,

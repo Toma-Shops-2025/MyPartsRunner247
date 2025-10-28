@@ -114,9 +114,10 @@ SELECT
     oq.created_at as queued_at,
     oq.updated_at as queue_updated_at,
     o.id as order_id,
-    o.customer_name,
+    o.customer_id,
     o.pickup_address,
     o.delivery_address,
+    o.item_description,
     o.total,
     o.created_at as order_created_at,
     EXTRACT(EPOCH FROM (NOW() - oq.created_at))/60 as minutes_waiting
