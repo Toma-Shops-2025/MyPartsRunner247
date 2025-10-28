@@ -81,8 +81,8 @@ export class DocumentUploadService {
         console.error('Storage upload failed:', uploadError);
         console.error('Upload error details:', {
           message: uploadError.message,
-          statusCode: uploadError.statusCode,
-          error: uploadError.error
+          statusCode: (uploadError as any).statusCode,
+          error: (uploadError as any).error
         });
         return this.handleUploadFailure(file, metadata, uploadError.message);
       }
@@ -194,8 +194,8 @@ export class DocumentUploadService {
         console.error('Storage upload failed:', uploadError);
         console.error('Upload error details:', {
           message: uploadError.message,
-          statusCode: uploadError.statusCode,
-          error: uploadError.error
+          statusCode: (uploadError as any).statusCode,
+          error: (uploadError as any).error
         });
         return this.handleUploadFailure(file, metadata, uploadError.message);
       }
