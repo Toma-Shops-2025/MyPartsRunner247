@@ -254,17 +254,55 @@ const DriverVerificationPage: React.FC = () => {
 
   // Check if onboarding is already completed
   useEffect(() => {
-    if (user?.id && profile?.onboarding_completed) {
-      // If onboarding is already completed, redirect to dashboard
-      toast({
-        title: "Onboarding Already Completed",
-        description: "You have already completed the onboarding process. Redirecting to dashboard...",
-      });
-      setTimeout(() => {
-        window.location.href = '/driver-dashboard';
-      }, 2000);
-    }
-  }, [user?.id, profile?.onboarding_completed]);
+    const checkOnboardingStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        // Check both profile and document status
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('onboarding_completed, status')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error checking profile status:', profileError);
+          return;
+        }
+
+        // Check if driver has approved documents
+        const { data: documents, error: docError } = await supabase
+          .from('driver_documents')
+          .select('document_type, status')
+          .eq('user_id', user.id)
+          .in('document_type', ['driver_license', 'insurance_certificate'])
+          .eq('status', 'approved');
+
+        if (docError) {
+          console.error('Error checking documents:', docError);
+          return;
+        }
+
+        const hasRequiredDocuments = documents && documents.length >= 2;
+        const isOnboardingCompleted = profileData?.onboarding_completed || hasRequiredDocuments;
+
+        if (isOnboardingCompleted) {
+          // If onboarding is completed, redirect to dashboard
+          toast({
+            title: "Onboarding Already Completed",
+            description: "You have already completed the onboarding process. Redirecting to dashboard...",
+          });
+          setTimeout(() => {
+            window.location.href = '/driver-dashboard';
+          }, 2000);
+        }
+      } catch (error) {
+        console.error('Error checking onboarding status:', error);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, [user?.id]);
 
   // Load data on component mount
   useEffect(() => {
