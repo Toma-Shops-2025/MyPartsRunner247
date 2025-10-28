@@ -307,6 +307,159 @@ class DocumentExpirationService {
   }
 
   /**
+   * Automatically deactivate drivers with expired documents
+   */
+  static async deactivateDriversWithExpiredDocuments(): Promise<number> {
+    try {
+      // Get drivers with expired documents
+      const { data: expiredDrivers, error } = await supabase
+        .from('document_expiration_tracking')
+        .select(`
+          user_id,
+          document_type,
+          expiration_date,
+          profiles!inner(full_name, email, status)
+        `)
+        .eq('status', 'expired')
+        .eq('profiles.user_type', 'driver')
+        .eq('profiles.status', 'active');
+
+      if (error) {
+        console.error('Error fetching drivers with expired documents:', error);
+        return 0;
+      }
+
+      let deactivatedCount = 0;
+
+      for (const driver of expiredDrivers || []) {
+        try {
+          // Deactivate driver
+          const { error: deactivateError } = await supabase
+            .from('profiles')
+            .update({ 
+              status: 'suspended',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', driver.user_id)
+            .eq('user_type', 'driver');
+
+          if (deactivateError) {
+            console.error(`Error deactivating driver ${driver.user_id}:`, deactivateError);
+            continue;
+          }
+
+          // Create notification for driver
+          await supabase
+            .from('driver_notifications')
+            .insert({
+              user_id: driver.user_id,
+              type: 'account_suspended',
+              title: 'Account Suspended - Expired Documents',
+              message: `Your account has been suspended due to expired ${driver.document_type}. Please upload updated documentation to reactivate your account.`,
+              severity: 'error',
+              action_required: true,
+              metadata: {
+                suspension_reason: 'expired_documents',
+                document_type: driver.document_type,
+                expiration_date: driver.expiration_date
+              }
+            });
+
+          // Update tracking status
+          await supabase
+            .from('document_expiration_tracking')
+            .update({ 
+              status: 'suspended',
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', driver.user_id)
+            .eq('document_type', driver.document_type);
+
+          deactivatedCount++;
+          console.log(`Driver ${driver.user_id} (${(driver.profiles as any).full_name}) deactivated due to expired ${driver.document_type}`);
+
+        } catch (error) {
+          console.error(`Error processing driver ${driver.user_id}:`, error);
+        }
+      }
+
+      return deactivatedCount;
+    } catch (error) {
+      console.error('Error in deactivateDriversWithExpiredDocuments:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Reactivate driver after document renewal
+   */
+  static async reactivateDriverAfterRenewal(userId: string): Promise<boolean> {
+    try {
+      // Check if all required documents are now valid
+      const { data: documents, error } = await supabase
+        .from('document_expiration_tracking')
+        .select('document_type, status, days_until_expiry')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error checking driver documents for reactivation:', error);
+        return false;
+      }
+
+      // Check if all required documents are valid (not expired or expiring soon)
+      const requiredDocuments = ['driver_license', 'insurance_certificate'];
+      const validDocuments = documents?.filter(doc => 
+        doc.status === 'active' && 
+        (doc.days_until_expiry === null || doc.days_until_expiry > 7)
+      ) || [];
+
+      const hasAllValidDocuments = requiredDocuments.every(requiredType => 
+        validDocuments.some(doc => doc.document_type === requiredType)
+      );
+
+      if (hasAllValidDocuments) {
+        // Reactivate driver
+        const { error: reactivateError } = await supabase
+          .from('profiles')
+          .update({ 
+            status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId)
+          .eq('user_type', 'driver');
+
+        if (reactivateError) {
+          console.error('Error reactivating driver:', reactivateError);
+          return false;
+        }
+
+        // Create reactivation notification
+        await supabase
+          .from('driver_notifications')
+          .insert({
+            user_id: userId,
+            type: 'account_reactivated',
+            title: 'Account Reactivated',
+            message: 'Your account has been reactivated! All your documents are now up to date.',
+            severity: 'info',
+            action_required: false,
+            metadata: {
+              reactivation_reason: 'documents_renewed'
+            }
+          });
+
+        console.log(`Driver ${userId} reactivated after document renewal`);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('Error in reactivateDriverAfterRenewal:', error);
+      return false;
+    }
+  }
+
+  /**
    * Check and send automatic reminders for expiring documents
    */
   static async checkAndSendReminders(): Promise<void> {
@@ -341,6 +494,12 @@ class DocumentExpirationService {
         if (driver.days_until_expiry === 1) {
           await this.sendDriverReminder(driver.user_id, driver.document_type, driver.days_until_expiry);
         }
+      }
+
+      // Check for expired documents and deactivate drivers
+      const deactivatedCount = await this.deactivateDriversWithExpiredDocuments();
+      if (deactivatedCount > 0) {
+        console.log(`Automatically deactivated ${deactivatedCount} drivers with expired documents`);
       }
 
     } catch (error) {

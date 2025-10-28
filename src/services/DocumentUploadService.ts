@@ -121,6 +121,16 @@ export class DocumentUploadService {
       // Check if driver should be automatically activated
       await this.checkAndActivateDriver(metadata.userId);
 
+      // Check if driver should be reactivated after document renewal
+      if (metadata.expirationDate) {
+        try {
+          const DocumentExpirationService = await import('./DocumentExpirationService');
+          await DocumentExpirationService.default.reactivateDriverAfterRenewal(metadata.userId);
+        } catch (error) {
+          console.error('Error checking driver reactivation:', error);
+        }
+      }
+
       return {
         success: true,
         documentId: documentData.id,
@@ -239,6 +249,16 @@ export class DocumentUploadService {
 
       // Check if driver should be automatically activated
       await this.checkAndActivateDriver(metadata.userId);
+
+      // Check if driver should be reactivated after document renewal
+      if (metadata.expirationDate) {
+        try {
+          const DocumentExpirationService = await import('./DocumentExpirationService');
+          await DocumentExpirationService.default.reactivateDriverAfterRenewal(metadata.userId);
+        } catch (error) {
+          console.error('Error checking driver reactivation:', error);
+        }
+      }
 
       return {
         success: true,

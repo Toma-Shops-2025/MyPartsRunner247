@@ -90,6 +90,88 @@ exports.handler = async (event, context) => {
       return true;
     }
 
+    // Function to automatically deactivate drivers with expired documents
+    async function deactivateDriversWithExpiredDocuments() {
+      try {
+        // Get drivers with expired documents
+        const { data: expiredDrivers, error } = await supabase
+          .from('document_expiration_tracking')
+          .select(`
+            user_id,
+            document_type,
+            expiration_date,
+            profiles!inner(full_name, email, status)
+          `)
+          .eq('status', 'expired')
+          .eq('profiles.user_type', 'driver')
+          .eq('profiles.status', 'active');
+
+        if (error) {
+          console.error('Error fetching drivers with expired documents:', error);
+          return 0;
+        }
+
+        let deactivatedCount = 0;
+
+        for (const driver of expiredDrivers || []) {
+          try {
+            // Deactivate driver
+            const { error: deactivateError } = await supabase
+              .from('profiles')
+              .update({ 
+                status: 'suspended',
+                updated_at: new Date().toISOString()
+              })
+              .eq('id', driver.user_id)
+              .eq('user_type', 'driver');
+
+            if (deactivateError) {
+              console.error(`Error deactivating driver ${driver.user_id}:`, deactivateError);
+              continue;
+            }
+
+            // Create notification for driver
+            await supabase
+              .from('driver_notifications')
+              .insert({
+                user_id: driver.user_id,
+                type: 'account_suspended',
+                title: 'Account Suspended - Expired Documents',
+                message: `Your account has been suspended due to expired ${driver.document_type}. Please upload updated documentation to reactivate your account.`,
+                severity: 'error',
+                action_required: true,
+                metadata: {
+                  suspension_reason: 'expired_documents',
+                  document_type: driver.document_type,
+                  expiration_date: driver.expiration_date
+                }
+              });
+
+            // Update tracking status
+            await supabase
+              .from('document_expiration_tracking')
+              .update({ 
+                status: 'suspended',
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', driver.user_id)
+              .eq('document_type', driver.document_type);
+
+            deactivatedCount++;
+            console.log(`Driver ${driver.user_id} (${driver.profiles.full_name}) deactivated due to expired ${driver.document_type}`);
+
+          } catch (error) {
+            console.error(`Error processing driver ${driver.user_id}:`, error);
+          }
+        }
+
+        return deactivatedCount;
+      } catch (error) {
+        console.error('Error in deactivateDriversWithExpiredDocuments:', error);
+        return 0;
+      }
+    }
+
     // Function to check if it's time for quarterly reminder
     function shouldSendQuarterlyReminder() {
       const now = new Date();
@@ -233,6 +315,12 @@ exports.handler = async (event, context) => {
 
     // Execute the cron job
     await checkAndSendReminders();
+    
+    // Check for expired documents and deactivate drivers
+    const deactivatedCount = await deactivateDriversWithExpiredDocuments();
+    if (deactivatedCount > 0) {
+      console.log(`Automatically deactivated ${deactivatedCount} drivers with expired documents`);
+    }
     
     // Check if it's time for quarterly bulk reminder
     if (shouldSendQuarterlyReminder()) {
