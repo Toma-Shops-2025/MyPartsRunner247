@@ -2,12 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MyPartsRunner - Anything, Anytime, Anywhere</title>
     <meta name="description" content="The only delivery service that picks up from absolutely anywhere. Available 24/7 nationwide. Anything, Anytime, Anywhere." />
     <link rel="icon" type="image/png" href="/favicon-new-32x32.png" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#4ECDC4" />
+    
+    <!-- iOS Specific Meta Tags -->
+    <link rel="apple-touch-icon" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-logo.png" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-logo.png" />
     
     <!-- Cache busting meta tags -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -27,8 +38,19 @@
     
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="MyPartsRunner" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    <meta name="apple-mobile-web-app-orientations" content="portrait" />
+    
+    <!-- iOS Safari specific -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-touch-fullscreen" content="yes" />
+    
+    <!-- Prevent zoom on iOS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
 
   <body>
@@ -49,6 +71,11 @@
           navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
               console.log('SW registered: ', registration);
+              console.log('iOS compatibility check:', {
+                userAgent: navigator.userAgent,
+                isIOS: /iPad|iPhone|iPod/.test(navigator.userAgent),
+                isSafari: /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgent)
+              });
               
               // Only check for updates in production, and only once per session
               if (location.hostname !== 'localhost' && location.hostname !== '127.0.0.1' && !sessionStorage.getItem('sw-updated')) {

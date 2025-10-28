@@ -1,9 +1,9 @@
 // Service Worker for PWA + FREE Push Notifications
 // ================================================
 
-const CACHE_NAME = 'mypartsrunner-v2';
-const STATIC_CACHE = 'mypartsrunner-static-v2';
-const DYNAMIC_CACHE = 'mypartsrunner-dynamic-v2';
+const CACHE_NAME = 'mypartsrunner-v3';
+const STATIC_CACHE = 'mypartsrunner-static-v3';
+const DYNAMIC_CACHE = 'mypartsrunner-dynamic-v3';
 
 const urlsToCache = [
   '/',
@@ -26,6 +26,8 @@ const API_CACHE_PATTERNS = [
 // Install event - Cache static assets
 self.addEventListener('install', function(event) {
   console.log('Service Worker installing...');
+  // Force activation for iOS compatibility
+  self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE)
       .then(function(cache) {
