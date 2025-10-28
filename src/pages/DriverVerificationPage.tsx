@@ -286,12 +286,21 @@ const DriverVerificationPage: React.FC = () => {
 
     setUploadStatus(prev => ({ ...prev, [type]: 'uploading' }));
 
+    // Get expiration date based on document type
+    let expirationDate: string | undefined;
+    if (type === 'driver_license' && formData.driverLicenseExp) {
+      expirationDate = formData.driverLicenseExp;
+    } else if (type === 'insurance_certificate' && formData.insuranceInfo.expirationDate) {
+      expirationDate = formData.insuranceInfo.expirationDate;
+    }
+
     const metadata: DocumentMetadata = {
       documentType: type,
       fileName: file.name,
       fileSize: file.size,
       mimeType: file.type,
-      userId: user.id
+      userId: user.id,
+      expirationDate: expirationDate
     };
 
     try {
@@ -607,6 +616,20 @@ const DriverVerificationPage: React.FC = () => {
                 onChange={(e) => handleFileChange('driver_license', e)}
                 className="hidden"
               />
+              
+              {/* Driver License Expiration Date */}
+              <div className="mt-4">
+                <Label htmlFor="driverLicenseExp" className="text-sm text-gray-300">
+                  License Expiration Date
+                </Label>
+                <Input
+                  id="driverLicenseExp"
+                  type="date"
+                  value={formData.driverLicenseExp}
+                  onChange={(e) => setFormData(prev => ({ ...prev, driverLicenseExp: e.target.value }))}
+                  className="mt-1 bg-gray-600 border-gray-500 text-white"
+                />
+              </div>
             </div>
 
             {/* Driver License Back */}
@@ -683,6 +706,23 @@ const DriverVerificationPage: React.FC = () => {
                 onChange={(e) => handleFileChange('insurance_certificate', e)}
                 className="hidden"
               />
+              
+              {/* Insurance Expiration Date */}
+              <div className="mt-4">
+                <Label htmlFor="insuranceExpiration" className="text-sm text-gray-300">
+                  Insurance Expiration Date
+                </Label>
+                <Input
+                  id="insuranceExpiration"
+                  type="date"
+                  value={formData.insuranceInfo.expirationDate}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    insuranceInfo: { ...prev.insuranceInfo, expirationDate: e.target.value }
+                  }))}
+                  className="mt-1 bg-gray-600 border-gray-500 text-white"
+                />
+              </div>
             </div>
 
             {/* Vehicle Registration - Optional */}

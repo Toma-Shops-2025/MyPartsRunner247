@@ -17,6 +17,7 @@ export interface DocumentMetadata {
   fileSize: number;
   mimeType: string;
   userId: string;
+  expirationDate?: string;
 }
 
 export class DocumentUploadService {
@@ -101,7 +102,8 @@ export class DocumentUploadService {
           mime_type: metadata.mimeType,
           status: 'approved',
           verified_at: new Date().toISOString(),
-          admin_notes: 'Automatically approved upon upload'
+          admin_notes: 'Automatically approved upon upload',
+          expiration_date: metadata.expirationDate || null
         })
         .select()
         .single();

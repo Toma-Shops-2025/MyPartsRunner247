@@ -6,6 +6,7 @@ import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
 import PushNotificationManager from '@/components/PushNotificationManager';
+import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp, AlertTriangle } from 'lucide-react';
@@ -284,6 +285,9 @@ const NewDriverDashboardPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>
           <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
         </div>
+
+        {/* Document Expiration Warning */}
+        <DocumentExpirationWarning />
 
         {/* Verification Deadline Alert */}
         {verificationDeadline && (

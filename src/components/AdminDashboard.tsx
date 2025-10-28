@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot, FileText } from 'lucide-react';
+import { BarChart3, Users, Package, DollarSign, TrendingUp, AlertCircle, Bot, FileText, Calendar } from 'lucide-react';
 import AutomationStatus from './AutomationStatus';
 import AdminDocumentReview from './AdminDocumentReview';
+import AdminDocumentExpirationManager from './AdminDocumentExpirationManager';
 
 interface AdminStats {
   totalOrders: number;
@@ -193,6 +194,10 @@ const AdminDashboard: React.FC = () => {
             <FileText className="w-4 h-4 mr-2" />
             Documents
           </TabsTrigger>
+          <TabsTrigger value="expirations">
+            <Calendar className="w-4 h-4 mr-2" />
+            Expirations
+          </TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="automation">
             <Bot className="w-4 h-4 mr-2" />
@@ -325,6 +330,10 @@ const AdminDashboard: React.FC = () => {
 
         <TabsContent value="documents" className="space-y-4">
           <AdminDocumentReview onDocumentReviewed={fetchDashboardData} />
+        </TabsContent>
+
+        <TabsContent value="expirations" className="space-y-4">
+          <AdminDocumentExpirationManager />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-4">
