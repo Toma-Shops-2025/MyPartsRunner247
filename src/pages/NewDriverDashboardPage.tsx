@@ -301,8 +301,22 @@ const NewDriverDashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* Driver Onboarding */}
-        {!hasStripeAccount && (
+        {/* Stripe Account Status */}
+        {hasStripeAccount ? (
+          <div className="mb-8">
+            <Card className="bg-green-900 border-green-700">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <CheckCircle className="w-8 h-8 text-green-400 mr-4" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-green-300">Payment Account Connected!</h3>
+                    <p className="text-green-200">You'll receive automatic payments for completed deliveries.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
           <div className="mb-8">
             <DriverOnboarding onComplete={() => setHasStripeAccount(true)} />
           </div>
@@ -368,15 +382,15 @@ const NewDriverDashboardPage: React.FC = () => {
         </div>
 
         {/* Active Orders */}
-        {activeOrders.length > 0 && (
-          <Card className="mb-8 bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="flex items-center text-white">
-                <Package className="w-6 h-6 text-teal-400 mr-2" />
-                Active Deliveries
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className="mb-8 bg-gray-800 border-gray-700">
+          <CardHeader>
+            <CardTitle className="flex items-center text-white">
+              <Package className="w-6 h-6 text-teal-400 mr-2" />
+              Active Deliveries
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {activeOrders.length > 0 ? (
               <div className="space-y-4">
                 {activeOrders.map((order) => (
                   <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
@@ -402,9 +416,15 @@ const NewDriverDashboardPage: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <div className="text-center py-8">
+                <Package className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-white mb-2">No Active Deliveries</h3>
+                <p className="text-gray-400">You don't have any active deliveries at the moment.</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Available Orders */}
         <Card className="mb-8 bg-gray-800 border-gray-700">
