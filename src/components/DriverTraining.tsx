@@ -1,71 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Pause, RotateCcw, CheckCircle, Clock, BookOpen, ExternalLink } from 'lucide-react';
-
-interface TrainingVideo {
-  id: number;
-  title: string;
-  description: string;
-  duration: string;
-  youtubeUrl: string;
-  completed: boolean;
-}
+import { useAuth } from '@/hooks/useAuth';
+import { DriverTrainingService, TrainingVideo, TrainingProgress } from '@/services/DriverTrainingService';
+import { toast } from '@/hooks/use-toast';
 
 const DriverTraining: React.FC = () => {
+  const { user } = useAuth();
   const [currentVideo, setCurrentVideo] = useState<number | null>(null);
-  const [completedVideos, setCompletedVideos] = useState<number[]>([]);
+  const [trainingVideos, setTrainingVideos] = useState<TrainingVideo[]>([]);
+  const [trainingProgress, setTrainingProgress] = useState<TrainingProgress | null>(null);
   const [videoProgress, setVideoProgress] = useState<{ [key: number]: number }>({});
+  const [loading, setLoading] = useState(true);
 
-  const trainingVideos: TrainingVideo[] = [
-    {
-      id: 1,
-      title: "Welcome to MyPartsRunner",
-      description: "Welcome to the MyPartsRunner family! Learn about our platform, driver benefits, and how to get started on your journey to success.",
-      duration: "1-2 minutes",
-      youtubeUrl: "https://www.youtube.com/embed/zXXTd81HXg4",
-      completed: completedVideos.includes(1)
-    },
-    {
-      id: 2,
-      title: "Driver Dashboard Overview",
-      description: "Master the driver dashboard, learn how to go online/offline, accept orders, and navigate to pickup locations efficiently.",
-      duration: "2-3 minutes",
-      youtubeUrl: "https://www.youtube.com/embed/z6vBcxe4a1Y",
-      completed: completedVideos.includes(2)
-    },
-    {
-      id: 3,
-      title: "Maximizing Your Earnings",
-      description: "Discover peak hours, high-demand areas, order selection strategies, and tips to maximize your earnings as a MyPartsRunner driver.",
-      duration: "3-4 minutes",
-      youtubeUrl: "https://www.youtube.com/embed/7vOyfgpVHLU",
-      completed: completedVideos.includes(3)
-    },
-    {
-      id: 4,
-      title: "Customer Service Excellence",
-      description: "Learn professional communication, handling difficult situations, building customer relationships, and providing exceptional service.",
-      duration: "2-3 minutes",
-      youtubeUrl: "https://www.youtube.com/embed/wq0bbatXx7A",
-      completed: completedVideos.includes(4)
-    },
-    {
-      id: 5,
-      title: "Safety First",
-      description: "Understand personal safety protocols, vehicle safety checks, emergency procedures, and maintaining safety standards while driving.",
-      duration: "2-3 minutes",
-      youtubeUrl: "https://www.youtube.com/embed/YnN2n1Ek5z8",
-      completed: completedVideos.includes(5)
-    }
-  ];
+  // Load training data on component mount
+  useEffect(() => {
+    const loadTrainingData = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
 
-  const handleVideoComplete = (videoId: number) => {
-    if (!completedVideos.includes(videoId)) {
-      setCompletedVideos([...completedVideos, videoId]);
-      // Store completion in localStorage
-      localStorage.setItem('driver_training_completed', JSON.stringify([...completedVideos, videoId]));
+      try {
+        // Sync any localStorage data to database first
+        await DriverTrainingService.syncLocalStorageWithDatabase(user.id);
+        
+        // Load training videos with completion status
+        const videos = await DriverTrainingService.getTrainingVideosWithStatus(user.id);
+        setTrainingVideos(videos);
+        
+        // Load training progress
+        const progress = await DriverTrainingService.getTrainingProgress(user.id);
+        setTrainingProgress(progress);
+      } catch (error) {
+        console.error('Error loading training data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load training data. Please refresh the page.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTrainingData();
+  }, [user?.id]);
+
+  const handleVideoComplete = async (videoId: number) => {
+    if (!user?.id) return;
+
+    const video = trainingVideos.find(v => v.id === videoId);
+    if (!video || video.completed) return;
+
+    try {
+      // Mark as completed in database
+      const success = await DriverTrainingService.markVideoCompleted(
+        user.id, 
+        videoId, 
+        video.title, 
+        videoProgress[videoId] || 100
+      );
+
+      if (success) {
+        // Update local state
+        setTrainingVideos(prev => 
+          prev.map(v => 
+            v.id === videoId 
+              ? { ...v, completed: true, completedAt: new Date().toISOString() }
+              : v
+          )
+        );
+
+        // Update progress
+        const newProgress = await DriverTrainingService.getTrainingProgress(user.id);
+        setTrainingProgress(newProgress);
+
+        toast({
+          title: "Video Completed!",
+          description: `Great job completing "${video.title}"!`,
+        });
+      } else {
+        throw new Error('Failed to save completion');
+      }
+    } catch (error) {
+      console.error('Error completing video:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark video as completed. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -74,10 +100,20 @@ const DriverTraining: React.FC = () => {
   };
 
   const getCompletionPercentage = () => {
-    return Math.round((completedVideos.length / trainingVideos.length) * 100);
+    return trainingProgress?.completionPercentage || 0;
   };
 
-  const allVideosCompleted = completedVideos.length === trainingVideos.length;
+  const allVideosCompleted = trainingProgress?.isFullyCompleted || false;
+
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto p-6">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -98,8 +134,13 @@ const DriverTraining: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-white">Training Progress</h3>
                 <p className="text-teal-100">
-                  {completedVideos.length} of {trainingVideos.length} videos completed
+                  {trainingProgress?.completedVideos || 0} of {trainingProgress?.totalVideos || 5} videos completed
                 </p>
+                {trainingProgress?.lastCompletionDate && (
+                  <p className="text-teal-200 text-sm">
+                    Last completed: {new Date(trainingProgress.lastCompletionDate).toLocaleDateString()}
+                  </p>
+                )}
               </div>
               <div className="text-right">
                 <div className="text-3xl font-bold text-white">{getCompletionPercentage()}%</div>
@@ -141,6 +182,11 @@ const DriverTraining: React.FC = () => {
                   {video.duration}
                 </div>
               </div>
+              {video.completed && video.completedAt && (
+                <div className="text-xs text-green-400 mb-2">
+                  Completed on {new Date(video.completedAt).toLocaleDateString()}
+                </div>
+              )}
               <CardTitle className="text-white text-lg">{video.title}</CardTitle>
             </CardHeader>
             <CardContent>

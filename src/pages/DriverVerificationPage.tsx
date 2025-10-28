@@ -252,6 +252,20 @@ const DriverVerificationPage: React.FC = () => {
     return () => clearInterval(interval);
   }, [verificationDeadline]);
 
+  // Check if onboarding is already completed
+  useEffect(() => {
+    if (user?.id && profile?.onboarding_completed) {
+      // If onboarding is already completed, redirect to dashboard
+      toast({
+        title: "Onboarding Already Completed",
+        description: "You have already completed the onboarding process. Redirecting to dashboard...",
+      });
+      setTimeout(() => {
+        window.location.href = '/driver-dashboard';
+      }, 2000);
+    }
+  }, [user?.id, profile?.onboarding_completed]);
+
   // Load data on component mount
   useEffect(() => {
     if (user?.id) {
