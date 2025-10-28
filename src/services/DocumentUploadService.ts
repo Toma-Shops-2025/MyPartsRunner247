@@ -51,7 +51,25 @@ export class DocumentUploadService {
       // Generate file path
       const filePath = this.generateFilePath(metadata);
       
+      // Check if bucket exists first
+      console.log('Checking if storage bucket exists:', this.BUCKET_NAME);
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Error listing buckets:', bucketsError);
+        return this.handleUploadFailure(file, metadata, `Failed to access storage: ${bucketsError.message}`);
+      }
+      
+      const bucketExists = buckets?.some(bucket => bucket.id === this.BUCKET_NAME);
+      console.log('Bucket exists:', bucketExists);
+      
+      if (!bucketExists) {
+        console.error('Storage bucket does not exist:', this.BUCKET_NAME);
+        return this.handleUploadFailure(file, metadata, `Storage bucket '${this.BUCKET_NAME}' does not exist. Please create it first.`);
+      }
+
       // Upload to Supabase Storage
+      console.log('Uploading file to storage:', filePath);
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(this.BUCKET_NAME)
         .upload(filePath, file, {
@@ -61,8 +79,15 @@ export class DocumentUploadService {
 
       if (uploadError) {
         console.error('Storage upload failed:', uploadError);
+        console.error('Upload error details:', {
+          message: uploadError.message,
+          statusCode: uploadError.statusCode,
+          error: uploadError.error
+        });
         return this.handleUploadFailure(file, metadata, uploadError.message);
       }
+
+      console.log('File uploaded successfully:', uploadData.path);
 
       // Store metadata in database
       const { data: documentData, error: dbError } = await supabase
@@ -74,7 +99,7 @@ export class DocumentUploadService {
           file_name: metadata.fileName,
           file_size: metadata.fileSize,
           mime_type: metadata.mimeType,
-          status: 'uploaded'
+          status: 'pending_review'
         })
         .select()
         .single();
@@ -139,7 +164,25 @@ export class DocumentUploadService {
       // Generate new file path
       const filePath = this.generateFilePath(metadata);
       
+      // Check if bucket exists first
+      console.log('Checking if storage bucket exists:', this.BUCKET_NAME);
+      const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
+      
+      if (bucketsError) {
+        console.error('Error listing buckets:', bucketsError);
+        return this.handleUploadFailure(file, metadata, `Failed to access storage: ${bucketsError.message}`);
+      }
+      
+      const bucketExists = buckets?.some(bucket => bucket.id === this.BUCKET_NAME);
+      console.log('Bucket exists:', bucketExists);
+      
+      if (!bucketExists) {
+        console.error('Storage bucket does not exist:', this.BUCKET_NAME);
+        return this.handleUploadFailure(file, metadata, `Storage bucket '${this.BUCKET_NAME}' does not exist. Please create it first.`);
+      }
+
       // Upload new version
+      console.log('Uploading file to storage:', filePath);
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(this.BUCKET_NAME)
         .upload(filePath, file, {
@@ -149,8 +192,15 @@ export class DocumentUploadService {
 
       if (uploadError) {
         console.error('Storage upload failed:', uploadError);
+        console.error('Upload error details:', {
+          message: uploadError.message,
+          statusCode: uploadError.statusCode,
+          error: uploadError.error
+        });
         return this.handleUploadFailure(file, metadata, uploadError.message);
       }
+
+      console.log('File uploaded successfully:', uploadData.path);
 
       // Create new version record
       const { data: documentData, error: dbError } = await supabase
