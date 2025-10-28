@@ -254,6 +254,7 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
       }
 
       console.log('Attempting to create signed URL for path:', docData.file_path);
+      console.log('Using bucket: driver-documents');
 
       // Create signed URL for viewing
       const { data: urlData, error: urlError } = await supabase.storage
@@ -262,6 +263,23 @@ const AdminDocumentReview: React.FC<DocumentReviewProps> = ({ onDocumentReviewed
 
       if (urlError) {
         console.error('Storage error:', urlError);
+        
+        // Try alternative bucket names
+        console.log('Trying alternative bucket names...');
+        const alternativeBuckets = ['driver_documents', 'driverdocuments', 'documents'];
+        
+        for (const bucketName of alternativeBuckets) {
+          console.log(`Trying bucket: ${bucketName}`);
+          const { data: altUrlData, error: altUrlError } = await supabase.storage
+            .from(bucketName)
+            .createSignedUrl(docData.file_path, 3600);
+          
+          if (!altUrlError && altUrlData) {
+            console.log(`Success with bucket: ${bucketName}`);
+            window.open(altUrlData.signedUrl, '_blank');
+            return;
+          }
+        }
         
         // Check if it's a bucket doesn't exist error
         if (urlError.message.includes('Bucket not found') || urlError.message.includes('does not exist')) {
