@@ -201,21 +201,21 @@ const PushNotificationManager: React.FC = () => {
   }
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-white">
+          <Bell className="w-5 h-5 text-teal-400" />
           Push Notifications
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Permission Status */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Permission Status:</span>
+          <span className="text-sm font-medium text-gray-300">Permission Status:</span>
           <span className={`text-sm px-2 py-1 rounded ${
-            permission === 'granted' ? 'bg-green-100 text-green-800' :
-            permission === 'denied' ? 'bg-red-100 text-red-800' :
-            'bg-yellow-100 text-yellow-800'
+            permission === 'granted' ? 'bg-green-900 text-green-300' :
+            permission === 'denied' ? 'bg-red-900 text-red-300' :
+            'bg-yellow-900 text-yellow-300'
           }`}>
             {permission === 'granted' ? 'Granted' :
              permission === 'denied' ? 'Denied' : 'Not Set'}
@@ -224,9 +224,9 @@ const PushNotificationManager: React.FC = () => {
 
         {/* Subscription Status */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Subscription Status:</span>
+          <span className="text-sm font-medium text-gray-300">Subscription Status:</span>
           <span className={`text-sm px-2 py-1 rounded ${
-            isSubscribed ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+            isSubscribed ? 'bg-green-900 text-green-300' : 'bg-gray-700 text-gray-300'
           }`}>
             {isSubscribed ? 'Subscribed' : 'Not Subscribed'}
           </span>
@@ -238,7 +238,7 @@ const PushNotificationManager: React.FC = () => {
             <Button 
               onClick={handleSubscribe}
               disabled={permission === 'denied'}
-              className="flex-1"
+              className="flex-1 bg-teal-600 hover:bg-teal-700"
             >
               <Bell className="w-4 h-4 mr-2" />
               Enable Notifications
@@ -247,7 +247,7 @@ const PushNotificationManager: React.FC = () => {
             <Button 
               onClick={handleUnsubscribe}
               variant="outline"
-              className="flex-1"
+              className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-700"
             >
               <BellOff className="w-4 h-4 mr-2" />
               Disable Notifications
@@ -259,6 +259,7 @@ const PushNotificationManager: React.FC = () => {
               onClick={testNotification}
               variant="outline"
               size="sm"
+              className="border-gray-600 text-gray-300 hover:bg-gray-700"
             >
               Test
             </Button>
@@ -267,9 +268,9 @@ const PushNotificationManager: React.FC = () => {
 
         {/* Notification Settings */}
         {isSubscribed && (
-          <div className="space-y-3 pt-4 border-t">
+          <div className="space-y-3 pt-4 border-t border-gray-600">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Order Updates</span>
+              <span className="text-sm font-medium text-gray-300">Order Updates</span>
               <Switch
                 checked={settings.orderUpdates}
                 onCheckedChange={(checked) => handleSettingChange('orderUpdates', checked)}
@@ -277,7 +278,7 @@ const PushNotificationManager: React.FC = () => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Driver Alerts</span>
+              <span className="text-sm font-medium text-gray-300">Driver Alerts</span>
               <Switch
                 checked={settings.driverAlerts}
                 onCheckedChange={(checked) => handleSettingChange('driverAlerts', checked)}
@@ -285,7 +286,7 @@ const PushNotificationManager: React.FC = () => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Earnings Updates</span>
+              <span className="text-sm font-medium text-gray-300">Earnings Updates</span>
               <Switch
                 checked={settings.earnings}
                 onCheckedChange={(checked) => handleSettingChange('earnings', checked)}
@@ -293,7 +294,7 @@ const PushNotificationManager: React.FC = () => {
             </div>
             
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Promotions</span>
+              <span className="text-sm font-medium text-gray-300">Promotions</span>
               <Switch
                 checked={settings.promotions}
                 onCheckedChange={(checked) => handleSettingChange('promotions', checked)}
@@ -303,13 +304,13 @@ const PushNotificationManager: React.FC = () => {
         )}
 
         {/* Help Text */}
-        <div className="text-xs text-gray-500 mt-4">
+        <div className="text-xs text-gray-400 mt-4">
           <p>• Notifications help you stay updated on order status</p>
           <p>• You can customize which notifications to receive</p>
           <p>• Notifications work even when the app is closed</p>
           {/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && (
-            <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
-              <p className="text-blue-800 font-medium">📱 Mobile Tips:</p>
+            <div className="mt-2 p-2 bg-blue-900 border border-blue-700 rounded">
+              <p className="text-blue-300 font-medium">📱 Mobile Tips:</p>
               <p>• Make sure notifications are enabled in your browser</p>
               <p>• On iOS: Go to Settings → Safari → Notifications</p>
               <p>• On Android: Check browser notification settings</p>

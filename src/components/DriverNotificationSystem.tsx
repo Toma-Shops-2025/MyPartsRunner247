@@ -80,23 +80,23 @@ const DriverNotificationSystem: React.FC = () => {
   const getNotificationColor = (severity: string) => {
     switch (severity) {
       case 'error':
-        return 'border-red-500 bg-red-50';
+        return 'border-red-500 bg-red-900';
       case 'warning':
-        return 'border-yellow-500 bg-yellow-50';
+        return 'border-yellow-500 bg-yellow-900';
       case 'info':
-        return 'border-blue-500 bg-blue-50';
+        return 'border-blue-500 bg-blue-900';
       default:
-        return 'border-green-500 bg-green-50';
+        return 'border-green-500 bg-green-900';
     }
   };
 
   if (loading) {
     return (
-      <Card>
+      <Card className="bg-gray-800 border-gray-700">
         <CardContent className="p-6">
           <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-600 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-600 rounded w-1/2"></div>
           </div>
         </CardContent>
       </Card>
@@ -106,11 +106,11 @@ const DriverNotificationSystem: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   return (
-    <Card>
+    <Card className="bg-gray-800 border-gray-700">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-teal-500" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Bell className="h-5 w-5 text-teal-400" />
             Driver Notifications
             {unreadCount > 0 && (
               <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
@@ -122,7 +122,7 @@ const DriverNotificationSystem: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-400 hover:text-white"
+            className="text-gray-400 hover:text-white hover:bg-gray-700"
           >
             {isExpanded ? (
               <ChevronUp className="h-4 w-4" />
@@ -136,9 +136,9 @@ const DriverNotificationSystem: React.FC = () => {
       {isExpanded && (
         <CardContent className="space-y-4">
           {notifications.length === 0 ? (
-            <Alert>
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
+            <Alert className="bg-green-900 border-green-700">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <AlertDescription className="text-green-300">
                 Your driver account is active and approved. You're ready to start accepting deliveries!
               </AlertDescription>
             </Alert>
@@ -154,7 +154,7 @@ const DriverNotificationSystem: React.FC = () => {
                   {getNotificationIcon(notification.type, notification.severity)}
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-gray-900">
+                      <h4 className="font-semibold text-white">
                         {notification.title}
                       </h4>
                       {!notification.is_read && (
@@ -162,13 +162,13 @@ const DriverNotificationSystem: React.FC = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => markAsRead(notification.id)}
-                          className="text-xs"
+                          className="text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
                         >
                           Mark as Read
                         </Button>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-300 mt-1">
                       {notification.message}
                     </p>
                     {notification.action_required && (

@@ -249,8 +249,8 @@ const NewDriverDashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600"></div>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400"></div>
       </div>
     );
   }
@@ -262,10 +262,10 @@ const NewDriverDashboardPage: React.FC = () => {
   // If onboarding is not completed, show loading while redirecting
   if (!onboardingCompleted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400 mx-auto mb-4"></div>
+          <p className="text-gray-300">
             {loadingTimeout ? 'Loading driver dashboard... (timeout reached)' : 'Loading driver dashboard...'}
           </p>
         </div>
@@ -274,23 +274,23 @@ const NewDriverDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900">
       <NewHeader />
       <DriverNotificationSystem />
       <PushNotificationManager />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Driver Dashboard</h1>
-          <p className="text-gray-600">Welcome back, {profile?.full_name || 'Driver'}!</p>
+          <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>
+          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
         </div>
 
         {/* Verification Deadline Alert */}
         {verificationDeadline && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="mb-6 p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
             <div className="flex items-center">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
-              <span className="text-yellow-800 font-medium">
+              <AlertTriangle className="w-5 h-5 text-yellow-400 mr-2" />
+              <span className="text-yellow-300 font-medium">
                 Verification Deadline: {timeRemaining}
               </span>
             </div>
@@ -306,13 +306,13 @@ const NewDriverDashboardPage: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <DollarSign className="w-8 h-8 text-green-600 mr-4" />
+                <DollarSign className="w-8 h-8 text-green-400 mr-4" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Earnings</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm font-medium text-gray-400">Total Earnings</p>
+                  <p className="text-2xl font-bold text-white">
                     ${driverStats.totalEarnings.toFixed(2)}
                   </p>
                 </div>
@@ -320,13 +320,13 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <Package className="w-8 h-8 text-blue-600 mr-4" />
+                <Package className="w-8 h-8 text-blue-400 mr-4" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm font-medium text-gray-400">Completed</p>
+                  <p className="text-2xl font-bold text-white">
                     {driverStats.completedDeliveries}
                   </p>
                 </div>
@@ -334,13 +334,13 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <Clock className="w-8 h-8 text-orange-600 mr-4" />
+                <Clock className="w-8 h-8 text-orange-400 mr-4" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm font-medium text-gray-400">Active</p>
+                  <p className="text-2xl font-bold text-white">
                     {driverStats.activeDeliveries}
                   </p>
                 </div>
@@ -348,13 +348,13 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-gray-800 border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <Star className="w-8 h-8 text-yellow-600 mr-4" />
+                <Star className="w-8 h-8 text-yellow-400 mr-4" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Rating</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-sm font-medium text-gray-400">Rating</p>
+                  <p className="text-2xl font-bold text-white">
                     {driverStats.rating.toFixed(1)}
                   </p>
                 </div>
@@ -365,24 +365,24 @@ const NewDriverDashboardPage: React.FC = () => {
 
         {/* Active Orders */}
         {activeOrders.length > 0 && (
-          <Card className="mb-8">
+          <Card className="mb-8 bg-gray-800 border-gray-700">
             <CardHeader>
-              <CardTitle className="flex items-center">
-                <Package className="w-6 h-6 text-teal-600 mr-2" />
+              <CardTitle className="flex items-center text-white">
+                <Package className="w-6 h-6 text-teal-400 mr-2" />
                 Active Deliveries
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {activeOrders.map((order) => (
-                  <div key={order.id} className="border rounded-lg p-4">
+                  <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold text-white">Order #{order.id.slice(-8)}</h3>
+                        <p className="text-sm text-gray-300">
                           {order.pickup_address} → {order.delivery_address}
                         </p>
-                        <p className="text-sm font-medium text-green-600">
+                        <p className="text-sm font-medium text-green-400">
                           ${order.total}
                         </p>
                       </div>
@@ -403,10 +403,10 @@ const NewDriverDashboardPage: React.FC = () => {
         )}
 
         {/* Available Orders */}
-        <Card className="mb-8">
+        <Card className="mb-8 bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <MapPin className="w-6 h-6 text-teal-600 mr-2" />
+            <CardTitle className="flex items-center text-white">
+              <MapPin className="w-6 h-6 text-teal-400 mr-2" />
               Available Orders
             </CardTitle>
           </CardHeader>
@@ -414,20 +414,20 @@ const NewDriverDashboardPage: React.FC = () => {
             {availableOrders.length === 0 ? (
               <div className="text-center py-8">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders available</h3>
-                <p className="text-gray-600">Check back later for new delivery opportunities</p>
+                <h3 className="text-lg font-semibold text-white mb-2">No orders available</h3>
+                <p className="text-gray-300">Check back later for new delivery opportunities</p>
               </div>
             ) : (
               <div className="space-y-4">
                 {availableOrders.map((order) => (
-                  <div key={order.id} className="border rounded-lg p-4">
+                  <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold">Order #{order.id.slice(-8)}</h3>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold text-white">Order #{order.id.slice(-8)}</h3>
+                        <p className="text-sm text-gray-300">
                           {order.pickup_address} → {order.delivery_address}
                         </p>
-                        <p className="text-sm font-medium text-green-600">
+                        <p className="text-sm font-medium text-green-400">
                           ${order.total}
                         </p>
                       </div>
@@ -456,10 +456,10 @@ const NewDriverDashboardPage: React.FC = () => {
         </Card>
 
         {/* Location Tracking Controls */}
-        <Card>
+        <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <MapPin className="w-6 h-6 text-teal-600 mr-2" />
+            <CardTitle className="flex items-center text-white">
+              <MapPin className="w-6 h-6 text-teal-400 mr-2" />
               Location Tracking
             </CardTitle>
           </CardHeader>
@@ -474,6 +474,7 @@ const NewDriverDashboardPage: React.FC = () => {
               <Button
                 onClick={stopLocationTracking}
                 variant="outline"
+                className="border-gray-600 text-gray-300 hover:bg-gray-700"
               >
                 Stop Tracking
               </Button>
