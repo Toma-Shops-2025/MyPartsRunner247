@@ -527,6 +527,36 @@ const DriverVerificationPage: React.FC = () => {
           )}
         </div>
 
+        {/* Important Notice */}
+        <Card className="mb-8 bg-blue-900 border-blue-700 text-white">
+          <CardContent className="p-6">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-lg font-bold">!</span>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-blue-100 mb-3">IMPORTANT NOTICE</h3>
+                <div className="text-blue-200 text-base leading-relaxed space-y-2">
+                  <p className="font-semibold">
+                    ONCE THE DRIVER HAS SUBMITTED THEIR DRIVERS LICENSE AND INSURANCE THEY WILL BE GRANTED ACCESS TO THE DRIVER DASHBOARD AND CAN START TAKING DELIVERIES.
+                  </p>
+                  <p>
+                    DRIVERS WILL HAVE 7 DAYS TO WATCH THE SHORT DRIVER TRAINING VIDEOS.
+                  </p>
+                  <p>
+                    DRIVERS WILL BE CONTACTED IF ANY FURTHER OBLIGATIONS NEED TO BE MET.
+                  </p>
+                  <p className="text-blue-300 font-medium">
+                    THANK YOU FOR CHOOSING TO DELIVER WITH MYPARTSRUNNER
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Overall Status */}
         <Card className="mb-8 bg-gray-800 border-gray-700 text-white">
           <CardHeader>
