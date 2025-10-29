@@ -75,18 +75,19 @@ const ProfilePage: React.FC = () => {
         throw error;
       }
 
-      // Update local profile state
-      setProfile(prev => ({
-        ...prev,
-        full_name: formData.full_name,
-        phone: formData.phone
-      }));
+      // Profile will be updated automatically by the useAuth hook
+      // No need to manually update local state
 
       toast({
         title: "Profile updated!",
         description: "Your profile information has been saved successfully.",
       });
       setIsEditing(false);
+      
+      // Refresh the page to ensure profile data is updated
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
