@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Settings, Shield, Bell } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -19,6 +20,16 @@ const ProfilePage: React.FC = () => {
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
   });
+
+  // Sync form data with profile when profile changes
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        full_name: profile.full_name || '',
+        phone: profile.phone || '',
+      });
+    }
+  }, [profile]);
 
   if (loading) {
     return (
@@ -40,14 +51,44 @@ const ProfilePage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      // Here you would update the profile in the database
-      // For now, just show a success message
+      if (!user?.id) {
+        toast({
+          title: "Error",
+          description: "User not authenticated. Please log in again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update the profile in the database
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: formData.full_name,
+          phone: formData.phone,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Error updating profile:', error);
+        throw error;
+      }
+
+      // Update local profile state
+      setProfile(prev => ({
+        ...prev,
+        full_name: formData.full_name,
+        phone: formData.phone
+      }));
+
       toast({
         title: "Profile updated!",
         description: "Your profile information has been saved successfully.",
       });
       setIsEditing(false);
     } catch (error) {
+      console.error('Error saving profile:', error);
       toast({
         title: "Update failed",
         description: "There was an error updating your profile. Please try again.",
