@@ -232,15 +232,105 @@ const ProfilePage: React.FC = () => {
                   Control how you receive notifications
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center py-8">
-                  <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Notification Settings</h3>
-                  <p className="text-gray-600 mb-4">
-                    Configure your notification preferences here.
-                  </p>
-                  <Button variant="outline">
-                    Configure Notifications
+              <CardContent className="space-y-6">
+                {/* Current Status */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-2">Current Status</h4>
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      'Notification' in window && Notification.permission === 'granted' 
+                        ? 'bg-green-500' 
+                        : 'bg-red-500'
+                    }`}></div>
+                    <span className="text-sm text-gray-600">
+                      {typeof window !== 'undefined' && 'Notification' in window 
+                        ? Notification.permission === 'granted' 
+                          ? 'Notifications enabled' 
+                          : Notification.permission === 'denied' 
+                            ? 'Notifications blocked' 
+                            : 'Notifications not configured'
+                        : 'Notifications not supported'
+                      }
+                    </span>
+                  </div>
+                </div>
+
+                {/* Notification Types */}
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900">Notification Types</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Order Updates</div>
+                        <div className="text-xs text-gray-500">New orders, status changes, delivery confirmations</div>
+                      </div>
+                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">Driver Notifications</div>
+                        <div className="text-xs text-gray-500">Earnings updates, schedule changes, important announcements</div>
+                      </div>
+                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                    </div>
+                    <div className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium text-sm">System Alerts</div>
+                        <div className="text-xs text-gray-500">Maintenance notifications, security alerts</div>
+                      </div>
+                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-3">
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Open browser notification settings
+                      if ('Notification' in window) {
+                        if (Notification.permission === 'granted') {
+                          alert('Notifications are already enabled! You can manage them in your browser settings.');
+                        } else if (Notification.permission === 'denied') {
+                          alert('Notifications are blocked. Please enable them in your browser settings:\n\nChrome: Settings > Privacy > Site Settings > Notifications\nSafari: Preferences > Websites > Notifications');
+                        } else {
+                          Notification.requestPermission().then((permission) => {
+                            if (permission === 'granted') {
+                              alert('Notifications enabled! You will now receive updates about your orders and deliveries.');
+                              // Refresh the page to update status
+                              window.location.reload();
+                            } else {
+                              alert('Notifications blocked. You can enable them later in your browser settings.');
+                            }
+                          });
+                        }
+                      } else {
+                        alert('This browser does not support notifications. Please use a modern browser like Chrome, Safari, or Firefox.');
+                      }
+                    }}
+                  >
+                    {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' 
+                      ? 'Manage Notifications' 
+                      : 'Enable Notifications'
+                    }
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      // Test notification
+                      if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('MyPartsRunner Test', {
+                          body: 'This is a test notification from MyPartsRunner!',
+                          icon: '/icon-192x192.png'
+                        });
+                      } else {
+                        alert('Please enable notifications first to test them.');
+                      }
+                    }}
+                  >
+                    Test Notification
                   </Button>
                 </div>
               </CardContent>

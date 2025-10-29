@@ -32,6 +32,7 @@ import SupportPage from "./pages/SupportPage";
 import DriverTrainingPage from "./pages/DriverTrainingPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
 import PushNotificationManager from "./components/PushNotificationManager";
+import IOSDebugPanel from "./components/IOSDebugPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
 import ErrorBoundary from "./components/ErrorBoundary";
