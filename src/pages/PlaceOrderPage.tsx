@@ -296,7 +296,7 @@ const PlaceOrderPage: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-gray-300">
                   <span>Base Fee</span>
-                  <span>$0.00</span>
+                  <span>$5.99</span>
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>Distance Fee</span>
