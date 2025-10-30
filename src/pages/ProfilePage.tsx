@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Settings, Shield, Bell } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import PushApiService from '@/services/PushApiService';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -361,15 +362,32 @@ const ProfilePage: React.FC = () => {
                   <Button 
                     variant="outline"
                     onClick={() => {
-                      // Test notification
-                      if ('Notification' in window && Notification.permission === 'granted') {
-                        new Notification('MyPartsRunner Test', {
-                          body: 'This is a test notification from MyPartsRunner!',
-                          icon: '/icon-192x192.png'
-                        });
-                      } else {
-                        alert('Please enable notifications first to test them.');
-                      }
+                      // Send a real web push via Netlify function
+                      (async () => {
+                        try {
+                          if (!('Notification' in window)) {
+                            alert('This browser does not support notifications.');
+                            return;
+                          }
+                          if (Notification.permission !== 'granted') {
+                            alert('Please enable notifications first to test them.');
+                            return;
+                          }
+                          const success = await PushApiService.sendToUsers([user.id], {
+                            title: 'MyPartsRunner Test',
+                            body: 'This is a test notification from MyPartsRunner!',
+                            data: { type: 'test' }
+                          });
+                          if (success) {
+                            toast({ title: 'Test sent', description: 'A test push was sent to your device.' });
+                          } else {
+                            toast({ title: 'Send failed', description: 'Could not send test push. Check subscription.', variant: 'destructive' });
+                          }
+                        } catch (e) {
+                          console.error('Test push error', e);
+                          toast({ title: 'Error', description: 'Unexpected error sending test push.', variant: 'destructive' });
+                        }
+                      })();
                     }}
                   >
                     Test Notification
