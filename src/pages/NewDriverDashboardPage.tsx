@@ -489,6 +489,16 @@ const NewDriverDashboardPage: React.FC = () => {
                             onClick={async () => {
                               try {
                                 await supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id);
+                                // Trigger payout processing
+                                try {
+                                  await fetch('/.netlify/functions/process-order-completion', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orderId: order.id })
+                                  });
+                                } catch (e) {
+                                  console.error('Failed to trigger payout function', e);
+                                }
                                 await fetchDriverData();
                               } catch (e) {
                                 console.error('Error marking delivered', e);

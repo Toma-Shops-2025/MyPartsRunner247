@@ -64,7 +64,19 @@ const DriverOrderDetailsPage: React.FC = () => {
     // Reload order to reflect current status
     const { data } = await supabase.from('orders').select('*').eq('id', orderId).single();
     setOrder(data || null);
-    if (newStatus === 'delivered') navigate('/driver-dashboard');
+    if (newStatus === 'delivered') {
+      // Trigger driver payout processing on server
+      try {
+        await fetch('/.netlify/functions/process-order-completion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId })
+        });
+      } catch (e) {
+        console.error('Failed to trigger payout function', e);
+      }
+      navigate('/driver-dashboard');
+    }
   };
 
   const completeDelivery = async () => {
