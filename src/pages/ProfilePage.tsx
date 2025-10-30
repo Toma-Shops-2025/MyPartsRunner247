@@ -347,13 +347,16 @@ const ProfilePage: React.FC = () => {
                         // Ensure a push subscription exists and is saved server-side
                         const sub = await pushNotificationService.subscribe();
                         if (sub && user?.id) {
-                          await supabase.from('push_subscriptions').upsert({
-                            user_id: user.id,
-                            endpoint: sub.endpoint,
-                            p256dh: sub.keys.p256dh,
-                            auth: sub.keys.auth,
-                            user_agent: navigator.userAgent
+                          // Save via Netlify function (service key) to avoid RLS/shape issues
+                          const resp = await fetch('/.netlify/functions/save-push-subscription', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ subscription: sub, userId: user.id })
                           });
+                          if (!resp.ok) {
+                            console.error('save-push-subscription failed', await resp.text());
+                            throw new Error('Failed to save push subscription');
+                          }
                           toast({ title: 'Notifications enabled', description: 'You are subscribed for push updates.' });
                         } else {
                           toast({ title: 'Subscription missing', description: 'Could not create a push subscription.', variant: 'destructive' });
