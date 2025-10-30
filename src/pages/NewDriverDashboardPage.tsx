@@ -484,7 +484,7 @@ const NewDriverDashboardPage: React.FC = () => {
                         >
                           View Details
                         </Button>
-                        {order.status === 'picked_up' && (
+                        {(order.status === 'picked_up' || order.status === 'accepted') && (
                           <Button
                             onClick={async () => {
                               try {

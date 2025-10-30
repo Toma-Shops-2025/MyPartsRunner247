@@ -67,6 +67,13 @@ const DriverOrderDetailsPage: React.FC = () => {
     if (newStatus === 'delivered') navigate('/driver-dashboard');
   };
 
+  const completeDelivery = async () => {
+    if (!orderId) return;
+    const confirmed = window.confirm('Complete delivery and mark this order as delivered?');
+    if (!confirmed) return;
+    await updateStatus('delivered');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -137,6 +144,12 @@ const DriverOrderDetailsPage: React.FC = () => {
             {profile?.user_type === 'driver' && order.status === 'picked_up' && (
               <div className="pt-2">
                 <Button onClick={() => updateStatus('delivered')} className="bg-green-600 hover:bg-green-700">Mark Delivered</Button>
+              </div>
+            )}
+
+            {profile?.user_type === 'driver' && order.status !== 'delivered' && (
+              <div className="pt-2">
+                <Button onClick={completeDelivery} variant="outline">Complete Delivery</Button>
               </div>
             )}
           </CardContent>

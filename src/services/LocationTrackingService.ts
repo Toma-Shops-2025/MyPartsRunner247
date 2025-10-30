@@ -48,13 +48,18 @@ class LocationTrackingService {
         onLocationUpdate(location);
       },
       (error) => {
-        console.warn('Geolocation not available:', error.message);
+        // Reduce console noise; only warn once per minute
+        const last = Number(localStorage.getItem('mpr_geo_warn_ts') || '0');
+        if (Date.now() - last > 60000) {
+          console.warn('Geolocation not available:', error.message);
+          localStorage.setItem('mpr_geo_warn_ts', String(Date.now()));
+        }
         // Don't treat this as a critical error - location is optional
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
+        timeout: 30000,
+        maximumAge: 10000
       }
     );
 
@@ -74,13 +79,17 @@ class LocationTrackingService {
         onLocationUpdate(location);
       },
       (error) => {
-        console.warn('Geolocation tracking unavailable:', error.message);
+        const last = Number(localStorage.getItem('mpr_geo_warn_ts') || '0');
+        if (Date.now() - last > 60000) {
+          console.warn('Geolocation tracking unavailable:', error.message);
+          localStorage.setItem('mpr_geo_warn_ts', String(Date.now()));
+        }
         // Don't treat this as a critical error - location is optional
       },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 30000 // 30 seconds
+        timeout: 30000,
+        maximumAge: 60000 // 60 seconds
       }
     );
 
