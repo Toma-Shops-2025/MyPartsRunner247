@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Bell, BellOff, Settings } from 'lucide-react';
 import pushNotificationService from '@/services/PushNotificationService';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/hooks/useAuth';
 import { MobileNotificationHelper } from '@/utils/mobileNotificationHelper';
 
 interface NotificationSettings {
@@ -20,6 +22,7 @@ const PushNotificationManager: React.FC = () => {
   const [isSupported, setIsSupported] = useState(false);
   const [permission, setPermission] = useState<NotificationPermission>('default');
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const { user } = useAuth();
   const [settings, setSettings] = useState<NotificationSettings>({
     orderUpdates: true,
     driverAlerts: true,
@@ -56,9 +59,17 @@ const PushNotificationManager: React.FC = () => {
 
       if (newPermission === 'granted') {
         const subscription = await pushNotificationService.subscribe();
-        if (subscription) {
+        if (subscription && user?.id) {
+          // Persist subscription in Supabase
+          const keys = subscription.toJSON().keys || {};
+          await supabase.from('push_subscriptions').upsert({
+            user_id: user.id,
+            endpoint: subscription.endpoint,
+            p256dh: keys.p256dh,
+            auth: keys.auth,
+            user_agent: navigator.userAgent
+          });
           setIsSubscribed(true);
-          // Save settings to localStorage
           localStorage.setItem('notificationSettings', JSON.stringify(settings));
         }
       } else {
@@ -76,6 +87,10 @@ const PushNotificationManager: React.FC = () => {
       if (success) {
         setIsSubscribed(false);
         localStorage.removeItem('notificationSettings');
+        // Remove server-side subscription
+        if (user?.id) {
+          await supabase.from('push_subscriptions').delete().eq('user_id', user.id);
+        }
       }
     } catch (error) {
       console.error('Error unsubscribing from notifications:', error);

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import PushApiService from './PushApiService';
 
 export class DriverNotificationService {
   private static instance: DriverNotificationService;
@@ -88,7 +89,7 @@ export class DriverNotificationService {
   // Send push notification
   private async sendPushNotification(driverId: string, message: any) {
     try {
-      // Store notification in database
+      // Store in DB for history
       const { error } = await supabase
         .from('driver_notifications')
         .insert({
@@ -102,9 +103,13 @@ export class DriverNotificationService {
         });
       
       if (error) throw error;
-      
-      // TODO: Integrate with actual push notification service (Firebase, etc.)
-      console.log(`📱 PUSH: ${message.title} - ${message.body}`);
+
+      // Real push via Netlify function
+      await PushApiService.sendToUsers([driverId], {
+        title: message.title,
+        body: message.body,
+        data: message.data
+      });
       
     } catch (error) {
       console.error('❌ Error sending push notification:', error);

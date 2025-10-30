@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import PushApiService from './PushApiService';
 import { orderQueueService } from './OrderQueueService';
 
 export class OrderAutomationService {
@@ -214,8 +215,11 @@ export class OrderAutomationService {
 
   // Send push notification
   private async sendPushNotification(userId: string, notification: any) {
-    // Implementation depends on your push notification service
-    console.log(`📱 PUSH NOTIFICATION to ${userId}:`, notification);
+    await PushApiService.sendToUsers([userId], {
+      title: notification?.title || 'MyPartsRunner',
+      body: notification?.body || 'You have an update',
+      data: notification?.data || {}
+    });
   }
 
   // Send SMS
