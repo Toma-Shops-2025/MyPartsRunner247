@@ -140,7 +140,6 @@ class PushNotificationService {
       const userId = this.getCurrentUserId();
       
       if (!userId) {
-        console.warn('No user ID available, skipping push subscription save');
         // Store subscription locally as fallback
         this.saveSubscriptionLocally(subscription);
         return;
@@ -262,7 +261,6 @@ class PushNotificationService {
 
       return null;
     } catch (error) {
-      console.warn('Error getting user ID:', error);
       return null;
     }
   }

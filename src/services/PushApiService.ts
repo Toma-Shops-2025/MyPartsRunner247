@@ -8,13 +8,24 @@ export class PushApiService {
       });
       if (!res.ok) {
         console.error('send-push failed', await res.text());
+        // Fallback: broadcast in-app event
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('mpr:inapp-notification', { detail: payload }));
+        }
         return false;
       }
       const json = await res.json();
       console.log('send-push result', json);
-      return typeof json?.sent === 'number' ? json.sent > 0 : true;
+      const success = typeof json?.sent === 'number' ? json.sent > 0 : true;
+      if (!success && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('mpr:inapp-notification', { detail: payload }));
+      }
+      return success;
     } catch (e) {
       console.error('send-push error', e);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('mpr:inapp-notification', { detail: payload }));
+      }
       return false;
     }
   }

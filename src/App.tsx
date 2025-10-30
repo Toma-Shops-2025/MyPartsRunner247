@@ -35,6 +35,7 @@ import PushNotificationManager from "./components/PushNotificationManager";
 import IOSDebugPanel from "./components/IOSDebugPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
+import InAppFallbackListener from "./components/InAppFallbackListener";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OptimizedPerformanceMonitor from "./components/OptimizedPerformanceMonitor";
 import MemoryCleanupButton from "./components/MemoryCleanupButton";
@@ -77,6 +78,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <InAppFallbackListener />
           <PushNotificationManager />
           <PWAInstallPrompt />
           <OfflineIndicator />
