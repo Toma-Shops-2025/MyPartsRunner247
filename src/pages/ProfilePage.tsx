@@ -13,6 +13,7 @@ import { User, Settings, Shield, Bell } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import PushApiService from '@/services/PushApiService';
+import pushNotificationService from '@/services/PushNotificationService';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -330,26 +331,36 @@ const ProfilePage: React.FC = () => {
                 <div className="flex space-x-3">
                   <Button 
                     variant="outline"
-                    onClick={() => {
-                      // Open browser notification settings
-                      if ('Notification' in window) {
-                        if (Notification.permission === 'granted') {
-                          alert('Notifications are already enabled! You can manage them in your browser settings.');
-                        } else if (Notification.permission === 'denied') {
-                          alert('Notifications are blocked. Please enable them in your browser settings:\n\nChrome: Settings > Privacy > Site Settings > Notifications\nSafari: Preferences > Websites > Notifications');
-                        } else {
-                          Notification.requestPermission().then((permission) => {
-                            if (permission === 'granted') {
-                              alert('Notifications enabled! You will now receive updates about your orders and deliveries.');
-                              // Refresh the page to update status
-                              window.location.reload();
-                            } else {
-                              alert('Notifications blocked. You can enable them later in your browser settings.');
-                            }
-                          });
+                    onClick={async () => {
+                      try {
+                        if (!('Notification' in window)) {
+                          alert('This browser does not support notifications. Please use a modern browser like Chrome, Safari, or Firefox.');
+                          return;
                         }
-                      } else {
-                        alert('This browser does not support notifications. Please use a modern browser like Chrome, Safari, or Firefox.');
+                        const permission = Notification.permission === 'granted'
+                          ? 'granted'
+                          : await Notification.requestPermission();
+                        if (permission !== 'granted') {
+                          alert('Notifications are blocked. Please enable them in your browser settings.');
+                          return;
+                        }
+                        // Ensure a push subscription exists and is saved server-side
+                        const sub = await pushNotificationService.subscribe();
+                        if (sub && user?.id) {
+                          await supabase.from('push_subscriptions').upsert({
+                            user_id: user.id,
+                            endpoint: sub.endpoint,
+                            p256dh: sub.keys.p256dh,
+                            auth: sub.keys.auth,
+                            user_agent: navigator.userAgent
+                          });
+                          toast({ title: 'Notifications enabled', description: 'You are subscribed for push updates.' });
+                        } else {
+                          toast({ title: 'Subscription missing', description: 'Could not create a push subscription.', variant: 'destructive' });
+                        }
+                      } catch (e) {
+                        console.error('Enable notifications error', e);
+                        toast({ title: 'Error', description: 'Failed to enable notifications.', variant: 'destructive' });
                       }
                     }}
                   >

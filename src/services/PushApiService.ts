@@ -12,7 +12,7 @@ export class PushApiService {
       }
       const json = await res.json();
       console.log('send-push result', json);
-      return true;
+      return typeof json?.sent === 'number' ? json.sent > 0 : true;
     } catch (e) {
       console.error('send-push error', e);
       return false;
