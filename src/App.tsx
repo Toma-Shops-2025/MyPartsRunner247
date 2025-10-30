@@ -30,6 +30,7 @@ import AnalyticsDashboard from "./pages/AnalyticsDashboard";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import SupportPage from "./pages/SupportPage";
 import DriverTrainingPage from "./pages/DriverTrainingPage";
+import DriverOrderDetailsPage from "./pages/DriverOrderDetailsPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
 import PushNotificationManager from "./components/PushNotificationManager";
 import IOSDebugPanel from "./components/IOSDebugPanel";
@@ -93,6 +94,7 @@ const App = () => (
             <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
+            <Route path="/driver/orders/:orderId" element={<DriverOrderDetailsPage />} />
             <Route path="/test-driver" element={<TestDriverPage />} />
             <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/profile" element={<ProfilePage />} />

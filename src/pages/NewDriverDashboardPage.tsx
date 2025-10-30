@@ -256,7 +256,8 @@ const NewDriverDashboardPage: React.FC = () => {
           status: 'accepted',
           accepted_at: new Date().toISOString()
         })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .eq('status', 'pending');
 
       if (error) {
         console.error('Error accepting order:', error);
@@ -265,6 +266,8 @@ const NewDriverDashboardPage: React.FC = () => {
 
       // Refresh data
       await fetchDriverData();
+      // Navigate to details so the driver sees next steps
+      navigate(`/driver/orders/${orderId}`);
     } catch (error) {
       console.error('Error accepting order:', error);
     }
