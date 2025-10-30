@@ -54,9 +54,16 @@ class PushNotificationService {
       await navigator.serviceWorker.ready;
 
       // Subscribe to push notifications
+      if (!this.vapidPublicKey) {
+        console.error('VAPID public key missing');
+        return null;
+      }
+
+      const applicationServerKey = this.urlBase64ToUint8Array(this.vapidPublicKey);
+
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.vapidPublicKey
+        applicationServerKey
       });
 
       // Convert to our custom interface
