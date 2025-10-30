@@ -48,21 +48,20 @@ exports.handler = async (event, context) => {
       throw new Error('Driver not found');
     }
 
-    // Calculate payment split with minimum driver payment
+    // Calculate payment split: Driver gets 70% of order total, Platform gets 30% (Stripe fee deducted from platform)
     const orderTotal = parseFloat(order.total) || 0;
-    const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ processing fee
-    const netAmount = orderTotal - stripeFee;
+    const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ Stripe processing fee
     
-    // Ensure driver gets at least 50% of order total (minimum commission)
-    const minimumDriverPayment = orderTotal * 0.50;
-    const calculatedDriverPayment = netAmount * 0.70;
-    const driverPayment = Math.max(calculatedDriverPayment, minimumDriverPayment);
+    // Driver gets exactly 70% of order total
+    const driverPayment = orderTotal * 0.70;
     
-    const platformFee = orderTotal - driverPayment;
+    // Platform gets 30% of order total, minus Stripe fee
+    const platformShare = orderTotal * 0.30;
+    const platformNet = platformShare - stripeFee;
 
-    console.log(`Order total: $${orderTotal}, Stripe fee: $${stripeFee.toFixed(2)}, Net amount: $${netAmount.toFixed(2)}`);
-    console.log(`Minimum driver payment: $${minimumDriverPayment.toFixed(2)}, Calculated: $${calculatedDriverPayment.toFixed(2)}`);
-    console.log(`Final driver payment: $${driverPayment.toFixed(2)}, Platform fee: $${platformFee.toFixed(2)}`);
+    console.log(`Order total: $${orderTotal.toFixed(2)}`);
+    console.log(`Driver payment (70%): $${driverPayment.toFixed(2)}`);
+    console.log(`Platform share (30%): $${platformShare.toFixed(2)}, Stripe fee: $${stripeFee.toFixed(2)}, Platform net: $${platformNet.toFixed(2)}`);
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
@@ -134,9 +133,9 @@ exports.handler = async (event, context) => {
           transferId: transfer.id,
           orderTotal: orderTotal,
           stripeFee: stripeFee,
-          netAmount: netAmount,
           driverPayment: driverPayment,
-          platformFee: platformFee,
+          platformShare: platformShare,
+          platformNet: platformNet,
           message: 'Driver payment processed successfully'
         })
       };
