@@ -484,6 +484,22 @@ const NewDriverDashboardPage: React.FC = () => {
                         >
                           View Details
                         </Button>
+                        {order.status === 'picked_up' && (
+                          <Button
+                            onClick={async () => {
+                              try {
+                                await supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id);
+                                await fetchDriverData();
+                              } catch (e) {
+                                console.error('Error marking delivered', e);
+                              }
+                            }}
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            Mark Delivered
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -49,6 +49,24 @@ const DriverOrderDetailsPage: React.FC = () => {
     navigate('/driver-dashboard');
   };
 
+  const updateStatus = async (newStatus: 'picked_up' | 'delivered') => {
+    if (!orderId) return;
+    const { error } = await supabase
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+    if (error) {
+      console.error('Update status failed', error);
+      toast({ title: 'Failed to update status', description: 'Please try again.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: `Order ${newStatus.replace('_', ' ')}`, description: `Status updated to ${newStatus}.` });
+    // Reload order to reflect current status
+    const { data } = await supabase.from('orders').select('*').eq('id', orderId).single();
+    setOrder(data || null);
+    if (newStatus === 'delivered') navigate('/driver-dashboard');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -107,6 +125,18 @@ const DriverOrderDetailsPage: React.FC = () => {
             {profile?.user_type === 'driver' && order.status === 'pending' && (
               <div className="pt-2">
                 <Button onClick={accept} className="bg-teal-600 hover:bg-teal-700">Accept Order</Button>
+              </div>
+            )}
+
+            {profile?.user_type === 'driver' && order.status === 'accepted' && (
+              <div className="pt-2">
+                <Button onClick={() => updateStatus('picked_up')} className="bg-blue-600 hover:bg-blue-700">Mark Picked Up</Button>
+              </div>
+            )}
+
+            {profile?.user_type === 'driver' && order.status === 'picked_up' && (
+              <div className="pt-2">
+                <Button onClick={() => updateStatus('delivered')} className="bg-green-600 hover:bg-green-700">Mark Delivered</Button>
               </div>
             )}
           </CardContent>
