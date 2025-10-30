@@ -63,7 +63,7 @@ class PushNotificationService {
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey
+        applicationServerKey: applicationServerKey as unknown as BufferSource
       });
 
       // Convert to our custom interface
