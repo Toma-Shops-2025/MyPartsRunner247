@@ -91,11 +91,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
 
           <div className="relative">
             {/* Hero Logo */}
-            <div className="relative w-full h-96 flex items-center justify-center">
+            <div className="relative w-full h-[30rem] flex items-center justify-center">
               <img 
                 src="/hero-logo.png"
                 alt="MyPartsRunner Logo"
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain transform scale-125"
               />
             </div>
           </div>
