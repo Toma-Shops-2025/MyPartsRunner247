@@ -39,8 +39,7 @@ const DriverOrderDetailsPage: React.FC = () => {
     const { error } = await supabase
       .from('orders')
       .update({ driver_id: user.id, status: 'accepted', accepted_at: new Date().toISOString() })
-      .eq('id', orderId)
-      .eq('status', 'pending');
+      .eq('id', orderId);
     if (error) {
       console.error('Accept failed', error);
       toast({ title: 'Failed to accept order', description: 'Please try again.', variant: 'destructive' });

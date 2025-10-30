@@ -256,8 +256,7 @@ const NewDriverDashboardPage: React.FC = () => {
           status: 'accepted',
           accepted_at: new Date().toISOString()
         })
-        .eq('id', orderId)
-        .eq('status', 'pending');
+        .eq('id', orderId);
 
       if (error) {
         console.error('Error accepting order:', error);
