@@ -110,6 +110,13 @@ const NewHeader: React.FC = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
+              {/* Online/Offline badge for drivers */}
+              {user && profile?.user_type === 'driver' && (
+                <div className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border ${profile?.is_online ? 'bg-green-900/40 text-green-300 border-green-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`}>
+                  <span className={`inline-block w-2 h-2 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-gray-400'}`}></span>
+                  <span>{profile?.is_online ? 'Online' : 'Offline'}</span>
+                </div>
+              )}
               {/* Admin Dashboard Button - Always visible for admins */}
               {user && profile?.user_type === 'admin' && (
                 <Button
