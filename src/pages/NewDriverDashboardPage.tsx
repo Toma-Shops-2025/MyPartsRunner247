@@ -253,8 +253,7 @@ const NewDriverDashboardPage: React.FC = () => {
         .from('orders')
         .update({ 
           driver_id: user.id, 
-          status: 'accepted',
-          accepted_at: new Date().toISOString()
+          status: 'accepted'
         })
         .eq('id', orderId);
 

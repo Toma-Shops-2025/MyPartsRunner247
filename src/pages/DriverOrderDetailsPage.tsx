@@ -38,7 +38,7 @@ const DriverOrderDetailsPage: React.FC = () => {
     if (!user?.id || !orderId) return;
     const { error } = await supabase
       .from('orders')
-      .update({ driver_id: user.id, status: 'accepted', accepted_at: new Date().toISOString() })
+      .update({ driver_id: user.id, status: 'accepted' })
       .eq('id', orderId);
     if (error) {
       console.error('Accept failed', error);
