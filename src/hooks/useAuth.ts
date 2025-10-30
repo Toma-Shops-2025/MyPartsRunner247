@@ -11,6 +11,7 @@ export interface Profile {
   avatar_url?: string;
   is_approved?: boolean;
   status?: string;
+  is_online?: boolean;
   vehicle_info?: any;
   onboarding_completed?: boolean;
   onboarding_completed_at?: string;
