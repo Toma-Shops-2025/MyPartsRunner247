@@ -597,7 +597,7 @@ const NewDriverDashboardPage: React.FC = () => {
                     onClick={stopLocationTracking}
                     className="bg-red-600 hover:bg-red-700 text-white"
                   >
-                    Stop Tracking
+                    Go Offline
                   </Button>
                 </div>
               ) : (
@@ -613,7 +613,7 @@ const NewDriverDashboardPage: React.FC = () => {
                     onClick={startLocationTracking}
                     className="bg-green-600 hover:bg-green-700 text-white"
                   >
-                    Start Tracking
+                    Go Online
                   </Button>
                 </div>
               )}
