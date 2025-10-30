@@ -60,13 +60,12 @@ const PushNotificationManager: React.FC = () => {
       if (newPermission === 'granted') {
         const subscription = await pushNotificationService.subscribe();
         if (subscription && user?.id) {
-          // Persist subscription in Supabase
-          const keys = subscription.toJSON().keys || {};
+          // Persist subscription in Supabase (subscription is our custom shape)
           await supabase.from('push_subscriptions').upsert({
             user_id: user.id,
             endpoint: subscription.endpoint,
-            p256dh: keys.p256dh,
-            auth: keys.auth,
+            p256dh: subscription.keys.p256dh,
+            auth: subscription.keys.auth,
             user_agent: navigator.userAgent
           });
           setIsSubscribed(true);
