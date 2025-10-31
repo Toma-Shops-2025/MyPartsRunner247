@@ -75,7 +75,17 @@ const DriverOrderDetailsPage: React.FC = () => {
         });
         const result = await response.json();
         console.log('💰 Payout result:', result);
-        if (result.success) {
+        
+        if (!response.ok) {
+          // Handle error response
+          const errorMsg = result.details || result.error || 'Failed to process payment';
+          const actionMsg = result.driverAction || '';
+          toast({ 
+            title: 'Payment Failed', 
+            description: `${errorMsg}${actionMsg ? ` ${actionMsg}` : ''}`,
+            variant: 'destructive'
+          });
+        } else if (result.success) {
           toast({ 
             title: 'Payment Processed', 
             description: `Driver payment processed: $${result.driverPayment}` 

@@ -98,18 +98,26 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Create earnings record
-    const { error: earningsError } = await supabase
-      .from('earnings')
-      .insert({
-        driver_id: order.driver_id,
-        order_id: orderId,
-        amount: driverPaymentGross,
-        status: 'pending'
-      });
+    // Create earnings record (non-blocking - continue even if this fails)
+    try {
+      const { error: earningsError } = await supabase
+        .from('earnings')
+        .insert({
+          driver_id: order.driver_id,
+          order_id: orderId,
+          amount: driverPaymentGross,
+          status: 'pending'
+        });
 
-    if (earningsError) {
-      console.error('Error creating earnings record:', earningsError);
+      if (earningsError) {
+        console.warn('⚠️ Earnings record creation failed (non-critical):', earningsError.message);
+        // Continue processing even if earnings record fails
+      } else {
+        console.log('✅ Earnings record created');
+      }
+    } catch (earningsErr) {
+      console.warn('⚠️ Earnings record creation error (non-critical):', earningsErr.message);
+      // Continue processing even if earnings record fails
     }
 
     // Process payment to driver
@@ -163,24 +171,42 @@ exports.handler = async (event, context) => {
     } catch (stripeError) {
       console.error('Stripe transfer error:', stripeError);
       
-      // Update earnings record as failed
-      await supabase
-        .from('earnings')
-        .update({
-          status: 'failed',
-          error_message: stripeError.message
-        })
-        .eq('order_id', orderId);
+      // Check for specific capability error
+      let errorMessage = stripeError.message;
+      let userFriendlyMessage = errorMessage;
+      
+      if (stripeError.code === 'insufficient_capabilities_for_transfer') {
+        userFriendlyMessage = 'Driver Stripe account is not fully set up. The driver needs to complete Stripe Connect onboarding and enable transfers capability.';
+        console.error('🚫 Driver Stripe account missing transfers capability. Driver must complete onboarding at: https://dashboard.stripe.com');
+      }
+      
+      // Try to update earnings record as failed (non-blocking)
+      try {
+        await supabase
+          .from('earnings')
+          .update({
+            status: 'failed',
+            error_message: errorMessage
+          })
+          .eq('order_id', orderId);
+      } catch (updateErr) {
+        console.warn('⚠️ Could not update earnings record:', updateErr.message);
+      }
 
       return {
-        statusCode: 500,
+        statusCode: 400,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
           error: 'Failed to process driver payment',
-          details: stripeError.message
+          details: userFriendlyMessage,
+          stripeError: stripeError.code,
+          technicalDetails: errorMessage,
+          driverAction: stripeError.code === 'insufficient_capabilities_for_transfer' 
+            ? 'Driver must complete Stripe Connect onboarding in their Stripe dashboard'
+            : 'Please contact support'
         })
       };
     }
