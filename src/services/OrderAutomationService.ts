@@ -17,6 +17,13 @@ export class OrderAutomationService {
     console.log('🤖 AUTOMATION: Processing new order', orderData.id);
     
     try {
+      // If coordinates are missing, broadcast to all online drivers
+      if (!orderData.pickup_latitude || !orderData.pickup_longitude) {
+        console.log('⚠️ No coordinates available, broadcasting to all online drivers');
+        await this.broadcastToOnlineDrivers(orderData);
+        return;
+      }
+      
       // 1. Find nearby drivers (within 15 miles)
       const nearbyDrivers = await this.findNearbyDrivers(
         orderData.pickup_latitude, 
@@ -27,7 +34,7 @@ export class OrderAutomationService {
       console.log(`🤖 Found ${nearbyDrivers.length} nearby drivers`);
       
       if (nearbyDrivers.length === 0) {
-        // No drivers nearby - notify admin
+        // No drivers nearby - notify admin and broadcast
         await this.notifyAdminNoDrivers(orderData);
         return;
       }
@@ -47,7 +54,76 @@ export class OrderAutomationService {
       
     } catch (error) {
       console.error('🤖 AUTOMATION ERROR:', error);
+      // On error, still try to broadcast to online drivers
+      try {
+        await this.broadcastToOnlineDrivers(orderData);
+      } catch (broadcastError) {
+        console.error('Failed to broadcast after error:', broadcastError);
+      }
       await this.notifyAdminError(orderData, error);
+    }
+  }
+
+  // Broadcast to all online drivers when coordinates are missing or as fallback
+  private async broadcastToOnlineDrivers(order: any) {
+    try {
+      // Get all online drivers
+      const { data: onlineDrivers, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, is_online, status')
+        .eq('user_type', 'driver')
+        .eq('is_online', true)
+        .eq('status', 'active');
+
+      if (error) {
+        console.error('Error fetching online drivers:', error);
+        return;
+      }
+
+      if (!onlineDrivers || onlineDrivers.length === 0) {
+        console.log('No online drivers found, will add to queue');
+        await orderQueueService.addToQueue(order.id);
+        return;
+      }
+
+      console.log(`📢 Broadcasting to ${onlineDrivers.length} online drivers for order ${order.id}`);
+
+      // Notify all online drivers
+      for (const driver of onlineDrivers) {
+        try {
+          // Send push notification
+          await this.sendPushNotification(driver.id, {
+            title: 'New Order Available!',
+            body: `Order #${String(order.id).slice(-8)} - $${order.total} - ${order.pickup_address?.substring(0, 40) || 'Pickup location'}...`,
+            data: {
+              orderId: order.id,
+              type: 'order_available'
+            }
+          });
+
+          // Create in-app notification
+          await supabase
+            .from('driver_notifications')
+            .insert({
+              user_id: driver.id,
+              type: 'order_available',
+              title: 'New Order Available!',
+              message: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
+              severity: 'info',
+              action_required: true,
+              metadata: {
+                order_id: order.id,
+                pickup_address: order.pickup_address,
+                delivery_address: order.delivery_address,
+                total: order.total
+              }
+            });
+        } catch (driverError) {
+          console.error(`Error notifying driver ${driver.id}:`, driverError);
+        }
+      }
+    } catch (error) {
+      console.error('Error broadcasting to online drivers:', error);
     }
   }
 

@@ -3,6 +3,7 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/hooks/useAuth';
 import { getStripe, createPaymentIntent } from '@/lib/stripe';
+import { orderAutomationService } from '@/services/OrderAutomationService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -230,6 +231,15 @@ const PaymentForm: React.FC<{
 
         console.log('Mock payment successful, order created:', order.id);
         setOrderCreated(true); // Prevent duplicate order creation
+        
+        // Trigger driver notifications
+        try {
+          await orderAutomationService.processNewOrder(order);
+          console.log('Driver notifications triggered for order:', order.id);
+        } catch (notifyError) {
+          console.error('Error triggering driver notifications:', notifyError);
+        }
+        
         onSuccess(order.id);
         return;
       }
@@ -344,6 +354,16 @@ const PaymentForm: React.FC<{
 
         console.log('Order created successfully:', order.id);
         setOrderCreated(true); // Prevent duplicate order creation
+        
+        // Trigger driver notifications
+        try {
+          await orderAutomationService.processNewOrder(order);
+          console.log('Driver notifications triggered for order:', order.id);
+        } catch (notifyError) {
+          console.error('Error triggering driver notifications:', notifyError);
+          // Don't block order success if notification fails
+        }
+        
         onSuccess(order.id);
       } else {
         throw new Error('Payment was not successful');
@@ -423,6 +443,15 @@ const PaymentForm: React.FC<{
 
           console.log('Direct order creation successful:', order.id);
           setOrderCreated(true); // Prevent duplicate order creation
+          
+          // Trigger driver notifications
+          try {
+            await orderAutomationService.processNewOrder(order);
+            console.log('Driver notifications triggered for order:', order.id);
+          } catch (notifyError) {
+            console.error('Error triggering driver notifications:', notifyError);
+          }
+          
           onSuccess(order.id);
           return;
         } catch (directOrderError) {
