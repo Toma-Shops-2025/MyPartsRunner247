@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { locationTrackingService } from '@/services/LocationTrackingService';
+import { toast } from '@/hooks/use-toast';
 
 const NewDriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -491,13 +492,28 @@ const NewDriverDashboardPage: React.FC = () => {
                                 await supabase.from('orders').update({ status: 'delivered' }).eq('id', order.id);
                                 // Trigger payout processing
                                 try {
-                                  await fetch('/.netlify/functions/process-order-completion', {
+                                  console.log('💸 Triggering payout for order:', order.id);
+                                  const response = await fetch('/.netlify/functions/process-order-completion', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ orderId: order.id })
                                   });
+                                  const result = await response.json();
+                                  console.log('💰 Payout result:', result);
+                                  if (result.warning) {
+                                    toast({ 
+                                      title: 'Payment Warning', 
+                                      description: result.warning,
+                                      variant: 'destructive'
+                                    });
+                                  }
                                 } catch (e) {
                                   console.error('Failed to trigger payout function', e);
+                                  toast({ 
+                                    title: 'Payment Error', 
+                                    description: 'Failed to process driver payout',
+                                    variant: 'destructive'
+                                  });
                                 }
                                 await fetchDriverData();
                               } catch (e) {

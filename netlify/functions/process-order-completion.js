@@ -51,33 +51,49 @@ exports.handler = async (event, context) => {
     // Calculate payment split: Driver gets 70% of order total, Platform gets 30% (Stripe fee deducted from platform)
     const orderTotal = parseFloat(order.total) || 0;
     const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ Stripe processing fee
+    const netAfterStripeFee = orderTotal - stripeFee; // What platform actually received after Stripe fee
     
-    // Driver gets exactly 70% of order total
-    const driverPayment = orderTotal * 0.70;
+    // Driver gets exactly 70% of order total (gross)
+    const driverPaymentGross = orderTotal * 0.70;
     
-    // Platform gets 30% of order total, minus Stripe fee
-    const platformShare = orderTotal * 0.30;
-    const platformNet = platformShare - stripeFee;
+    // Platform share is 30% of gross, minus Stripe fee
+    const platformShareGross = orderTotal * 0.30;
+    const platformNetAfterFee = platformShareGross - stripeFee;
+    
+    // Since Stripe fee was already deducted from the payment, we transfer driver's 70% from the net
+    // Platform keeps: net - driver payment = (orderTotal - stripeFee) - (orderTotal * 0.70)
+    // Which equals: orderTotal - stripeFee - orderTotal * 0.70 = orderTotal * 0.30 - stripeFee
+    const driverPaymentAmount = Math.round(driverPaymentGross * 100); // Amount to transfer in cents
 
-    console.log(`Order total: $${orderTotal.toFixed(2)}`);
-    console.log(`Driver payment (70%): $${driverPayment.toFixed(2)}`);
-    console.log(`Platform share (30%): $${platformShare.toFixed(2)}, Stripe fee: $${stripeFee.toFixed(2)}, Platform net: $${platformNet.toFixed(2)}`);
+    console.log(`💰 PAYOUT CALCULATION:`);
+    console.log(`   Order total (gross): $${orderTotal.toFixed(2)}`);
+    console.log(`   Stripe fee: $${stripeFee.toFixed(2)}`);
+    console.log(`   Platform received (net): $${netAfterStripeFee.toFixed(2)}`);
+    console.log(`   Driver payment (70% of gross): $${driverPaymentGross.toFixed(2)}`);
+    console.log(`   Platform keeps (30% - fees): $${platformNetAfterFee.toFixed(2)}`);
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
     const stripeConnected = driver.stripe_connected;
     
     if (!stripeAccountId || !stripeConnected) {
-      console.log('Driver has no Stripe account or not connected, skipping payment');
-      console.log('Stripe account ID:', stripeAccountId);
-      console.log('Stripe connected:', stripeConnected);
+      console.log('⚠️ Driver has no Stripe account or not connected, skipping payment');
+      console.log('   Driver ID:', order.driver_id);
+      console.log('   Stripe account ID:', stripeAccountId);
+      console.log('   Stripe connected:', stripeConnected);
+      console.log('   Driver payment would be:', driverPaymentGross.toFixed(2));
       return {
         statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
+        },
         body: JSON.stringify({
           message: 'Driver payment skipped - no Stripe account connected',
-          driverPayment: driverPayment,
-          stripeAccountId: stripeAccountId,
-          stripeConnected: stripeConnected
+          driverPayment: driverPaymentGross.toFixed(2),
+          stripeAccountId: stripeAccountId || 'none',
+          stripeConnected: stripeConnected || false,
+          warning: 'Driver must connect Stripe account to receive payments'
         })
       };
     }
@@ -88,7 +104,7 @@ exports.handler = async (event, context) => {
       .insert({
         driver_id: order.driver_id,
         order_id: orderId,
-        amount: driverPayment,
+        amount: driverPaymentGross,
         status: 'pending'
       });
 
@@ -98,15 +114,19 @@ exports.handler = async (event, context) => {
 
     // Process payment to driver
     try {
+      console.log(`💸 Creating transfer: $${(driverPaymentAmount / 100).toFixed(2)} to driver ${stripeAccountId}`);
+      
       const transfer = await stripe.transfers.create({
-        amount: Math.round(driverPayment * 100), // Convert to cents
+        amount: driverPaymentAmount, // Already in cents
         currency: 'usd',
         destination: stripeAccountId,
-        description: `Payment for order ${orderId}`,
+        description: `Driver payment (70%) for order ${orderId}`,
         metadata: {
           order_id: orderId,
           payment_type: 'driver_commission',
-          commission_rate: '70%'
+          commission_rate: '70%',
+          order_total: orderTotal.toFixed(2),
+          platform_share: platformNetAfterFee.toFixed(2)
         }
       });
 
@@ -131,12 +151,12 @@ exports.handler = async (event, context) => {
         body: JSON.stringify({
           success: true,
           transferId: transfer.id,
-          orderTotal: orderTotal,
-          stripeFee: stripeFee,
-          driverPayment: driverPayment,
-          platformShare: platformShare,
-          platformNet: platformNet,
-          message: 'Driver payment processed successfully'
+          orderTotal: orderTotal.toFixed(2),
+          stripeFee: stripeFee.toFixed(2),
+          driverPayment: driverPaymentGross.toFixed(2),
+          platformShare: platformShareGross.toFixed(2),
+          platformNet: platformNetAfterFee.toFixed(2),
+          message: 'Driver payment processed successfully - 70% to driver, 30% to platform (fees deducted)'
         })
       };
 

@@ -67,13 +67,33 @@ const DriverOrderDetailsPage: React.FC = () => {
     if (newStatus === 'delivered') {
       // Trigger driver payout processing on server
       try {
-        await fetch('/.netlify/functions/process-order-completion', {
+        console.log('💸 Triggering payout for order:', orderId);
+        const response = await fetch('/.netlify/functions/process-order-completion', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId })
         });
+        const result = await response.json();
+        console.log('💰 Payout result:', result);
+        if (result.success) {
+          toast({ 
+            title: 'Payment Processed', 
+            description: `Driver payment processed: $${result.driverPayment}` 
+          });
+        } else if (result.warning) {
+          toast({ 
+            title: 'Payment Warning', 
+            description: result.warning,
+            variant: 'destructive'
+          });
+        }
       } catch (e) {
         console.error('Failed to trigger payout function', e);
+        toast({ 
+          title: 'Payment Error', 
+          description: 'Failed to process driver payout',
+          variant: 'destructive'
+        });
       }
       navigate('/driver-dashboard');
     }
