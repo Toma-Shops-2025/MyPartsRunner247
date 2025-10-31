@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
@@ -32,6 +32,28 @@ const NewDriverDashboardPage: React.FC = () => {
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
   const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
   const [isTracking, setIsTracking] = useState<boolean>(false);
+  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+  const locationUpdateCountRef = useRef<number>(0);
+
+  // Memoize location update handler to prevent re-renders
+  const handleLocationUpdate = useCallback((lat: number, lng: number) => {
+    // Throttle location updates - only log/process every 10th update or if location changed significantly
+    locationUpdateCountRef.current++;
+    const prevLocation = lastLocationRef.current;
+    
+    if (!prevLocation || 
+        Math.abs(prevLocation.lat - lat) > 0.001 || 
+        Math.abs(prevLocation.lng - lng) > 0.001) {
+      // Location changed significantly - update location tracking
+      lastLocationRef.current = { lat, lng };
+      
+      // Only log occasionally to reduce console spam
+      if (locationUpdateCountRef.current % 10 === 0) {
+        // Location tracking service update would go here if needed
+        // locationTrackingService.updateLocation(user?.id, lat, lng);
+      }
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
@@ -677,10 +699,7 @@ const NewDriverDashboardPage: React.FC = () => {
             console.log('Delivery completed');
             // Handle delivery completion
           }}
-          onLocationUpdate={(lat, lng) => {
-            console.log('Location updated:', lat, lng);
-            // Handle location update
-          }}
+          onLocationUpdate={handleLocationUpdate}
           customerPhone={activeOrders[0].customer_phone}
           customerEmail={activeOrders[0].customer_email}
         />

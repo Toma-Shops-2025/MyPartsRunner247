@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Clock, Car, Navigation } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { loadGoogleMaps } from '@/utils/googleMapsLoader';
 
 interface CustomerTrackingProps {
   orderId: string;
@@ -111,60 +112,47 @@ const CustomerTracking: React.FC<CustomerTrackingProps> = ({ orderId }) => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
-    const googleApiKey = 'AIzaSyBNIjxagh6NVm-NQz0lyUMlGAQJEkReJ7o';
-    if (!googleApiKey) {
-      console.error('Google Maps API key not found');
-      return;
-    }
+    let isMounted = true;
+    let updateInterval: ReturnType<typeof setInterval> | null = null;
 
-    // Load Google Maps JavaScript API
-    const loadGoogleMaps = () => {
-      if (window.google && window.window.google.maps) {
-        initializeMap();
-        return;
-      }
+    // Load Google Maps JavaScript API using shared loader
+    loadGoogleMaps(['geometry'])
+      .then(() => {
+        if (!isMounted || !mapContainer.current || !window.google?.maps) return;
 
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=geometry`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeMap;
-      document.head.appendChild(script);
-    };
+        // Initialize map
+        mapRef.current = new window.google.maps.Map(mapContainer.current, {
+          center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
+          zoom: 12,
+          mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ]
+        });
 
-    const initializeMap = () => {
-      if (!mapContainer.current || !window.google) return;
+        // Fetch real order data
+        fetchOrderData();
 
-      // Initialize map
-      mapRef.current = new window.google.maps.Map(mapContainer.current, {
-        center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
-        zoom: 12,
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
-        styles: [
-          {
-            featureType: 'poi',
-            elementType: 'labels',
-            stylers: [{ visibility: 'off' }]
+        // Set up real-time updates
+        updateInterval = setInterval(() => {
+          if (isMounted) {
+            fetchOrderData(); // Refresh order data every 30 seconds
           }
-        ]
+        }, 30000);
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps:', error);
       });
 
-      // Fetch real order data
-      fetchOrderData();
-
-      // Set up real-time updates
-      const interval = setInterval(() => {
-        fetchOrderData(); // Refresh order data every 30 seconds
-      }, 30000);
-
-      return () => {
-        clearInterval(interval);
-      };
-    };
-
-    loadGoogleMaps();
-
     return () => {
+      isMounted = false;
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
       if (driverMarker.current) {
         driverMarker.current.setMap(null);
       }

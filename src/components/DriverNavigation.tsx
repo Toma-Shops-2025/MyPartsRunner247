@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Navigation, CheckCircle, Clock, Car } from 'lucide-react';
+import { loadGoogleMaps } from '@/utils/googleMapsLoader';
 
 interface DriverNavigationProps {
   pickupLocation: string;
@@ -24,105 +25,107 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   customerPhone,
   customerEmail
 }) => {
-  // Debug props
-  console.log('DriverNavigation props:', {
-    pickupLocation,
-    deliveryLocation,
-    orderId,
-    customerPhone,
-    customerEmail
-  });
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any | null>(null);
   const directionsService = useRef<any | null>(null);
   const directionsRenderer = useRef<any | null>(null);
+  const geolocationWatchId = useRef<number | null>(null);
   const [currentStep, setCurrentStep] = useState<'pickup' | 'delivery'>('pickup');
   const [currentLocation, setCurrentLocation] = useState<{lat: number, lng: number} | null>(null);
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // Memoize location update callback to prevent re-renders
+  const handleLocationUpdate = useCallback((lat: number, lng: number) => {
+    onLocationUpdate(lat, lng);
+  }, [onLocationUpdate]);
+
   useEffect(() => {
     if (!mapContainer.current) {
       return;
     }
 
-    // Load Google Maps JavaScript API
-    const loadGoogleMaps = () => {
-      if ((window as any).google && (window as any).google.maps) {
-        initializeMap();
-        return;
-      }
+    let isMounted = true;
 
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBNIjxagh6NVm-NQz0lyUMlGAQJEkReJ7o&libraries=places`;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
+    // Load Google Maps JavaScript API using shared loader
+    loadGoogleMaps(['places'])
+      .then(() => {
+        if (!isMounted || !mapContainer.current) return;
 
-      script.onload = () => {
-        initializeMap();
-      };
-    };
+        // Initialize map
+        mapRef.current = new (window as any).google.maps.Map(mapContainer.current, {
+          center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
+          zoom: 12,
+          mapTypeId: (window as any).google.maps.MapTypeId.ROADMAP,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }]
+            }
+          ]
+        });
 
-    // Initialize map
-    const initializeMap = () => {
-      if (!mapContainer.current) return;
+        // Initialize directions service
+        directionsService.current = new (window as any).google.maps.DirectionsService();
+        directionsRenderer.current = new (window as any).google.maps.DirectionsRenderer({
+          draggable: false,
+          suppressMarkers: false,
+          map: mapRef.current
+        });
 
-      mapRef.current = new (window as any).google.maps.Map(mapContainer.current, {
-        center: { lat: 38.2527, lng: -85.7585 }, // Louisville center
-        zoom: 12,
-        mapTypeId: (window as any).google.maps.MapTypeId.ROADMAP,
-        styles: [
-          {
-            featureType: 'poi',
-            elementType: 'labels',
-            stylers: [{ visibility: 'off' }]
-          }
-        ]
-      });
+        // Start watching user's geolocation with more lenient settings
+        if (navigator.geolocation) {
+          geolocationWatchId.current = navigator.geolocation.watchPosition(
+            (position) => {
+              if (!isMounted) return;
+              
+              const { latitude, longitude } = position.coords;
+              const newLocation = { lat: latitude, lng: longitude };
+              setCurrentLocation((prev) => {
+                // Only update if location actually changed (reduce unnecessary updates)
+                if (!prev || 
+                    Math.abs(prev.lat - latitude) > 0.0001 || 
+                    Math.abs(prev.lng - longitude) > 0.0001) {
+                  handleLocationUpdate(latitude, longitude);
+                  return newLocation;
+                }
+                return prev;
+              });
 
-      // Initialize directions service
-      directionsService.current = new (window as any).google.maps.DirectionsService();
-      directionsRenderer.current = new (window as any).google.maps.DirectionsRenderer({
-        draggable: false,
-        suppressMarkers: false
-      });
-
-      // Start watching user's geolocation with more lenient settings
-      const watchId = navigator.geolocation.watchPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const newLocation = { lat: latitude, lng: longitude };
-          setCurrentLocation(newLocation);
-          onLocationUpdate(latitude, longitude);
-
-          // Update map center to driver's current location
-          mapRef.current?.setCenter(newLocation);
-        },
-        (error) => {
-          console.warn('Geolocation not available:', error.message);
-          // Don't fail completely - just work without current location
-        },
-        { 
-          enableHighAccuracy: false, // Less aggressive for better compatibility
-          timeout: 10000, // Longer timeout
-          maximumAge: 300000 // 5 minutes cache
+              // Update map center to driver's current location
+              mapRef.current?.setCenter(newLocation);
+            },
+            (error) => {
+              // Only log errors that aren't timeout-related
+              if (error.code !== error.TIMEOUT) {
+                console.warn('Geolocation error:', error.message);
+              }
+              // Don't fail completely - just work without current location
+            },
+            { 
+              enableHighAccuracy: false, // Less aggressive for better compatibility
+              timeout: 10000, // Longer timeout
+              maximumAge: 300000 // 5 minutes cache
+            }
+          );
         }
-      );
+      })
+      .catch((error) => {
+        console.error('Failed to load Google Maps:', error);
+      });
 
-      return () => {
-        navigator.geolocation.clearWatch(watchId);
-      };
+    return () => {
+      isMounted = false;
+      if (geolocationWatchId.current !== null) {
+        navigator.geolocation.clearWatch(geolocationWatchId.current);
+        geolocationWatchId.current = null;
+      }
     };
-
-    loadGoogleMaps();
-  }, [pickupLocation, deliveryLocation, onLocationUpdate]);
+  }, []); // Empty deps - only run once on mount
 
   const navigateToPickup = () => {
-    console.log('Navigate to Pickup clicked');
-    console.log('Pickup location:', pickupLocation);
-    console.log('Current location:', currentLocation);
     setIsNavigating(true);
     
     // Check if user is on mobile device for native app navigation
@@ -192,9 +195,6 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
   };
 
   const navigateToDelivery = () => {
-    console.log('Navigate to Delivery clicked');
-    console.log('Delivery location:', deliveryLocation);
-    console.log('Pickup location:', pickupLocation);
     setIsNavigating(true);
     
     // Check if user is on mobile device for native app navigation
@@ -350,14 +350,10 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
               variant="outline"
               className="border-teal-600 text-teal-600 hover:bg-teal-50 flex-1"
               onClick={() => {
-                console.log('Call button clicked');
-                console.log('Customer phone:', customerPhone);
                 if (customerPhone) {
                   const callUrl = `tel:${customerPhone}`;
-                  console.log('Opening call URL:', callUrl);
                   window.open(callUrl, '_blank');
                 } else {
-                  console.warn('No customer phone number available');
                   alert('Customer phone number not available. Please contact support.');
                 }
               }}
@@ -369,14 +365,10 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
               variant="outline"
               className="border-purple-600 text-purple-600 hover:bg-purple-50 flex-1"
               onClick={() => {
-                console.log('Text button clicked');
-                console.log('Customer phone:', customerPhone);
                 if (customerPhone) {
                   const smsUrl = `sms:${customerPhone}`;
-                  console.log('Opening SMS URL:', smsUrl);
                   window.open(smsUrl, '_blank');
                 } else {
-                  console.warn('No customer phone number available');
                   alert('Customer phone number not available. Please contact support.');
                 }
               }}
