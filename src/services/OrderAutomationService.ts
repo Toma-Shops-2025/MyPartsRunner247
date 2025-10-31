@@ -91,8 +91,8 @@ export class OrderAutomationService {
       // Notify all online drivers
       for (const driver of onlineDrivers) {
         try {
-          // Send push notification
-          await this.sendPushNotification(driver.id, {
+          // Send push notification (will silently fail if no subscription)
+          const pushResult = await this.sendPushNotification(driver.id, {
             title: 'New Order Available!',
             body: `Order #${String(order.id).slice(-8)} - $${order.total} - ${order.pickup_address?.substring(0, 40) || 'Pickup location'}...`,
             data: {
@@ -100,24 +100,32 @@ export class OrderAutomationService {
               type: 'order_available'
             }
           });
+          
+          if (!pushResult) {
+            console.log(`⚠️ Push notification failed for driver ${driver.id} (likely no subscription)`);
+          }
 
           // Create in-app notification
-          await supabase
-            .from('driver_notifications')
-            .insert({
-              user_id: driver.id,
-              type: 'order_available',
-              title: 'New Order Available!',
-              message: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
-              severity: 'info',
-              action_required: true,
-              metadata: {
-                order_id: order.id,
-                pickup_address: order.pickup_address,
-                delivery_address: order.delivery_address,
-                total: order.total
-              }
-            });
+          try {
+            const { error: notifError } = await supabase
+              .from('driver_notifications')
+              .insert({
+                driver_id: driver.id,
+                type: 'in_app',
+                title: 'New Order Available!',
+                body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
+                status: 'unread',
+                data: {
+                  order_id: order.id,
+                  pickup_address: order.pickup_address,
+                  delivery_address: order.delivery_address,
+                  total: order.total
+                }
+              });
+            if (notifError) console.error('Failed to create in-app notification:', notifError);
+          } catch (notifErr) {
+            console.error('Error creating in-app notification:', notifErr);
+          }
         } catch (driverError) {
           console.error(`Error notifying driver ${driver.id}:`, driverError);
         }
@@ -290,12 +298,17 @@ export class OrderAutomationService {
   }
 
   // Send push notification
-  private async sendPushNotification(userId: string, notification: any) {
-    await PushApiService.sendToUsers([userId], {
-      title: notification?.title || 'MyPartsRunner',
-      body: notification?.body || 'You have an update',
-      data: notification?.data || {}
-    });
+  private async sendPushNotification(userId: string, notification: any): Promise<boolean> {
+    try {
+      return await PushApiService.sendToUsers([userId], {
+        title: notification?.title || 'MyPartsRunner',
+        body: notification?.body || 'You have an update',
+        data: notification?.data || {}
+      });
+    } catch (error) {
+      console.error('Error sending push notification:', error);
+      return false;
+    }
   }
 
   // Send SMS
@@ -374,23 +387,27 @@ export class OrderAutomationService {
       for (const driver of allDrivers) {
         try {
           // Create in-app notification
-          await supabase
-            .from('driver_notifications')
-            .insert({
-              user_id: driver.id,
-              type: 'order_available',
-              title: 'New Order Available!',
-              message: `Order #${order.id.slice(-8)} is waiting for a driver. Pickup: ${order.pickup_address}. Total: $${order.total}`,
-              severity: 'info',
-              action_required: true,
-              metadata: {
-                order_id: order.id,
-                pickup_address: order.pickup_address,
-                delivery_address: order.delivery_address,
-                total: order.total,
-                is_broadcast: true
-              }
-            });
+          try {
+            const { error: notifError } = await supabase
+              .from('driver_notifications')
+              .insert({
+                driver_id: driver.id,
+                type: 'in_app',
+                title: 'New Order Available!',
+                body: `Order #${String(order.id).slice(-8)} is waiting for a driver. Pickup: ${order.pickup_address}. Total: $${order.total}`,
+                status: 'unread',
+                data: {
+                  order_id: order.id,
+                  pickup_address: order.pickup_address,
+                  delivery_address: order.delivery_address,
+                  total: order.total,
+                  is_broadcast: true
+                }
+              });
+            if (notifError) console.error('Failed to create in-app notification:', notifError);
+          } catch (notifErr) {
+            console.error('Error creating in-app notification:', notifErr);
+          }
 
           // Send push notification if driver has push enabled
           await this.sendPushNotification(driver.id, {
