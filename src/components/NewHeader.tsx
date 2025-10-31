@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { usePushSubscription } from '@/hooks/usePushSubscription';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import NewAuthModal from './NewAuthModal';
 import AvatarUpload from './AvatarUpload';
-import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft, BookOpen } from 'lucide-react';
+import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft, BookOpen, Bell, BellOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewHeader: React.FC = () => {
   const { user, profile, signOut, forceLogout, loading, updateUserType } = useAuth();
+  const { hasSubscription: hasPushSubscription } = usePushSubscription();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -110,12 +112,24 @@ const NewHeader: React.FC = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
-              {/* Online/Offline badge for drivers */}
+              {/* Status badges for drivers */}
               {user && profile?.user_type === 'driver' && (
-                <div className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border ${profile?.is_online ? 'bg-green-900/40 text-green-300 border-green-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`}>
-                  <span className={`inline-block w-2 h-2 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-gray-400'}`}></span>
-                  <span>{profile?.is_online ? 'Online' : 'Offline'}</span>
-                </div>
+                <>
+                  {/* Online/Offline badge */}
+                  <div className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border ${profile?.is_online ? 'bg-green-900/40 text-green-300 border-green-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`}>
+                    <span className={`inline-block w-2 h-2 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-gray-400'}`}></span>
+                    <span>{profile?.is_online ? 'Online' : 'Offline'}</span>
+                  </div>
+                  {/* Push Notification badge */}
+                  <div className={`flex items-center gap-2 px-2 py-1 rounded-full text-xs font-medium border ${hasPushSubscription ? 'bg-blue-900/40 text-blue-300 border-blue-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`} title={hasPushSubscription ? 'Push notifications enabled' : 'Push notifications disabled'}>
+                    {hasPushSubscription ? (
+                      <Bell className="w-3 h-3" />
+                    ) : (
+                      <BellOff className="w-3 h-3" />
+                    )}
+                    <span>{hasPushSubscription ? 'Push On' : 'Push Off'}</span>
+                  </div>
+                </>
               )}
               {/* Admin Dashboard Button - Always visible for admins */}
               {user && profile?.user_type === 'admin' && (

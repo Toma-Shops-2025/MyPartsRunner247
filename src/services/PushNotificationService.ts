@@ -290,6 +290,61 @@ class PushNotificationService {
     }
     return window.btoa(binary);
   }
+
+  // Check if user has an active push subscription
+  async hasActiveSubscription(): Promise<boolean> {
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) return false;
+      
+      const subscription = await registration.pushManager.getSubscription();
+      return !!subscription;
+    } catch (error) {
+      console.error('Error checking subscription:', error);
+      return false;
+    }
+  }
+
+  // Restore subscription to database if browser has one but it's not saved
+  async restoreSubscriptionIfNeeded(userId: string): Promise<boolean> {
+    try {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) return false;
+
+      const browserSubscription = await registration.pushManager.getSubscription();
+      if (!browserSubscription) return false;
+
+      // Save subscription directly to database using Netlify function
+      const customSubscription = {
+        endpoint: browserSubscription.endpoint,
+        keys: {
+          p256dh: this.arrayBufferToBase64(browserSubscription.getKey('p256dh')!),
+          auth: this.arrayBufferToBase64(browserSubscription.getKey('auth')!)
+        }
+      };
+
+      const response = await fetch('/.netlify/functions/save-push-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subscription: customSubscription,
+          userId: userId
+        })
+      });
+
+      if (response.ok) {
+        console.log('✅ Push subscription restored to database');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('Error restoring subscription:', error);
+      return false;
+    }
+  }
 }
 
 // Export singleton instance
