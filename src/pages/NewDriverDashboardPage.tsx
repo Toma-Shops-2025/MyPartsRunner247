@@ -153,16 +153,52 @@ const NewDriverDashboardPage: React.FC = () => {
 
       const { data, error } = await supabase
         .from('driver_applications')
-        .select('verification_deadline')
+        .select('verification_deadline, verification_status, status')
         .eq('user_id', user?.id)
         .single();
       
-      if (data?.verification_deadline) {
-        const deadline = new Date(data.verification_deadline);
-        setVerificationDeadline(deadline);
+      // Only show deadline if verification is not completed
+      // Check if status is 'approved' or verification_status indicates completion
+      if (data) {
+        const isVerified = data.status === 'approved' || 
+                          data.verification_status === 'approved' || 
+                          data.verification_status === 'verified';
+        
+        // Also check profile for verification status
+        if (!isVerified && user?.id) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('verification_status, driver_license_verified, insurance_verified')
+            .eq('id', user.id)
+            .single();
+          
+          // Check if driver has completed verification based on profile
+          const profileVerified = profileData?.verification_status === 'approved' ||
+                                 (profileData?.driver_license_verified && profileData?.insurance_verified);
+          
+          if (profileVerified) {
+            setVerificationDeadline(null);
+            return;
+          }
+        }
+        
+        // If verification is complete, don't show deadline
+        if (isVerified) {
+          setVerificationDeadline(null);
+          return;
+        }
+        
+        // Only set deadline if verification is still pending and deadline exists
+        if (data?.verification_deadline && !isVerified) {
+          const deadline = new Date(data.verification_deadline);
+          setVerificationDeadline(deadline);
+        } else {
+          setVerificationDeadline(null);
+        }
       }
     } catch (error) {
       console.error('Error loading verification deadline:', error);
+      setVerificationDeadline(null);
     }
   };
 
