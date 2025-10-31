@@ -379,19 +379,11 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
         </CardContent>
       </Card>
 
-      {/* Map Container */}
-      <Card className="bg-gray-800 border-gray-700">
-        <CardHeader>
-          <CardTitle className="text-white">Navigation Map</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div 
-            ref={mapContainer}
-            className="w-full h-96 bg-gray-700 rounded-lg"
-            style={{ minHeight: '400px' }}
-          />
-        </CardContent>
-      </Card>
+      {/* Hidden map container for directions calculations (not displayed to user) */}
+      <div 
+        ref={mapContainer}
+        className="hidden"
+      />
     </div>
   );
 };
