@@ -18,30 +18,57 @@ export function usePushSubscription() {
       return;
     }
 
-    // Check if user has an active subscription
-    const checkSubscription = async () => {
+    // Check if user has an active subscription and restore if needed
+    const checkAndRestoreSubscription = async () => {
       try {
         setIsChecking(true);
-        const hasSub = await pushNotificationService.hasActiveSubscription();
-        setHasSubscription(hasSub);
         
-        // If browser has subscription, try to restore it to DB if needed
-        if (hasSub) {
-          await pushNotificationService.restoreSubscriptionIfNeeded(user.id);
+        // Wait a bit for service worker to be ready
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check if browser has an active subscription
+        const hasBrowserSub = await pushNotificationService.hasActiveSubscription();
+        
+        // Always try to restore subscription on login (even if check fails initially)
+        // This ensures the subscription is saved to DB after login
+        const restoreResult = await pushNotificationService.restoreSubscriptionIfNeeded(user.id);
+        
+        // Re-check after restoration attempt
+        const finalCheck = await pushNotificationService.hasActiveSubscription();
+        setHasSubscription(finalCheck || hasBrowserSub);
+        
+        if (restoreResult) {
+          console.log('✅ Push subscription restored successfully');
+        } else if (hasBrowserSub) {
+          console.log('⚠️ Browser has subscription but restoration may have failed');
         }
       } catch (error) {
-        console.error('Error checking push subscription:', error);
-        setHasSubscription(false);
+        console.error('Error checking/restoring push subscription:', error);
+        // Still check if browser has subscription even if restore fails
+        try {
+          const hasSub = await pushNotificationService.hasActiveSubscription();
+          setHasSubscription(hasSub);
+        } catch (checkError) {
+          setHasSubscription(false);
+        }
       } finally {
         setIsChecking(false);
       }
     };
 
-    checkSubscription();
+    // Run immediately on mount/login
+    checkAndRestoreSubscription();
 
-    // Re-check when permission changes
-    const interval = setInterval(checkSubscription, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
+    // Also run after a short delay to catch service worker registration
+    const delayedCheck = setTimeout(checkAndRestoreSubscription, 2000);
+
+    // Re-check periodically
+    const interval = setInterval(checkAndRestoreSubscription, 60000); // Check every minute
+    
+    return () => {
+      clearTimeout(delayedCheck);
+      clearInterval(interval);
+    };
   }, [user?.id]);
 
   return { hasSubscription, isChecking };

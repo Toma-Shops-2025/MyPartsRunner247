@@ -1,6 +1,8 @@
 // FREE Push Notification Service using Web Push API
 // ================================================
 
+import { supabase } from '@/lib/supabase';
+
 interface CustomPushSubscription {
   endpoint: string;
   keys: {
@@ -308,13 +310,34 @@ class PushNotificationService {
   // Restore subscription to database if browser has one but it's not saved
   async restoreSubscriptionIfNeeded(userId: string): Promise<boolean> {
     try {
-      const registration = await navigator.serviceWorker.getRegistration();
+      // First, ensure service worker is registered and ready
+      let registration = await navigator.serviceWorker.getRegistration();
+      
+      if (!registration) {
+        // Try to register service worker if not already registered
+        try {
+          registration = await navigator.serviceWorker.register('/sw.js');
+          await navigator.serviceWorker.ready;
+          console.log('Service worker registered for subscription restoration');
+        } catch (swError) {
+          console.error('Failed to register service worker for subscription restoration:', swError);
+          return false;
+        }
+      } else {
+        // Wait for service worker to be ready
+        await navigator.serviceWorker.ready;
+      }
+
       if (!registration) return false;
 
+      // Get subscription from push manager
       const browserSubscription = await registration.pushManager.getSubscription();
-      if (!browserSubscription) return false;
+      if (!browserSubscription) {
+        console.log('No browser subscription found to restore');
+        return false;
+      }
 
-      // Save subscription directly to database using Netlify function
+      // Convert to our custom format
       const customSubscription = {
         endpoint: browserSubscription.endpoint,
         keys: {
@@ -323,6 +346,24 @@ class PushNotificationService {
         }
       };
 
+      // Check if subscription already exists in database to avoid duplicate saves
+      try {
+        const { data: existingSubs } = await supabase
+          .from('push_subscriptions')
+          .select('endpoint')
+          .eq('user_id', userId)
+          .eq('endpoint', customSubscription.endpoint)
+          .limit(1);
+
+        if (existingSubs && existingSubs.length > 0) {
+          console.log('✅ Push subscription already exists in database');
+          return true;
+        }
+      } catch (checkError) {
+        console.warn('Could not check for existing subscription, proceeding with save:', checkError);
+      }
+
+      // Save subscription directly to database using Netlify function
       const response = await fetch('/.netlify/functions/save-push-subscription', {
         method: 'POST',
         headers: {
@@ -335,11 +376,14 @@ class PushNotificationService {
       });
 
       if (response.ok) {
-        console.log('✅ Push subscription restored to database');
+        const result = await response.json();
+        console.log('✅ Push subscription restored to database:', result);
         return true;
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to restore subscription:', response.status, errorText);
+        return false;
       }
-      
-      return false;
     } catch (error) {
       console.error('Error restoring subscription:', error);
       return false;
