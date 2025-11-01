@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from './useAuth';
 import pushNotificationService from '@/services/PushNotificationService';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Hook to check push notification subscription status
@@ -29,22 +30,45 @@ export function usePushSubscription() {
         // Check if browser has an active subscription
         const hasBrowserSub = await pushNotificationService.hasActiveSubscription();
         
-        // Always try to restore subscription on login (even if check fails initially)
-        // This ensures the subscription is saved to DB after login
-        const restoreResult = await pushNotificationService.restoreSubscriptionIfNeeded(user.id);
+        if (!hasBrowserSub) {
+          // No browser subscription, definitely no subscription
+          setHasSubscription(false);
+          setIsChecking(false);
+          return;
+        }
         
-        // Re-check after restoration attempt
-        const finalCheck = await pushNotificationService.hasActiveSubscription();
-        setHasSubscription(finalCheck || hasBrowserSub);
+        // Browser has subscription - check if it's in the database
+        const { data: dbSubscriptions, error } = await supabase
+          .from('push_subscriptions')
+          .select('endpoint')
+          .eq('user_id', user.id)
+          .limit(1);
         
-        if (restoreResult) {
-          console.log('✅ Push subscription restored successfully');
-        } else if (hasBrowserSub) {
-          console.log('⚠️ Browser has subscription but restoration may have failed');
+        const hasDbSubscription = !error && dbSubscriptions && dbSubscriptions.length > 0;
+        
+        // If browser has subscription but DB doesn't, restore it
+        if (hasBrowserSub && !hasDbSubscription) {
+          console.log('📱 Browser has subscription but not in DB, restoring...');
+          const restoreResult = await pushNotificationService.restoreSubscriptionIfNeeded(user.id);
+          
+          if (restoreResult) {
+            console.log('✅ Push subscription restored to database successfully');
+            setHasSubscription(true);
+          } else {
+            console.warn('⚠️ Failed to restore subscription to database');
+            // Only show as subscribed if it's in the database
+            setHasSubscription(false);
+          }
+        } else if (hasBrowserSub && hasDbSubscription) {
+          // Both browser and DB have subscription - fully subscribed
+          console.log('✅ Push subscription active (browser + database)');
+          setHasSubscription(true);
+        } else {
+          setHasSubscription(false);
         }
       } catch (error) {
         console.error('Error checking/restoring push subscription:', error);
-        // Still check if browser has subscription even if restore fails
+        // On error, fallback to browser check only
         try {
           const hasSub = await pushNotificationService.hasActiveSubscription();
           setHasSubscription(hasSub);
