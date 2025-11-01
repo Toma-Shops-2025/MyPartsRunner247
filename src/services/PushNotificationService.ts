@@ -1,8 +1,6 @@
 // FREE Push Notification Service using Web Push API
 // ================================================
 
-import { supabase } from '@/lib/supabase';
-
 interface CustomPushSubscription {
   endpoint: string;
   keys: {
@@ -347,21 +345,8 @@ class PushNotificationService {
       };
 
       // Check if subscription already exists in database to avoid duplicate saves
-      try {
-        const { data: existingSubs } = await supabase
-          .from('push_subscriptions')
-          .select('endpoint')
-          .eq('user_id', userId)
-          .eq('endpoint', customSubscription.endpoint)
-          .limit(1);
-
-        if (existingSubs && existingSubs.length > 0) {
-          console.log('✅ Push subscription already exists in database');
-          return true;
-        }
-      } catch (checkError) {
-        console.warn('Could not check for existing subscription, proceeding with save:', checkError);
-      }
+      // Note: We'll skip this check and let the Netlify function handle duplicates
+      // to avoid import complexity in the service class
 
       // Save subscription directly to database using Netlify function
       const response = await fetch('/.netlify/functions/save-push-subscription', {
