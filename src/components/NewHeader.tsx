@@ -307,6 +307,23 @@ const NewHeader: React.FC = () => {
                     <hr className="my-2 border-gray-600" />
                     {profile?.user_type === 'driver' && (
                       <>
+                        {/* Status badges for drivers - Mobile */}
+                        <div className="flex items-center gap-2 px-3 py-2">
+                          {/* Online/Offline badge */}
+                          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border flex-1 justify-center ${profile?.is_online ? 'bg-green-900/40 text-green-300 border-green-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`}>
+                            <span className={`inline-block w-2 h-2 rounded-full ${profile?.is_online ? 'bg-green-400' : 'bg-gray-400'}`}></span>
+                            <span>{profile?.is_online ? 'Online' : 'Offline'}</span>
+                          </div>
+                          {/* Push Notification badge */}
+                          <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border flex-1 justify-center ${hasPushSubscription ? 'bg-blue-900/40 text-blue-300 border-blue-700' : 'bg-gray-700/60 text-gray-300 border-gray-600'}`} title={hasPushSubscription ? 'Push notifications enabled' : 'Push notifications disabled'}>
+                            {hasPushSubscription ? (
+                              <Bell className="w-3 h-3" />
+                            ) : (
+                              <BellOff className="w-3 h-3" />
+                            )}
+                            <span>{hasPushSubscription ? 'Push On' : 'Push Off'}</span>
+                          </div>
+                        </div>
                         <button 
                           onClick={() => handleNavigation('/driver-dashboard')}
                           className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"
