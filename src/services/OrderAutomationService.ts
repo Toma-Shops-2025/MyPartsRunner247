@@ -300,6 +300,26 @@ export class OrderAutomationService {
   // Send push notification
   private async sendPushNotification(userId: string, notification: any): Promise<boolean> {
     try {
+      // For "new order" or "order available" notifications, verify user is a driver
+      const notificationType = notification?.data?.type;
+      const isOrderNotification = notification?.title?.includes('New Order') || 
+                                   notification?.title?.includes('Order Available') ||
+                                   notificationType === 'order_available';
+      
+      if (isOrderNotification) {
+        // Verify user is a driver before sending order notifications
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', userId)
+          .single();
+        
+        if (!userProfile || userProfile.user_type !== 'driver') {
+          console.log(`⚠️ Skipping order notification to non-driver user ${userId}`);
+          return false;
+        }
+      }
+      
       return await PushApiService.sendToUsers([userId], {
         title: notification?.title || 'MyPartsRunner',
         body: notification?.body || 'You have an update',
