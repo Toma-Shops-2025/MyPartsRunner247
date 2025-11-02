@@ -46,6 +46,14 @@ const AboutPage: React.FC = () => {
       {/* Hero Section */}
       <section className="bg-gray-800 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4 text-gray-300 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
           <div className="text-center">
             <h1 className="text-5xl font-bold text-white mb-6">
               About <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">MyPartsRunner</span>
