@@ -4,7 +4,7 @@ import NewHeader from '@/components/NewHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Target, Award, Heart } from 'lucide-react';
+import { Users, Target, Award, Heart, ArrowLeft } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();

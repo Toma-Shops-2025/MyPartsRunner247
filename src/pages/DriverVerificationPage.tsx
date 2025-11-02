@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +22,8 @@ import {
   CreditCard,
   AlertTriangle,
   Clock,
-  CheckSquare
+  CheckSquare,
+  ArrowLeft
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
@@ -40,6 +41,7 @@ interface VerificationStatus {
 
 const DriverVerificationPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
 
   // Helper function to check if we're in development mode
   const isDevelopment = () => {
@@ -548,6 +550,14 @@ const DriverVerificationPage: React.FC = () => {
       <NewHeader />
       
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Verification</h1>
           <p className="text-gray-300">

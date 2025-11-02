@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, Save, Upload, CheckCircle, X } from 'lucide-react';
+import { Car, Save, Upload, CheckCircle, X, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const VehicleSettingsPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
   const [vehicleData, setVehicleData] = useState({
     make: 'Toyota',
     model: 'Camry',
@@ -179,6 +180,14 @@ const VehicleSettingsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
         <NewHeader />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Vehicle Settings</h1>
           <p className="text-gray-600">Manage your delivery vehicle information</p>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,11 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import PaymentModal from '@/components/PaymentModal';
-import { MapPin, Package, Clock, DollarSign, Navigation } from 'lucide-react';
+import { MapPin, Package, Clock, DollarSign, Navigation, ArrowLeft } from 'lucide-react';
 
 const PlaceOrderPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
   const { location: userLocation, loading: locationLoading } = useLocation();
   const [orderData, setOrderData] = useState({
     pickupAddress: '',
@@ -148,6 +149,14 @@ const PlaceOrderPage: React.FC = () => {
     <div className="min-h-screen bg-gray-900">
       <NewHeader />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-4">Place Your Order</h1>
           <p className="text-gray-300">Get anything delivered from anywhere, anytime</p>

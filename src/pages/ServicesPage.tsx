@@ -4,7 +4,7 @@ import NewHeader from '@/components/NewHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Package, Clock, MapPin, Shield } from 'lucide-react';
+import { Package, Clock, MapPin, Shield, ArrowLeft } from 'lucide-react';
 
 const ServicesPage: React.FC = () => {
   const navigate = useNavigate();

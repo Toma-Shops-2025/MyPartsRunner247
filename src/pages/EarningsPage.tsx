@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, Calendar, Clock } from 'lucide-react';
+import { DollarSign, TrendingUp, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const EarningsPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
   const [earningsData, setEarningsData] = useState({
     totalEarnings: 0,
     totalTips: 0,
@@ -111,6 +112,14 @@ const EarningsPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
         <NewHeader />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 text-gray-600 hover:text-gray-900"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Earnings Dashboard</h1>
           <p className="text-gray-600">Track your delivery earnings and performance</p>

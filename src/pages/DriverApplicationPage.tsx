@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Car, FileText, CheckCircle } from 'lucide-react';
+import { Car, FileText, CheckCircle, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 const DriverApplicationPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const navigate = useNavigate();
   const [applicationData, setApplicationData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
@@ -155,6 +156,14 @@ const DriverApplicationPage: React.FC = () => {
     <div className="min-h-screen bg-gray-900">
         <NewHeader />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 text-gray-300 hover:text-white"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Driver Application</h1>
           <p className="text-gray-300">Apply to become a MyPartsRunner driver and start earning money delivering packages.</p>
