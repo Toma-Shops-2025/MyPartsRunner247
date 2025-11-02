@@ -151,7 +151,7 @@ const DriverOrderDetailsPage: React.FC = () => {
         <Card className="bg-gray-800 border-gray-700">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <Package className="w-5 h-5 text-teal-400" /> Order #{String(order.id).slice(-8)}
+              <Package className="w-5 h-5 text-teal-400" /> Order #{String(order.id).slice(0, 8)}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">

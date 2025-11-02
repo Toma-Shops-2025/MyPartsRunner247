@@ -528,7 +528,7 @@ const NewDriverDashboardPage: React.FC = () => {
                   <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-white">Order #{order.id.slice(-8)}</h3>
+                        <h3 className="font-semibold text-white">Order #{order.id.slice(0, 8)}</h3>
                         <p className="text-sm text-gray-300">
                           {order.pickup_address} → {order.delivery_address}
                         </p>
@@ -635,7 +635,7 @@ const NewDriverDashboardPage: React.FC = () => {
                   <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-white">Order #{order.id.slice(-8)}</h3>
+                        <h3 className="font-semibold text-white">Order #{order.id.slice(0, 8)}</h3>
                         <p className="text-sm text-gray-300">
                           {order.pickup_address} → {order.delivery_address}
                         </p>
