@@ -53,12 +53,13 @@ const ServicesPage: React.FC = () => {
           </Button>
           <div className="text-center">
             <h1 className="text-5xl font-bold text-white mb-6">
-            Our <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">Services</span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            From personal errands to business solutions, MyPartsRunner provides reliable delivery services 
-            that adapt to your needs. Available 24/7 nationwide.
-          </p>
+              Our <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">Services</span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              From personal errands to business solutions, MyPartsRunner provides reliable delivery services 
+              that adapt to your needs. Available 24/7 nationwide.
+            </p>
+          </div>
         </div>
       </section>
 
