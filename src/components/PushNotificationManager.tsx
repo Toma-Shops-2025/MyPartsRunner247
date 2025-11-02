@@ -200,18 +200,10 @@ const PushNotificationManager: React.FC = () => {
     );
   }
 
-  // If notifications are already set up, show minimal status
+  // If notifications are already set up, hide the component
+  // Status is shown in the header badge, no need to display here
   if (isSubscribed && permission === 'granted') {
-    return (
-      <Card className="bg-green-50 border-green-200">
-        <CardContent className="p-4">
-          <div className="flex items-center gap-2 text-green-800">
-            <Bell className="w-5 h-5" />
-            <span>Push notifications are enabled</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
 
   return (
