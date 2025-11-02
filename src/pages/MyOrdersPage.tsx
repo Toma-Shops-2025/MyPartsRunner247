@@ -151,6 +151,14 @@ const MyOrdersPage: React.FC = () => {
         <NewHeader />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
           <p className="text-gray-600">Track and manage your delivery orders</p>
         </div>
