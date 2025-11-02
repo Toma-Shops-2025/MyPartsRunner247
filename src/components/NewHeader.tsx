@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePushSubscription } from '@/hooks/usePushSubscription';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import NewAuthModal from './NewAuthModal';
 import AvatarUpload from './AvatarUpload';
-import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft, BookOpen, Bell, BellOff } from 'lucide-react';
+import { User, LogOut, Package, Car, BarChart3, Settings, Home, Menu, X, ArrowRightLeft, BookOpen, Bell, BellOff, Download, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const NewHeader: React.FC = () => {
@@ -14,7 +14,53 @@ const NewHeader: React.FC = () => {
   const { hasSubscription: hasPushSubscription } = usePushSubscription();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
   const navigate = useNavigate();
+
+  // Check if PWA is installable
+  useEffect(() => {
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                       (window.navigator as any).standalone === true;
+    
+    if (!isInstalled) {
+      const handleBeforeInstallPrompt = (e: Event) => {
+        e.preventDefault();
+        setInstallPrompt(e);
+        setShowInstallButton(true);
+      };
+      
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      
+      // Check for iOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        setShowInstallButton(true);
+      }
+      
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      };
+    }
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (installPrompt) {
+      try {
+        await (installPrompt as any).prompt();
+        const { outcome } = await (installPrompt as any).userChoice;
+        if (outcome === 'accepted') {
+          setShowInstallButton(false);
+        }
+        setInstallPrompt(null);
+      } catch (error) {
+        console.error('Install error:', error);
+      }
+    } else {
+      // iOS or instructions needed
+      navigate('/download-app');
+    }
+  };
 
   const handleNavigation = (path: string) => {
     // Debug logging only in development
@@ -112,6 +158,19 @@ const NewHeader: React.FC = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-2 sm:space-x-4">
+              {/* Install App Button */}
+              {showInstallButton && !user && (
+                <Button
+                  onClick={handleInstallClick}
+                  variant="outline"
+                  size="sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Get App
+                </Button>
+              )}
+              
               {/* Status badges for drivers */}
               {user && profile?.user_type === 'driver' && (
                 <>
@@ -266,8 +325,19 @@ const NewHeader: React.FC = () => {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="md:hidden">
+            {/* Mobile menu button and install button */}
+            <div className="md:hidden flex items-center gap-2">
+              {showInstallButton && !user && (
+                <Button
+                  onClick={handleInstallClick}
+                  variant="outline"
+                  size="sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white border-teal-600 px-3"
+                >
+                  <Smartphone className="w-4 h-4 mr-1" />
+                  <span className="text-xs">Get App</span>
+                </Button>
+              )}
               <Button
                 variant="ghost"
                 size="sm"
@@ -283,6 +353,15 @@ const NewHeader: React.FC = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden border-t border-gray-700 bg-gray-800">
               <div className="px-2 pt-2 pb-3 space-y-1">
+                {showInstallButton && !user && (
+                  <button 
+                    onClick={() => { handleInstallClick(); setIsMobileMenuOpen(false); }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md mb-2"
+                  >
+                    <Smartphone className="w-4 h-4 inline mr-2" />
+                    Get MyPartsRunner App
+                  </button>
+                )}
                 <button 
                   onClick={() => handleNavigation('/services')}
                   className="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-teal-400 hover:bg-gray-700 rounded-md"

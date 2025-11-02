@@ -32,6 +32,7 @@ import SupportPage from "./pages/SupportPage";
 import DriverTrainingPage from "./pages/DriverTrainingPage";
 import DriverOrderDetailsPage from "./pages/DriverOrderDetailsPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
+import DownloadAppPage from "./pages/DownloadAppPage";
 import PushNotificationManager from "./components/PushNotificationManager";
 import IOSDebugPanel from "./components/IOSDebugPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -118,6 +119,7 @@ const App = () => (
             <Route path="/admin-dashboard" element={<AdminDashboardPage />} />
             <Route path="/driver-training" element={<DriverTrainingPage />} />
             <Route path="/production-readiness" element={<ProductionReadinessDashboard />} />
+            <Route path="/download-app" element={<DownloadAppPage />} />
             <Route path="*" element={<NotFound />} />
             </Routes>
           </ErrorBoundary>

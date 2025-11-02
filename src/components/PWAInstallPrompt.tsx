@@ -85,65 +85,71 @@ const PWAInstallPrompt: React.FC = () => {
   }
 
   return (
-    <Card className="fixed bottom-4 left-4 right-4 z-50 bg-gradient-to-r from-teal-500 to-blue-600 text-white border-0 shadow-lg">
-      <CardHeader className="pb-2">
+    <Card className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 z-50 bg-gradient-to-r from-teal-600 to-blue-600 text-white border-0 shadow-2xl animate-in slide-in-from-bottom-4">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Smartphone className="w-5 h-5" />
-            Install MyPartsRunner
+          <CardTitle className="text-xl font-bold flex items-center gap-2">
+            <Smartphone className="w-6 h-6" />
+            Get the MyPartsRunner App
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleDismiss}
-            className="text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 rounded-full"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
-        <div className="space-y-3">
-          <p className="text-sm opacity-90">
+        <div className="space-y-4">
+          <p className="text-base font-medium">
             {installSource === 'ios' 
-              ? 'Add to your home screen for quick access and offline support!'
-              : 'Install our app for a better experience with offline support and push notifications!'
+              ? '📱 Install for faster access, push notifications, and offline mode!'
+              : '🚀 Install our app for a faster, better experience with offline support and instant notifications!'
             }
           </p>
           
           <div className="flex gap-2">
             {installSource === 'ios' ? (
-              <div className="flex-1">
+              <div className="flex-1 space-y-2">
                 <Button
                   onClick={() => setShowInstallPrompt(false)}
-                  className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30"
+                  className="w-full bg-white text-teal-600 hover:bg-gray-100 font-semibold py-3 text-base shadow-lg"
+                  size="lg"
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  Add to Home Screen
+                  <Download className="w-5 h-5 mr-2" />
+                  Show Instructions
                 </Button>
-                <p className="text-xs mt-1 opacity-75">
-                  Tap the share button and select "Add to Home Screen"
+                <p className="text-xs opacity-90 leading-relaxed">
+                  Tap <span className="font-bold">Share</span> (📤) then select <span className="font-bold">"Add to Home Screen"</span>
                 </p>
               </div>
             ) : (
               <Button
                 onClick={handleInstallClick}
-                className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30"
+                className="flex-1 bg-white text-teal-600 hover:bg-gray-100 font-semibold py-3 text-base shadow-lg"
+                size="lg"
               >
-                <Download className="w-4 h-4 mr-2" />
-                Install App
+                <Download className="w-5 h-5 mr-2" />
+                Install Now
               </Button>
             )}
           </div>
           
-          <div className="flex items-center gap-4 text-xs opacity-75">
-            <div className="flex items-center gap-1">
-              <Monitor className="w-3 h-3" />
-              <span>Works offline</span>
+          <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/20">
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                <Monitor className="w-3 h-3" />
+              </div>
+              <span className="font-medium">Works Offline</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Smartphone className="w-3 h-3" />
-              <span>Push notifications</span>
+            <div className="flex items-center gap-2 text-xs">
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                <Smartphone className="w-3 h-3" />
+              </div>
+              <span className="font-medium">Push Alerts</span>
             </div>
           </div>
         </div>
