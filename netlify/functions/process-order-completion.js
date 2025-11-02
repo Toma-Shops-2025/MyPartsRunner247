@@ -122,7 +122,12 @@ exports.handler = async (event, context) => {
 
     // Process payment to driver
     try {
-      console.log(`💸 Creating transfer: $${(driverPaymentAmount / 100).toFixed(2)} to driver ${stripeAccountId}`);
+      console.log(`💸 CREATING TRANSFER TO DRIVER`);
+      console.log(`   Order ID: ${orderId}`);
+      console.log(`   Driver ID: ${order.driver_id}`);
+      console.log(`   Driver Stripe Account: ${stripeAccountId}`);
+      console.log(`   Amount: $${(driverPaymentAmount / 100).toFixed(2)}`);
+      console.log(`   Order Total: $${orderTotal.toFixed(2)}`);
       
       // IMPORTANT: Stripe Connect transfers go to driver's Stripe balance
       // From there, funds pay out on driver's schedule (2-7 days by default)
@@ -131,9 +136,41 @@ exports.handler = async (event, context) => {
       // 2. Have a debit card added
       // 3. Manually trigger instant payout OR have it auto-enabled
       
+      // Verify we have enough balance to transfer
+      try {
+        const balance = await stripe.balance.retrieve();
+        const availableBalance = balance.available[0]?.amount || 0;
+        console.log(`   Platform available balance: $${(availableBalance / 100).toFixed(2)}`);
+        
+        if (availableBalance < driverPaymentAmount) {
+          console.error(`❌ INSUFFICIENT BALANCE! Need $${(driverPaymentAmount / 100).toFixed(2)}, have $${(availableBalance / 100).toFixed(2)}`);
+          throw new Error(`Insufficient balance. Need $${(driverPaymentAmount / 100).toFixed(2)}, have $${(availableBalance / 100).toFixed(2)}`);
+        }
+      } catch (balanceError) {
+        console.warn('⚠️ Could not check balance, continuing anyway:', balanceError.message);
+      }
+      
+      // Verify driver account before transferring
+      try {
+        const account = await stripe.accounts.retrieve(stripeAccountId);
+        console.log(`   Account status: ${account.details_submitted ? 'onboarded' : 'not onboarded'}`);
+        console.log(`   Charges enabled: ${account.charges_enabled}`);
+        console.log(`   Payouts enabled: ${account.payouts_enabled}`);
+        console.log(`   Transfers capability: ${account.capabilities?.transfers || 'not_requested'}`);
+        
+        if (account.capabilities?.transfers !== 'active') {
+          console.error(`❌ TRANSFERS CAPABILITY NOT ACTIVE! Status: ${account.capabilities?.transfers}`);
+          throw new Error(`Driver transfers capability is ${account.capabilities?.transfers || 'not_requested'}. Must be 'active' to receive transfers.`);
+        }
+      } catch (accountCheckError) {
+        console.error('❌ Error checking driver account:', accountCheckError);
+        throw accountCheckError;
+      }
+      
       // Create transfer to driver's Stripe Connect account
       // This puts money in their Stripe balance immediately
       // Payout timing depends on driver's account settings
+      console.log(`   Creating transfer now...`);
       const transfer = await stripe.transfers.create({
         amount: driverPaymentAmount,
         currency: 'usd',
@@ -141,6 +178,7 @@ exports.handler = async (event, context) => {
         description: `Driver payment (70%) for order ${orderId}`,
         metadata: {
           order_id: orderId,
+          driver_id: order.driver_id,
           payment_type: 'driver_commission',
           commission_rate: '70%',
           order_total: orderTotal.toFixed(2),
@@ -148,6 +186,12 @@ exports.handler = async (event, context) => {
           note: 'Funds transferred to driver Stripe balance. Payout timing depends on driver account settings.'
         }
       });
+      
+      console.log(`✅ TRANSFER CREATED SUCCESSFULLY!`);
+      console.log(`   Transfer ID: ${transfer.id}`);
+      console.log(`   Transfer Amount: $${(transfer.amount / 100).toFixed(2)}`);
+      console.log(`   Transfer Status: ${transfer.status}`);
+      console.log(`   Destination: ${transfer.destination}`);
       
       // Check if driver has instant payout capability
       let payoutTiming = '2-7 business days (standard Stripe schedule)';
@@ -208,7 +252,12 @@ exports.handler = async (event, context) => {
       };
 
     } catch (stripeError) {
-      console.error('Stripe transfer error:', stripeError);
+      console.error('❌❌❌ STRIPE TRANSFER ERROR ❌❌❌');
+      console.error('   Error Type:', stripeError.type);
+      console.error('   Error Code:', stripeError.code);
+      console.error('   Error Message:', stripeError.message);
+      console.error('   Error Status:', stripeError.statusCode);
+      console.error('   Full Error:', JSON.stringify(stripeError, null, 2));
       
       // Check for specific capability error
       let errorMessage = stripeError.message;
@@ -217,6 +266,15 @@ exports.handler = async (event, context) => {
       if (stripeError.code === 'insufficient_capabilities_for_transfer') {
         userFriendlyMessage = 'Driver Stripe account is not fully set up. The driver needs to complete Stripe Connect onboarding and enable transfers capability.';
         console.error('🚫 Driver Stripe account missing transfers capability. Driver must complete onboarding at: https://dashboard.stripe.com');
+      } else if (stripeError.code === 'insufficient_funds') {
+        userFriendlyMessage = 'Platform account does not have sufficient funds to transfer to driver. Check Stripe balance.';
+        console.error('🚫 INSUFFICIENT FUNDS in platform account to transfer to driver!');
+      } else if (stripeError.code === 'account_invalid') {
+        userFriendlyMessage = 'Driver Stripe account is invalid or does not exist. Driver must reconnect their Stripe account.';
+        console.error('🚫 Driver Stripe account is invalid!');
+      } else if (stripeError.type === 'StripeInvalidRequestError') {
+        userFriendlyMessage = `Stripe rejected the transfer request: ${stripeError.message}`;
+        console.error('🚫 Stripe rejected transfer request!');
       }
       
       // Try to update earnings record as failed (non-blocking)
