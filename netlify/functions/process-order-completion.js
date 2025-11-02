@@ -124,8 +124,18 @@ exports.handler = async (event, context) => {
     try {
       console.log(`💸 Creating transfer: $${(driverPaymentAmount / 100).toFixed(2)} to driver ${stripeAccountId}`);
       
+      // IMPORTANT: Stripe Connect transfers go to driver's Stripe balance
+      // From there, funds pay out on driver's schedule (2-7 days by default)
+      // For instant payouts, driver must:
+      // 1. Have instant payouts enabled in their Stripe account
+      // 2. Have a debit card added
+      // 3. Manually trigger instant payout OR have it auto-enabled
+      
+      // Create transfer to driver's Stripe Connect account
+      // This puts money in their Stripe balance immediately
+      // Payout timing depends on driver's account settings
       const transfer = await stripe.transfers.create({
-        amount: driverPaymentAmount, // Already in cents
+        amount: driverPaymentAmount,
         currency: 'usd',
         destination: stripeAccountId,
         description: `Driver payment (70%) for order ${orderId}`,
@@ -134,11 +144,34 @@ exports.handler = async (event, context) => {
           payment_type: 'driver_commission',
           commission_rate: '70%',
           order_total: orderTotal.toFixed(2),
-          platform_share: platformNetAfterFee.toFixed(2)
+          platform_share: platformNetAfterFee.toFixed(2),
+          note: 'Funds transferred to driver Stripe balance. Payout timing depends on driver account settings.'
         }
       });
+      
+      // Check if driver has instant payout capability
+      let payoutTiming = '2-7 business days (standard Stripe schedule)';
+      let instantAvailable = false;
+      
+      try {
+        const account = await stripe.accounts.retrieve(stripeAccountId);
+        // Check account settings for instant payout availability
+        // Note: Even if available, driver must have debit card to use it
+        instantAvailable = account.details_submitted && 
+                          account.payouts_enabled && 
+                          account.capabilities?.transfers === 'active';
+        
+        if (instantAvailable) {
+          payoutTiming = 'Funds are in your Stripe account. Add a debit card for instant payouts (minutes), otherwise 2-7 business days.';
+        }
+      } catch (accountCheckError) {
+        console.log('Could not check account for instant payout availability');
+      }
 
-      console.log(`Transfer created: ${transfer.id}`);
+      console.log(`✅ Transfer created: ${transfer.id}`);
+      console.log(`   Amount: $${(driverPaymentAmount / 100).toFixed(2)}`);
+      console.log(`   Driver: ${stripeAccountId}`);
+      console.log(`   Instant payouts available: ${instantAvailable ? 'Yes (if debit card added)' : 'No'}`);
 
       // Update earnings record with transfer ID
       await supabase
@@ -146,7 +179,8 @@ exports.handler = async (event, context) => {
         .update({
           status: 'paid',
           transfer_id: transfer.id,
-          paid_at: new Date().toISOString()
+          paid_at: new Date().toISOString(),
+          payout_method: instantAvailable ? 'instant_available' : 'standard'
         })
         .eq('order_id', orderId);
 
@@ -164,7 +198,12 @@ exports.handler = async (event, context) => {
           driverPayment: driverPaymentGross.toFixed(2),
           platformShare: platformShareGross.toFixed(2),
           platformNet: platformNetAfterFee.toFixed(2),
-          message: 'Driver payment processed successfully - 70% to driver, 30% to platform (fees deducted)'
+          instantPayoutsAvailable: instantAvailable,
+          payoutTiming: payoutTiming,
+          message: `✅ Driver payment processed successfully! 70% ($${driverPaymentGross.toFixed(2)}) transferred to driver Stripe account. ${payoutTiming}`,
+          note: instantAvailable 
+            ? 'Driver can add debit card in Stripe dashboard to enable instant payouts (minutes vs 2-7 days)'
+            : 'Driver will receive payout in 2-7 business days per Stripe standard schedule'
         })
       };
 

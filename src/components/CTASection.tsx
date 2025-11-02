@@ -75,7 +75,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onRequestPickup, onBecomeDriver
               </li>
               <li className="flex items-center">
                 <ArrowRight className="w-5 h-5 text-blue-500 mr-3" />
-                Immediate Payouts
+                Fast Payouts (2-7 days or instant with debit card)
               </li>
             </ul>
             <button 

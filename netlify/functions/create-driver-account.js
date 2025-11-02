@@ -27,6 +27,14 @@ exports.handler = async (event, context) => {
         card_payments: { requested: true },
         transfers: { requested: true }
       },
+      settings: {
+        payouts: {
+          schedule: {
+            interval: 'manual', // Allows instant payouts when driver has debit card
+            // Note: Instant payouts require driver to add debit card in Stripe
+          }
+        }
+      },
       business_type: 'individual',
       individual: {
         email: email,
