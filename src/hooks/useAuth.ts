@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import autoPushNotificationService from '@/services/AutoPushNotificationService';
 
 export interface Profile {
   id: string;
@@ -74,6 +75,15 @@ export const useAuth = () => {
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
+            
+            // Automatically enable push notifications on login (after a short delay for service worker)
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications:', error);
+              }
+            }, 2000); // Wait 2 seconds for service worker to be ready
           } else {
             setLoading(false);
           }
@@ -85,6 +95,11 @@ export const useAuth = () => {
           setLastProcessedUserId(null);
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
+          
+          // Clear push notification tracking
+          if (lastProcessedUserId) {
+            autoPushNotificationService.clearUser(lastProcessedUserId);
+          }
         } else if (event === 'INITIAL_SESSION' && session?.user) {
           setSession(session);
           setUser(session.user);
@@ -93,6 +108,15 @@ export const useAuth = () => {
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
+            
+            // Automatically enable push notifications on initial session (after a short delay)
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications:', error);
+              }
+            }, 2000);
           } else {
             setLoading(false);
           }
