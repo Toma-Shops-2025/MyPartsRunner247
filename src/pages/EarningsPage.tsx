@@ -4,6 +4,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import NewHeader from '@/components/NewHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { DollarSign, TrendingUp, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
