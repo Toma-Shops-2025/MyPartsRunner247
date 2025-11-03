@@ -47,17 +47,30 @@ class AutoPushNotificationService {
       // Check if subscription exists in database
       const { data: dbSubscriptions, error: dbError } = await supabase
         .from('push_subscriptions')
-        .select('endpoint')
+        .select('endpoint, user_id')
         .eq('user_id', userId)
         .limit(1);
 
       const hasDbSub = dbSubscriptions && dbSubscriptions.length > 0;
 
+      console.log(`🔍 Subscription check for user ${userId}:`);
+      console.log(`   Browser subscription: ${hasBrowserSub ? '✅' : '❌'}`);
+      console.log(`   Database subscription: ${hasDbSub ? '✅' : '❌'}`);
+      if (dbError) {
+        console.error('   Database check error:', dbError);
+      }
+
       // If already subscribed in both browser and DB, we're done
       if (hasBrowserSub && hasDbSub) {
-        console.log('✅ User already has push notifications enabled');
+        console.log('✅ User already has push notifications enabled in both browser and database');
         this.subscribedUsers.add(userId);
         return true;
+      }
+      
+      // If browser has subscription but DB doesn't, we need to save it
+      if (hasBrowserSub && !hasDbSub) {
+        console.log('⚠️ Browser has subscription but database does not - saving to database...');
+        // This will be handled below by restoreSubscriptionIfNeeded
       }
 
       console.log(`🔔 Auto-enabling push notifications (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...`);

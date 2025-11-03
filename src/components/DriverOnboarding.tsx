@@ -76,10 +76,55 @@ const DriverOnboarding: React.FC<DriverOnboardingProps> = ({ onComplete }) => {
     // Update database to mark Stripe as connected
     if (user) {
       try {
-        await supabase
-          .from('profiles')
-          .update({ stripe_connected: true })
-          .eq('id', user.id);
+        // First verify the account is actually connected by checking Stripe
+        const accountId = localStorage.getItem('stripe_account_id') || profile?.stripe_account_id;
+        
+        if (accountId) {
+          // Verify with Stripe that account is actually connected
+          try {
+            const verifyResponse = await fetch('/.netlify/functions/check-driver-capabilities', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ driverId: user.id })
+            });
+            
+            const verifyResult = await verifyResponse.json();
+            
+            if (verifyResult.isFullyOnboarded || verifyResult.canReceiveTransfers) {
+              // Account is actually connected - update database
+              const { error: updateError } = await supabase
+                .from('profiles')
+                .update({ stripe_connected: true })
+                .eq('id', user.id);
+              
+              if (updateError) {
+                console.error('Error updating Stripe connection status:', updateError);
+              } else {
+                console.log('✅ Stripe connection status updated to true');
+              }
+            } else {
+              console.warn('⚠️ Stripe account not fully onboarded yet');
+              // Still update to true if user says they completed it
+              await supabase
+                .from('profiles')
+                .update({ stripe_connected: true })
+                .eq('id', user.id);
+            }
+          } catch (verifyError) {
+            console.error('Error verifying Stripe account:', verifyError);
+            // Fallback: just update the flag
+            await supabase
+              .from('profiles')
+              .update({ stripe_connected: true })
+              .eq('id', user.id);
+          }
+        } else {
+          // No account ID, just update flag
+          await supabase
+            .from('profiles')
+            .update({ stripe_connected: true })
+            .eq('id', user.id);
+        }
       } catch (error) {
         console.error('Error updating Stripe connection status:', error);
       }

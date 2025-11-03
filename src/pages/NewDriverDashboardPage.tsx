@@ -61,6 +61,20 @@ const NewDriverDashboardPage: React.FC = () => {
       checkOnboardingCompletion();
       fetchDriverData();
       
+      // Check if returning from Stripe onboarding (URL params)
+      const urlParams = new URLSearchParams(window.location.search);
+      const stripeSuccess = urlParams.get('success');
+      const stripeRefresh = urlParams.get('refresh');
+      
+      if (stripeSuccess === 'true' || stripeRefresh === 'true') {
+        console.log('🔄 Returning from Stripe onboarding - verifying and updating connection status...');
+        // Verify Stripe account status and update database
+        verifyAndUpdateStripeStatus();
+        
+        // Clean up URL
+        window.history.replaceState({}, '', '/driver-dashboard');
+      }
+      
       // Set a timeout to prevent infinite loading
       const timeout = setTimeout(() => {
         if (!onboardingCompleted) {
@@ -73,6 +87,37 @@ const NewDriverDashboardPage: React.FC = () => {
       return () => clearTimeout(timeout);
     }
   }, [user, profile, onboardingCompleted]);
+  
+  // Verify Stripe account status and update database
+  const verifyAndUpdateStripeStatus = async () => {
+    if (!user?.id || !profile?.stripe_account_id) return;
+    
+    try {
+      // Call Netlify function to verify Stripe account
+      const response = await fetch('/.netlify/functions/check-driver-capabilities', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driverId: user.id })
+      });
+      
+      const result = await response.json();
+      
+      if (result.isFullyOnboarded || result.canReceiveTransfers) {
+        // Update database to mark as connected
+        await supabase
+          .from('profiles')
+          .update({ stripe_connected: true })
+          .eq('id', user.id);
+        
+        console.log('✅ Stripe connection status updated in database');
+        setHasStripeAccount(true);
+      } else {
+        console.log('⚠️ Stripe account not fully onboarded yet');
+      }
+    } catch (error) {
+      console.error('Error verifying Stripe status:', error);
+    }
+  };
 
   // Load verification deadline after onboarding status is determined
   useEffect(() => {

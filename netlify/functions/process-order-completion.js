@@ -74,7 +74,38 @@ exports.handler = async (event, context) => {
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
-    const stripeConnected = driver.stripe_connected;
+    let stripeConnected = driver.stripe_connected;
+    
+    // If stripeAccountId exists but stripe_connected is false, verify with Stripe
+    if (stripeAccountId && !stripeConnected) {
+      console.log('⚠️ stripe_connected flag is false, but account ID exists - verifying with Stripe...');
+      try {
+        const account = await stripe.accounts.retrieve(stripeAccountId);
+        const isActuallyConnected = account.details_submitted && 
+                                   account.charges_enabled && 
+                                   account.payouts_enabled;
+        
+        if (isActuallyConnected) {
+          console.log('✅ Account is actually connected! Updating database flag...');
+          // Update database to reflect actual status
+          await supabase
+            .from('profiles')
+            .update({ stripe_connected: true })
+            .eq('id', order.driver_id);
+          
+          stripeConnected = true;
+          console.log('✅ Database updated - stripe_connected set to true');
+        } else {
+          console.log('❌ Account exists but not fully onboarded:', {
+            details_submitted: account.details_submitted,
+            charges_enabled: account.charges_enabled,
+            payouts_enabled: account.payouts_enabled
+          });
+        }
+      } catch (verifyError) {
+        console.error('Error verifying Stripe account:', verifyError);
+      }
+    }
     
     if (!stripeAccountId || !stripeConnected) {
       console.log('⚠️ Driver has no Stripe account or not connected, skipping payment');
