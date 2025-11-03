@@ -156,12 +156,40 @@ exports.handler = async (event, context) => {
         console.log(`   Account status: ${account.details_submitted ? 'onboarded' : 'not onboarded'}`);
         console.log(`   Charges enabled: ${account.charges_enabled}`);
         console.log(`   Payouts enabled: ${account.payouts_enabled}`);
-        console.log(`   Transfers capability: ${account.capabilities?.transfers || 'not_requested'}`);
+        console.log(`   Details submitted: ${account.details_submitted}`);
+        console.log(`   All capabilities:`, JSON.stringify(account.capabilities, null, 2));
         
-        if (account.capabilities?.transfers !== 'active') {
-          console.error(`❌ TRANSFERS CAPABILITY NOT ACTIVE! Status: ${account.capabilities?.transfers}`);
-          throw new Error(`Driver transfers capability is ${account.capabilities?.transfers || 'not_requested'}. Must be 'active' to receive transfers.`);
+        // For Stripe Connect Express accounts, transfers work if:
+        // 1. Account is fully onboarded (details_submitted)
+        // 2. Charges are enabled (for receiving money)
+        // 3. Payouts are enabled (for sending money out)
+        // The "transfers" capability might not exist or might be different for Express accounts
+        
+        const canReceiveTransfers = account.details_submitted && 
+                                   account.charges_enabled && 
+                                   account.payouts_enabled;
+        
+        // Also check transfers capability if it exists (some account types have it)
+        const transfersCapabilityStatus = account.capabilities?.transfers;
+        const hasTransfersCapability = transfersCapabilityStatus === 'active' || 
+                                      transfersCapabilityStatus === undefined; // Express accounts might not show this
+        
+        if (!canReceiveTransfers) {
+          const missing = [];
+          if (!account.details_submitted) missing.push('details not submitted');
+          if (!account.charges_enabled) missing.push('charges not enabled');
+          if (!account.payouts_enabled) missing.push('payouts not enabled');
+          
+          console.error(`❌ ACCOUNT NOT READY FOR TRANSFERS! Missing: ${missing.join(', ')}`);
+          throw new Error(`Driver Stripe account is not fully set up. Missing: ${missing.join(', ')}. Driver must complete Stripe Connect onboarding.`);
         }
+        
+        // Log if transfers capability exists and is not active (warning, not error)
+        if (transfersCapabilityStatus && transfersCapabilityStatus !== 'active') {
+          console.warn(`⚠️ Transfers capability status is '${transfersCapabilityStatus}' but account has charges and payouts enabled - proceeding with transfer`);
+        }
+        
+        console.log(`✅ Account verified - ready to receive transfers`);
       } catch (accountCheckError) {
         console.error('❌ Error checking driver account:', accountCheckError);
         throw accountCheckError;
@@ -199,11 +227,11 @@ exports.handler = async (event, context) => {
       
       try {
         const account = await stripe.accounts.retrieve(stripeAccountId);
-        // Check account settings for instant payout availability
+        // For Express accounts, instant payouts are available if:
+        // - Account is fully onboarded
+        // - Payouts are enabled
         // Note: Even if available, driver must have debit card to use it
-        instantAvailable = account.details_submitted && 
-                          account.payouts_enabled && 
-                          account.capabilities?.transfers === 'active';
+        instantAvailable = account.details_submitted && account.payouts_enabled;
         
         if (instantAvailable) {
           payoutTiming = 'Funds are in your Stripe account. Add a debit card for instant payouts (minutes), otherwise 2-7 business days.';

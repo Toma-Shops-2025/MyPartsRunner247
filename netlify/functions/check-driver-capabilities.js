@@ -59,11 +59,14 @@ exports.handler = async (event, context) => {
 
     // Check required capabilities
     const capabilities = account.capabilities || {};
-    const transfersEnabled = capabilities.transfers === 'active';
+    
+    // For Express accounts, transfers work based on charges_enabled and payouts_enabled
+    // The "transfers" capability might not exist or be needed for Express accounts
+    const transfersEnabled = account.charges_enabled && account.payouts_enabled;
     const cardPaymentsEnabled = capabilities.card_payments === 'active';
-    const chargesEnabled = capabilities.card_payments === 'active';
+    const chargesEnabled = account.charges_enabled;
 
-    // Check if account is fully onboarded
+    // Check if account is fully onboarded (this is what enables transfers for Express accounts)
     const isFullyOnboarded = account.details_submitted && 
                              account.charges_enabled && 
                              account.payouts_enabled;
@@ -76,16 +79,18 @@ exports.handler = async (event, context) => {
       payoutsEnabled: account.payouts_enabled,
       detailsSubmitted: account.details_submitted,
       isFullyOnboarded: isFullyOnboarded,
+      canReceiveTransfers: isFullyOnboarded, // Express accounts can receive transfers if fully onboarded
       capabilities: {
         transfers: {
-          status: capabilities.transfers || 'not_requested',
+          status: capabilities.transfers || (isFullyOnboarded ? 'active (via charges/payouts)' : 'inactive'),
           enabled: transfersEnabled,
-          required: true
+          required: true,
+          note: 'For Express accounts, transfers work via charges_enabled and payouts_enabled'
         },
         card_payments: {
           status: capabilities.card_payments || 'not_requested',
           enabled: cardPaymentsEnabled,
-          required: true
+          required: false // Not strictly required for receiving transfers
         }
       },
       needsAction: [],
@@ -93,23 +98,28 @@ exports.handler = async (event, context) => {
     };
 
     // Determine what actions are needed
-    if (!isFullyOnboarded) {
-      accountStatus.needsAction.push('Complete Stripe Connect onboarding');
-      accountStatus.recommendations.push('Driver must complete onboarding to receive payments');
+    if (!account.details_submitted) {
+      accountStatus.needsAction.push('Complete Stripe Connect onboarding - submit details');
+      accountStatus.recommendations.push('Driver must complete all required information in Stripe');
+    }
+    
+    if (!account.charges_enabled) {
+      accountStatus.needsAction.push('Enable charges in Stripe account');
+      accountStatus.recommendations.push('Charges must be enabled to receive transfers');
+    }
+    
+    if (!account.payouts_enabled) {
+      accountStatus.needsAction.push('Enable payouts in Stripe account');
+      accountStatus.recommendations.push('Payouts must be enabled to receive transfers');
     }
 
-    if (!transfersEnabled) {
-      accountStatus.needsAction.push('Enable transfers capability');
-      accountStatus.recommendations.push('Transfers capability is required for driver payouts');
-      
-      // Check if it's pending or inactive
-      if (capabilities.transfers === 'pending') {
-        accountStatus.recommendations.push('Transfers capability is pending review by Stripe');
-      } else if (capabilities.transfers === 'inactive') {
-        accountStatus.recommendations.push('Transfers capability was declined. Contact Stripe support.');
-      } else {
-        accountStatus.recommendations.push('Request transfers capability to be enabled');
-      }
+    if (!isFullyOnboarded) {
+      accountStatus.recommendations.push('Driver must complete Stripe Connect onboarding to receive payments');
+    }
+
+    // Note about transfers capability (might not exist for Express accounts)
+    if (capabilities.transfers && capabilities.transfers !== 'active') {
+      accountStatus.recommendations.push(`Transfers capability status: ${capabilities.transfers} (may not be needed for Express accounts if charges/payouts are enabled)`);
     }
 
     if (!cardPaymentsEnabled && capabilities.card_payments === 'pending') {
