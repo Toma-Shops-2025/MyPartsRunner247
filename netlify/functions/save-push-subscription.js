@@ -12,17 +12,34 @@ exports.handler = async (event) => {
     const { subscription, userId } = JSON.parse(event.body);
 
     if (!subscription || !userId) {
+      console.error('❌ Missing subscription or userId');
       return { 
         statusCode: 400, 
         body: JSON.stringify({ error: 'Missing subscription or userId' }) 
       };
     }
 
+    console.log(`💾 SAVE-PUSH-SUBSCRIPTION: Saving subscription for user ${userId}`);
+    console.log(`   Endpoint: ${subscription.endpoint?.substring(0, 50)}...`);
+
     // Initialize Supabase client
     const supabase = createClient(
       process.env.VITE_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+
+    // Check if subscription already exists
+    const { data: existing } = await supabase
+      .from('push_subscriptions')
+      .select('user_id, endpoint')
+      .eq('user_id', userId)
+      .single();
+
+    if (existing) {
+      console.log(`   Updating existing subscription for user ${userId}`);
+    } else {
+      console.log(`   Creating new subscription for user ${userId}`);
+    }
 
     // Save subscription to database
     const { data, error } = await supabase
@@ -32,19 +49,25 @@ exports.handler = async (event) => {
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }, {
         onConflict: 'user_id'
       });
 
     if (error) {
-      console.error('Error saving subscription:', error);
+      console.error('❌ Error saving subscription:', error);
+      console.error('   Error details:', JSON.stringify(error, null, 2));
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to save subscription' })
+        body: JSON.stringify({ 
+          error: 'Failed to save subscription',
+          details: error.message 
+        })
       };
     }
 
+    console.log(`✅ Subscription saved successfully for user ${userId}`);
     return {
       statusCode: 200,
       body: JSON.stringify({ 
