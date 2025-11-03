@@ -19,17 +19,16 @@ class AutoPushNotificationService {
   /**
    * Automatically enable push notifications for a user
    * Runs silently in the background, similar to other platforms
+   * RETRIES multiple times to ensure success (like DoorDash/other platforms)
    */
-  async autoEnablePushNotifications(userId: string): Promise<boolean> {
-    // Prevent duplicate attempts
-    if (this.subscribedUsers.has(userId)) {
-      return true;
-    }
+  async autoEnablePushNotifications(userId: string, retryCount: number = 0): Promise<boolean> {
+    const MAX_RETRIES = 5;
+    const RETRY_DELAY = 3000; // 3 seconds between retries
 
     try {
       // Check if push is supported
       if (!pushNotificationService.isPushSupported()) {
-        console.log('Push notifications not supported on this device');
+        console.log('⚠️ Push notifications not supported on this device');
         return false;
       }
 
@@ -38,15 +37,15 @@ class AutoPushNotificationService {
 
       // If permission is denied, we can't enable it automatically
       if (currentPermission === 'denied') {
-        console.warn('Push notification permission is denied');
+        console.warn('⚠️ Push notification permission is denied - user must enable manually');
         return false;
       }
 
-      // Check if user already has a subscription
+      // Check if user already has a subscription in both browser and DB
       const hasBrowserSub = await pushNotificationService.hasActiveSubscription();
       
       // Check if subscription exists in database
-      const { data: dbSubscriptions } = await supabase
+      const { data: dbSubscriptions, error: dbError } = await supabase
         .from('push_subscriptions')
         .select('endpoint')
         .eq('user_id', userId)
@@ -61,40 +60,122 @@ class AutoPushNotificationService {
         return true;
       }
 
+      console.log(`🔔 Auto-enabling push notifications (attempt ${retryCount + 1}/${MAX_RETRIES + 1})...`);
+      console.log(`   Browser subscription: ${hasBrowserSub ? '✅' : '❌'}`);
+      console.log(`   Database subscription: ${hasDbSub ? '✅' : '❌'}`);
+      console.log(`   Permission: ${currentPermission}`);
+
+      // Wait for service worker to be ready (critical for mobile!)
+      if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          console.log('✅ Service worker ready');
+        } catch (swError) {
+          console.warn('⚠️ Service worker not ready yet, waiting...');
+          if (retryCount < MAX_RETRIES) {
+            setTimeout(() => {
+              this.autoEnablePushNotifications(userId, retryCount + 1);
+            }, RETRY_DELAY);
+            return false;
+          }
+        }
+      }
+
       // If permission is default (not asked yet), request it
       if (currentPermission === 'default') {
         console.log('🔔 Requesting push notification permission...');
         const permission = await pushNotificationService.requestPermission();
         
         if (permission !== 'granted') {
-          console.warn('Push notification permission not granted');
+          console.warn(`⚠️ Push notification permission not granted (${permission})`);
+          // Retry if user might accept later (sometimes it takes a moment)
+          if (retryCount < MAX_RETRIES && permission === 'default') {
+            setTimeout(() => {
+              this.autoEnablePushNotifications(userId, retryCount + 1);
+            }, RETRY_DELAY);
+          }
           return false;
         }
+        console.log('✅ Permission granted!');
       }
 
       // If browser doesn't have subscription, create one
       if (!hasBrowserSub) {
-        console.log('📱 Subscribing to push notifications...');
+        console.log('📱 Creating browser push subscription...');
         const subscription = await pushNotificationService.subscribe();
         
         if (!subscription) {
-          console.error('Failed to create push subscription');
+          console.error('❌ Failed to create push subscription');
+          // Retry if we haven't exceeded max retries
+          if (retryCount < MAX_RETRIES) {
+            console.log(`🔄 Retrying in ${RETRY_DELAY / 1000} seconds...`);
+            setTimeout(() => {
+              this.autoEnablePushNotifications(userId, retryCount + 1);
+            }, RETRY_DELAY);
+            return false;
+          }
           return false;
         }
+        console.log('✅ Browser subscription created');
       }
 
       // Ensure subscription is saved to database
+      console.log('💾 Saving subscription to database...');
       const restoreResult = await pushNotificationService.restoreSubscriptionIfNeeded(userId);
       
+      // Double-check database save
+      if (!hasDbSub) {
+        // Wait a moment for save to complete
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Check again
+        const { data: checkSubs } = await supabase
+          .from('push_subscriptions')
+          .select('endpoint')
+          .eq('user_id', userId)
+          .limit(1);
+        
+        if (!checkSubs || checkSubs.length === 0) {
+          console.warn('⚠️ Subscription not in database yet, retrying save...');
+          if (retryCount < MAX_RETRIES) {
+            setTimeout(() => {
+              this.autoEnablePushNotifications(userId, retryCount + 1);
+            }, RETRY_DELAY);
+            return false;
+          }
+        } else {
+          console.log('✅ Subscription confirmed in database');
+        }
+      }
+      
       if (restoreResult || hasDbSub) {
-        console.log('✅ Push notifications automatically enabled for user');
+        console.log('✅✅✅ Push notifications automatically enabled for user');
         this.subscribedUsers.add(userId);
         return true;
       }
 
+      // Final retry if still not working
+      if (retryCount < MAX_RETRIES) {
+        console.log(`🔄 Final retry in ${RETRY_DELAY / 1000} seconds...`);
+        setTimeout(() => {
+          this.autoEnablePushNotifications(userId, retryCount + 1);
+        }, RETRY_DELAY);
+        return false;
+      }
+
+      console.error('❌ Failed to enable push notifications after all retries');
       return false;
     } catch (error) {
-      console.error('Error auto-enabling push notifications:', error);
+      console.error('❌ Error auto-enabling push notifications:', error);
+      
+      // Retry on error if we haven't exceeded max
+      if (retryCount < MAX_RETRIES) {
+        console.log(`🔄 Retrying after error in ${RETRY_DELAY / 1000} seconds...`);
+        setTimeout(() => {
+          this.autoEnablePushNotifications(userId, retryCount + 1);
+        }, RETRY_DELAY);
+      }
+      
       return false;
     }
   }

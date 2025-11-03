@@ -13,6 +13,7 @@ import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star
 import { supabase } from '@/lib/supabase';
 import { locationTrackingService } from '@/services/LocationTrackingService';
 import { toast } from '@/hooks/use-toast';
+import autoPushNotificationService from '@/services/AutoPushNotificationService';
 
 const NewDriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -78,6 +79,28 @@ const NewDriverDashboardPage: React.FC = () => {
     if (user && profile?.user_type === 'driver') {
       loadVerificationDeadline();
       checkTrackingStatus();
+      
+      // Aggressively auto-enable push notifications when driver visits dashboard
+      // This ensures drivers get notifications even if login auto-enable missed it
+      if (user.id) {
+        setTimeout(async () => {
+          try {
+            console.log('🚗 Driver dashboard: Auto-enabling push notifications...');
+            await autoPushNotificationService.autoEnablePushNotifications(user.id);
+          } catch (error) {
+            console.error('Driver dashboard: Failed to auto-enable push notifications:', error);
+          }
+        }, 2000);
+        
+        // Retry a couple more times
+        setTimeout(async () => {
+          try {
+            await autoPushNotificationService.autoEnablePushNotifications(user.id);
+          } catch (error) {
+            // Silent retry
+          }
+        }, 5000);
+      }
     }
   }, [user, profile, onboardingCompleted]);
 

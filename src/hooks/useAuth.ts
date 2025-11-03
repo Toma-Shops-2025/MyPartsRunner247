@@ -76,14 +76,33 @@ export const useAuth = () => {
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
             
-            // Automatically enable push notifications on login (after a short delay for service worker)
+            // Automatically enable push notifications on login (aggressive, multiple attempts)
+            // Try immediately, then retry several times with delays
             setTimeout(async () => {
               try {
                 await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
               } catch (error) {
                 console.error('Failed to auto-enable push notifications:', error);
               }
-            }, 2000); // Wait 2 seconds for service worker to be ready
+            }, 1000); // Try after 1 second
+            
+            // Also try again after 3 seconds (for slow service worker)
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications (retry):', error);
+              }
+            }, 3000);
+            
+            // And once more after 5 seconds (for mobile devices)
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications (final retry):', error);
+              }
+            }, 5000);
           } else {
             setLoading(false);
           }
@@ -109,14 +128,30 @@ export const useAuth = () => {
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
             
-            // Automatically enable push notifications on initial session (after a short delay)
+            // Automatically enable push notifications on initial session (aggressive, multiple attempts)
             setTimeout(async () => {
               try {
                 await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
               } catch (error) {
                 console.error('Failed to auto-enable push notifications:', error);
               }
-            }, 2000);
+            }, 1000);
+            
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications (retry):', error);
+              }
+            }, 3000);
+            
+            setTimeout(async () => {
+              try {
+                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
+              } catch (error) {
+                console.error('Failed to auto-enable push notifications (final retry):', error);
+              }
+            }, 5000);
           } else {
             setLoading(false);
           }
