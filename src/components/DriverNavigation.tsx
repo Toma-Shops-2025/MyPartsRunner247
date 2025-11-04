@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Navigation, CheckCircle, Clock, Car } from 'lucide-react';
+import { MapPin, Navigation, CheckCircle, Clock, Car, Camera } from 'lucide-react';
 import { loadGoogleMaps } from '@/utils/googleMapsLoader';
+import { supabase } from '@/lib/supabase';
 
 interface DriverNavigationProps {
   pickupLocation: string;
@@ -344,7 +345,7 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button 
               size="sm" 
               variant="outline"
@@ -375,6 +376,166 @@ const DriverNavigation: React.FC<DriverNavigationProps> = ({
             >
               💬 Text
             </Button>
+            {currentStep === 'delivery' && (
+              <Button 
+                size="sm" 
+                variant="outline"
+                className="border-orange-600 text-orange-600 hover:bg-orange-50 flex-1"
+                onClick={async () => {
+                  try {
+                    // Request camera access
+                    const stream = await navigator.mediaDevices.getUserMedia({ 
+                      video: { facingMode: 'environment' } // Use back camera on mobile
+                    });
+                    
+                    // Create video element to show camera preview
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    video.autoplay = true;
+                    video.playsInline = true;
+                    
+                    // Create modal overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.cssText = `
+                      position: fixed;
+                      top: 0;
+                      left: 0;
+                      right: 0;
+                      bottom: 0;
+                      background: rgba(0, 0, 0, 0.9);
+                      z-index: 9999;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                      gap: 20px;
+                    `;
+                    
+                    const container = document.createElement('div');
+                    container.style.cssText = `
+                      width: 90%;
+                      max-width: 500px;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 15px;
+                    `;
+                    
+                    video.style.cssText = `
+                      width: 100%;
+                      border-radius: 8px;
+                      background: #000;
+                    `;
+                    
+                    const captureBtn = document.createElement('button');
+                    captureBtn.textContent = 'Capture Photo';
+                    captureBtn.style.cssText = `
+                      padding: 12px 24px;
+                      background: #14b8a6;
+                      color: white;
+                      border: none;
+                      border-radius: 8px;
+                      font-size: 16px;
+                      font-weight: 600;
+                      cursor: pointer;
+                    `;
+                    
+                    const cancelBtn = document.createElement('button');
+                    cancelBtn.textContent = 'Cancel';
+                    cancelBtn.style.cssText = `
+                      padding: 12px 24px;
+                      background: #6b7280;
+                      color: white;
+                      border: none;
+                      border-radius: 8px;
+                      font-size: 16px;
+                      cursor: pointer;
+                    `;
+                    
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.style.cssText = 'display: flex; gap: 10px;';
+                    buttonContainer.appendChild(captureBtn);
+                    buttonContainer.appendChild(cancelBtn);
+                    
+                    container.appendChild(video);
+                    container.appendChild(buttonContainer);
+                    overlay.appendChild(container);
+                    document.body.appendChild(overlay);
+                    
+                    // Capture photo
+                    captureBtn.onclick = () => {
+                      const canvas = document.createElement('canvas');
+                      canvas.width = video.videoWidth;
+                      canvas.height = video.videoHeight;
+                      const ctx = canvas.getContext('2d');
+                      ctx?.drawImage(video, 0, 0);
+                      
+                      // Stop camera stream
+                      stream.getTracks().forEach(track => track.stop());
+                      
+                      // Convert to blob and upload
+                      canvas.toBlob(async (blob) => {
+                        if (!blob) {
+                          alert('Failed to capture photo');
+                          document.body.removeChild(overlay);
+                          return;
+                        }
+                        
+                        // Upload photo to Supabase storage
+                        const file = new File([blob], `delivery-${orderId}-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                        const fileName = `deliveries/${orderId}/${file.name}`;
+                        
+                        try {
+                          const { data: uploadData, error: uploadError } = await supabase.storage
+                            .from('order-photos')
+                            .upload(fileName, file, {
+                              cacheControl: '3600',
+                              upsert: false
+                            });
+                          
+                          if (uploadError) throw uploadError;
+                          
+                          // Get public URL
+                          const { data: urlData } = supabase.storage
+                            .from('order-photos')
+                            .getPublicUrl(fileName);
+                          
+                          // Save photo reference to order
+                          const { error: updateError } = await supabase
+                            .from('orders')
+                            .update({ 
+                              delivery_photo: urlData.publicUrl,
+                              delivery_photo_taken_at: new Date().toISOString()
+                            })
+                            .eq('id', orderId);
+                          
+                          if (updateError) {
+                            console.error('Error saving photo reference:', updateError);
+                          }
+                          
+                          alert('Photo captured and saved! Customer not present - photo documented for delivery.');
+                        } catch (error) {
+                          console.error('Error uploading photo:', error);
+                          alert('Photo captured but failed to upload. Please try again.');
+                        }
+                        
+                        document.body.removeChild(overlay);
+                      }, 'image/jpeg', 0.9);
+                    };
+                    
+                    cancelBtn.onclick = () => {
+                      stream.getTracks().forEach(track => track.stop());
+                      document.body.removeChild(overlay);
+                    };
+                  } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    alert('Unable to access camera. Please check permissions or use a different device.');
+                  }
+                }}
+              >
+                <Camera className="w-4 h-4 mr-1" />
+                Take Photo (Customer Not Present)
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

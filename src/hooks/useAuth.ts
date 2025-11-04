@@ -234,6 +234,24 @@ export const useAuth = () => {
     
     setIsSigningOut(true);
     try {
+      // Set driver offline before signing out
+      if (user?.id && profile?.user_type === 'driver') {
+        try {
+          await supabase
+            .from('profiles')
+            .update({ 
+              is_online: false,
+              status: 'inactive',
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', user.id);
+          console.log('Driver marked as offline on logout');
+        } catch (offlineError) {
+          console.error('Error setting driver offline:', offlineError);
+          // Continue with logout even if this fails
+        }
+      }
+      
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
