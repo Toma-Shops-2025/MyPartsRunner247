@@ -533,8 +533,8 @@ const NewDriverDashboardPage: React.FC = () => {
         await updateLastSeen();
         
         // Then update every 2 minutes while tracking
-        // Note: We update every 2 minutes, but notifications check for last 5 minutes
-        // This gives a 3-minute buffer for network delays or missed updates
+        // Note: We update every 2 minutes, but notifications check for last 15 minutes
+        // This gives a 13-minute buffer for network delays or missed updates
         const lastSeenInterval = setInterval(updateLastSeen, 2 * 60 * 1000);
         
         // Store interval ID so we can clear it later

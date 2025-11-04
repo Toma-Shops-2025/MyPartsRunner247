@@ -95,10 +95,10 @@ export class OrderAutomationService {
         return;
       }
 
-      // Get all online drivers who have been active recently (within last 5 minutes)
+      // Get all online drivers who have been active recently (within last 15 minutes)
       // This ensures we only notify drivers who have the app open or recently closed it
-      // Drivers who closed the app more than 5 minutes ago won't receive notifications
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      // Drivers who closed the app more than 15 minutes ago won't receive notifications
+      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
       
       // Query using driver_availability table to check last_seen
       const { data: availabilityData, error: availabilityError } = await supabase
@@ -111,7 +111,7 @@ export class OrderAutomationService {
         .eq('profiles.is_online', true)
         .eq('profiles.status', 'active')
         .eq('profiles.user_type', 'driver')
-        .gte('last_seen', fiveMinutesAgo);
+        .gte('last_seen', fifteenMinutesAgo);
       
       if (availabilityError) {
         console.error('Error fetching active drivers:', availabilityError);
