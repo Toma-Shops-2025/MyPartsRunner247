@@ -23,13 +23,23 @@ export class OrderQueueService {
         });
 
       if (error) {
+        // If table doesn't exist, just log and continue (don't fail)
+        if (error.code === 'PGRST205' || error.message?.includes('not found')) {
+          console.log(`⚠️ Order queue table not found - skipping queue (this is optional)`);
+          return false; // Return false but don't throw error
+        }
         console.error('Error adding order to queue:', error);
         return false;
       }
 
       console.log(`📋 Order ${orderId} added to queue`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      // If table doesn't exist, just log and continue
+      if (error?.code === 'PGRST205' || error?.message?.includes('not found')) {
+        console.log(`⚠️ Order queue table not found - skipping queue (this is optional)`);
+        return false;
+      }
       console.error('Error adding order to queue:', error);
       return false;
     }

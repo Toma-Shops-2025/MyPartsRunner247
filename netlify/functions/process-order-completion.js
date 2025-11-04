@@ -319,9 +319,10 @@ exports.handler = async (event, context) => {
       if (stripeError.code === 'insufficient_capabilities_for_transfer') {
         userFriendlyMessage = 'Driver Stripe account is not fully set up. The driver needs to complete Stripe Connect onboarding and enable transfers capability.';
         console.error('🚫 Driver Stripe account missing transfers capability. Driver must complete onboarding at: https://dashboard.stripe.com');
-      } else if (stripeError.code === 'insufficient_funds') {
-        userFriendlyMessage = 'Platform account does not have sufficient funds to transfer to driver. Check Stripe balance.';
+      } else if (stripeError.code === 'insufficient_funds' || stripeError.code === 'balance_insufficient') {
+        userFriendlyMessage = 'The platform account does not have sufficient funds to transfer to the driver. The payment will be processed once funds are available in the platform Stripe account.';
         console.error('🚫 INSUFFICIENT FUNDS in platform account to transfer to driver!');
+        console.error('   Platform needs to add funds to Stripe account or wait for payment processing to complete.');
       } else if (stripeError.code === 'account_invalid') {
         userFriendlyMessage = 'Driver Stripe account is invalid or does not exist. Driver must reconnect their Stripe account.';
         console.error('🚫 Driver Stripe account is invalid!');

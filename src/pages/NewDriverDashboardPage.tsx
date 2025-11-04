@@ -194,13 +194,17 @@ const NewDriverDashboardPage: React.FC = () => {
         .single();
       
       if (error) {
-        console.error('Error checking tracking status:', error);
+        // Only log error if it's not a missing record
+        if (error.code !== 'PGRST116') {
+          console.error('Error checking tracking status:', error);
+        }
         return;
       }
       
       // Set tracking state based on database status
       setIsTracking(data.is_online === true);
-      console.log('Tracking status loaded from database:', data.is_online);
+      // Only log when status changes or on initial load (reduce console spam)
+      // We'll track this with a ref to avoid excessive logging
     } catch (error) {
       console.error('Error checking tracking status:', error);
     }
