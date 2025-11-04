@@ -9,7 +9,7 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
   const navigate = useNavigate();
 
   const benefits = [
-    { icon: "💰", title: "Earn More", description: "70% commission with fast payouts via Stripe" },
+    { icon: "💰", title: "Earn More", description: "70% commission with INSTANT/DAILY payouts via Stripe" },
     { icon: "⏰", title: "Flexible Hours", description: "Work when you want, 24/7 availability" },
     { icon: "📱", title: "Easy App", description: "Simple driver dashboard with Google Maps navigation" },
     { icon: "🚗", title: "Use Your Vehicle", description: "Car, bike, motorcycle - all welcome" }
@@ -24,7 +24,7 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
           </h2>
           <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
             Join our nationwide network of drivers and start earning today. 
-            Earn 70% commission with fast payouts and flexible scheduling.
+            Earn 70% commission with INSTANT/DAILY payouts and flexible scheduling.
           </p>
         </div>
 
@@ -43,7 +43,7 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
           <h3 className="text-2xl font-bold mb-4">Start Earning Today</h3>
           <p className="text-teal-100 mb-6 max-w-2xl mx-auto">
             Join thousands of drivers already earning with MyPartsRunner. 
-            Quick onboarding, instant payments, and the freedom to work on your schedule.
+            Quick onboarding, INSTANT/DAILY payouts, and the freedom to work on your schedule.
           </p>
           <button 
             onClick={() => navigate('/driver-application')}

@@ -13,7 +13,7 @@ const FeaturesSection: React.FC = () => {
     },
     {
       title: "Instant Payments",
-      description: "Secure payments with Stripe, automatic driver payouts",
+      description: "Secure payments with Stripe, INSTANT/DAILY driver payouts",
       icon: CreditCard,
       color: "from-blue-500 to-purple-600"
     },

@@ -60,9 +60,17 @@ exports.handler = async (event, context) => {
         .single();
       
       if (driverProfile?.stripe_account_id) {
-        // Create payment intent with transfer to driver
-        const platformFee = Math.round(amount * 100 * 0.30); // 30% platform fee
-        const driverAmount = Math.round(amount * 100 * 0.70); // 70% to driver
+        // Calculate Stripe fee first (2.9% + 30¢)
+        const stripeFee = (amount * 0.029) + 0.30;
+        const netAfterStripeFee = amount - stripeFee;
+        
+        // Driver gets 70% of net after Stripe fees, Platform gets 30%
+        const driverAmountNet = netAfterStripeFee * 0.70;
+        const platformShareNet = netAfterStripeFee * 0.30;
+        
+        // Convert to cents for Stripe
+        const platformFee = Math.round(platformShareNet * 100); // Platform fee (30% of net)
+        const driverAmount = Math.round(driverAmountNet * 100); // 70% of net to driver
         
         paymentIntent = await stripe.paymentIntents.create({
           amount: Math.round(amount * 100),

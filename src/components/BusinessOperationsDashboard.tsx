@@ -90,9 +90,12 @@ const BusinessOperationsDashboard: React.FC = () => {
       const completedOrders = orders?.filter(o => o.status === 'delivered').length || 0;
       const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
 
-      // Calculate driver earnings (70% of revenue)
-      const driverEarnings = totalRevenue * 0.70;
-      const platformFee = totalRevenue * 0.30;
+      // Calculate driver earnings (70% of net after Stripe fees)
+      // Estimate Stripe fee at ~3% of revenue
+      const estimatedStripeFee = totalRevenue * 0.03;
+      const netAfterStripeFee = totalRevenue - estimatedStripeFee;
+      const driverEarnings = netAfterStripeFee * 0.70;
+      const platformFee = netAfterStripeFee * 0.30;
 
       // Mock data for other metrics
       const customerSatisfaction = 4.2; // Average rating

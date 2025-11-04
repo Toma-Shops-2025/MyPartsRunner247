@@ -118,8 +118,12 @@ const AnalyticsDashboard: React.FC = () => {
       const totalCustomers = users?.filter(user => user.user_type === 'customer').length || 0;
       const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
       const completionRate = totalOrders > 0 ? (completedOrders / totalOrders) * 100 : 0;
-      const driverEarnings = totalRevenue * 0.7; // 70% to drivers
-      const platformFee = totalRevenue * 0.3; // 30% to platform
+      // Calculate 70% of net after Stripe fees (2.9% + 30¢ per transaction)
+      // For estimation, assume average Stripe fee of ~3%
+      const estimatedStripeFee = totalRevenue * 0.03;
+      const netAfterStripeFee = totalRevenue - estimatedStripeFee;
+      const driverEarnings = netAfterStripeFee * 0.7; // 70% of net to drivers
+      const platformFee = netAfterStripeFee * 0.3; // 30% of net to platform
 
       // Calculate growth (simplified)
       const revenueGrowth = 15.2; // Mock data - would calculate from previous period

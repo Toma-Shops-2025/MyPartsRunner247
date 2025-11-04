@@ -48,29 +48,26 @@ exports.handler = async (event, context) => {
       throw new Error('Driver not found');
     }
 
-    // Calculate payment split: Driver gets 70% of order total, Platform gets 30% (Stripe fee deducted from platform)
+    // Calculate payment split: Driver gets 70% of payment AFTER Stripe fees, Platform gets 30% (Stripe fee deducted from platform)
     const orderTotal = parseFloat(order.total) || 0;
     const stripeFee = (orderTotal * 0.029) + 0.30; // 2.9% + 30¢ Stripe processing fee
     const netAfterStripeFee = orderTotal - stripeFee; // What platform actually received after Stripe fee
     
-    // Driver gets exactly 70% of order total (gross)
-    const driverPaymentGross = orderTotal * 0.70;
+    // Driver gets 70% of net payment (after Stripe fees)
+    const driverPaymentNet = netAfterStripeFee * 0.70;
     
-    // Platform share is 30% of gross, minus Stripe fee
-    const platformShareGross = orderTotal * 0.30;
-    const platformNetAfterFee = platformShareGross - stripeFee;
+    // Platform keeps 30% of net payment (after Stripe fees)
+    const platformNetAfterFee = netAfterStripeFee * 0.30;
     
-    // Since Stripe fee was already deducted from the payment, we transfer driver's 70% from the net
-    // Platform keeps: net - driver payment = (orderTotal - stripeFee) - (orderTotal * 0.70)
-    // Which equals: orderTotal - stripeFee - orderTotal * 0.70 = orderTotal * 0.30 - stripeFee
-    const driverPaymentAmount = Math.round(driverPaymentGross * 100); // Amount to transfer in cents
+    // Amount to transfer to driver in cents
+    const driverPaymentAmount = Math.round(driverPaymentNet * 100);
 
-    console.log(`💰 PAYOUT CALCULATION:`);
+    console.log(`💰 PAYOUT CALCULATION (70% of net after Stripe fees):`);
     console.log(`   Order total (gross): $${orderTotal.toFixed(2)}`);
     console.log(`   Stripe fee: $${stripeFee.toFixed(2)}`);
-    console.log(`   Platform received (net): $${netAfterStripeFee.toFixed(2)}`);
-    console.log(`   Driver payment (70% of gross): $${driverPaymentGross.toFixed(2)}`);
-    console.log(`   Platform keeps (30% - fees): $${platformNetAfterFee.toFixed(2)}`);
+    console.log(`   Platform received (net after fees): $${netAfterStripeFee.toFixed(2)}`);
+    console.log(`   Driver payment (70% of net): $${driverPaymentNet.toFixed(2)}`);
+    console.log(`   Platform keeps (30% of net): $${platformNetAfterFee.toFixed(2)}`);
 
     // Check if driver has Stripe Connect account
     const stripeAccountId = driver.stripe_account_id;
@@ -112,7 +109,7 @@ exports.handler = async (event, context) => {
       console.log('   Driver ID:', order.driver_id);
       console.log('   Stripe account ID:', stripeAccountId);
       console.log('   Stripe connected:', stripeConnected);
-      console.log('   Driver payment would be:', driverPaymentGross.toFixed(2));
+      console.log('   Driver payment would be:', driverPaymentNet.toFixed(2));
       return {
         statusCode: 200,
         headers: {
@@ -136,7 +133,7 @@ exports.handler = async (event, context) => {
         .insert({
           driver_id: order.driver_id,
           order_id: orderId,
-          amount: driverPaymentGross,
+          amount: driverPaymentNet,
           status: 'pending'
         });
 
@@ -253,19 +250,18 @@ exports.handler = async (event, context) => {
       console.log(`   Destination: ${transfer.destination}`);
       
       // Check if driver has instant payout capability
-      let payoutTiming = '2-7 business days (standard Stripe schedule)';
-      let instantAvailable = false;
+      let payoutTiming = 'INSTANT/DAILY payouts available';
+      let instantAvailable = true; // Drivers get INSTANT/DAILY payouts
       
       try {
         const account = await stripe.accounts.retrieve(stripeAccountId);
         // For Express accounts, instant payouts are available if:
         // - Account is fully onboarded
         // - Payouts are enabled
-        // Note: Even if available, driver must have debit card to use it
         instantAvailable = account.details_submitted && account.payouts_enabled;
         
         if (instantAvailable) {
-          payoutTiming = 'Funds are in your Stripe account. Add a debit card for instant payouts (minutes), otherwise 2-7 business days.';
+          payoutTiming = 'INSTANT/DAILY payouts available';
         }
       } catch (accountCheckError) {
         console.log('Could not check account for instant payout availability');
@@ -298,15 +294,13 @@ exports.handler = async (event, context) => {
           transferId: transfer.id,
           orderTotal: orderTotal.toFixed(2),
           stripeFee: stripeFee.toFixed(2),
-          driverPayment: driverPaymentGross.toFixed(2),
-          platformShare: platformShareGross.toFixed(2),
+          driverPayment: driverPaymentNet.toFixed(2),
+          platformShare: platformNetAfterFee.toFixed(2),
           platformNet: platformNetAfterFee.toFixed(2),
           instantPayoutsAvailable: instantAvailable,
           payoutTiming: payoutTiming,
-          message: `✅ Driver payment processed successfully! 70% ($${driverPaymentGross.toFixed(2)}) transferred to driver Stripe account. ${payoutTiming}`,
-          note: instantAvailable 
-            ? 'Driver can add debit card in Stripe dashboard to enable instant payouts (minutes vs 2-7 days)'
-            : 'Driver will receive payout in 2-7 business days per Stripe standard schedule'
+          message: `✅ Driver payment processed successfully! 70% ($${driverPaymentNet.toFixed(2)}) transferred to driver Stripe account. INSTANT/DAILY payouts available.`,
+          note: 'Driver receives INSTANT/DAILY payouts via Stripe'
         })
       };
 

@@ -244,7 +244,7 @@ const LegalTermsPage: React.FC = () => {
                 <ul className="text-gray-300 space-y-2 ml-4">
                   <li>• 70% of delivery fee goes to driver</li>
                   <li>• 100% of tips go to driver</li>
-                  <li>• Weekly payments via direct deposit</li>
+                  <li>• INSTANT/DAILY payouts via Stripe</li>
                   <li>• Detailed earnings statements provided</li>
                   <li>• Tax forms issued annually (1099)</li>
                 </ul>
