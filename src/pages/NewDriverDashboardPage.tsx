@@ -90,7 +90,11 @@ const NewDriverDashboardPage: React.FC = () => {
   
   // Verify Stripe account status and update database
   const verifyAndUpdateStripeStatus = async () => {
-    if (!user?.id || !profile?.stripe_account_id) return;
+    if (!user?.id) return;
+    
+    // Check if profile has stripe_account_id (it might not be in the type definition)
+    const stripeAccountId = (profile as any)?.stripe_account_id;
+    if (!stripeAccountId) return;
     
     try {
       console.log('🔄 Verifying Stripe account status...');
@@ -355,11 +359,18 @@ const NewDriverDashboardPage: React.FC = () => {
       // Check Stripe account status
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('stripe_connected')
+        .select('stripe_connected, stripe_account_id')
         .eq('id', user.id)
         .single();
 
-      setHasStripeAccount(profileData?.stripe_connected || false);
+      const hasAccount = profileData?.stripe_connected || false;
+      setHasStripeAccount(hasAccount);
+      
+      // If stripe_account_id exists but stripe_connected is false, verify with Stripe
+      if (profileData?.stripe_account_id && !hasAccount) {
+        console.log('⚠️ stripe_account_id exists but stripe_connected is false - verifying...');
+        verifyAndUpdateStripeStatus();
+      }
 
     } catch (error) {
       console.error('Error fetching driver data:', error);
