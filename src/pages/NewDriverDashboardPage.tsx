@@ -256,11 +256,25 @@ const NewDriverDashboardPage: React.FC = () => {
         return;
       }
 
+      if (!user?.id) return;
+      
       const { data, error } = await supabase
         .from('driver_applications')
         .select('verification_deadline, verification_status, status')
-        .eq('user_id', user?.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle(); // Use maybeSingle() instead of single() to handle missing records gracefully
+      
+      // If table doesn't exist or query fails, skip this check
+      if (error) {
+        if (error.code === 'PGRST205' || error.message?.includes('not found') || error.code === '42P01' || error.code === '42883') {
+          console.log('⚠️ driver_applications table/columns not found - skipping verification deadline check');
+          setVerificationDeadline(null);
+          return;
+        }
+        console.error('Error loading verification deadline:', error);
+        setVerificationDeadline(null);
+        return;
+      }
       
       // Only show deadline if verification is not completed
       // Check if status is 'approved' or verification_status indicates completion
