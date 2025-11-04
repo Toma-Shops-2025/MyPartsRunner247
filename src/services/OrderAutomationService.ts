@@ -100,33 +100,53 @@ export class OrderAutomationService {
       // Drivers who closed the app more than 15 minutes ago won't receive notifications
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
       
-      // Query using driver_availability table to check last_seen
-      const { data: availabilityData, error: availabilityError } = await supabase
-        .from('driver_availability')
-        .select(`
-          driver_id,
-          last_seen,
-          profiles!inner(id, full_name, email, phone, is_online, status, user_type)
-        `)
-        .eq('profiles.is_online', true)
-        .eq('profiles.status', 'active')
-        .eq('profiles.user_type', 'driver')
-        .gte('last_seen', fifteenMinutesAgo);
+      // First, get online drivers from profiles
+      const { data: onlineDriverProfiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, phone, is_online, status, user_type')
+        .eq('user_type', 'driver')
+        .eq('is_online', true)
+        .eq('status', 'active');
       
-      if (availabilityError) {
-        console.error('Error fetching active drivers:', availabilityError);
+      if (profilesError) {
+        console.error('Error fetching online drivers from profiles:', profilesError);
         return;
       }
       
-      // Extract driver data from the joined query
-      const onlineDrivers = (availabilityData || []).map((item: any) => ({
-        id: item.profiles.id,
-        full_name: item.profiles.full_name,
-        email: item.profiles.email,
-        phone: item.profiles.phone,
-        is_online: item.profiles.is_online,
-        status: item.profiles.status
-      }));
+      if (!onlineDriverProfiles || onlineDriverProfiles.length === 0) {
+        console.log('No online drivers found in profiles, will add to queue');
+        await orderQueueService.addToQueue(order.id);
+        return;
+      }
+      
+      // Now check driver_availability for last_seen to filter by activity
+      const driverIds = onlineDriverProfiles.map(d => d.id);
+      let onlineDrivers: any[] = [];
+      
+      const { data: availabilityData, error: availabilityError } = await supabase
+        .from('driver_availability')
+        .select('driver_id, last_seen')
+        .in('driver_id', driverIds)
+        .gte('last_seen', fifteenMinutesAgo);
+      
+      if (availabilityError) {
+        console.error('Error fetching driver availability:', availabilityError);
+        // If availability check fails, fall back to all online drivers (don't block notifications)
+        console.log('⚠️ Falling back to all online drivers (availability check failed)');
+        onlineDrivers = onlineDriverProfiles;
+      } else {
+        // Filter to only drivers who have been active recently
+        const activeDriverIds = new Set((availabilityData || []).map((item: any) => item.driver_id));
+        onlineDrivers = onlineDriverProfiles.filter(driver => activeDriverIds.has(driver.id));
+        
+        if (onlineDrivers.length === 0) {
+          console.log(`⚠️ No drivers active within last 15 minutes (${onlineDriverProfiles.length} online but inactive)`);
+          await orderQueueService.addToQueue(order.id);
+          return;
+        }
+        
+        console.log(`📊 Found ${onlineDrivers.length} active drivers out of ${onlineDriverProfiles.length} online drivers`);
+      }
 
       if (!onlineDrivers || onlineDrivers.length === 0) {
         console.log('No online drivers found, will add to queue');
