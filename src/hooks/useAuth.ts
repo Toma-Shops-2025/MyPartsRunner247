@@ -16,6 +16,8 @@ export interface Profile {
   vehicle_info?: any;
   onboarding_completed?: boolean;
   onboarding_completed_at?: string;
+  stripe_account_id?: string;
+  stripe_connected?: boolean;
   created_at?: string;
   updated_at?: string;
 }
