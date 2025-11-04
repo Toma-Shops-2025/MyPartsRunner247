@@ -93,6 +93,7 @@ const NewDriverDashboardPage: React.FC = () => {
     if (!user?.id || !profile?.stripe_account_id) return;
     
     try {
+      console.log('🔄 Verifying Stripe account status...');
       // Call Netlify function to verify Stripe account
       const response = await fetch('/.netlify/functions/check-driver-capabilities', {
         method: 'POST',
@@ -100,22 +101,49 @@ const NewDriverDashboardPage: React.FC = () => {
         body: JSON.stringify({ driverId: user.id })
       });
       
+      if (!response.ok) {
+        console.error('❌ Failed to check driver capabilities:', response.status);
+        return;
+      }
+      
       const result = await response.json();
+      console.log('📊 Stripe account status:', {
+        isFullyOnboarded: result.isFullyOnboarded,
+        canReceiveTransfers: result.canReceiveTransfers,
+        detailsSubmitted: result.detailsSubmitted,
+        chargesEnabled: result.chargesEnabled,
+        payoutsEnabled: result.payoutsEnabled
+      });
       
       if (result.isFullyOnboarded || result.canReceiveTransfers) {
         // Update database to mark as connected
-        await supabase
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({ stripe_connected: true })
           .eq('id', user.id);
         
-        console.log('✅ Stripe connection status updated in database');
-        setHasStripeAccount(true);
+        if (updateError) {
+          console.error('❌ Error updating stripe_connected:', updateError);
+        } else {
+          console.log('✅ Stripe connection status updated in database - stripe_connected: true');
+          setHasStripeAccount(true);
+          
+          // Refresh profile to get updated status
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .select('stripe_connected')
+            .eq('id', user.id)
+            .single();
+          
+          if (updatedProfile?.stripe_connected) {
+            console.log('✅ Verified: stripe_connected is now true in database');
+          }
+        }
       } else {
-        console.log('⚠️ Stripe account not fully onboarded yet');
+        console.log('⚠️ Stripe account not fully onboarded yet:', result);
       }
     } catch (error) {
-      console.error('Error verifying Stripe status:', error);
+      console.error('❌ Error verifying Stripe status:', error);
     }
   };
 

@@ -53,16 +53,22 @@ class AutoPushNotificationService {
 
       const hasDbSub = dbSubscriptions && dbSubscriptions.length > 0;
 
-      console.log(`🔍 Subscription check for user ${userId}:`);
-      console.log(`   Browser subscription: ${hasBrowserSub ? '✅' : '❌'}`);
-      console.log(`   Database subscription: ${hasDbSub ? '✅' : '❌'}`);
-      if (dbError) {
-        console.error('   Database check error:', dbError);
+      // Only log detailed subscription check if not already subscribed (to reduce spam)
+      if (!hasBrowserSub || !hasDbSub) {
+        console.log(`🔍 Subscription check for user ${userId}:`);
+        console.log(`   Browser subscription: ${hasBrowserSub ? '✅' : '❌'}`);
+        console.log(`   Database subscription: ${hasDbSub ? '✅' : '❌'}`);
+        if (dbError) {
+          console.error('   Database check error:', dbError);
+        }
       }
 
       // If already subscribed in both browser and DB, we're done
       if (hasBrowserSub && hasDbSub) {
-        console.log('✅ User already has push notifications enabled in both browser and database');
+        // Only log once per user to avoid spam
+        if (!this.subscribedUsers.has(userId)) {
+          console.log('✅ User already has push notifications enabled in both browser and database');
+        }
         this.subscribedUsers.add(userId);
         return true;
       }
