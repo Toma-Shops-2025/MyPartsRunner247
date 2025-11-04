@@ -118,7 +118,7 @@ exports.handler = async (event, context) => {
         },
         body: JSON.stringify({
           message: 'Driver payment skipped - no Stripe account connected',
-          driverPayment: driverPaymentGross.toFixed(2),
+          driverPayment: driverPaymentNet.toFixed(2),
           stripeAccountId: stripeAccountId || 'none',
           stripeConnected: stripeConnected || false,
           warning: 'Driver must connect Stripe account to receive payments'
