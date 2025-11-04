@@ -60,6 +60,7 @@ const NewDriverDashboardPage: React.FC = () => {
     if (user && profile?.user_type === 'driver') {
       checkOnboardingCompletion();
       fetchDriverData();
+      checkTrackingStatus(); // Load online status from database
       
       // Check if returning from Stripe onboarding (URL params)
       const urlParams = new URLSearchParams(window.location.search);
@@ -447,7 +448,7 @@ const NewDriverDashboardPage: React.FC = () => {
       // Update driver online status in database (both profiles and driver_availability)
       if (user?.id) {
         // Update profiles table
-        await supabase
+        const { error: profileError } = await supabase
           .from('profiles')
           .update({ 
             is_online: true,
@@ -455,6 +456,10 @@ const NewDriverDashboardPage: React.FC = () => {
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);
+        
+        if (profileError) {
+          console.error('Error updating profiles:', profileError);
+        }
         
         // Update driver_availability table using RPC function
         try {
@@ -499,6 +504,19 @@ const NewDriverDashboardPage: React.FC = () => {
         }
         
         console.log('Driver marked as online and active (synced with driver_availability)');
+        
+        // Refresh profile to ensure UI has latest state
+        if (profile) {
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .select('is_online')
+            .eq('id', user.id)
+            .single();
+          
+          if (updatedProfile) {
+            setIsTracking(updatedProfile.is_online === true);
+          }
+        }
 
         // Check for queued orders when driver comes online
         await orderQueueService.checkQueuedOrdersForDriver(user.id);
@@ -507,6 +525,8 @@ const NewDriverDashboardPage: React.FC = () => {
       console.log('Location tracking started - UI updated');
     } catch (error) {
       console.error('Error starting location tracking:', error);
+      // Revert UI state on error
+      setIsTracking(false);
     }
   };
 
@@ -520,7 +540,7 @@ const NewDriverDashboardPage: React.FC = () => {
       // Update driver offline status in database (both profiles and driver_availability)
       if (user?.id) {
         // Update profiles table
-        await supabase
+        const { error: profileError } = await supabase
           .from('profiles')
           .update({ 
             is_online: false,
@@ -528,6 +548,10 @@ const NewDriverDashboardPage: React.FC = () => {
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);
+        
+        if (profileError) {
+          console.error('Error updating profiles:', profileError);
+        }
         
         // Update driver_availability table using RPC function
         try {
@@ -572,11 +596,26 @@ const NewDriverDashboardPage: React.FC = () => {
         }
         
         console.log('Driver marked as offline and inactive (synced with driver_availability)');
+        
+        // Refresh profile to ensure UI has latest state
+        if (profile) {
+          const { data: updatedProfile } = await supabase
+            .from('profiles')
+            .select('is_online')
+            .eq('id', user.id)
+            .single();
+          
+          if (updatedProfile) {
+            setIsTracking(updatedProfile.is_online === true);
+          }
+        }
       }
       
       console.log('Location tracking stopped - UI updated');
     } catch (error) {
       console.error('Error stopping location tracking:', error);
+      // Revert UI state on error
+      setIsTracking(true);
     }
   };
 

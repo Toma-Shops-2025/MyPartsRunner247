@@ -109,48 +109,8 @@ export const useAuth = () => {
             setLoading(false);
           }
         } else if (event === 'SIGNED_OUT') {
-          // Set driver offline if they were a driver (before clearing user data)
-          if (lastProcessedUserId && profile?.user_type === 'driver') {
-            try {
-              // Update profiles table
-              await supabase
-                .from('profiles')
-                .update({ 
-                  is_online: false,
-                  status: 'inactive',
-                  updated_at: new Date().toISOString()
-                })
-                .eq('id', lastProcessedUserId);
-              
-              // Update driver_availability table (trigger will also handle this, but doing it explicitly too)
-              try {
-                await supabase.rpc('update_driver_availability', {
-                  p_driver_id: lastProcessedUserId,
-                  p_is_online: false,
-                  p_is_available: false,
-                  p_max_orders: 3
-                });
-              } catch (availError) {
-                // Fallback to direct update
-                await supabase
-                  .from('driver_availability')
-                  .upsert({
-                    driver_id: lastProcessedUserId,
-                    is_online: false,
-                    is_available: false,
-                    max_orders: 3,
-                    current_orders: 0,
-                    last_seen: new Date().toISOString()
-                  }, {
-                    onConflict: 'driver_id'
-                  });
-              }
-              console.log('Driver marked offline on SIGNED_OUT event');
-            } catch (offlineError) {
-              console.error('Error setting driver offline on SIGNED_OUT:', offlineError);
-            }
-          }
-          
+          // Note: We keep driver online status on logout - they'll stay online until they explicitly click "Go Offline"
+          // This provides better UX and drivers can resume where they left off
           setSession(null);
           setUser(null);
           setProfile(null);
@@ -276,53 +236,28 @@ export const useAuth = () => {
     
     setIsSigningOut(true);
     try {
-      // Set driver offline before signing out (both profiles and driver_availability)
+      // Note: We keep driver online status on logout - they'll stay online until they explicitly click "Go Offline"
+      // This provides better UX (like DoorDash) and drivers can resume where they left off
+      // Only update last_seen timestamp to indicate they're not actively logged in
       if (user?.id && profile?.user_type === 'driver') {
         try {
-          // Update profiles table
-          await supabase
-            .from('profiles')
-            .update({ 
-              is_online: false,
-              status: 'inactive',
-              updated_at: new Date().toISOString()
-            })
-            .eq('id', user.id);
-          
-          // Update driver_availability table using RPC function
+          // Update last_seen in driver_availability to track when they were last active
+          // But keep is_online = true so they remain in the online state
           try {
-            const { error: availabilityError } = await supabase.rpc('update_driver_availability', {
+            await supabase.rpc('update_driver_availability', {
               p_driver_id: user.id,
-              p_is_online: false,
-              p_is_available: false,
+              p_is_online: profile.is_online || false, // Keep current online status
+              p_is_available: profile.is_online || false,
               p_max_orders: 3
             });
-            
-            if (availabilityError) {
-              console.error('Error updating driver_availability:', availabilityError);
-              // Fallback: try direct update if RPC fails
-              await supabase
-                .from('driver_availability')
-                .upsert({
-                  driver_id: user.id,
-                  is_online: false,
-                  is_available: false,
-                  max_orders: 3,
-                  current_orders: 0,
-                  last_seen: new Date().toISOString()
-                }, {
-                  onConflict: 'driver_id'
-                });
-            }
           } catch (availabilityErr) {
-            console.error('Error in driver_availability update:', availabilityErr);
             // Fallback: try direct update
             await supabase
               .from('driver_availability')
               .upsert({
                 driver_id: user.id,
-                is_online: false,
-                is_available: false,
+                is_online: profile.is_online || false,
+                is_available: profile.is_online || false,
                 max_orders: 3,
                 current_orders: 0,
                 last_seen: new Date().toISOString()
@@ -330,10 +265,9 @@ export const useAuth = () => {
                 onConflict: 'driver_id'
               });
           }
-          
-          console.log('Driver marked as offline on logout (synced with driver_availability)');
-        } catch (offlineError) {
-          console.error('Error setting driver offline:', offlineError);
+          console.log('Driver online status preserved on logout');
+        } catch (error) {
+          console.error('Error updating driver_availability on logout:', error);
           // Continue with logout even if this fails
         }
       }
