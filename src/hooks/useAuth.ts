@@ -341,9 +341,27 @@ export const useAuth = () => {
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error signing out:', error);
+      } else {
+        // Successfully signed out - clear state immediately and redirect
+        setSession(null);
+        setUser(null);
+        setProfile(null);
+        setLastProcessedUserId(null);
+        
+        // Redirect to home page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/';
+        }
       }
     } catch (error) {
       console.error('Error signing out:', error);
+      // Even on error, try to clear state and redirect
+      setSession(null);
+      setUser(null);
+      setProfile(null);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     } finally {
       setIsSigningOut(false);
     }

@@ -439,8 +439,10 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const startLocationTracking = async () => {
     try {
-      await locationTrackingService.startTracking();
+      // Optimistically update UI immediately
       setIsTracking(true);
+      
+      await locationTrackingService.startTracking();
       
       // Update driver online status in database (both profiles and driver_availability)
       if (user?.id) {
@@ -510,8 +512,10 @@ const NewDriverDashboardPage: React.FC = () => {
 
   const stopLocationTracking = async () => {
     try {
-      await locationTrackingService.stopTracking();
+      // Optimistically update UI immediately
       setIsTracking(false);
+      
+      await locationTrackingService.stopTracking();
       
       // Update driver offline status in database (both profiles and driver_availability)
       if (user?.id) {
@@ -890,8 +894,9 @@ const NewDriverDashboardPage: React.FC = () => {
                   <Button
                     onClick={stopLocationTracking}
                     className="bg-red-600 hover:bg-red-700 text-white"
+                    disabled={!isTracking}
                   >
-                    Go Offline
+                    {!isTracking ? 'Going Offline...' : 'Go Offline'}
                   </Button>
                 </div>
               ) : (
@@ -906,8 +911,9 @@ const NewDriverDashboardPage: React.FC = () => {
                   <Button
                     onClick={startLocationTracking}
                     className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={isTracking}
                   >
-                    Go Online
+                    {isTracking ? 'Going Online...' : 'Go Online'}
                   </Button>
                 </div>
               )}

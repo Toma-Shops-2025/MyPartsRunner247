@@ -85,9 +85,14 @@ const NewHeader: React.FC = () => {
       setIsMobileMenuOpen(false);
       await signOut();
       console.log('Sign out completed');
-      // Note: signOut() already handles navigation via window.location.href
+      // signOut() will handle navigation via window.location.href
+      // No need to navigate here as it's handled in useAuth
     } catch (error) {
       console.error('Error in handleSignOut:', error);
+      // Fallback navigation on error
+      if (typeof window !== 'undefined') {
+        window.location.href = '/';
+      }
     }
   };
 
