@@ -442,8 +442,9 @@ const NewDriverDashboardPage: React.FC = () => {
       await locationTrackingService.startTracking();
       setIsTracking(true);
       
-      // Update driver online status in database
+      // Update driver online status in database (both profiles and driver_availability)
       if (user?.id) {
+        // Update profiles table
         await supabase
           .from('profiles')
           .update({ 
@@ -452,7 +453,50 @@ const NewDriverDashboardPage: React.FC = () => {
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);
-        console.log('Driver marked as online and active');
+        
+        // Update driver_availability table using RPC function
+        try {
+          const { error: availabilityError } = await supabase.rpc('update_driver_availability', {
+            p_driver_id: user.id,
+            p_is_online: true,
+            p_is_available: true,
+            p_max_orders: 3
+          });
+          
+          if (availabilityError) {
+            console.error('Error updating driver_availability:', availabilityError);
+            // Fallback: try direct update if RPC fails
+            await supabase
+              .from('driver_availability')
+              .upsert({
+                driver_id: user.id,
+                is_online: true,
+                is_available: true,
+                max_orders: 3,
+                current_orders: 0,
+                last_seen: new Date().toISOString()
+              }, {
+                onConflict: 'driver_id'
+              });
+          }
+        } catch (availabilityErr) {
+          console.error('Error in driver_availability update:', availabilityErr);
+          // Fallback: try direct update
+          await supabase
+            .from('driver_availability')
+            .upsert({
+              driver_id: user.id,
+              is_online: true,
+              is_available: true,
+              max_orders: 3,
+              current_orders: 0,
+              last_seen: new Date().toISOString()
+            }, {
+              onConflict: 'driver_id'
+            });
+        }
+        
+        console.log('Driver marked as online and active (synced with driver_availability)');
 
         // Check for queued orders when driver comes online
         await orderQueueService.checkQueuedOrdersForDriver(user.id);
@@ -469,8 +513,9 @@ const NewDriverDashboardPage: React.FC = () => {
       await locationTrackingService.stopTracking();
       setIsTracking(false);
       
-      // Update driver offline status in database
+      // Update driver offline status in database (both profiles and driver_availability)
       if (user?.id) {
+        // Update profiles table
         await supabase
           .from('profiles')
           .update({ 
@@ -479,7 +524,50 @@ const NewDriverDashboardPage: React.FC = () => {
             updated_at: new Date().toISOString()
           })
           .eq('id', user.id);
-        console.log('Driver marked as offline and inactive');
+        
+        // Update driver_availability table using RPC function
+        try {
+          const { error: availabilityError } = await supabase.rpc('update_driver_availability', {
+            p_driver_id: user.id,
+            p_is_online: false,
+            p_is_available: false,
+            p_max_orders: 3
+          });
+          
+          if (availabilityError) {
+            console.error('Error updating driver_availability:', availabilityError);
+            // Fallback: try direct update if RPC fails
+            await supabase
+              .from('driver_availability')
+              .upsert({
+                driver_id: user.id,
+                is_online: false,
+                is_available: false,
+                max_orders: 3,
+                current_orders: 0,
+                last_seen: new Date().toISOString()
+              }, {
+                onConflict: 'driver_id'
+              });
+          }
+        } catch (availabilityErr) {
+          console.error('Error in driver_availability update:', availabilityErr);
+          // Fallback: try direct update
+          await supabase
+            .from('driver_availability')
+            .upsert({
+              driver_id: user.id,
+              is_online: false,
+              is_available: false,
+              max_orders: 3,
+              current_orders: 0,
+              last_seen: new Date().toISOString()
+            }, {
+              onConflict: 'driver_id'
+            });
+        }
+        
+        console.log('Driver marked as offline and inactive (synced with driver_availability)');
       }
       
       console.log('Location tracking stopped - UI updated');

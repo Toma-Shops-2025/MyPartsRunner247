@@ -234,9 +234,10 @@ export const useAuth = () => {
     
     setIsSigningOut(true);
     try {
-      // Set driver offline before signing out
+      // Set driver offline before signing out (both profiles and driver_availability)
       if (user?.id && profile?.user_type === 'driver') {
         try {
+          // Update profiles table
           await supabase
             .from('profiles')
             .update({ 
@@ -245,7 +246,50 @@ export const useAuth = () => {
               updated_at: new Date().toISOString()
             })
             .eq('id', user.id);
-          console.log('Driver marked as offline on logout');
+          
+          // Update driver_availability table using RPC function
+          try {
+            const { error: availabilityError } = await supabase.rpc('update_driver_availability', {
+              p_driver_id: user.id,
+              p_is_online: false,
+              p_is_available: false,
+              p_max_orders: 3
+            });
+            
+            if (availabilityError) {
+              console.error('Error updating driver_availability:', availabilityError);
+              // Fallback: try direct update if RPC fails
+              await supabase
+                .from('driver_availability')
+                .upsert({
+                  driver_id: user.id,
+                  is_online: false,
+                  is_available: false,
+                  max_orders: 3,
+                  current_orders: 0,
+                  last_seen: new Date().toISOString()
+                }, {
+                  onConflict: 'driver_id'
+                });
+            }
+          } catch (availabilityErr) {
+            console.error('Error in driver_availability update:', availabilityErr);
+            // Fallback: try direct update
+            await supabase
+              .from('driver_availability')
+              .upsert({
+                driver_id: user.id,
+                is_online: false,
+                is_available: false,
+                max_orders: 3,
+                current_orders: 0,
+                last_seen: new Date().toISOString()
+              }, {
+                onConflict: 'driver_id'
+              });
+          }
+          
+          console.log('Driver marked as offline on logout (synced with driver_availability)');
         } catch (offlineError) {
           console.error('Error setting driver offline:', offlineError);
           // Continue with logout even if this fails
