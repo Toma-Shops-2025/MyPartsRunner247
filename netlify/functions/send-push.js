@@ -38,6 +38,37 @@ exports.handler = async (event) => {
     if (isOrderAvailableNotification) {
       console.log('🔒 Order notification detected - filtering to drivers only');
       
+      // CRITICAL: Verify order is still pending and available before sending
+      if (data?.orderId) {
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .select('id, status, driver_id')
+          .eq('id', data.orderId)
+          .single();
+        
+        if (orderError) {
+          console.error(`❌ Error checking order ${data.orderId}:`, orderError);
+          return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'Order not found' }) };
+        }
+        
+        if (!orderData) {
+          console.log(`⚠️ Order ${data.orderId} not found, skipping notification`);
+          return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'Order not found' }) };
+        }
+        
+        if (orderData.status !== 'pending') {
+          console.log(`⚠️ Order ${data.orderId} is no longer pending (status: ${orderData.status}), skipping notification`);
+          return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: `Order status is ${orderData.status}, not pending` }) };
+        }
+        
+        if (orderData.driver_id) {
+          console.log(`⚠️ Order ${data.orderId} already has driver ${orderData.driver_id} assigned, skipping notification`);
+          return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'Order already assigned' }) };
+        }
+        
+        console.log(`✅ Order ${data.orderId} verified: pending, no driver assigned - proceeding with notification`);
+      }
+      
       // Get user types for all requested users
       const { data: userProfiles, error: profileError } = await supabase
         .from('profiles')

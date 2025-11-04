@@ -67,6 +67,34 @@ export class OrderAutomationService {
   // Broadcast to all online drivers when coordinates are missing or as fallback
   private async broadcastToOnlineDrivers(order: any) {
     try {
+      // CRITICAL: Verify order is still pending before sending notifications
+      const { data: currentOrder, error: orderError } = await supabase
+        .from('orders')
+        .select('id, status, driver_id')
+        .eq('id', order.id)
+        .single();
+
+      if (orderError) {
+        console.error(`❌ Error checking order status for ${order.id}:`, orderError);
+        return;
+      }
+
+      if (!currentOrder) {
+        console.log(`⚠️ Order ${order.id} not found in database, skipping notification`);
+        return;
+      }
+
+      // Only send notifications for pending orders that haven't been assigned
+      if (currentOrder.status !== 'pending') {
+        console.log(`⚠️ Order ${order.id} is no longer pending (status: ${currentOrder.status}), skipping notification`);
+        return;
+      }
+
+      if (currentOrder.driver_id) {
+        console.log(`⚠️ Order ${order.id} already has a driver assigned, skipping notification`);
+        return;
+      }
+
       // Get all online drivers
       const { data: onlineDrivers, error } = await supabase
         .from('profiles')
@@ -86,7 +114,7 @@ export class OrderAutomationService {
         return;
       }
 
-      console.log(`📢 Broadcasting to ${onlineDrivers.length} online drivers for order ${order.id}`);
+      console.log(`📢 Broadcasting to ${onlineDrivers.length} online drivers for order ${order.id} (verified: pending, no driver assigned)`);
 
       // Notify all online drivers
       for (const driver of onlineDrivers) {
