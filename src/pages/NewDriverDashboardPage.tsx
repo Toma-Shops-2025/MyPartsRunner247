@@ -505,6 +505,29 @@ const NewDriverDashboardPage: React.FC = () => {
         
         console.log('Driver marked as online and active (synced with driver_availability)');
         
+        // Start periodic last_seen updates (every 2 minutes) to keep driver "active" for notifications
+        const updateLastSeen = async () => {
+          if (!isTracking || !user?.id) return;
+          
+          try {
+            await supabase
+              .from('driver_availability')
+              .update({ last_seen: new Date().toISOString() })
+              .eq('driver_id', user.id);
+          } catch (error) {
+            console.error('Error updating last_seen:', error);
+          }
+        };
+        
+        // Update immediately
+        await updateLastSeen();
+        
+        // Then update every 2 minutes while tracking
+        const lastSeenInterval = setInterval(updateLastSeen, 2 * 60 * 1000);
+        
+        // Store interval ID so we can clear it later
+        (window as any).__lastSeenInterval = lastSeenInterval;
+        
         // Refresh profile to ensure UI has latest state
         if (profile) {
           const { data: updatedProfile } = await supabase
@@ -534,6 +557,12 @@ const NewDriverDashboardPage: React.FC = () => {
     try {
       // Optimistically update UI immediately
       setIsTracking(false);
+      
+      // Stop periodic last_seen updates
+      if ((window as any).__lastSeenInterval) {
+        clearInterval((window as any).__lastSeenInterval);
+        delete (window as any).__lastSeenInterval;
+      }
       
       await locationTrackingService.stopTracking();
       

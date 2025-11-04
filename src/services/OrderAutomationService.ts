@@ -95,13 +95,40 @@ export class OrderAutomationService {
         return;
       }
 
-      // Get all online drivers
-      const { data: onlineDrivers, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, email, phone, is_online, status')
-        .eq('user_type', 'driver')
-        .eq('is_online', true)
-        .eq('status', 'active');
+      // Get all online drivers who have been active recently (within last 5 minutes)
+      // This ensures we only notify drivers who have the app open or recently closed it
+      // Drivers who closed the app more than 5 minutes ago won't receive notifications
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      
+      // Query using driver_availability table to check last_seen
+      const { data: availabilityData, error: availabilityError } = await supabase
+        .from('driver_availability')
+        .select(`
+          driver_id,
+          last_seen,
+          profiles!inner(id, full_name, email, phone, is_online, status, user_type)
+        `)
+        .eq('profiles.is_online', true)
+        .eq('profiles.status', 'active')
+        .eq('profiles.user_type', 'driver')
+        .gte('last_seen', fiveMinutesAgo);
+      
+      if (availabilityError) {
+        console.error('Error fetching active drivers:', availabilityError);
+        return;
+      }
+      
+      // Extract driver data from the joined query
+      const onlineDrivers = (availabilityData || []).map((item: any) => ({
+        id: item.profiles.id,
+        full_name: item.profiles.full_name,
+        email: item.profiles.email,
+        phone: item.profiles.phone,
+        is_online: item.profiles.is_online,
+        status: item.profiles.status
+      }));
+      
+      const error = null; // No error if we got here
 
       if (error) {
         console.error('Error fetching online drivers:', error);
