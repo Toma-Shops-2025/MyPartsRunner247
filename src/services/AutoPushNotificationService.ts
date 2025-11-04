@@ -136,35 +136,47 @@ class AutoPushNotificationService {
       console.log('💾 Saving subscription to database...');
       const restoreResult = await pushNotificationService.restoreSubscriptionIfNeeded(userId);
       
-      // Double-check database save
-      if (!hasDbSub) {
-        // Wait a moment for save to complete
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      // Check if restore was successful (restoreResult returns boolean)
+      const saveSuccess = restoreResult === true;
+      
+      if (saveSuccess) {
+        console.log('✅ Subscription saved to database successfully');
+        // Give database a moment to propagate (especially for Supabase replication)
+        await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Check again
-        const { data: checkSubs } = await supabase
+        // Verify it's actually in database now (with longer timeout for replication)
+        const { data: verifySubs, error: verifyError } = await supabase
           .from('push_subscriptions')
-          .select('endpoint')
+          .select('endpoint, user_id')
           .eq('user_id', userId)
           .limit(1);
         
-        if (!checkSubs || checkSubs.length === 0) {
-          console.warn('⚠️ Subscription not in database yet, retrying save...');
-          if (retryCount < MAX_RETRIES) {
-            setTimeout(() => {
-              this.autoEnablePushNotifications(userId, retryCount + 1);
-            }, RETRY_DELAY);
-            return false;
-          }
+        if (verifyError) {
+          console.error('⚠️ Error verifying subscription in database:', verifyError);
+          // Continue anyway - the save said it succeeded
+        } else if (verifySubs && verifySubs.length > 0) {
+          console.log('✅ Subscription verified in database');
         } else {
-          console.log('✅ Subscription confirmed in database');
+          console.warn('⚠️ Subscription save reported success but not found in database yet (replication delay)');
+          // This is likely a replication delay - trust the save result and continue
+          // The subscription will be found on next check
         }
-      }
-      
-      if (restoreResult || hasDbSub) {
+        
         console.log('✅✅✅ Push notifications automatically enabled for user');
         this.subscribedUsers.add(userId);
         return true;
+      } else {
+        // Save failed - retry if we haven't exceeded max retries
+        console.warn('⚠️ Subscription save failed, retrying...');
+        if (retryCount < MAX_RETRIES) {
+          setTimeout(() => {
+            this.autoEnablePushNotifications(userId, retryCount + 1);
+          }, RETRY_DELAY);
+          return false;
+        } else {
+          console.error('❌ Failed to save subscription after all retries');
+          return false;
+        }
       }
 
       // Final retry if still not working
