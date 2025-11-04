@@ -506,8 +506,18 @@ const NewDriverDashboardPage: React.FC = () => {
         console.log('Driver marked as online and active (synced with driver_availability)');
         
         // Start periodic last_seen updates (every 2 minutes) to keep driver "active" for notifications
+        // This ensures drivers receive push notifications while the app is open
         const updateLastSeen = async () => {
-          if (!isTracking || !user?.id) return;
+          // Check current tracking state, not the closure variable
+          const currentTrackingState = isTracking;
+          if (!currentTrackingState || !user?.id) {
+            // If tracking stopped, clear interval
+            if ((window as any).__lastSeenInterval) {
+              clearInterval((window as any).__lastSeenInterval);
+              delete (window as any).__lastSeenInterval;
+            }
+            return;
+          }
           
           try {
             await supabase
@@ -523,6 +533,8 @@ const NewDriverDashboardPage: React.FC = () => {
         await updateLastSeen();
         
         // Then update every 2 minutes while tracking
+        // Note: We update every 2 minutes, but notifications check for last 5 minutes
+        // This gives a 3-minute buffer for network delays or missed updates
         const lastSeenInterval = setInterval(updateLastSeen, 2 * 60 * 1000);
         
         // Store interval ID so we can clear it later

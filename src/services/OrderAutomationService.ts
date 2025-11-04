@@ -127,13 +127,6 @@ export class OrderAutomationService {
         is_online: item.profiles.is_online,
         status: item.profiles.status
       }));
-      
-      const error = null; // No error if we got here
-
-      if (error) {
-        console.error('Error fetching online drivers:', error);
-        return;
-      }
 
       if (!onlineDrivers || onlineDrivers.length === 0) {
         console.log('No online drivers found, will add to queue');
