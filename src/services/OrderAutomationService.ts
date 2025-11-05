@@ -100,64 +100,62 @@ export class OrderAutomationService {
       // Drivers who closed the app more than 15 minutes ago won't receive notifications
       const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
       
-      // First, get online drivers from profiles
-      const { data: onlineDriverProfiles, error: profilesError } = await supabase
+      // Get all active drivers (not just "online" ones)
+      // Also include drivers with push subscriptions - they want notifications!
+      const { data: allDriverProfiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, email, phone, is_online, status, user_type')
         .eq('user_type', 'driver')
-        .eq('is_online', true)
         .eq('status', 'active');
       
       if (profilesError) {
-        console.error('Error fetching online drivers from profiles:', profilesError);
+        console.error('Error fetching drivers from profiles:', profilesError);
         return;
       }
       
-      if (!onlineDriverProfiles || onlineDriverProfiles.length === 0) {
-        console.log('No online drivers found in profiles, will add to queue');
+      if (!allDriverProfiles || allDriverProfiles.length === 0) {
+        console.log('No active drivers found, will add to queue');
         await orderQueueService.addToQueue(order.id);
         return;
       }
       
-      // Now check driver_availability for last_seen to filter by activity
-      const driverIds = onlineDriverProfiles.map(d => d.id);
-      let onlineDrivers: any[] = [];
+      // Get drivers with push subscriptions (they want notifications even if not explicitly "online")
+      const driverIds = allDriverProfiles.map(d => d.id);
+      const { data: pushSubs, error: pushSubsError } = await supabase
+        .from('push_subscriptions')
+        .select('user_id')
+        .in('user_id', driverIds);
       
+      const driversWithPush = new Set((pushSubs || []).map((sub: any) => sub.user_id));
+      
+      // Get online/active drivers first
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('driver_availability')
-        .select('driver_id, last_seen')
+        .select('driver_id, last_seen, is_online')
         .in('driver_id', driverIds)
         .gte('last_seen', fifteenMinutesAgo);
       
-      if (availabilityError) {
-        console.error('Error fetching driver availability:', availabilityError);
-        // If availability check fails, fall back to all online drivers (don't block notifications)
-        console.log('⚠️ Falling back to all online drivers (availability check failed)');
-        onlineDrivers = onlineDriverProfiles;
-      } else {
-        // Filter to only drivers who have been active recently
-        const activeDriverIds = new Set((availabilityData || []).map((item: any) => item.driver_id));
-        onlineDrivers = onlineDriverProfiles.filter(driver => activeDriverIds.has(driver.id));
-        
-        if (onlineDrivers.length === 0) {
-          console.log(`⚠️ No drivers active within last 15 minutes (${onlineDriverProfiles.length} online but inactive)`);
-          await orderQueueService.addToQueue(order.id);
-          return;
-        }
-        
-        console.log(`📊 Found ${onlineDrivers.length} active drivers out of ${onlineDriverProfiles.length} online drivers`);
-      }
-
-      if (!onlineDrivers || onlineDrivers.length === 0) {
-        console.log('No online drivers found, will add to queue');
+      const activeDriverIds = new Set((availabilityData || [])
+        .filter((item: any) => item.is_online === true)
+        .map((item: any) => item.driver_id));
+      
+      // Combine: drivers who are online/active OR have push subscriptions
+      let driversToNotify = allDriverProfiles.filter(driver => 
+        activeDriverIds.has(driver.id) || driversWithPush.has(driver.id)
+      );
+      
+      if (driversToNotify.length === 0) {
+        console.log(`⚠️ No drivers found (${allDriverProfiles.length} active drivers, but none online or with push subscriptions)`);
         await orderQueueService.addToQueue(order.id);
         return;
       }
+      
+      console.log(`📊 Found ${driversToNotify.length} drivers to notify (${activeDriverIds.size} online, ${driversWithPush.size} with push subscriptions)`);
 
-      console.log(`📢 Broadcasting to ${onlineDrivers.length} online drivers for order ${order.id} (verified: pending, no driver assigned)`);
+      console.log(`📢 Broadcasting to ${driversToNotify.length} drivers for order ${order.id} (verified: pending, no driver assigned)`);
 
-      // Notify all online drivers
-      for (const driver of onlineDrivers) {
+      // Notify all drivers
+      for (const driver of driversToNotify) {
         try {
           // Send push notification (will silently fail if no subscription)
           const pushResult = await this.sendPushNotification(driver.id, {
@@ -329,10 +327,26 @@ export class OrderAutomationService {
       .single();
     
     if (customer) {
+      let title = 'Order Update';
+      let body = '';
+      
+      switch (type) {
+        case 'order_created':
+          title = 'Order Confirmed!';
+          body = `Your order #${String(order.id).slice(-8)} has been confirmed. We're finding a driver for you!`;
+          break;
+        case 'driver_assigned':
+          title = 'Driver Assigned!';
+          body = `Your order #${String(order.id).slice(-8)} has been assigned to a driver!`;
+          break;
+        default:
+          body = `Your order #${String(order.id).slice(-8)} status has been updated.`;
+      }
+      
       await this.sendPushNotification(customer.id, {
-        title: 'Order Update',
-        body: `Your order #${order.id} has been assigned to a driver!`,
-        data: { orderId: order.id }
+        title,
+        body,
+        data: { orderId: order.id, type }
       });
     }
   }
