@@ -456,6 +456,21 @@ Alternatively:
             </div>
           </div>
 
+          {/* Camera Permission Button - Always visible for easy access */}
+          <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-50 bg-yellow-50/50 font-semibold"
+              onClick={requestCameraPermission}
+            >
+              📷 Enable Camera Access
+            </Button>
+            <p className="text-xs text-yellow-300/80 mt-2 text-center">
+              Click this if "Take Photo" button isn't working
+            </p>
+          </div>
+
           {/* Navigation Status */}
           {isNavigating && (
             <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
@@ -480,23 +495,6 @@ Alternatively:
               >
                 Stop Navigation
               </Button>
-            </div>
-          )}
-
-          {/* Camera Permission Button */}
-          {currentStep === 'delivery' && (
-            <div className="mb-3">
-              <Button
-                size="sm"
-                variant="outline"
-                className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-50"
-                onClick={requestCameraPermission}
-              >
-                📷 Enable Camera Access
-              </Button>
-              <p className="text-xs text-gray-500 mt-1 text-center">
-                Click this button first if camera isn't working
-              </p>
             </div>
           )}
 
