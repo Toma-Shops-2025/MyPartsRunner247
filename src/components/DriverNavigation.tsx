@@ -307,54 +307,73 @@ Alternatively:
     alert(`Camera permission is required.\n\n${instructions}\n\nOr use "Choose from Gallery" as an alternative.`);
   };
 
+  const handleFileUpload = async (file: File) => {
+    try {
+      const fileName = `deliveries/${orderId}/delivery-${orderId}-${Date.now()}.jpg`;
+      
+      // Upload photo to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('order-photos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('order-photos')
+        .getPublicUrl(fileName);
+
+      // Save photo reference to order
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({
+          delivery_photo: urlData.publicUrl,
+          delivery_photo_taken_at: new Date().toISOString()
+        })
+        .eq('id', orderId);
+
+      if (updateError) {
+        console.error('Error saving photo reference:', updateError);
+        alert('Photo selected but failed to save. Please try again.');
+      } else {
+        alert('Photo saved! Customer not present - photo documented for delivery.');
+      }
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      alert('Failed to upload photo. Please try again.');
+    }
+  };
+
   const showFileInputFallback = () => {
-    // Create file input element
+    // Create file input element for camera capture
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.capture = 'environment'; // Prefer back camera on mobile
+    input.capture = 'environment'; // Use camera to capture new photo
     
     input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
+      await handleFileUpload(file);
+    };
 
-      try {
-        const fileName = `deliveries/${orderId}/delivery-${orderId}-${Date.now()}.jpg`;
-        
-        // Upload photo to Supabase storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('order-photos')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
+    input.click();
+  };
 
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const { data: urlData } = supabase.storage
-          .from('order-photos')
-          .getPublicUrl(fileName);
-
-        // Save photo reference to order
-        const { error: updateError } = await supabase
-          .from('orders')
-          .update({
-            delivery_photo: urlData.publicUrl,
-            delivery_photo_taken_at: new Date().toISOString()
-          })
-          .eq('id', orderId);
-
-        if (updateError) {
-          console.error('Error saving photo reference:', updateError);
-          alert('Photo selected but failed to save. Please try again.');
-        } else {
-          alert('Photo saved! Customer not present - photo documented for delivery.');
-        }
-      } catch (error) {
-        console.error('Error uploading photo:', error);
-        alert('Failed to upload photo. Please try again.');
-      }
+  const showGalleryPicker = () => {
+    // Create file input element for gallery selection (no capture attribute)
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    // No capture attribute - this opens the gallery/file picker
+    
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      await handleFileUpload(file);
     };
 
     input.click();
@@ -477,22 +496,24 @@ Alternatively:
                     return;
                   }
 
-                  // Check camera permissions first
-                  try {
-                    const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
-                    if (permissionStatus.state === 'denied') {
-                      showCameraPermissionInstructions();
-                      return;
-                    }
-                  } catch (e) {
-                    // Permission query not supported, continue with camera request
-                  }
+                                     // Check camera permissions first (if API is available)
+                   try {
+                     const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
+                     if (permissionStatus.state === 'denied') {
+                       showCameraPermissionInstructions();
+                       return;
+                     }
+                   } catch (e) {
+                     // Permission query not supported on all browsers, continue with camera request
+                     // This is normal - we'll let getUserMedia handle the permission request
+                   }
 
-                  try {
-                    // Request camera access
-                    const stream = await navigator.mediaDevices.getUserMedia({ 
-                      video: { facingMode: 'environment' } // Use back camera on mobile
-                    });
+                   try {
+                     // Request camera access
+                     // Note: If permissions were just granted in site settings, you may need to refresh the page
+                     const stream = await navigator.mediaDevices.getUserMedia({ 
+                       video: { facingMode: 'environment' } // Use back camera on mobile
+                     });
                     
                     // Create video element to show camera preview
                     const video = document.createElement('video');
@@ -632,42 +653,48 @@ Alternatively:
                       stream.getTracks().forEach(track => track.stop());
                       document.body.removeChild(overlay);
                     };
-                  } catch (error: any) {
-                    console.error('Error accessing camera:', error);
-                    
-                    // Show detailed error message with instructions
-                    const errorMessage = error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError'
-                      ? 'Camera permission denied. Please enable camera access in your browser settings.'
-                      : error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError'
-                      ? 'No camera found. Using file picker instead.'
-                      : 'Unable to access camera. Using file picker instead.';
-                    
-                    // Create a dialog with options
-                    const shouldShowInstructions = confirm(`${errorMessage}\n\nWould you like to see instructions to enable camera permissions?`);
-                    
-                    if (shouldShowInstructions) {
-                      showCameraPermissionInstructions();
-                    } else {
-                      // Automatically fallback to file input
-                      showFileInputFallback();
-                    }
-                  }
+                                     } catch (error: any) {
+                     console.error('Error accessing camera:', error);
+                     
+                     // Show detailed error message with instructions
+                     const errorMessage = error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError'
+                       ? 'Camera permission denied. If you just enabled camera access in site settings, please refresh this page and try again.'
+                       : error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError'
+                       ? 'No camera found. Using file picker instead.'
+                       : 'Unable to access camera. If you just enabled camera access, try refreshing the page.';
+                     
+                     // Create a dialog with options
+                     const shouldRefresh = confirm(`${errorMessage}\n\nWould you like to refresh the page now? (Click Cancel to use file picker instead)`);
+                     
+                     if (shouldRefresh) {
+                       window.location.reload();
+                     } else {
+                       // Offer to show instructions or use fallback
+                       const shouldShowInstructions = confirm('Would you like to see instructions to enable camera permissions?');
+                       if (shouldShowInstructions) {
+                         showCameraPermissionInstructions();
+                       } else {
+                         // Automatically fallback to file input
+                         showFileInputFallback();
+                       }
+                     }
+                   }
                 }}
               >
                 <Camera className="w-4 h-4 mr-1" />
                 Take Photo (Customer Not Present)
               </Button>
             )}
-            {currentStep === 'delivery' && (
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-50 flex-1"
-                onClick={showFileInputFallback}
-              >
-                📷 Choose from Gallery
-              </Button>
-            )}
+                         {currentStep === 'delivery' && (
+               <Button
+                 size="sm"
+                 variant="outline"
+                 className="border-blue-600 text-blue-600 hover:bg-blue-50 flex-1"
+                 onClick={showGalleryPicker}
+               >
+                 📷 Choose from Gallery
+               </Button>
+             )}
           </div>
         </CardContent>
       </Card>
