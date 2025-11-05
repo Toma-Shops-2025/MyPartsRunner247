@@ -32,9 +32,10 @@ const NewDriverDashboardPage: React.FC = () => {
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
   const [loadingTimeout, setLoadingTimeout] = useState<boolean>(false);
-  const [isTracking, setIsTracking] = useState<boolean>(false);
-  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+    const [isTracking, setIsTracking] = useState<boolean>(false);
+  const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);    
   const locationUpdateCountRef = useRef<number>(0);
+  const pushNotificationEnabledRef = useRef<boolean>(false);
 
   // Memoize location update handler to prevent re-renders
   const handleLocationUpdate = useCallback((lat: number, lng: number) => {
@@ -152,35 +153,38 @@ const NewDriverDashboardPage: React.FC = () => {
     }
   };
 
-  // Load verification deadline after onboarding status is determined
+    // Load verification deadline after onboarding status is determined
   useEffect(() => {
     if (user && profile?.user_type === 'driver') {
       loadVerificationDeadline();
       checkTrackingStatus();
       
-      // Aggressively auto-enable push notifications when driver visits dashboard
-      // This ensures drivers get notifications even if login auto-enable missed it
-      if (user.id) {
+      // Aggressively auto-enable push notifications when driver visits dashboard                                                                               
+      // This ensures drivers get notifications even if login auto-enable missed it                                                                             
+      // Only attempt once per session to prevent repeated calls
+      if (user.id && !pushNotificationEnabledRef.current) {
+        pushNotificationEnabledRef.current = true;
         setTimeout(async () => {
           try {
-            console.log('🚗 Driver dashboard: Auto-enabling push notifications...');
-            await autoPushNotificationService.autoEnablePushNotifications(user.id);
+            console.log('🚗 Driver dashboard: Auto-enabling push notifications...');                                                                          
+            await autoPushNotificationService.autoEnablePushNotifications(user.id);                                                                             
           } catch (error) {
-            console.error('Driver dashboard: Failed to auto-enable push notifications:', error);
+            console.error('Driver dashboard: Failed to auto-enable push notifications:', error);                                                                
           }
         }, 2000);
-        
-        // Retry a couple more times
+
+        // Retry once more after a delay
         setTimeout(async () => {
           try {
-            await autoPushNotificationService.autoEnablePushNotifications(user.id);
+            await autoPushNotificationService.autoEnablePushNotifications(user.id);                                                                             
           } catch (error) {
             // Silent retry
           }
         }, 5000);
       }
     }
-  }, [user, profile, onboardingCompleted]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, profile?.user_type, onboardingCompleted]);
 
   // Check if driver is currently tracking/online
   const checkTrackingStatus = async () => {
@@ -258,16 +262,16 @@ const NewDriverDashboardPage: React.FC = () => {
 
       if (!user?.id) return;
       
-      const { data, error } = await supabase
+            const { data, error } = await supabase
         .from('driver_applications')
-        .select('verification_deadline, verification_status, status')
+        .select('verification_deadline, status')
         .eq('user_id', user.id)
-        .maybeSingle(); // Use maybeSingle() instead of single() to handle missing records gracefully
-      
+        .maybeSingle(); // Use maybeSingle() instead of single() to handle missing records gracefully                                                           
+
       // If table doesn't exist or query fails, skip this check
       if (error) {
-        if (error.code === 'PGRST205' || error.message?.includes('not found') || error.code === '42P01' || error.code === '42883') {
-          console.log('⚠️ driver_applications table/columns not found - skipping verification deadline check');
+        if (error.code === 'PGRST205' || error.message?.includes('not found') || error.code === '42P01' || error.code === '42883' || error.code === '42703') {                            
+          // Column doesn't exist (42703) or table/columns not found - skip verification deadline check
           setVerificationDeadline(null);
           return;
         }
@@ -277,11 +281,9 @@ const NewDriverDashboardPage: React.FC = () => {
       }
       
       // Only show deadline if verification is not completed
-      // Check if status is 'approved' or verification_status indicates completion
+      // Check if status is 'approved'
       if (data) {
-        const isVerified = data.status === 'approved' || 
-                          data.verification_status === 'approved' || 
-                          data.verification_status === 'verified';
+        const isVerified = data.status === 'approved';
         
         // Also check profile for verification status
         if (!isVerified && user?.id) {
