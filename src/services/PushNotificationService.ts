@@ -1,6 +1,8 @@
 // FREE Push Notification Service using Web Push API
 // ================================================
 
+import { supabase } from '@/lib/supabase';
+
 interface CustomPushSubscription {
   endpoint: string;
   keys: {
@@ -137,13 +139,16 @@ class PushNotificationService {
   // Save subscription to database
   private async saveSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
-      const userId = this.getCurrentUserId();
+      const userId = await this.getCurrentUserId();
       
       if (!userId) {
+        console.warn('⚠️ No user ID available, storing subscription locally only');
         // Store subscription locally as fallback
         this.saveSubscriptionLocally(subscription);
         return;
       }
+      
+      console.log(`💾 Saving push subscription for user ${userId}`);
 
       const response = await fetch('/.netlify/functions/save-push-subscription', {
         method: 'POST',
@@ -191,7 +196,7 @@ class PushNotificationService {
   // Delete subscription from database
   private async deleteSubscription(subscription: CustomPushSubscription): Promise<void> {
     try {
-      const userId = this.getCurrentUserId();
+      const userId = await this.getCurrentUserId();
       
       if (!userId) {
         console.warn('No user ID available, deleting subscription locally only');
@@ -236,31 +241,31 @@ class PushNotificationService {
   }
 
   // Get current user ID
-  private getCurrentUserId(): string | null {
-    // Try to get user ID from various sources
+  private async getCurrentUserId(): Promise<string | null> {
     try {
-      // First try to get from localStorage
+      // Get authenticated user from Supabase
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error) {
+        console.error('Error getting current user:', error);
+        return null;
+      }
+      
+      if (user?.id) {
+        console.log(`✅ Got user ID from Supabase auth: ${user.id}`);
+        return user.id;
+      }
+
+      // Fallback to localStorage if Supabase auth fails
       const storedUserId = localStorage.getItem('user_id');
       if (storedUserId) {
+        console.log(`⚠️ Using user ID from localStorage (fallback): ${storedUserId}`);
         return storedUserId;
-      }
-
-      // Try to get from mock profile
-      const mockProfile = localStorage.getItem('mock_profile');
-      if (mockProfile) {
-        const profile = JSON.parse(mockProfile);
-        if (profile.id) {
-          return profile.id;
-        }
-      }
-
-      // Try to get from auth context (if available)
-      if (typeof window !== 'undefined' && (window as any).authUser) {
-        return (window as any).authUser.id;
       }
 
       return null;
     } catch (error) {
+      console.error('Error in getCurrentUserId:', error);
       return null;
     }
   }
