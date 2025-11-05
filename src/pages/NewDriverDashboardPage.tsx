@@ -1024,8 +1024,8 @@ const NewDriverDashboardPage: React.FC = () => {
       </div>
 
       {/* DriverNavigation component - only shown when there's an active order */}
-      {/* Push Notification Diagnostics */}
-      <PushNotificationDiagnostic />
+      {/* Push Notification Diagnostics - Admin Only */}
+      {profile?.user_type === 'admin' && <PushNotificationDiagnostic />}
 
       {activeOrders.length > 0 && (
         <DriverNavigation
