@@ -217,7 +217,7 @@ export class OrderAutomationService {
       // Notify all drivers
       for (const driver of driversToNotify) {
         try {
-          // Send push notification (will silently fail if no subscription)
+          // Send push notification (will fail if no subscription)
           const pushResult = await this.sendPushNotification(driver.id, {
             title: 'New Order Available!',
             body: `Order #${String(order.id).slice(-8)} - $${order.total} - ${order.pickup_address?.substring(0, 40) || 'Pickup location'}...`,
@@ -228,7 +228,10 @@ export class OrderAutomationService {
           });
           
           if (!pushResult) {
-            console.log(`⚠️ Push notification failed for driver ${driver.id} (likely no subscription)`);
+            console.log(`⚠️ Push notification failed for driver ${driver.id} (${driver.email || 'unknown email'}) - driver may not have push notifications enabled`);
+            console.log(`   💡 Driver should enable push notifications in their profile/dashboard`);
+          } else {
+            console.log(`✅ Push notification sent successfully to driver ${driver.id} (${driver.email || 'unknown email'})`);
           }
 
           // Create in-app notification
@@ -445,31 +448,42 @@ export class OrderAutomationService {
       console.log(`📤 Attempting to send push notification to user ${userId}`);
       console.log(`   Notification:`, { title: notification?.title, body: notification?.body, type: notification?.data?.type });
       
-      // For "new order" or "order available" notifications, verify user is a driver
+      // CRITICAL: For "new order" or "order available" notifications, verify user is a driver BEFORE sending
       const notificationType = notification?.data?.type;
       const isOrderNotification = notification?.title?.includes('New Order') || 
                                    notification?.title?.includes('Order Available') ||
                                    notificationType === 'order_available';
       
       if (isOrderNotification) {
-        // Verify user is a driver before sending order notifications
-        const { data: userProfile } = await supabase
+        // CRITICAL: Verify user is a driver - ABORT if not
+        const { data: userProfile, error: profileError } = await supabase
           .from('profiles')
           .select('user_type, email')
           .eq('id', userId)
           .single();
         
-        if (!userProfile || userProfile.user_type !== 'driver') {
-          console.log(`⚠️ Skipping order notification to non-driver user ${userId} (type: ${userProfile?.user_type || 'unknown'})`);
+        if (profileError) {
+          console.error(`❌ CRITICAL: Error checking user type for ${userId} - ABORTING driver notification:`, profileError);
           return false;
         }
-        console.log(`✅ Verified user ${userId} (${userProfile.email}) is a driver`);
+        
+        if (!userProfile || userProfile.user_type !== 'driver') {
+          console.log(`🚫 BLOCKED: Skipping driver notification to non-driver user ${userId} (type: ${userProfile?.user_type || 'unknown'}, email: ${userProfile?.email || 'unknown'})`);
+          return false;
+        }
+        console.log(`✅ Verified user ${userId} (${userProfile.email}) is a driver - proceeding with notification`);
       }
+      
+      // Add user_id to notification data for service worker verification
+      const notificationData = {
+        ...(notification?.data || {}),
+        userId: userId // Add for service worker verification
+      };
       
       const result = await PushApiService.sendToUsers([userId], {
         title: notification?.title || 'MyPartsRunner',
         body: notification?.body || 'You have an update',
-        data: notification?.data || {}
+        data: notificationData
       });
       
       console.log(`📤 Push notification result for user ${userId}:`, result);

@@ -69,32 +69,49 @@ exports.handler = async (event) => {
         console.log(`✅ Order ${data.orderId} verified: pending, no driver assigned - proceeding with notification`);
       }
       
-      // Get user types for all requested users
+      // CRITICAL: Get user types FIRST before any other operations
+      // This MUST succeed or we abort - we cannot send driver notifications to non-drivers
       const { data: userProfiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id, user_type')
+        .select('id, user_type, email')
         .in('id', userIds);
       
       if (profileError) {
-        console.error('Error checking user types:', profileError);
-      } else {
-        // Filter to only driver IDs
-        const driverIds = (userProfiles || [])
-          .filter(p => p.user_type === 'driver')
-          .map(p => p.id);
-        
-        console.log(`   Filtered: ${driverIds.length} drivers out of ${userIds.length} users`);
-        console.log(`   Driver IDs: ${driverIds.join(', ')}`);
-        
-        // Only send to drivers
-        userIds.length = 0;
-        userIds.push(...driverIds);
-        
-        if (driverIds.length === 0) {
-          console.log('⚠️ No drivers in recipient list, skipping notification');
-          return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'No drivers to notify' }) };
-        }
+        console.error('❌ CRITICAL: Error checking user types - ABORTING driver notification:', profileError);
+        return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'Failed to verify user types - notification blocked for safety' }) };
       }
+      
+      if (!userProfiles || userProfiles.length === 0) {
+        console.log('⚠️ No user profiles found, skipping notification');
+        return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'No user profiles found' }) };
+      }
+      
+      // Filter to ONLY driver IDs - CRITICAL: Non-drivers must be excluded
+      const driverIds = userProfiles
+        .filter(p => {
+          const isDriver = p.user_type === 'driver';
+          if (!isDriver) {
+            console.log(`🚫 BLOCKED: User ${p.id} (${p.email}) is not a driver (type: ${p.user_type}) - notification blocked`);
+          }
+          return isDriver;
+        })
+        .map(p => p.id);
+      
+      console.log(`   Filtered: ${driverIds.length} drivers out of ${userIds.length} users`);
+      console.log(`   Driver IDs: ${driverIds.join(', ')}`);
+      
+      // CRITICAL: If no drivers found, abort immediately
+      if (driverIds.length === 0) {
+        console.log('⚠️ No drivers in recipient list - ABORTING notification to prevent sending to customers');
+        return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'No drivers to notify - notification blocked' }) };
+      }
+      
+      // CRITICAL: Replace userIds array with ONLY driver IDs
+      // This ensures we never send to non-drivers even if there's a bug later
+      userIds.length = 0;
+      userIds.push(...driverIds);
+      
+      console.log(`✅ Verified ${driverIds.length} drivers only - proceeding with notification`);
     }
 
     // Fetch subscriptions for these users
@@ -113,7 +130,17 @@ exports.handler = async (event) => {
     if (!subs || subs.length === 0) {
       console.log(`⚠️ No subscriptions found for users: ${userIds.join(', ')}`);
       console.log(`   This means these users haven't subscribed to push notifications yet`);
-      return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: 0, message: 'No subscriptions found' }) };
+      console.log(`   💡 Users need to enable push notifications in their browser and register their subscription`);
+      
+      // For driver notifications, this is critical - log it prominently
+      const isOrderAvailableNotification = title?.includes('New Order') || 
+                                          title?.includes('Order Available') ||
+                                          data?.type === 'order_available';
+      if (isOrderAvailableNotification) {
+        console.log(`🚨 CRITICAL: Driver notification could not be sent - drivers need to enable push notifications`);
+      }
+      
+      return { statusCode: 200, body: JSON.stringify({ sent: 0, failed: userIds.length, message: 'No subscriptions found - users need to enable push notifications' }) };
     }
 
     let sent = 0, failed = 0;
