@@ -496,21 +496,10 @@ Alternatively:
                     return;
                   }
 
-                                     // Check camera permissions first (if API is available)
                    try {
-                     const permissionStatus = await navigator.permissions.query({ name: 'camera' as PermissionName });
-                     if (permissionStatus.state === 'denied') {
-                       showCameraPermissionInstructions();
-                       return;
-                     }
-                   } catch (e) {
-                     // Permission query not supported on all browsers, continue with camera request
-                     // This is normal - we'll let getUserMedia handle the permission request
-                   }
-
-                   try {
-                     // Request camera access
-                     // Note: If permissions were just granted in site settings, you may need to refresh the page
+                     // Try to access camera directly - this will work if permissions are granted
+                     // If permissions were just granted in site settings, we need to refresh the page
+                     // but first let's try accessing it - it might work immediately
                      const stream = await navigator.mediaDevices.getUserMedia({ 
                        video: { facingMode: 'environment' } // Use back camera on mobile
                      });
@@ -653,29 +642,45 @@ Alternatively:
                       stream.getTracks().forEach(track => track.stop());
                       document.body.removeChild(overlay);
                     };
-                                     } catch (error: any) {
+                   } catch (error: any) {
                      console.error('Error accessing camera:', error);
                      
-                     // Show detailed error message with instructions
-                     const errorMessage = error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError'
-                       ? 'Camera permission denied. If you just enabled camera access in site settings, please refresh this page and try again.'
-                       : error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError'
-                       ? 'No camera found. Using file picker instead.'
-                       : 'Unable to access camera. If you just enabled camera access, try refreshing the page.';
-                     
-                     // Create a dialog with options
-                     const shouldRefresh = confirm(`${errorMessage}\n\nWould you like to refresh the page now? (Click Cancel to use file picker instead)`);
-                     
-                     if (shouldRefresh) {
-                       window.location.reload();
-                     } else {
-                       // Offer to show instructions or use fallback
-                       const shouldShowInstructions = confirm('Would you like to see instructions to enable camera permissions?');
-                       if (shouldShowInstructions) {
-                         showCameraPermissionInstructions();
+                     // Handle permission errors
+                     if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
+                       // Permission was denied - offer to refresh or show instructions
+                       const shouldRefresh = confirm(
+                         'Camera access was denied.\n\n' +
+                         'If you just enabled camera access in Chrome site settings, please refresh this page.\n\n' +
+                         'Would you like to refresh now? (Click Cancel to see instructions or use gallery instead)'
+                       );
+                       
+                       if (shouldRefresh) {
+                         window.location.reload();
                        } else {
-                         // Automatically fallback to file input
-                         showFileInputFallback();
+                         // Offer to show instructions or use fallback
+                         const action = confirm('Would you like to see instructions to enable camera permissions?\n\n(Click Cancel to use "Choose from Gallery" instead)');
+                         if (action) {
+                           showCameraPermissionInstructions();
+                         } else {
+                           showGalleryPicker(); // Use gallery picker instead of file input fallback
+                         }
+                       }
+                     } else if (error?.name === 'NotFoundError' || error?.name === 'DevicesNotFoundError') {
+                       // No camera found
+                       alert('No camera found on this device. Using gallery picker instead.');
+                       showGalleryPicker();
+                     } else {
+                       // Other error - offer refresh or fallback
+                       const shouldRefresh = confirm(
+                         'Unable to access camera.\n\n' +
+                         'If you just enabled camera access, try refreshing the page.\n\n' +
+                         'Would you like to refresh now? (Click Cancel to use gallery instead)'
+                       );
+                       
+                       if (shouldRefresh) {
+                         window.location.reload();
+                       } else {
+                         showGalleryPicker();
                        }
                      }
                    }
