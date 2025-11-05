@@ -1037,8 +1037,8 @@ const NewDriverDashboardPage: React.FC = () => {
             // Handle delivery completion
           }}
           onLocationUpdate={handleLocationUpdate}
-          customerPhone={activeOrders[0].customer_phone}
-          customerEmail={activeOrders[0].customer_email}
+          customerPhone={activeOrders[0].contact_phone || activeOrders[0].customer_phone}
+          customerEmail={activeOrders[0].customer_email || activeOrders[0].contact_email}
         />
       )}
     </div>
