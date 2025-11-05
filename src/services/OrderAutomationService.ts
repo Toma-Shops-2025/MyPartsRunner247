@@ -17,6 +17,15 @@ export class OrderAutomationService {
     console.log('🤖 AUTOMATION: Processing new order', orderData.id);
     
     try {
+      // First, notify customer that their order was created
+      try {
+        console.log('📧 Attempting to notify customer of order creation...');
+        await this.notifyCustomer(orderData, 'order_created');
+        console.log('✅ Customer notification sent');
+      } catch (customerNotifyError) {
+        console.error('❌ Error notifying customer of order creation:', customerNotifyError);
+      }
+      
       // If coordinates are missing, broadcast to all online drivers
       if (!orderData.pickup_latitude || !orderData.pickup_longitude) {
         console.log('⚠️ No coordinates available, broadcasting to all online drivers');
@@ -121,12 +130,21 @@ export class OrderAutomationService {
       
       // Get drivers with push subscriptions (they want notifications even if not explicitly "online")
       const driverIds = allDriverProfiles.map(d => d.id);
+      console.log(`🔍 Checking for push subscriptions for ${driverIds.length} drivers:`, driverIds);
+      
       const { data: pushSubs, error: pushSubsError } = await supabase
         .from('push_subscriptions')
         .select('user_id')
         .in('user_id', driverIds);
       
+      if (pushSubsError) {
+        console.error('❌ Error fetching push subscriptions:', pushSubsError);
+      } else {
+        console.log(`📱 Found ${pushSubs?.length || 0} push subscriptions for drivers:`, pushSubs);
+      }
+      
       const driversWithPush = new Set((pushSubs || []).map((sub: any) => sub.user_id));
+      console.log(`📱 Drivers with push subscriptions:`, Array.from(driversWithPush));
       
       // Get online/active drivers first
       const { data: availabilityData, error: availabilityError } = await supabase
@@ -144,13 +162,20 @@ export class OrderAutomationService {
         activeDriverIds.has(driver.id) || driversWithPush.has(driver.id)
       );
       
+      console.log(`📊 Driver selection results:`);
+      console.log(`   - Total active drivers: ${allDriverProfiles.length}`);
+      console.log(`   - Online/active drivers: ${activeDriverIds.size}`);
+      console.log(`   - Drivers with push subscriptions: ${driversWithPush.size}`);
+      console.log(`   - Drivers to notify: ${driversToNotify.length}`);
+      console.log(`   - Driver IDs to notify:`, driversToNotify.map(d => d.id));
+      
       if (driversToNotify.length === 0) {
         console.log(`⚠️ No drivers found (${allDriverProfiles.length} active drivers, but none online or with push subscriptions)`);
+        console.log(`   Active driver IDs:`, allDriverProfiles.map(d => d.id));
+        console.log(`   Active driver emails:`, allDriverProfiles.map(d => d.email));
         await orderQueueService.addToQueue(order.id);
         return;
       }
-      
-      console.log(`📊 Found ${driversToNotify.length} drivers to notify (${activeDriverIds.size} online, ${driversWithPush.size} with push subscriptions)`);
 
       console.log(`📢 Broadcasting to ${driversToNotify.length} drivers for order ${order.id} (verified: pending, no driver assigned)`);
 
