@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import autoPushNotificationService from '@/services/AutoPushNotificationService';
+import { storeUserIdInIndexedDB, clearUserIdFromIndexedDB } from '@/utils/userIdStorage';
 
 export interface Profile {
   id: string;
@@ -48,8 +49,12 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        // Store user ID in IndexedDB for service worker verification
+        storeUserIdInIndexedDB(session.user.id);
         fetchProfile(session.user.id);
       } else {
+        // Clear user ID when logged out
+        clearUserIdFromIndexedDB();
         setLoading(false);
       }
       
@@ -73,6 +78,9 @@ export const useAuth = () => {
           setSession(session);
           setUser(session.user);
           setLoading(true);
+          
+          // Store user ID in IndexedDB for service worker verification
+          storeUserIdInIndexedDB(session.user.id);
           
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
@@ -119,6 +127,9 @@ export const useAuth = () => {
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
           
+          // Clear user ID from IndexedDB
+          clearUserIdFromIndexedDB();
+          
           // Clear push notification tracking
           if (lastProcessedUserId) {
             autoPushNotificationService.clearUser(lastProcessedUserId);
@@ -127,6 +138,9 @@ export const useAuth = () => {
           setSession(session);
           setUser(session.user);
           setLoading(true);
+          
+          // Store user ID in IndexedDB for service worker verification
+          storeUserIdInIndexedDB(session.user.id);
           
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {

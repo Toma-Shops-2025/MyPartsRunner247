@@ -198,11 +198,36 @@ export class OrderAutomationService {
           }
         }
         
-        // If still no drivers, notify all active drivers anyway (they might have subscriptions we can't find)
+        // CRITICAL: Only notify drivers who have subscriptions - don't notify drivers without subscriptions
+        // This prevents sending notifications to wrong users
         if (driversToNotify.length === 0) {
-          console.log(`⚠️ Still no drivers found, but attempting to notify all ${allDriverProfiles.length} active drivers anyway`);
-          console.log(`   (Push API will handle filtering if no subscription exists)`);
-          driversToNotify = allDriverProfiles;
+          console.log(`⚠️ No drivers with push subscriptions found - will NOT notify drivers without subscriptions`);
+          console.log(`   This prevents sending driver notifications to wrong users`);
+          console.log(`   Drivers need to enable push notifications in their browser to receive notifications`);
+          // Don't notify - just create in-app notifications for drivers
+          for (const driver of allDriverProfiles) {
+            try {
+              const { error: notifError } = await supabase
+                .from('driver_notifications')
+                .insert({
+                  driver_id: driver.id,
+                  type: 'in_app',
+                  title: 'New Order Available!',
+                  body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
+                  status: 'unread',
+                  data: {
+                    order_id: order.id,
+                    pickup_address: order.pickup_address,
+                    delivery_address: order.delivery_address,
+                    total: order.total
+                  }
+                });
+              if (notifError) console.error('Failed to create in-app notification:', notifError);
+            } catch (notifErr) {
+              console.error('Error creating in-app notification:', notifErr);
+            }
+          }
+          return; // Exit early - don't send push notifications
         }
       }
       

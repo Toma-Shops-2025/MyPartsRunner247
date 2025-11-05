@@ -152,53 +152,115 @@ self.addEventListener('push', function(event) {
     console.log(`⚠️ [${timestamp}] Push event has no data`);
   }
 
-  // CRITICAL: Verify this is a driver notification before showing
+  // CRITICAL: Block driver notifications if they don't match the current user
+  // This prevents customers from seeing driver notifications
+  const notificationUserId = data?.data?.userId;
   const notificationType = data?.data?.type;
   const isOrderAvailableNotification = data?.title?.includes('New Order') || 
                                        data?.title?.includes('Order Available') ||
                                        notificationType === 'order_available';
   
-  if (isOrderAvailableNotification) {
-    console.log(`🔒 [${timestamp}] Driver notification detected - will verify user_id before showing`);
-    // Note: We can't easily check user_id in service worker without IndexedDB/localStorage access
-    // But we've already filtered at the send-push level, so this is just a safety check
-    // The notification will still show, but we log it for debugging
-  }
-
-  const options = {
-    body: data.body || 'You have a new notification',
-    icon: data.icon || '/icon-192x192.png',
-    badge: data.badge || '/badge-72x72.png',
-    vibrate: [100, 50, 100],
-    data: data.data || {},
-    actions: data.actions || [
-      {
-        action: 'view',
-        title: 'View',
-        icon: '/checkmark.png'
-      },
-      {
-        action: 'close',
-        title: 'Close',
-        icon: '/xmark.png'
-      }
-    ],
-    requireInteraction: data.requireInteraction || false,
-    silent: data.silent || false
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title || 'MyPartsRunner', options)
-      .then(() => {
-        console.log(`✅ [${timestamp}] Notification displayed: ${data.title}`);
-        if (isOrderAvailableNotification) {
-          console.log(`⚠️ [${timestamp}] Driver notification shown - verify user is a driver`);
+  // For driver notifications, verify user before showing
+  if (isOrderAvailableNotification && notificationUserId) {
+    event.waitUntil(
+      (async () => {
+        try {
+          // Try to get current user ID from IndexedDB
+          let currentUserId = null;
+          try {
+            const db = await new Promise((resolve, reject) => {
+              const request = indexedDB.open('mypartsrunner-user', 1);
+              request.onerror = () => reject(request.error);
+              request.onsuccess = () => resolve(request.result);
+              request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains('user')) {
+                  db.createObjectStore('user');
+                }
+              };
+            });
+            
+            const tx = db.transaction('user', 'readonly');
+            const store = tx.objectStore('user');
+            currentUserId = await new Promise((resolve, reject) => {
+              const request = store.get('userId');
+              request.onsuccess = () => resolve(request.result);
+              request.onerror = () => reject(request.error);
+            });
+          } catch (dbError) {
+            console.log(`⚠️ [${timestamp}] Could not access IndexedDB:`, dbError);
+          }
+          
+          if (currentUserId && currentUserId !== notificationUserId) {
+            console.log(`🚫 [${timestamp}] BLOCKED: Driver notification for ${notificationUserId} but current user is ${currentUserId}`);
+            console.log(`   NOT showing notification to prevent customer from seeing driver notifications`);
+            return; // Don't show the notification
+          }
+          
+          // User matches or we can't verify - show notification
+          const options = {
+            body: data.body || 'You have a new notification',
+            icon: data.icon || '/icon-192x192.png',
+            badge: data.badge || '/badge-72x72.png',
+            vibrate: [100, 50, 100],
+            data: data.data || {},
+            actions: data.actions || [
+              {
+                action: 'view',
+                title: 'View',
+                icon: '/checkmark.png'
+              },
+              {
+                action: 'close',
+                title: 'Close',
+                icon: '/xmark.png'
+              }
+            ],
+            requireInteraction: data.requireInteraction || false,
+            silent: data.silent || false
+          };
+          
+          await self.registration.showNotification(data.title || 'MyPartsRunner', options);
+          console.log(`✅ [${timestamp}] Driver notification displayed: ${data.title}`);
+        } catch (error) {
+          console.error(`❌ [${timestamp}] Error processing driver notification:`, error);
         }
-      })
-      .catch((error) => {
-        console.error(`❌ [${timestamp}] Failed to show notification:`, error);
-      })
-  );
+      })()
+    );
+  } else {
+    // Not a driver notification or no user_id - show normally
+    const options = {
+      body: data.body || 'You have a new notification',
+      icon: data.icon || '/icon-192x192.png',
+      badge: data.badge || '/badge-72x72.png',
+      vibrate: [100, 50, 100],
+      data: data.data || {},
+      actions: data.actions || [
+        {
+          action: 'view',
+          title: 'View',
+          icon: '/checkmark.png'
+        },
+        {
+          action: 'close',
+          title: 'Close',
+          icon: '/xmark.png'
+        }
+      ],
+      requireInteraction: data.requireInteraction || false,
+      silent: data.silent || false
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'MyPartsRunner', options)
+        .then(() => {
+          console.log(`✅ [${timestamp}] Notification displayed: ${data.title}`);
+        })
+        .catch((error) => {
+          console.error(`❌ [${timestamp}] Failed to show notification:`, error);
+        })
+    );
+  }
 });
 
 // Notification click event
