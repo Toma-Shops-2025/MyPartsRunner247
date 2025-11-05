@@ -28,31 +28,36 @@ exports.handler = async (event) => {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Check if subscription already exists
+    // Check if subscription already exists for this endpoint
     const { data: existing } = await supabase
       .from('push_subscriptions')
       .select('user_id, endpoint')
-      .eq('user_id', userId)
+      .eq('endpoint', subscription.endpoint)
       .single();
 
     if (existing) {
-      console.log(`   Updating existing subscription for user ${userId}`);
+      console.log(`   Updating existing subscription for user ${userId} (endpoint already exists)`);
     } else {
       console.log(`   Creating new subscription for user ${userId}`);
     }
 
+    // Delete any existing subscriptions for this user (one subscription per user)
+    // This ensures we don't have multiple subscriptions per user
+    await supabase
+      .from('push_subscriptions')
+      .delete()
+      .eq('user_id', userId);
+
     // Save subscription to database
     const { data, error } = await supabase
       .from('push_subscriptions')
-      .upsert({
+      .insert({
         user_id: userId,
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
       });
 
     if (error) {
