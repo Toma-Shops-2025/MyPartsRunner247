@@ -136,15 +136,20 @@ function isAPIRequest(url) {
 
 // Push event - Handle incoming push notifications
 self.addEventListener('push', function(event) {
-  console.log('Push event received:', event);
+  const timestamp = new Date().toISOString();
+  console.log(`🔔 [${timestamp}] Push event received:`, event);
 
   let data = {};
   if (event.data) {
     try {
       data = event.data.json();
+      console.log(`📬 [${timestamp}] Push data parsed:`, data);
     } catch (e) {
       data = { title: 'MyPartsRunner', body: event.data.text() };
+      console.log(`📬 [${timestamp}] Push data (text):`, data);
     }
+  } else {
+    console.log(`⚠️ [${timestamp}] Push event has no data`);
   }
 
   const options = {
@@ -171,6 +176,12 @@ self.addEventListener('push', function(event) {
 
   event.waitUntil(
     self.registration.showNotification(data.title || 'MyPartsRunner', options)
+      .then(() => {
+        console.log(`✅ [${timestamp}] Notification displayed: ${data.title}`);
+      })
+      .catch((error) => {
+        console.error(`❌ [${timestamp}] Failed to show notification:`, error);
+      })
   );
 });
 

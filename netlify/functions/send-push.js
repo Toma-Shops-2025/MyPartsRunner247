@@ -127,8 +127,15 @@ exports.handler = async (event) => {
         keys: { p256dh: sub.p256dh, auth: sub.auth }
       };
       try {
-        await webpush.sendNotification(subscription, payload);
-        console.log(`   ✅ Sent to user ${sub.user_id}`);
+        // Configure push options for immediate delivery
+        const pushOptions = {
+          TTL: 0, // Don't queue - deliver immediately or fail
+          urgency: 'high', // High priority for immediate delivery
+          topic: `order-${data?.orderId || Date.now()}` // Unique topic to prevent queuing
+        };
+        
+        await webpush.sendNotification(subscription, payload, pushOptions);
+        console.log(`   ✅ Sent to user ${sub.user_id} (immediate delivery)`);
         sent++;
       } catch (e) {
         console.error(`   ❌ Push failed for user ${sub.user_id}:`, e?.statusCode || e?.message);
