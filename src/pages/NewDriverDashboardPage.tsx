@@ -6,6 +6,7 @@ import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
 import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
+import PushNotificationDiagnostic from '@/components/PushNotificationDiagnostic';
 import { orderQueueService } from '@/services/OrderQueueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -1023,6 +1024,9 @@ const NewDriverDashboardPage: React.FC = () => {
       </div>
 
       {/* DriverNavigation component - only shown when there's an active order */}
+      {/* Push Notification Diagnostics */}
+      <PushNotificationDiagnostic />
+
       {activeOrders.length > 0 && (
         <DriverNavigation
           pickupLocation={activeOrders[0].pickup_address || 'Pickup location'}
