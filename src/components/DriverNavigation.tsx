@@ -307,117 +307,6 @@ Alternatively:
     alert(`Camera permission is required.\n\n${instructions}\n\nOr use "Choose from Gallery" as an alternative.`);
   };
 
-  const requestCameraPermission = async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Camera API is not available on this device.');
-      return;
-    }
-
-    // On mobile, try file input with capture first as it sometimes works better
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-      // Try file input approach first - this sometimes triggers permission prompts better on mobile
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'environment';
-      
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0];
-        if (file) {
-          // If file was selected, permission might be working now
-          alert('✅ Camera access detected! You can now use the "Take Photo" button.\n\nIf it still doesn\'t work, try the direct camera method below.');
-          // Also try the direct method to see if it works now
-          tryDirectCameraAccess();
-        }
-      };
-      
-      input.oncancel = () => {
-        // User cancelled - try direct method or show instructions
-        tryDirectCameraAccess();
-      };
-      
-      // Show a message first
-      const proceed = confirm(
-        'This will open your camera.\n\n' +
-        'If you see a permission prompt, tap "Allow".\n\n' +
-        'If no prompt appears, camera access was previously denied and you\'ll need to enable it in settings.\n\n' +
-        'Click OK to continue, or Cancel to see settings instructions.'
-      );
-      
-      if (proceed) {
-        input.click();
-      } else {
-        showMobileCameraInstructions();
-      }
-    } else {
-      // Desktop - try direct access
-      tryDirectCameraAccess();
-    }
-  };
-
-  const tryDirectCameraAccess = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
-      });
-      
-      stream.getTracks().forEach(track => track.stop());
-      alert('✅ Camera permission granted! You can now use the "Take Photo" button.');
-    } catch (error: any) {
-      console.error('Camera permission request failed:', error);
-      
-      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
-        showMobileCameraInstructions();
-      } else {
-        alert('Unable to access camera. Please check your device settings or use "Choose from Gallery" instead.');
-      }
-    }
-  };
-
-  const showMobileCameraInstructions = () => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    let instructions = '';
-    if (isAndroid) {
-      instructions = `To enable camera access on Android Chrome:
-
-1. Tap the 3-dot menu (⋮) at the top right
-2. Tap "Settings"
-3. Tap "Site settings" (under Privacy and security)
-4. Tap "Camera"
-5. Find "mypartsrunner.com" in the list
-   - If it's in "Blocked", tap it and change to "Allow"
-   - If it's not listed, make sure "Ask before accessing" is enabled
-6. Go back to this page and refresh it
-
-OR use "Choose from Gallery" as an alternative.`;
-    } else if (isIOS) {
-      instructions = `To enable camera access on iOS:
-
-1. Go to iPhone Settings
-2. Scroll down and tap "Safari" (or "Chrome")
-3. Tap "Camera"
-4. Make sure camera access is allowed
-5. Return to this app and refresh
-
-OR use "Choose from Gallery" as an alternative.`;
-    } else {
-      instructions = `To enable camera access:
-
-1. Click the lock icon in the address bar
-2. Click "Camera"
-3. Change to "Allow"
-4. Refresh this page
-
-OR use "Choose from Gallery" as an alternative.`;
-    }
-    
-    alert(`Camera permission needs to be enabled in your browser settings.\n\n${instructions}`);
-  };
-
   const handleFileUpload = async (file: File) => {
     try {
       const fileName = `deliveries/${orderId}/delivery-${orderId}-${Date.now()}.jpg`;
@@ -533,21 +422,6 @@ OR use "Choose from Gallery" as an alternative.`;
                 Navigate to Delivery
               </Button>
             </div>
-          </div>
-
-          {/* Camera Permission Button - Always visible for easy access */}
-          <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-3 mb-3">
-            <Button
-              size="sm"
-              variant="outline"
-              className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-50 bg-yellow-50/50 font-semibold"
-              onClick={requestCameraPermission}
-            >
-              📷 Enable Camera Access
-            </Button>
-            <p className="text-xs text-yellow-300/80 mt-2 text-center">
-              Click this if "Take Photo" button isn't working
-            </p>
           </div>
 
           {/* Navigation Status */}
