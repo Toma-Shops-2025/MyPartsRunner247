@@ -307,6 +307,38 @@ Alternatively:
     alert(`Camera permission is required.\n\n${instructions}\n\nOr use "Choose from Gallery" as an alternative.`);
   };
 
+  const requestCameraPermission = async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Camera API is not available on this device.');
+      return;
+    }
+
+    try {
+      // Try to request camera permission directly
+      // This will trigger the browser's native permission prompt
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      
+      // Permission granted! Stop the stream immediately
+      stream.getTracks().forEach(track => track.stop());
+      
+      alert('✅ Camera permission granted! You can now use the "Take Photo" button.');
+    } catch (error: any) {
+      console.error('Camera permission request failed:', error);
+      
+      if (error?.name === 'NotAllowedError' || error?.name === 'PermissionDeniedError') {
+        alert(
+          'Camera permission was denied.\n\n' +
+          'Please allow camera access in your browser settings, then refresh this page.\n\n' +
+          'You can also use "Choose from Gallery" as an alternative.'
+        );
+      } else {
+        alert('Unable to request camera permission. Please check your browser settings or use "Choose from Gallery" instead.');
+      }
+    }
+  };
+
   const handleFileUpload = async (file: File) => {
     try {
       const fileName = `deliveries/${orderId}/delivery-${orderId}-${Date.now()}.jpg`;
@@ -448,6 +480,23 @@ Alternatively:
               >
                 Stop Navigation
               </Button>
+            </div>
+          )}
+
+          {/* Camera Permission Button */}
+          {currentStep === 'delivery' && (
+            <div className="mb-3">
+              <Button
+                size="sm"
+                variant="outline"
+                className="w-full border-yellow-500 text-yellow-600 hover:bg-yellow-50"
+                onClick={requestCameraPermission}
+              >
+                📷 Enable Camera Access
+              </Button>
+              <p className="text-xs text-gray-500 mt-1 text-center">
+                Click this button first if camera isn't working
+              </p>
             </div>
           )}
 
