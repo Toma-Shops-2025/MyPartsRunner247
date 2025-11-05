@@ -711,11 +711,66 @@ const NewDriverDashboardPage: React.FC = () => {
       <NewHeader />
       <DriverNotificationSystem />
       
-      <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>
-          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>
+          <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>                                                                           
+          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>                                                                      
         </div>
+
+        {/* Location Tracking Controls - Moved to top for visibility */}
+        <Card className="bg-gray-800 border-gray-700 mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center text-white">
+              <MapPin className="w-6 h-6 text-teal-400 mr-2" />
+              Location Tracking
+              {isTracking && (
+                <div className="ml-3 flex items-center">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
+                  <span className="text-green-400 text-sm font-medium">Active</span>
+                </div>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {isTracking ? (
+                <div className="flex items-center justify-between p-4 bg-green-900 border border-green-700 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
+                    <div>
+                      <p className="text-green-300 font-medium">Location tracking is active</p>
+                      <p className="text-green-200 text-sm">Your location is being shared with the platform</p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={stopLocationTracking}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                    disabled={!isTracking}
+                  >
+                    {!isTracking ? 'Going Offline...' : 'Go Offline'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-lg">
+                  <div className="flex items-center">
+                    <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
+                    <div>
+                      <p className="text-gray-300 font-medium">Location tracking is inactive</p>
+                      <p className="text-gray-400 text-sm">Start tracking to share your location</p>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={startLocationTracking}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                    disabled={isTracking}
+                  >
+                    {isTracking ? 'Going Online...' : 'Go Online'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Document Expiration Warning */}
         <DocumentExpirationWarning />
@@ -963,61 +1018,6 @@ const NewDriverDashboardPage: React.FC = () => {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Location Tracking Controls */}
-        <Card className="bg-gray-800 border-gray-700">
-          <CardHeader>
-            <CardTitle className="flex items-center text-white">
-              <MapPin className="w-6 h-6 text-teal-400 mr-2" />
-              Location Tracking
-              {isTracking && (
-                <div className="ml-3 flex items-center">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse mr-2"></div>
-                  <span className="text-green-400 text-sm font-medium">Active</span>
-                </div>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {isTracking ? (
-                <div className="flex items-center justify-between p-4 bg-green-900 border border-green-700 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
-                    <div>
-                      <p className="text-green-300 font-medium">Location tracking is active</p>
-                      <p className="text-green-200 text-sm">Your location is being shared with the platform</p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={stopLocationTracking}
-                    className="bg-red-600 hover:bg-red-700 text-white"
-                    disabled={!isTracking}
-                  >
-                    {!isTracking ? 'Going Offline...' : 'Go Offline'}
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
-                    <div>
-                      <p className="text-gray-300 font-medium">Location tracking is inactive</p>
-                      <p className="text-gray-400 text-sm">Start tracking to share your location</p>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={startLocationTracking}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    disabled={isTracking}
-                  >
-                    {isTracking ? 'Going Online...' : 'Go Online'}
-                  </Button>
-                </div>
-              )}
-            </div>
           </CardContent>
         </Card>
       </div>
