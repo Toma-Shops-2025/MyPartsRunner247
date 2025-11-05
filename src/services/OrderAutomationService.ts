@@ -169,10 +169,45 @@ export class OrderAutomationService {
       console.log(`   - Drivers to notify: ${driversToNotify.length}`);
       console.log(`   - Driver IDs to notify:`, driversToNotify.map(d => d.id));
       
-      if (driversToNotify.length === 0) {
-        console.log(`⚠️ No drivers found (${allDriverProfiles.length} active drivers, but none online or with push subscriptions)`);
+      // If no drivers found but we have active drivers, try to notify them anyway
+      // (subscription query might have failed or there's a user_id mismatch)
+      if (driversToNotify.length === 0 && allDriverProfiles.length > 0) {
+        console.log(`⚠️ No drivers found via subscription query (${allDriverProfiles.length} active drivers)`);
         console.log(`   Active driver IDs:`, allDriverProfiles.map(d => d.id));
         console.log(`   Active driver emails:`, allDriverProfiles.map(d => d.email));
+        
+        // Try to get ALL push subscriptions and match by email as fallback
+        console.log(`🔍 Fallback: Checking all push subscriptions...`);
+        const { data: allSubs, error: allSubsError } = await supabase
+          .from('push_subscriptions')
+          .select('user_id');
+        
+        if (!allSubsError && allSubs && allSubs.length > 0) {
+          console.log(`📱 Found ${allSubs.length} total push subscriptions in database`);
+          const allSubUserIds = new Set(allSubs.map((s: any) => s.user_id));
+          
+          // Match driver profiles to subscriptions by user_id
+          driversToNotify = allDriverProfiles.filter(driver => allSubUserIds.has(driver.id));
+          
+          if (driversToNotify.length > 0) {
+            console.log(`✅ Fallback successful: Found ${driversToNotify.length} drivers with subscriptions via fallback`);
+          } else {
+            console.log(`⚠️ Fallback failed: Driver IDs don't match subscription user_ids`);
+            console.log(`   Driver IDs:`, allDriverProfiles.map(d => d.id));
+            console.log(`   Subscription user_ids:`, Array.from(allSubUserIds));
+          }
+        }
+        
+        // If still no drivers, notify all active drivers anyway (they might have subscriptions we can't find)
+        if (driversToNotify.length === 0) {
+          console.log(`⚠️ Still no drivers found, but attempting to notify all ${allDriverProfiles.length} active drivers anyway`);
+          console.log(`   (Push API will handle filtering if no subscription exists)`);
+          driversToNotify = allDriverProfiles;
+        }
+      }
+      
+      if (driversToNotify.length === 0) {
+        console.log(`❌ No drivers to notify at all`);
         await orderQueueService.addToQueue(order.id);
         return;
       }
