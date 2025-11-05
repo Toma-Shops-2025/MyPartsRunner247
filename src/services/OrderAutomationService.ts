@@ -407,6 +407,9 @@ export class OrderAutomationService {
   // Send push notification
   private async sendPushNotification(userId: string, notification: any): Promise<boolean> {
     try {
+      console.log(`📤 Attempting to send push notification to user ${userId}`);
+      console.log(`   Notification:`, { title: notification?.title, body: notification?.body, type: notification?.data?.type });
+      
       // For "new order" or "order available" notifications, verify user is a driver
       const notificationType = notification?.data?.type;
       const isOrderNotification = notification?.title?.includes('New Order') || 
@@ -417,23 +420,27 @@ export class OrderAutomationService {
         // Verify user is a driver before sending order notifications
         const { data: userProfile } = await supabase
           .from('profiles')
-          .select('user_type')
+          .select('user_type, email')
           .eq('id', userId)
           .single();
         
         if (!userProfile || userProfile.user_type !== 'driver') {
-          console.log(`⚠️ Skipping order notification to non-driver user ${userId}`);
+          console.log(`⚠️ Skipping order notification to non-driver user ${userId} (type: ${userProfile?.user_type || 'unknown'})`);
           return false;
         }
+        console.log(`✅ Verified user ${userId} (${userProfile.email}) is a driver`);
       }
       
-      return await PushApiService.sendToUsers([userId], {
+      const result = await PushApiService.sendToUsers([userId], {
         title: notification?.title || 'MyPartsRunner',
         body: notification?.body || 'You have an update',
         data: notification?.data || {}
       });
+      
+      console.log(`📤 Push notification result for user ${userId}:`, result);
+      return result;
     } catch (error) {
-      console.error('Error sending push notification:', error);
+      console.error(`❌ Error sending push notification to user ${userId}:`, error);
       return false;
     }
   }
