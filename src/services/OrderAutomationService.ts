@@ -131,16 +131,37 @@ export class OrderAutomationService {
       // Get drivers with push subscriptions (they want notifications even if not explicitly "online")
       const driverIds = allDriverProfiles.map(d => d.id);
       console.log(`🔍 Checking for push subscriptions for ${driverIds.length} drivers:`, driverIds);
+      console.log(`   Driver emails:`, allDriverProfiles.map(d => d.email));
       
       const { data: pushSubs, error: pushSubsError } = await supabase
         .from('push_subscriptions')
-        .select('user_id')
+        .select('user_id, endpoint, created_at')
         .in('user_id', driverIds);
       
       if (pushSubsError) {
         console.error('❌ Error fetching push subscriptions:', pushSubsError);
       } else {
         console.log(`📱 Found ${pushSubs?.length || 0} push subscriptions for drivers:`, pushSubs);
+        if (pushSubs && pushSubs.length > 0) {
+          pushSubs.forEach((sub: any) => {
+            const driver = allDriverProfiles.find(d => d.id === sub.user_id);
+            console.log(`   ✅ Driver ${sub.user_id} (${driver?.email || 'unknown'}) has subscription`);
+          });
+        }
+      }
+      
+      // Also check ALL subscriptions to see what's registered
+      const { data: allSubs } = await supabase
+        .from('push_subscriptions')
+        .select('user_id, endpoint, created_at');
+      
+      if (allSubs && allSubs.length > 0) {
+        console.log(`📊 Total push subscriptions in database: ${allSubs.length}`);
+        allSubs.forEach((sub: any) => {
+          const driver = allDriverProfiles.find(d => d.id === sub.user_id);
+          const isDriver = driver ? '✅ DRIVER' : '❌ NOT A DRIVER';
+          console.log(`   ${isDriver}: user_id=${sub.user_id}, endpoint=${sub.endpoint?.substring(0, 50)}...`);
+        });
       }
       
       const driversWithPush = new Set((pushSubs || []).map((sub: any) => sub.user_id));
