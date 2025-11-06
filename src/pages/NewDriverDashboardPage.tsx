@@ -6,6 +6,7 @@ import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
 import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
+import DriverPushNotificationPrompt from '@/components/DriverPushNotificationPrompt';
 import { orderQueueService } from '@/services/OrderQueueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -716,6 +717,9 @@ const NewDriverDashboardPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>                                                                           
           <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>                                                                      
         </div>
+
+        {/* Push Notification Prompt - Show if driver doesn't have push notifications enabled */}
+        <DriverPushNotificationPrompt />
 
         {/* Location Tracking Controls - Moved to top for visibility */}
         <Card className="bg-gray-800 border-gray-700 mb-8">
