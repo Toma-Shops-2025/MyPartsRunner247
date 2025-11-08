@@ -110,119 +110,134 @@ const EarningsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-        <NewHeader />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-4 text-gray-600 hover:text-gray-900"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
-        </Button>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Earnings Dashboard</h1>
-          <p className="text-gray-600">Track your delivery earnings and performance</p>
+    <div className="relative min-h-screen overflow-hidden text-white">
+      <div className="absolute inset-0 -z-20 pointer-events-none overflow-hidden">
+        <iframe
+          className="h-full w-full scale-125"
+          src="https://www.youtube.com/embed/xbjtcgWWbeU?autoplay=1&mute=1&controls=0&loop=1&playlist=xbjtcgWWbeU&modestbranding=1&playsinline=1&rel=0&showinfo=0"
+          title="Earnings Dashboard Background"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-slate-900/75 backdrop-blur" />
+
+      <div className="relative z-10 min-h-screen">
+        <div className="bg-slate-900/40">
+          <NewHeader />
         </div>
+        <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-4 border border-white/30 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white drop-shadow-lg">Earnings Dashboard</h1>
+            <p className="text-white/80">Track your delivery earnings and performance</p>
+          </div>
 
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-700">Total Earnings</CardTitle>
+                <DollarSign className="h-4 w-4 text-slate-500" />
+              </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${earningsData.totalEarnings.toFixed(2)}</div>
-                <p className="text-xs text-muted-foreground">All time earnings</p>
+                <div className="text-2xl font-bold text-slate-900">${earningsData.totalEarnings.toFixed(2)}</div>
+                <p className="text-xs text-slate-500">All time earnings</p>
               </CardContent>
-          </Card>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Trips</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-700">Total Trips</CardTitle>
+                <TrendingUp className="h-4 w-4 text-slate-500" />
+              </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{earningsData.totalTrips}</div>
-                <p className="text-xs text-muted-foreground">Completed deliveries</p>
+                <div className="text-2xl font-bold text-slate-900">{earningsData.totalTrips}</div>
+                <p className="text-xs text-slate-500">Completed deliveries</p>
               </CardContent>
-          </Card>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Hours Worked</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-700">Hours Worked</CardTitle>
+                <Clock className="h-4 w-4 text-slate-500" />
+              </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{earningsData.totalHours.toFixed(1)}</div>
-                <p className="text-xs text-muted-foreground">Active hours</p>
+                <div className="text-2xl font-bold text-slate-900">{earningsData.totalHours.toFixed(1)}</div>
+                <p className="text-xs text-slate-500">Active hours</p>
               </CardContent>
-          </Card>
+            </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Per Hour</CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-slate-700">Avg Per Hour</CardTitle>
+                <Calendar className="h-4 w-4 text-slate-500" />
+              </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${earningsData.avgPerHour.toFixed(2)}</div>
-                <p className="text-xs text-muted-foreground">Hourly rate</p>
+                <div className="text-2xl font-bold text-slate-900">${earningsData.avgPerHour.toFixed(2)}</div>
+                <p className="text-xs text-slate-500">Hourly rate</p>
               </CardContent>
-          </Card>
-        </div>
+            </Card>
+          </div>
 
-        {/* Tip Breakdown */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <Card>
+          {/* Tip Breakdown */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-green-700">Base Earnings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-700">${earningsData.totalBaseEarnings.toFixed(2)}</div>
+                <p className="text-sm text-slate-500">From delivery fees</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-pink-600">Tips Received</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-pink-600">${earningsData.totalTips.toFixed(2)}</div>
+                <p className="text-sm text-slate-500">From customer tips</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Daily Earnings */}
+          <Card className="bg-white/85 backdrop-blur border-white/20 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-green-600">Base Earnings</CardTitle>
+              <CardTitle className="text-slate-800">Daily Earnings Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-green-600">${earningsData.totalBaseEarnings.toFixed(2)}</div>
-              <p className="text-sm text-gray-500">From delivery fees</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-pink-600">Tips Received</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-pink-600">${earningsData.totalTips.toFixed(2)}</div>
-              <p className="text-sm text-gray-500">From customer tips</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Daily Earnings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Daily Earnings Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {earningsData.dailyBreakdown.map((day, index) => (
-                <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center space-x-4">
-                    <div>
-                      <p className="font-medium">{new Date(day.date).toLocaleDateString()}</p>
-                      <p className="text-sm text-gray-500">{day.trips} trips • {day.hours.toFixed(1)}h</p>
+              <div className="space-y-4">
+                {earningsData.dailyBreakdown.map((day, index) => (
+                  <div key={index} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white/90 p-4">
+                    <div className="flex items-center space-x-4">
+                      <div>
+                        <p className="font-medium text-slate-900">{new Date(day.date).toLocaleDateString()}</p>
+                        <p className="text-sm text-slate-500">{day.trips} trips • {day.hours.toFixed(1)}h</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-semibold text-slate-900">${day.amount.toFixed(2)}</p>
+                      {day.hours > 0 && (
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-700">${(day.amount / day.hours).toFixed(2)}/hr</Badge>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-lg font-semibold">${day.amount.toFixed(2)}</p>
-                    {day.hours > 0 && (
-                      <Badge variant="secondary">${(day.amount / day.hours).toFixed(2)}/hr</Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
     </div>
   );
 };
