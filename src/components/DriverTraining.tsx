@@ -117,18 +117,31 @@ const DriverTraining: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <BookOpen className="w-8 h-8 text-teal-500" />
-          <h1 className="text-3xl font-bold text-white">Driver Training Center</h1>
+      <div className="mb-10">
+        <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl mb-8">
+          <img
+            src="/driver-training-background-upper.png"
+            alt="Driver training background"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-slate-950/60" />
+          <div className="relative p-8 sm:p-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-teal-500/20 text-teal-300 backdrop-blur-sm">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-white drop-shadow-md">Driver Training Center</h1>
+                <p className="text-white/80 text-base sm:text-lg mt-2 max-w-2xl">
+                  Complete all training videos to become a certified MyPartsRunner driver. These lessons keep you sharp and ready for every run.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <p className="text-gray-300 text-lg mb-6">
-          Complete all training videos to become a certified MyPartsRunner driver. 
-          These videos will help you provide excellent service and maximize your earnings.
-        </p>
-        
+
         {/* Progress Overview */}
-        <Card className="bg-gradient-to-r from-teal-600 to-blue-600 border-0 mb-8">
+        <Card className="bg-gradient-to-r from-teal-600 to-blue-600 border-0 mb-8 shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
