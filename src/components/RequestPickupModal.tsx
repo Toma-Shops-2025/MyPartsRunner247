@@ -156,7 +156,7 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
       <div
         className="rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
         style={{
-          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.48)), url('${modalBackgroundImage}')`,
+          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), url('${modalBackgroundImage}')`,
           backgroundBlendMode: 'overlay',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
