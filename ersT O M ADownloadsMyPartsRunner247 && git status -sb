@@ -1,0 +1,114 @@
+[1mdiff --git a/src/pages/EarningsPage.tsx b/src/pages/EarningsPage.tsx[m
+[1mindex 224cfe1..40371c1 100644[m
+[1m--- a/src/pages/EarningsPage.tsx[m
+[1m+++ b/src/pages/EarningsPage.tsx[m
+[36m@@ -111,122 +111,126 @@[m [mconst EarningsPage: React.FC = () => {[m
+ [m
+   return ([m
+     <div className="relative min-h-screen overflow-hidden text-white">[m
+[31m-      <div className="absolute inset-0 -z-30 hidden md:block bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />[m
+[31m-      <div className="absolute inset-0 -z-30 md:hidden bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />[m
+[31m-      <div className="absolute inset-0 -z-20 bg-gradient-to-b from-black/65 via-black/45 to-black/30 md:bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.8)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0.35)_65%,rgba(0,0,0,0.1)_100%)]" />[m
+[32m+[m[32m      <div className="absolute inset-0 -z-20">[m
+[32m+[m[32m        <img[m
+[32m+[m[32m          src="/earnings-dashboard-background-image.png"[m
+[32m+[m[32m          alt="Dollar background"[m
+[32m+[m[32m          className="h-full w-full object-cover"[m
+[32m+[m[32m        />[m
+[32m+[m[32m      </div>[m
+ [m
+       <div className="relative z-10 min-h-screen">[m
+[31m-        <div className="bg-gradient-to-b from-black/80 to-transparent">[m
+[32m+[m[32m        <div className="bg-black/35">[m
+           <NewHeader />[m
+         </div>[m
+         <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">[m
+           <Button[m
+             variant="ghost"[m
+             onClick={() => navigate(-1)}[m
+[31m-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/10 px-5 py-2 text-sm font-medium text-white transition hover:bg-white/20 hover:border-white/80"[m
+[32m+[m[32m            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-black/45 px-5 py-2 text-sm font-medium text-white transition hover:bg-black/55"[m
+           >[m
+             <ArrowLeft className="w-4 h-4" />[m
+             Back[m
+           </Button>[m
+           <div className="mb-10">[m
+[31m-            <h1 className="text-4xl font-bold text-white drop-shadow-2xl">Earnings Dashboard</h1>[m
+[32m+[m[32m            <h1 className="text-4xl font-bold text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">Earnings Dashboard</h1>[m
+             <p className="text-white/85 drop-shadow">Track your delivery earnings and performance</p>[m
+           </div>[m
+ [m
+           {/* Summary Cards */}[m
+           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">[m
+[31m-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">[m
+[32m+[m[32m            <div className="rounded-2xl border border-white/35 bg-black/35 p-6 text-white shadow-xl">[m
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+[31m-                <CardTitle className="text-sm font-medium text-white/95">Total Earnings</CardTitle>[m
+[32m+[m[32m                <CardTitle className="text-sm font-medium text-white">Total Earnings</CardTitle>[m
+                 <DollarSign className="h-4 w-4 text-white/80" />[m
+               </CardHeader>[m
+               <CardContent>[m
+                 <div className="text-3xl font-bold text-white drop-shadow-lg">${earningsData.totalEarnings.toFixed(2)}</div>[m
+[31m-                <p className="text-xs text-white/80">All time earnings</p>[m
+[32m+[m[32m                <p className="text-xs text-white/75">All time earnings</p>[m
+               </CardContent>[m
+[31m-            </Card>[m
+[32m+[m[32m            </div>[m
+ [m
+[31m-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">[m
+[32m+[m[32m            <div className="rounded-2xl border border-white/35 bg-black/35 p-6 text-white shadow-xl">[m
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+[31m-                <CardTitle className="text-sm font-medium text-white/95">Total Trips</CardTitle>[m
+[32m+[m[32m                <CardTitle className="text-sm font-medium text-white">Total Trips</CardTitle>[m
+                 <TrendingUp className="h-4 w-4 text-white/80" />[m
+               </CardHeader>[m
+               <CardContent>[m
+                 <div className="text-3xl font-bold text-white drop-shadow-lg">{earningsData.totalTrips}</div>[m
+[31m-                <p className="text-xs text-white/80">Completed deliveries</p>[m
+[32m+[m[32m                <p className="text-xs text-white/75">Completed deliveries</p>[m
+               </CardContent>[m
+[31m-            </Card>[m
+[32m+[m[32m            </div>[m
+ [m
+[31m-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">[m
+[32m+[m[32m            <div className="rounded-2xl border border-white/35 bg-black/35 p-6 text-white shadow-xl">[m
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+[31m-                <CardTitle className="text-sm font-medium text-white/95">Hours Worked</CardTitle>[m
+[32m+[m[32m                <CardTitle className="text-sm font-medium text-white">Hours Worked</CardTitle>[m
+                 <Clock className="h-4 w-4 text-white/80" />[m
+               </CardHeader>[m
+               <CardContent>[m
+                 <div className="text-3xl font-bold text-white drop-shadow-lg">{earningsData.totalHours.toFixed(1)}</div>[m
+[31m-                <p className="text-xs text-white/80">Active hours</p>[m
+[32m+[m[32m                <p className="text-xs text-white/75">Active hours</p>[m
+               </CardContent>[m
+[31m-            </Card>[m
+[32m+[m[32m            </div>[m
+ [m
+[31m-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">[m
+[32m+[m[32m            <div className="rounded-2xl border border-white/35 bg-black/35 p-6 text-white shadow-xl">[m
+               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+[31m-                <CardTitle className="text-sm font-medium text-white/95">Avg Per Hour</CardTitle>[m
+[32m+[m[32m                <CardTitle className="text-sm font-medium text-white">Avg Per Hour</CardTitle>[m
+                 <Calendar className="h-4 w-4 text-white/80" />[m
+               </CardHeader>[m
+               <CardContent>[m
+                 <div className="text-3xl font-bold text-white drop-shadow-lg">${earningsData.avgPerHour.toFixed(2)}</div>[m
+[31m-                <p className="text-xs text-white/80">Hourly rate</p>[m
+[32m+[m[32m                <p className="text-xs text-white/75">Hourly rate</p>[m
+               </CardContent>[m
+[31m-            </Card>[m
+[32m+[m[32m            </div>[m
+           </div>[m
+ [m
+           {/* Tip Breakdown */}[m
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">[m
+[31m-            <Card className="rounded-2xl border border-white/45 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">[m
+[32m+[m[32m            <div className="rounded-2xl border border-white/35 bg-black/35 p-6 text-white shadow-xl">[m
+               <CardHeader>[m
+                 <CardTitle className="text-green-300 drop-shadow">Base Earnings</CardTitle>[m
+               </CardHeader>[m
+               <CardContent>[m
+                 <div className="text-4xl font-bold text-green-300 drop-shadow-xl">${earningsData.totalBaseEarnings.toFixed(2)}</div>[m
+[31m-                <p className="text-sm text-white/80">From delivery fees</p>[m
+[32m+[m[32m                <p className="text-sm text-white/75">From delivery fees</
