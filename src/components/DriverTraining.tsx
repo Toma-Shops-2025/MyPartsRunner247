@@ -120,7 +120,7 @@ const DriverTraining: React.FC = () => {
       <div className="mb-10">
         <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900/80 shadow-xl mb-8">
           <img
-            src="/driver-training-background-upper.png"
+            src="/driver-training-background-upper.jpg"
             alt="Driver training background"
             className="absolute inset-0 h-full w-full object-cover"
           />
