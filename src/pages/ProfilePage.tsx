@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
                 alt="Notification preferences background"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" />
+              <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[1px]" />
               <div className="relative p-8 space-y-8">
                 <div>
                   <h2 className="text-3xl font-bold text-white">Notification Preferences</h2>
