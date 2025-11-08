@@ -111,17 +111,23 @@ const EarningsPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
-      <div className="absolute inset-0 -z-20 bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />
+      <div className="absolute inset-0 -z-20">
+        <img
+          src="/earnings-dashboard-background-image.png"
+          alt="Dollar background"
+          className="h-full w-full object-cover"
+        />
+      </div>
 
       <div className="relative z-10 min-h-screen">
-        <div className="bg-black/50">
+        <div className="bg-black/45">
           <NewHeader />
         </div>
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-black/60 px-5 py-2 text-sm font-medium text-white transition hover:bg-black/70"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/70 bg-black/55 px-5 py-2 text-sm font-medium text-white transition hover:bg-black/65"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -133,7 +139,7 @@ const EarningsPage: React.FC = () => {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white">Total Earnings</CardTitle>
                 <DollarSign className="h-4 w-4 text-white/80" />
@@ -144,7 +150,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </div>
 
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white">Total Trips</CardTitle>
                 <TrendingUp className="h-4 w-4 text-white/80" />
@@ -155,7 +161,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </div>
 
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white">Hours Worked</CardTitle>
                 <Clock className="h-4 w-4 text-white/80" />
@@ -166,7 +172,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </div>
 
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white">Avg Per Hour</CardTitle>
                 <Calendar className="h-4 w-4 text-white/80" />
@@ -180,7 +186,7 @@ const EarningsPage: React.FC = () => {
 
           {/* Tip Breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader>
                 <CardTitle className="text-green-300 drop-shadow">Base Earnings</CardTitle>
               </CardHeader>
@@ -190,7 +196,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </div>
             
-            <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+            <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
               <CardHeader>
                 <CardTitle className="text-pink-300 drop-shadow">Tips Received</CardTitle>
               </CardHeader>
@@ -202,14 +208,14 @@ const EarningsPage: React.FC = () => {
           </div>
 
           {/* Daily Earnings */}
-          <div className="rounded-2xl border border-white/60 bg-black/55 p-6 text-white shadow-xl">
+          <div className="rounded-2xl border border-white/40 bg-black/45 p-6 text-white shadow-xl">
             <CardHeader>
               <CardTitle className="text-white drop-shadow">Daily Earnings Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {earningsData.dailyBreakdown.map((day, index) => (
-                  <div key={index} className="flex items-center justify-between rounded-xl border border-white/40 bg-black/50 p-4">
+                  <div key={index} className="flex items-center justify-between rounded-xl border border-white/35 bg-black/50 p-4">
                     <div>
                       <p className="font-medium text-white drop-shadow-sm">{new Date(day.date).toLocaleDateString()}</p>
                       <p className="text-sm text-white/70">{day.trips} trips • {day.hours.toFixed(1)}h</p>
