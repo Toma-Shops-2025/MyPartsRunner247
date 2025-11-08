@@ -33,11 +33,9 @@ import DriverTrainingPage from "./pages/DriverTrainingPage";
 import DriverOrderDetailsPage from "./pages/DriverOrderDetailsPage";
 import ProductionReadinessDashboard from "./components/ProductionReadinessDashboard";
 import DownloadAppPage from "./pages/DownloadAppPage";
-import PushNotificationManager from "./components/PushNotificationManager";
-import IOSDebugPanel from "./components/IOSDebugPanel";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import OfflineIndicator from "./components/OfflineIndicator";
-import InAppFallbackListener from "./components/InAppFallbackListener";
+import NotificationTestPage from "./pages/NotificationTestPage";
 import ErrorBoundary from "./components/ErrorBoundary";
 import OptimizedPerformanceMonitor from "./components/OptimizedPerformanceMonitor";
 import MemoryCleanupButton from "./components/MemoryCleanupButton";
@@ -80,8 +78,6 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <InAppFallbackListener />
-          <PushNotificationManager />
           <PWAInstallPrompt />
           <OfflineIndicator />
           {typeof window !== 'undefined' && window.location.hostname === 'localhost' && (
@@ -97,6 +93,7 @@ const App = () => (
             <Route path="/driver-dashboard" element={<NewDriverDashboardPage />} />
             <Route path="/driver/orders/:orderId" element={<DriverOrderDetailsPage />} />
             <Route path="/test-driver" element={<TestDriverPage />} />
+            <Route path="/notification-test" element={<NotificationTestPage />} />
             <Route path="/place-order" element={<PlaceOrderPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/earnings" element={<EarningsPage />} />

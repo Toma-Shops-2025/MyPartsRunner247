@@ -140,7 +140,6 @@ class PWAService {
     const features: string[] = [];
     
     if ('serviceWorker' in navigator) features.push('Service Worker');
-    if ('PushManager' in window) features.push('Push Notifications');
     if ('Notification' in window) features.push('Notifications');
     if ('caches' in window) features.push('Caching');
     if ('backgroundSync' in navigator.serviceWorker) features.push('Background Sync');

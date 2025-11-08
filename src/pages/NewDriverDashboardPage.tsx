@@ -6,7 +6,6 @@ import DriverNotificationSystem from '@/components/DriverNotificationSystem';
 import DriverOnboarding from '@/components/DriverOnboarding';
 import DriverNavigation from '@/components/DriverNavigation';
 import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
-import DriverPushNotificationPrompt from '@/components/DriverPushNotificationPrompt';
 import { orderQueueService } from '@/services/OrderQueueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,6 @@ import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star
 import { supabase } from '@/lib/supabase';
 import { locationTrackingService } from '@/services/LocationTrackingService';
 import { toast } from '@/hooks/use-toast';
-import autoPushNotificationService from '@/services/AutoPushNotificationService';
 
 const NewDriverDashboardPage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -36,7 +34,6 @@ const NewDriverDashboardPage: React.FC = () => {
     const [isTracking, setIsTracking] = useState<boolean>(false);
   const lastLocationRef = useRef<{ lat: number; lng: number } | null>(null);    
   const locationUpdateCountRef = useRef<number>(0);
-  const pushNotificationEnabledRef = useRef<boolean>(false);
 
   // Memoize location update handler to prevent re-renders
   const handleLocationUpdate = useCallback((lat: number, lng: number) => {
@@ -159,30 +156,6 @@ const NewDriverDashboardPage: React.FC = () => {
     if (user && profile?.user_type === 'driver') {
       loadVerificationDeadline();
       checkTrackingStatus();
-      
-      // Aggressively auto-enable push notifications when driver visits dashboard                                                                               
-      // This ensures drivers get notifications even if login auto-enable missed it                                                                             
-      // Only attempt once per session to prevent repeated calls
-      if (user.id && !pushNotificationEnabledRef.current) {
-        pushNotificationEnabledRef.current = true;
-        setTimeout(async () => {
-          try {
-            console.log('🚗 Driver dashboard: Auto-enabling push notifications...');                                                                          
-            await autoPushNotificationService.autoEnablePushNotifications(user.id);                                                                             
-          } catch (error) {
-            console.error('Driver dashboard: Failed to auto-enable push notifications:', error);                                                                
-          }
-        }, 2000);
-
-        // Retry once more after a delay
-        setTimeout(async () => {
-          try {
-            await autoPushNotificationService.autoEnablePushNotifications(user.id);                                                                             
-          } catch (error) {
-            // Silent retry
-          }
-        }, 5000);
-      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, profile?.user_type, onboardingCompleted]);
@@ -526,8 +499,8 @@ const NewDriverDashboardPage: React.FC = () => {
         
         console.log('Driver marked as online and active (synced with driver_availability)');
         
-        // Start periodic last_seen updates (every 2 minutes) to keep driver "active" for notifications
-        // This ensures drivers receive push notifications while the app is open
+        // Start periodic last_seen updates (every 2 minutes) to keep driver "active" for dispatching
+        // This ensures the automation system knows the driver is available while the app is open
         const updateLastSeen = async () => {
           // Check current tracking state, not the closure variable
           const currentTrackingState = isTracking;
@@ -717,9 +690,6 @@ const NewDriverDashboardPage: React.FC = () => {
           <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>                                                                           
           <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>                                                                      
         </div>
-
-        {/* Push Notification Prompt - Show if driver doesn't have push notifications enabled */}
-        <DriverPushNotificationPrompt />
 
         {/* Location Tracking Controls - Moved to top for visibility */}
         <Card className="bg-gray-800 border-gray-700 mb-8">

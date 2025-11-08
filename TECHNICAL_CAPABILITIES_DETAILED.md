@@ -82,7 +82,7 @@ interface Order {
 
 #### Order Status Tracking
 - **Real-time Updates**: Live status changes
-- **Push Notifications**: Instant alerts to users
+- **Real-Time Alerts**: Instant updates to users within the app
 - **Email Notifications**: Automated email updates
 - **SMS Notifications**: Text message alerts
 - **In-App Notifications**: Platform notifications
@@ -143,7 +143,7 @@ interface Order {
 - **Route Optimization**: Efficient delivery paths
 
 #### Real-Time Notifications
-- **Push Notifications**: Mobile app alerts
+- **Mobile Alerts**: App-based updates and reminders
 - **SMS Notifications**: Text message updates
 - **Email Notifications**: Automated email alerts
 - **In-App Notifications**: Platform notifications

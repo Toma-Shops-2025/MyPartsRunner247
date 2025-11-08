@@ -38,6 +38,16 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
     contactPhone: ''
   });
 
+  const backgroundImages = [
+    '/request-pickup-background-step1.png',
+    '/request-pickup-background-step2.png',
+    '/request-pickup-background-step3.png',
+    '/request-pickup-background-step4.png'
+  ];
+
+  const fallbackBackground = '/request-pickup-background.png';
+  const modalBackgroundImage = backgroundImages[step - 1] || fallbackBackground;
+
   if (!isOpen) return null;
 
   const calculateEstimatedCost = () => {
@@ -143,7 +153,16 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div
+        className="rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)), url('${modalBackgroundImage}')`,
+          backgroundBlendMode: 'overlay',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Request Pickup</h2>

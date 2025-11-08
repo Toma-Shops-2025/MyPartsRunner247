@@ -162,7 +162,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 #### 4. Accepting & Completing Orders
 
 ##### Order Acceptance Process
-1. **Receive Notification**: Push notification for new orders
+1. **Receive Notification**: Real-time in-app alert for new orders
 2. **Review Details**: Pickup location, delivery address, item description
 3. **Accept Order**: Tap to accept (first-come, first-served)
 4. **Navigate to Pickup**: Use integrated Google Maps
@@ -207,7 +207,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 ##### Communication
 - **In-App Messaging**: Direct customer communication
-- **Push Notifications**: Order alerts and updates
+- **Order Alerts**: Real-time updates within the application
 - **Phone Support**: Driver support hotline
 - **Community Forum**: Driver tips and support
 
@@ -255,7 +255,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 #### 1. Real-Time Technology
 - **Live GPS Tracking**: Google Maps integration
-- **Push Notifications**: Instant order alerts
+- **Order Alerts**: Immediate updates for new deliveries
 - **Real-Time Updates**: Live status changes
 - **Location Services**: Precise location tracking
 
@@ -269,7 +269,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 - **In-App Messaging**: Customer-driver communication
 - **SMS Notifications**: Text message alerts
 - **Email Updates**: Automated email notifications
-- **Push Notifications**: Mobile app alerts
+- **Mobile Alerts**: App-based updates and reminders
 
 #### 4. Security & Verification
 - **Background Checks**: Automated driver verification

@@ -106,8 +106,8 @@ const PWAInstallPrompt: React.FC = () => {
         <div className="space-y-4">
           <p className="text-base font-medium">
             {installSource === 'ios' 
-              ? '📱 Install for faster access, push notifications, and offline mode!'
-              : '🚀 Install our app for a faster, better experience with offline support and instant notifications!'
+              ? '📱 Install for faster access and offline mode!'
+              : '🚀 Install our app for a faster, better experience with offline support and real-time dashboards!'
             }
           </p>
           
@@ -149,7 +149,7 @@ const PWAInstallPrompt: React.FC = () => {
               <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
                 <Smartphone className="w-3 h-3" />
               </div>
-              <span className="font-medium">Push Alerts</span>
+              <span className="font-medium">Instant Updates</span>
             </div>
           </div>
         </div>

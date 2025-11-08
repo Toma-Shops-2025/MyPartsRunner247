@@ -1,20 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle, Clock, XCircle, Bell, ChevronDown, ChevronUp } from 'lucide-react';
+import { Bell, ChevronDown, ChevronUp, Mail, Phone, WifiOff, CheckCircle, RefreshCcw, Inbox } from 'lucide-react';
+
+type NotificationType = 'sms' | 'email' | 'in_app';
+type NotificationStatus = 'unread' | 'read' | 'sent' | 'failed';
 
 interface DriverNotification {
   id: string;
-  type: 'background_check' | 'document_expired' | 'account_suspended' | 'payment_issue';
+  driver_id: string;
   title: string;
-  message: string;
-  severity: 'warning' | 'error' | 'info';
-  is_read: boolean;
+  body: string;
+  type: NotificationType;
+  status: NotificationStatus;
   created_at: string;
-  action_required: boolean;
+  read_at: string | null;
+  data?: Record<string, any> | null;
 }
 
 const DriverNotificationSystem: React.FC = () => {
@@ -22,88 +26,113 @@ const DriverNotificationSystem: React.FC = () => {
   const [notifications, setNotifications] = useState<DriverNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [filter, setFilter] = useState<'all' | 'unread'>('unread');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const fetchNotifications = useCallback(async () => {
+    if (!user?.id) return;
+
+    setLoading(true);
+    setErrorMessage(null);
+
+    const { data, error } = await supabase
+      .from('driver_notifications')
+      .select('*')
+      .eq('driver_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      console.error('Error fetching notifications:', error);
+      setErrorMessage('Unable to load notifications. Please try again later.');
+    } else {
+      setNotifications(data || []);
+    }
+
+    setLoading(false);
+  }, [user?.id]);
 
   useEffect(() => {
-    if (user && profile?.user_type === 'driver') {
-      fetchNotifications();
-    }
-  }, [user, profile]);
+    if (!user || profile?.user_type !== 'driver') return;
 
-  const fetchNotifications = async () => {
-    try {
-      // For now, we'll create mock notifications
-      // In production, these would come from a notifications table
-      const mockNotifications: DriverNotification[] = [
+    fetchNotifications();
+
+    const channel = supabase.channel(`driver_notifications_${user.id}`)
+      .on(
+        'postgres_changes',
         {
-          id: '1',
-          type: 'background_check',
-          title: 'Background Check Required',
-          message: 'Your background check is pending. You can continue driving while we process your application.',
-          severity: 'warning',
-          is_read: false,
-          created_at: new Date().toISOString(),
-          action_required: false
+          event: '*',
+          schema: 'public',
+          table: 'driver_notifications',
+          filter: `driver_id=eq.${user.id}`
+        },
+        () => {
+          fetchNotifications();
         }
-      ];
+      )
+      .subscribe();
 
-      setNotifications(mockNotifications);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, profile?.user_type, fetchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === notificationId 
-          ? { ...notif, is_read: true }
-          : notif
-      )
-    );
-  };
+    try {
+      const { error } = await supabase
+        .from('driver_notifications')
+        .update({ status: 'read', read_at: new Date().toISOString() })
+        .eq('id', notificationId);
 
-  const getNotificationIcon = (type: string, severity: string) => {
-    switch (severity) {
-      case 'error':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-      case 'info':
-        return <Clock className="h-5 w-5 text-blue-500" />;
-      default:
-        return <CheckCircle className="h-5 w-5 text-green-500" />;
+      if (error) throw error;
+
+      setNotifications(prev =>
+        prev.map(notif =>
+          notif.id === notificationId
+            ? { ...notif, status: 'read', read_at: new Date().toISOString() }
+            : notif
+        )
+      );
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
     }
   };
 
-  const getNotificationColor = (severity: string) => {
-    switch (severity) {
-      case 'error':
-        return 'border-red-500 bg-red-900';
-      case 'warning':
-        return 'border-yellow-500 bg-yellow-900';
-      case 'info':
-        return 'border-blue-500 bg-blue-900';
+  const getNotificationIcon = (type: NotificationType, status: NotificationStatus) => {
+    if (status === 'failed') {
+      return <WifiOff className="h-5 w-5 text-red-400" />;
+    }
+
+    switch (type) {
+      case 'sms':
+        return <Phone className="h-5 w-5 text-green-400" />;
+      case 'email':
+        return <Mail className="h-5 w-5 text-blue-400" />;
       default:
-        return 'border-green-500 bg-green-900';
+        return <Bell className="h-5 w-5 text-teal-400" />;
     }
   };
 
-  if (loading) {
-    return (
-      <Card className="bg-gray-800 border-gray-700">
-        <CardContent className="p-6">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-600 rounded w-3/4 mb-2"></div>
-            <div className="h-4 bg-gray-600 rounded w-1/2"></div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const getNotificationStatusLabel = (status: NotificationStatus) => {
+    switch (status) {
+      case 'unread':
+        return 'Unread';
+      case 'read':
+        return 'Read';
+      case 'sent':
+        return 'Sent';
+      case 'failed':
+        return 'Failed';
+      default:
+        return status;
+    }
+  };
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const filteredNotifications = notifications.filter(notification =>
+    filter === 'all' ? true : notification.status === 'unread'
+  );
+
+  const unreadCount = notifications.filter(n => n.status === 'unread').length;
 
   return (
     <Card className="bg-gray-800 border-gray-700">
@@ -114,50 +143,110 @@ const DriverNotificationSystem: React.FC = () => {
             Driver Notifications
             {unreadCount > 0 && (
               <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
-                {unreadCount}
+                {unreadCount} new
               </span>
             )}
           </CardTitle>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="text-gray-400 hover:text-white hover:bg-gray-700"
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => fetchNotifications()}
+              className="text-gray-400 hover:text-white hover:bg-gray-700"
+            >
+              <RefreshCcw className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="text-gray-400 hover:text-white hover:bg-gray-700"
+            >
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </CardHeader>
-      
+
       {isExpanded && (
         <CardContent className="space-y-4">
-          {notifications.length === 0 ? (
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={filter === 'unread' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilter('unread')}
+            >
+              Unread
+            </Button>
+            <Button
+              variant={filter === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilter('all')}
+            >
+              All Notifications
+            </Button>
+          </div>
+
+          {loading && (
+            <div className="animate-pulse space-y-3">
+              <div className="h-4 bg-gray-700 rounded w-2/3"></div>
+              <div className="h-4 bg-gray-700 rounded w-1/2"></div>
+            </div>
+          )}
+
+          {errorMessage && (
+            <Alert className="bg-red-900 border-red-700">
+              <AlertDescription className="text-red-200">{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+
+          {!loading && !errorMessage && filteredNotifications.length === 0 && (
             <Alert className="bg-green-900 border-green-700">
               <CheckCircle className="h-4 w-4 text-green-400" />
               <AlertDescription className="text-green-300">
-                Your driver account is active and approved. You're ready to start accepting deliveries!
+                {filter === 'unread'
+                  ? 'No unread notifications. You are all caught up!'
+                  : 'No notifications yet. New alerts will appear here.'}
               </AlertDescription>
             </Alert>
-          ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`p-4 rounded-lg border ${getNotificationColor(notification.severity)} ${
-                  !notification.is_read ? 'ring-2 ring-opacity-50' : ''
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {getNotificationIcon(notification.type, notification.severity)}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-semibold text-white">
-                        {notification.title}
-                      </h4>
-                      {!notification.is_read && (
+          )}
+
+          {!loading && !errorMessage && filteredNotifications.map(notification => (
+            <div
+              key={notification.id}
+              className={`p-4 rounded-lg border border-gray-700 bg-gray-900/60 shadow-sm ${
+                notification.status === 'unread' ? 'ring-2 ring-teal-500/50' : ''
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <div className="mt-1">
+                  {getNotificationIcon(notification.type, notification.status)}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <h4 className="font-semibold text-white">{notification.title}</h4>
+                      <p className="text-xs text-gray-400">
+                        {new Date(notification.created_at).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          notification.status === 'failed'
+                            ? 'bg-red-900 text-red-200'
+                            : notification.status === 'unread'
+                            ? 'bg-teal-900 text-teal-200'
+                            : 'bg-gray-800 text-gray-300'
+                        }`}
+                      >
+                        {getNotificationStatusLabel(notification.status)}
+                      </span>
+                      {notification.status === 'unread' && (
                         <Button
                           size="sm"
                           variant="outline"
@@ -168,21 +257,17 @@ const DriverNotificationSystem: React.FC = () => {
                         </Button>
                       )}
                     </div>
-                    <p className="text-sm text-gray-300 mt-1">
-                      {notification.message}
-                    </p>
-                    {notification.action_required && (
-                      <div className="mt-2">
-                        <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                          Take Action
-                        </Button>
-                      </div>
-                    )}
                   </div>
+                  <p className="text-sm text-gray-200 whitespace-pre-wrap">{notification.body}</p>
+                  {notification.data?.order_id && (
+                    <p className="text-xs text-gray-400">
+                      Order #{String(notification.data.order_id).slice(-8)}
+                    </p>
+                  )}
                 </div>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </CardContent>
       )}
     </Card>

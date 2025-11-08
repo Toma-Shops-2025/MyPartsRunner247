@@ -190,8 +190,8 @@ const DownloadAppPage: React.FC = () => {
                   <div className="flex items-start gap-3">
                     <Bell className="w-5 h-5 text-teal-400 mt-0.5 flex-shrink-0" />
                     <div>
-                      <h3 className="text-white font-semibold mb-1">Push Notifications</h3>
-                      <p className="text-gray-400 text-sm">Get instant alerts for orders, updates, and messages</p>
+                      <h3 className="text-white font-semibold mb-1">Real-Time Updates</h3>
+                      <p className="text-gray-400 text-sm">Stay on top of orders and account changes with live dashboards.</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">

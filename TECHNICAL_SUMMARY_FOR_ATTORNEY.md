@@ -79,7 +79,7 @@
 ### **Order Processing**
 - **Real-time Detection:** Automatic order detection
 - **Driver Matching:** AI-powered driver selection
-- **Notification System:** Multi-channel notifications (push, SMS, email)
+- **Notification System:** Multi-channel notifications (in-app, SMS, email)
 - **Status Updates:** Automatic status tracking
 - **Payment Processing:** Automated payment handling
 

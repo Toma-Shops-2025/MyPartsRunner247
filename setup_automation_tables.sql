@@ -8,14 +8,27 @@ CREATE TABLE IF NOT EXISTS driver_notifications (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   data JSONB,
-  type TEXT NOT NULL CHECK (type IN ('push', 'sms', 'email', 'in_app')),
+  type TEXT NOT NULL CHECK (type IN ('sms', 'email', 'in_app')),
   status TEXT NOT NULL DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'sent', 'failed')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   read_at TIMESTAMP WITH TIME ZONE,
   expires_at TIMESTAMP WITH TIME ZONE
 );
 
--- 2. Order Rejections Table (track which drivers rejected which orders)
+-- 2. Customer Notifications Table
+CREATE TABLE IF NOT EXISTS customer_notifications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  customer_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  data JSONB,
+  type TEXT NOT NULL CHECK (type IN ('sms', 'email', 'in_app')),
+  status TEXT NOT NULL DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'sent', 'failed')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  read_at TIMESTAMP WITH TIME ZONE
+);
+
+-- 3. Order Rejections Table (track which drivers rejected which orders)
 CREATE TABLE IF NOT EXISTS order_rejections (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
@@ -25,7 +38,7 @@ CREATE TABLE IF NOT EXISTS order_rejections (
   UNIQUE(order_id, driver_id)
 );
 
--- 3. Driver Location Tracking Table
+-- 4. Driver Location Tracking Table
 CREATE TABLE IF NOT EXISTS driver_locations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   driver_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
@@ -37,7 +50,7 @@ CREATE TABLE IF NOT EXISTS driver_locations (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 4. Automation Logs Table
+-- 5. Automation Logs Table
 CREATE TABLE IF NOT EXISTS automation_logs (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
@@ -47,7 +60,7 @@ CREATE TABLE IF NOT EXISTS automation_logs (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 5. Driver Availability Table
+-- 6. Driver Availability Table
 CREATE TABLE IF NOT EXISTS driver_availability (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   driver_id UUID REFERENCES profiles(id) ON DELETE CASCADE UNIQUE,
@@ -60,17 +73,21 @@ CREATE TABLE IF NOT EXISTS driver_availability (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 6. Update profiles table to include location and availability fields
+-- 7. Update profiles table to include location and availability fields
 ALTER TABLE profiles 
 ADD COLUMN IF NOT EXISTS current_latitude DECIMAL(10, 8),
 ADD COLUMN IF NOT EXISTS current_longitude DECIMAL(11, 8),
 ADD COLUMN IF NOT EXISTS is_online BOOLEAN DEFAULT FALSE,
 ADD COLUMN IF NOT EXISTS last_location_update TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
--- 7. Create indexes for performance
+-- 8. Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_driver_notifications_driver_id ON driver_notifications(driver_id);
 CREATE INDEX IF NOT EXISTS idx_driver_notifications_status ON driver_notifications(status);
 CREATE INDEX IF NOT EXISTS idx_driver_notifications_created_at ON driver_notifications(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_customer_notifications_customer_id ON customer_notifications(customer_id);
+CREATE INDEX IF NOT EXISTS idx_customer_notifications_status ON customer_notifications(status);
+CREATE INDEX IF NOT EXISTS idx_customer_notifications_created_at ON customer_notifications(created_at);
 
 CREATE INDEX IF NOT EXISTS idx_order_rejections_order_id ON order_rejections(order_id);
 CREATE INDEX IF NOT EXISTS idx_order_rejections_driver_id ON order_rejections(driver_id);
@@ -85,18 +102,26 @@ CREATE INDEX IF NOT EXISTS idx_driver_availability_driver_id ON driver_availabil
 CREATE INDEX IF NOT EXISTS idx_driver_availability_is_online ON driver_availability(is_online);
 CREATE INDEX IF NOT EXISTS idx_driver_availability_is_available ON driver_availability(is_available);
 
--- 8. Create RLS policies for security
+-- 9. Create RLS policies for security
 ALTER TABLE driver_notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_rejections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE driver_locations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE automation_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE driver_availability ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customer_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Driver notifications policies
 CREATE POLICY "Drivers can view their own notifications" ON driver_notifications
   FOR SELECT USING (driver_id = auth.uid());
 
 CREATE POLICY "System can insert notifications" ON driver_notifications
+  FOR INSERT WITH CHECK (true);
+
+-- Customer notifications policies
+CREATE POLICY "Customers can view their own notifications" ON customer_notifications
+  FOR SELECT USING (customer_id = auth.uid());
+
+CREATE POLICY "System can insert customer notifications" ON customer_notifications
   FOR INSERT WITH CHECK (true);
 
 -- Order rejections policies

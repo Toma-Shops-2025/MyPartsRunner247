@@ -46,8 +46,8 @@ export class AutomationController {
   private async initializeDriverNotifications() {
     console.log('📱 Initializing driver notification system...');
     
-    // Set up push notification service
-    // TODO: Configure Firebase/other push service
+    // Push notifications are currently disabled. Configure here if reintroducing in the future.
+    // SMS and email channels are handled via Netlify functions (Twilio + SendGrid).
     
     // Set up SMS service
     // TODO: Configure Twilio/other SMS service

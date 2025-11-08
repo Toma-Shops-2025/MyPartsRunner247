@@ -1,3 +1,10 @@
+## SendGrid Setup Checklist
+
+1. Create a SendGrid account at https://sendgrid.com.
+2. Navigate to Settings → API Keys and create a key with “Mail Send” permission.
+3. Add the key in Netlify as `SENDGRID_API_KEY`.
+4. Verify your sender (either single sender or domain) and use that address for `SENDGRID_FROM_EMAIL`.
+5. Test via `/notification-test` route once your site is redeployed.
 # MyPartsRunner - Anything, Anytime, Anywhere
 
 A modern delivery service platform built with React, TypeScript, and Vite. MyPartsRunner is the only delivery service that picks up from absolutely anywhere, available 24/7 nationwide.

@@ -19,7 +19,6 @@ import DriverRegistration from './DriverRegistration';
 import PaymentModal from './PaymentModal';
 import NewAuthModal from './NewAuthModal';
 import CustomerNotificationSystem from './CustomerNotificationSystem';
-import NotificationSystemTest from './NotificationSystemTest';
 import EndToEndTest from './EndToEndTest';
 import ProductionMonitoring from './ProductionMonitoring';
 import CustomerSupport from './CustomerSupport';
@@ -61,13 +60,6 @@ const AppLayout: React.FC = () => {
             {user && profile?.user_type === 'customer' && (
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                 <CustomerNotificationSystem />
-              </div>
-            )}
-            
-            {/* Show notification system test for admins only */}
-            {user && profile?.user_type === 'admin' && (
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                <NotificationSystemTest />
               </div>
             )}
             

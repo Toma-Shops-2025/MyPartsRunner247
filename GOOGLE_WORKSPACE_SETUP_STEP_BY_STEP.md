@@ -182,7 +182,7 @@ Website: www.mypartsrunner.com
 3. **Set up notifications** for important emails
 
 ### 7.2 Configure Email Settings
-1. **Enable push notifications** for business emails
+1. **Ensure notifications are configured** for business emails
 2. **Set up email signatures** on mobile
 3. **Test sending emails** from your phone
 

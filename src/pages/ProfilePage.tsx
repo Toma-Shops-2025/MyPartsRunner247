@@ -12,8 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Settings, Shield, Bell, ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import PushApiService from '@/services/PushApiService';
-import pushNotificationService from '@/services/PushNotificationService';
 
 const ProfilePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
@@ -336,86 +334,6 @@ const ProfilePage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex space-x-3">
-                  <Button 
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        if (!('Notification' in window)) {
-                          alert('This browser does not support notifications. Please use a modern browser like Chrome, Safari, or Firefox.');
-                          return;
-                        }
-                        const permission = Notification.permission === 'granted'
-                          ? 'granted'
-                          : await Notification.requestPermission();
-                        if (permission !== 'granted') {
-                          alert('Notifications are blocked. Please enable them in your browser settings.');
-                          return;
-                        }
-                        // Ensure a push subscription exists and is saved server-side
-                        const sub = await pushNotificationService.subscribe();
-                        if (sub && user?.id) {
-                          // Save via Netlify function (service key) to avoid RLS/shape issues
-                          const resp = await fetch('/.netlify/functions/save-push-subscription', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ subscription: sub, userId: user.id })
-                          });
-                          if (!resp.ok) {
-                            console.error('save-push-subscription failed', await resp.text());
-                            throw new Error('Failed to save push subscription');
-                          }
-                          toast({ title: 'Notifications enabled', description: 'You are subscribed for push updates.' });
-                        } else {
-                          toast({ title: 'Subscription missing', description: 'Could not create a push subscription.', variant: 'destructive' });
-                        }
-                      } catch (e) {
-                        console.error('Enable notifications error', e);
-                        toast({ title: 'Error', description: 'Failed to enable notifications.', variant: 'destructive' });
-                      }
-                    }}
-                  >
-                    {typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted' 
-                      ? 'Manage Notifications' 
-                      : 'Enable Notifications'
-                    }
-                  </Button>
-                  
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      // Send a real web push via Netlify function
-                      (async () => {
-                        try {
-                          if (!('Notification' in window)) {
-                            alert('This browser does not support notifications.');
-                            return;
-                          }
-                          if (Notification.permission !== 'granted') {
-                            alert('Please enable notifications first to test them.');
-                            return;
-                          }
-                          const success = await PushApiService.sendToUsers([user.id], {
-                            title: 'MyPartsRunner Test',
-                            body: 'This is a test notification from MyPartsRunner!',
-                            data: { type: 'test' }
-                          });
-                          if (success) {
-                            toast({ title: 'Test sent', description: 'A test push was sent to your device.' });
-                          } else {
-                            toast({ title: 'Send failed', description: 'Could not send test push. Check subscription.', variant: 'destructive' });
-                          }
-                        } catch (e) {
-                          console.error('Test push error', e);
-                          toast({ title: 'Error', description: 'Unexpected error sending test push.', variant: 'destructive' });
-                        }
-                      })();
-                    }}
-                  >
-                    Test Notification
-                  </Button>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>

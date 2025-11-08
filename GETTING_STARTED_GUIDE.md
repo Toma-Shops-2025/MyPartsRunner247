@@ -171,7 +171,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 ### Step 4: Accepting Orders
 
 #### Order Acceptance Process
-1. **Receive Notification**: Push notification for new orders
+1. **Receive Notification**: Real-time in-app alert for new orders
 2. **Review Details**: Pickup location, delivery address, item description
 3. **Accept Order**: Tap to accept (first-come, first-served)
 4. **Navigate to Pickup**: Use integrated Google Maps
@@ -293,7 +293,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 #### Navigation & Communication
 - **Google Maps Integration**: Turn-by-turn navigation
 - **In-App Messaging**: Customer communication
-- **Push Notifications**: Order alerts
+- **Order Alerts**: Immediate in-app notifications for new deliveries
 - **Route Optimization**: Efficient delivery paths
 
 #### Profile Management

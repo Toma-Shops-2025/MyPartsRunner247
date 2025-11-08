@@ -172,7 +172,7 @@ const SystemSettingsPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>System Notifications</Label>
-                    <p className="text-sm text-gray-600">Enable push notifications for system events</p>
+                    <p className="text-sm text-gray-600">Enable alerts for important system events</p>
                   </div>
                   <Switch
                     checked={settings.enableNotifications}

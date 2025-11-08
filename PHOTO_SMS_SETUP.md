@@ -16,6 +16,8 @@ In your Netlify dashboard, add these environment variables:
 TWILIO_ACCOUNT_SID=your_account_sid_here
 TWILIO_AUTH_TOKEN=your_auth_token_here
 TWILIO_PHONE_NUMBER=+1234567890
+SENDGRID_API_KEY=your_sendgrid_api_key
+SENDGRID_FROM_EMAIL=notifications@mypartsrunner.com
 ```
 
 ### 3. Install Twilio in Netlify Functions
@@ -48,10 +50,45 @@ The function will automatically install Twilio when deployed.
 - Less immediate than SMS
 - Good for customers who prefer email
 
-### Option 2: Push Notifications
-- Most modern approach
-- Requires customer app
-- Best user experience
+### Option 2: In-App Alerts
+- Displays updates directly within the app
+- Requires customer to check the application
+- Excellent for real-time engagement
+
+## 🛠️ Netlify Functions Included
+
+Two serverless functions power SMS and email delivery:
+
+| Function | Path | Description |
+|----------|------|-------------|
+| `send-sms.js` | `/.netlify/functions/send-sms` | Sends SMS via Twilio |
+| `send-email.js` | `/.netlify/functions/send-email` | Sends email via SendGrid |
+
+### Example: Trigger SMS from the App
+```ts
+await fetch('/.netlify/functions/send-sms', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    to: '+15025550123',
+    body: '🚚 Delivery Complete! Order #12345 has arrived.'
+  }),
+});
+```
+
+### Example: Trigger Email from the App
+```ts
+await fetch('/.netlify/functions/send-email', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    to: 'customer@example.com',
+    subject: 'Delivery Complete',
+    text: 'Your order #12345 has arrived!',
+    html: '<h2>Delivery Complete</h2><p>Your order #12345 has arrived!</p>'
+  }),
+});
+```
 
 ### Option 3: WhatsApp Business API
 - Very popular globally

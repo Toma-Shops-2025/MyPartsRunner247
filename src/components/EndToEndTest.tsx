@@ -155,13 +155,6 @@ const EndToEndTest: React.FC = () => {
       status: 'pending',
       steps: [
         {
-          id: 'push-permission',
-          name: 'Push Permission',
-          description: 'Check notification permissions',
-          status: 'pending',
-          icon: <Bell className="w-4 h-4" />
-        },
-        {
           id: 'service-worker',
           name: 'Service Worker',
           description: 'Verify service worker registration',
@@ -404,17 +397,7 @@ const EndToEndTest: React.FC = () => {
     updateScenarioStatus(scenarioId, 'running');
 
     try {
-      // Step 1: Push Permission
-      updateStepStatus(scenarioId, 'push-permission', 'running');
-      const permission = Notification.permission;
-      if (permission === 'granted') {
-        updateStepStatus(scenarioId, 'push-permission', 'success', 'Push notifications enabled', 100);
-      } else {
-        updateStepStatus(scenarioId, 'push-permission', 'error', 'Push notifications not enabled');
-        return;
-      }
-
-      // Step 2: Service Worker
+      // Step 1: Service Worker
       updateStepStatus(scenarioId, 'service-worker', 'running');
       const registration = await navigator.serviceWorker.getRegistration();
       if (registration) {
@@ -424,7 +407,7 @@ const EndToEndTest: React.FC = () => {
         return;
       }
 
-      // Step 3: Real-time Updates
+      // Step 2: Real-time Updates
       updateStepStatus(scenarioId, 'real-time-updates', 'running');
       // Test real-time subscription
       const channel = supabase

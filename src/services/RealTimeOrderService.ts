@@ -155,22 +155,135 @@ export class RealTimeOrderService {
       .select('*')
       .eq('id', order.customer_id)
       .single();
-    
-    if (customer) {
-      const messages = {
-        'accepted': `🎉 Great news! Your order #${order.id} has been accepted by a driver.`,
-        'rejected': `⏳ Your order #${order.id} is being reassigned to another driver.`,
-        'assigned': `🚗 Your order #${order.id} has been assigned to a driver!`
-      };
-      
-      const message = messages[status] || `Your order #${order.id} status has been updated.`;
-      
-      // Send push notification
-      await this.sendPushNotification(customer.id, {
-        title: 'Order Update',
-        body: message,
-        data: { orderId: order.id, status }
+
+    if (!customer) {
+      console.warn(`⚠️ Customer not found for order ${order.id}`);
+      return;
+    }
+
+    const shortOrderId = String(order.id).slice(-8);
+    const { title, body } = this.getCustomerStatusMessage(status, shortOrderId);
+    const notificationData = {
+      order_id: order.id,
+      status,
+      type: 'status_update',
+      driver_id: order.driver_id || null,
+      total: order.total
+    };
+
+    try {
+      const { error } = await supabase
+        .from('customer_notifications')
+        .insert({
+          customer_id: customer.id,
+          title,
+          body,
+          data: notificationData,
+          type: 'in_app',
+          status: 'unread'
+        });
+
+      if (error) {
+        console.error('❌ Error storing customer notification:', error);
+      }
+    } catch (error) {
+      console.error('❌ Error inserting customer notification:', error);
+    }
+
+    if (customer.phone) {
+      await this.sendCustomerSMS(customer.phone, `${title}\n${body}`);
+    }
+
+    if (customer.email) {
+      const appUrl = import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com';
+      const html = `
+        <h2>${title}</h2>
+        <p>${body}</p>
+        <p><a href="${appUrl}/my-orders">View order #${shortOrderId}</a></p>
+      `;
+      await this.sendCustomerEmail(customer.email, title, html, `${title}\n\n${body}`);
+    }
+  }
+
+  private getCustomerStatusMessage(status: string, shortOrderId: string) {
+    switch (status) {
+      case 'accepted':
+        return {
+          title: 'Driver Accepted!',
+          body: `A driver has accepted order #${shortOrderId} and is preparing to pick it up.`
+        };
+      case 'picked_up':
+        return {
+          title: 'Order Picked Up',
+          body: `Your order #${shortOrderId} has been picked up and is on the way to you.`
+        };
+      case 'in_transit':
+        return {
+          title: 'Order In Transit',
+          body: `Your driver is en route with order #${shortOrderId}.`
+        };
+      case 'delivered':
+        return {
+          title: 'Order Delivered',
+          body: `Your order #${shortOrderId} has been delivered successfully. Thank you for choosing MyPartsRunner!`
+        };
+      case 'rejected':
+        return {
+          title: 'Finding Another Driver',
+          body: `A driver declined order #${shortOrderId}. We are assigning a new driver now.`
+        };
+      case 'cancelled':
+        return {
+          title: 'Order Cancelled',
+          body: `Order #${shortOrderId} has been cancelled. Please contact support if you have questions.`
+        };
+      default:
+        return {
+          title: 'Order Update',
+          body: `Your order #${shortOrderId} status has been updated to ${status}.`
+        };
+    }
+  }
+
+  private async sendCustomerSMS(phone: string, message: string) {
+    if (!phone) return;
+
+    const normalizedPhone = phone.replace(/[^0-9+]/g, '').startsWith('+')
+      ? phone.replace(/[^0-9+]/g, '')
+      : `+1${phone.replace(/[^0-9]/g, '')}`;
+
+    try {
+      const response = await fetch('/.netlify/functions/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: normalizedPhone, body: message })
       });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('⚠️ Customer SMS delivery failed:', text);
+      }
+    } catch (error) {
+      console.error('❌ Error sending customer SMS:', error);
+    }
+  }
+
+  private async sendCustomerEmail(to: string, subject: string, html: string, text?: string) {
+    if (!to) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, html, text })
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        console.warn('⚠️ Customer email delivery failed:', message);
+      }
+    } catch (error) {
+      console.error('❌ Error sending customer email:', error);
     }
   }
 
@@ -208,12 +321,6 @@ export class RealTimeOrderService {
       body: `Order #${order.id} has no available drivers. Manual intervention required.`,
       data: { orderId: order.id }
     });
-  }
-
-  // Send push notification
-  private async sendPushNotification(userId: string, notification: any) {
-    // Implementation depends on your push notification service
-    console.log(`📱 PUSH NOTIFICATION to ${userId}:`, notification);
   }
 
   // Send admin notification

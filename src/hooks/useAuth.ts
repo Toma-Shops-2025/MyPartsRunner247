@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
-import autoPushNotificationService from '@/services/AutoPushNotificationService';
-import { storeUserIdInIndexedDB, clearUserIdFromIndexedDB } from '@/utils/userIdStorage';
 
 export interface Profile {
   id: string;
@@ -49,12 +47,8 @@ export const useAuth = () => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Store user ID in IndexedDB for service worker verification
-        storeUserIdInIndexedDB(session.user.id);
         fetchProfile(session.user.id);
       } else {
-        // Clear user ID when logged out
-        clearUserIdFromIndexedDB();
         setLoading(false);
       }
       
@@ -79,40 +73,9 @@ export const useAuth = () => {
           setUser(session.user);
           setLoading(true);
           
-          // Store user ID in IndexedDB for service worker verification
-          storeUserIdInIndexedDB(session.user.id);
-          
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
-            
-            // Automatically enable push notifications on login (aggressive, multiple attempts)
-            // Try immediately, then retry several times with delays
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications:', error);
-              }
-            }, 1000); // Try after 1 second
-            
-            // Also try again after 3 seconds (for slow service worker)
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications (retry):', error);
-              }
-            }, 3000);
-            
-            // And once more after 5 seconds (for mobile devices)
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications (final retry):', error);
-              }
-            }, 5000);
           } else {
             setLoading(false);
           }
@@ -126,50 +89,14 @@ export const useAuth = () => {
           setLastProcessedUserId(null);
           localStorage.removeItem('mock_profile');
           localStorage.removeItem('fallback_user');
-          
-          // Clear user ID from IndexedDB
-          clearUserIdFromIndexedDB();
-          
-          // Clear push notification tracking
-          if (lastProcessedUserId) {
-            autoPushNotificationService.clearUser(lastProcessedUserId);
-          }
         } else if (event === 'INITIAL_SESSION' && session?.user) {
           setSession(session);
           setUser(session.user);
           setLoading(true);
           
-          // Store user ID in IndexedDB for service worker verification
-          storeUserIdInIndexedDB(session.user.id);
-          
           // Only fetch profile if we don't already have it for this user
           if (lastProcessedUserId !== session.user.id) {
             await fetchProfile(session.user.id);
-            
-            // Automatically enable push notifications on initial session (aggressive, multiple attempts)
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications:', error);
-              }
-            }, 1000);
-            
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications (retry):', error);
-              }
-            }, 3000);
-            
-            setTimeout(async () => {
-              try {
-                await autoPushNotificationService.autoEnablePushNotifications(session.user.id);
-              } catch (error) {
-                console.error('Failed to auto-enable push notifications (final retry):', error);
-              }
-            }, 5000);
           } else {
             setLoading(false);
           }

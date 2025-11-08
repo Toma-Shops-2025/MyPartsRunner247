@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import PushApiService from './PushApiService';
 import { orderQueueService } from './OrderQueueService';
 
 export class OrderAutomationService {
@@ -76,7 +75,6 @@ export class OrderAutomationService {
   // Broadcast to all online drivers when coordinates are missing or as fallback
   private async broadcastToOnlineDrivers(order: any) {
     try {
-      // CRITICAL: Verify order is still pending before sending notifications
       const { data: currentOrder, error: orderError } = await supabase
         .from('orders')
         .select('id, status, driver_id')
@@ -93,7 +91,6 @@ export class OrderAutomationService {
         return;
       }
 
-      // Only send notifications for pending orders that haven't been assigned
       if (currentOrder.status !== 'pending') {
         console.log(`⚠️ Order ${order.id} is no longer pending (status: ${currentOrder.status}), skipping notification`);
         return;
@@ -104,205 +101,75 @@ export class OrderAutomationService {
         return;
       }
 
-      // Get all online drivers who have been active recently (within last 15 minutes)
-      // This ensures we only notify drivers who have the app open or recently closed it
-      // Drivers who closed the app more than 15 minutes ago won't receive notifications
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-      
-      // Get all active drivers (not just "online" ones)
-      // Also include drivers with push subscriptions - they want notifications!
       const { data: allDriverProfiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, full_name, email, phone, is_online, status, user_type')
         .eq('user_type', 'driver')
         .eq('status', 'active');
-      
+
       if (profilesError) {
         console.error('Error fetching drivers from profiles:', profilesError);
         return;
       }
-      
+
       if (!allDriverProfiles || allDriverProfiles.length === 0) {
         console.log('No active drivers found, will add to queue');
         await orderQueueService.addToQueue(order.id);
         return;
       }
-      
-      // Get drivers with push subscriptions (they want notifications even if not explicitly "online")
+
+      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+
       const driverIds = allDriverProfiles.map(d => d.id);
-      console.log(`🔍 Checking for push subscriptions for ${driverIds.length} drivers:`, driverIds);
-      console.log(`   Driver emails:`, allDriverProfiles.map(d => d.email));
-      
-      const { data: pushSubs, error: pushSubsError } = await supabase
-        .from('push_subscriptions')
-        .select('user_id, endpoint, created_at')
-        .in('user_id', driverIds);
-      
-      if (pushSubsError) {
-        console.error('❌ Error fetching push subscriptions:', pushSubsError);
-      } else {
-        console.log(`📱 Found ${pushSubs?.length || 0} push subscriptions for drivers:`, pushSubs);
-        if (pushSubs && pushSubs.length > 0) {
-          pushSubs.forEach((sub: any) => {
-            const driver = allDriverProfiles.find(d => d.id === sub.user_id);
-            console.log(`   ✅ Driver ${sub.user_id} (${driver?.email || 'unknown'}) has subscription`);
-          });
-        }
-      }
-      
-      // Also check ALL subscriptions to see what's registered
-      const { data: allSubs } = await supabase
-        .from('push_subscriptions')
-        .select('user_id, endpoint, created_at');
-      
-      if (allSubs && allSubs.length > 0) {
-        console.log(`📊 Total push subscriptions in database: ${allSubs.length}`);
-        allSubs.forEach((sub: any) => {
-          const driver = allDriverProfiles.find(d => d.id === sub.user_id);
-          const isDriver = driver ? '✅ DRIVER' : '❌ NOT A DRIVER';
-          console.log(`   ${isDriver}: user_id=${sub.user_id}, endpoint=${sub.endpoint?.substring(0, 50)}...`);
-        });
-      }
-      
-      const driversWithPush = new Set((pushSubs || []).map((sub: any) => sub.user_id));
-      console.log(`📱 Drivers with push subscriptions:`, Array.from(driversWithPush));
-      
-      // Get online/active drivers first
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('driver_availability')
         .select('driver_id, last_seen, is_online')
         .in('driver_id', driverIds)
         .gte('last_seen', fifteenMinutesAgo);
-      
+
+      if (availabilityError) {
+        console.error('Error fetching driver availability:', availabilityError);
+      }
+
       const activeDriverIds = new Set((availabilityData || [])
         .filter((item: any) => item.is_online === true)
         .map((item: any) => item.driver_id));
-      
-      // Combine: drivers who are online/active OR have push subscriptions
-      let driversToNotify = allDriverProfiles.filter(driver => 
-        activeDriverIds.has(driver.id) || driversWithPush.has(driver.id)
-      );
-      
-      console.log(`📊 Driver selection results:`);
-      console.log(`   - Total active drivers: ${allDriverProfiles.length}`);
-      console.log(`   - Online/active drivers: ${activeDriverIds.size}`);
-      console.log(`   - Drivers with push subscriptions: ${driversWithPush.size}`);
-      console.log(`   - Drivers to notify: ${driversToNotify.length}`);
-      console.log(`   - Driver IDs to notify:`, driversToNotify.map(d => d.id));
-      
-      // If no drivers found but we have active drivers, try to notify them anyway
-      // (subscription query might have failed or there's a user_id mismatch)
-      if (driversToNotify.length === 0 && allDriverProfiles.length > 0) {
-        console.log(`⚠️ No drivers found via subscription query (${allDriverProfiles.length} active drivers)`);
-        console.log(`   Active driver IDs:`, allDriverProfiles.map(d => d.id));
-        console.log(`   Active driver emails:`, allDriverProfiles.map(d => d.email));
-        
-        // Try to get ALL push subscriptions and match by email as fallback
-        console.log(`🔍 Fallback: Checking all push subscriptions...`);
-        const { data: allSubs, error: allSubsError } = await supabase
-          .from('push_subscriptions')
-          .select('user_id');
-        
-        if (!allSubsError && allSubs && allSubs.length > 0) {
-          console.log(`📱 Found ${allSubs.length} total push subscriptions in database`);
-          const allSubUserIds = new Set(allSubs.map((s: any) => s.user_id));
-          
-          // Match driver profiles to subscriptions by user_id
-          driversToNotify = allDriverProfiles.filter(driver => allSubUserIds.has(driver.id));
-          
-          if (driversToNotify.length > 0) {
-            console.log(`✅ Fallback successful: Found ${driversToNotify.length} drivers with subscriptions via fallback`);
-          } else {
-            console.log(`⚠️ Fallback failed: Driver IDs don't match subscription user_ids`);
-            console.log(`   Driver IDs:`, allDriverProfiles.map(d => d.id));
-            console.log(`   Subscription user_ids:`, Array.from(allSubUserIds));
-          }
-        }
-        
-        // CRITICAL: Only notify drivers who have subscriptions - don't notify drivers without subscriptions
-        // This prevents sending notifications to wrong users
-        if (driversToNotify.length === 0) {
-          console.log(`⚠️ No drivers with push subscriptions found - will NOT notify drivers without subscriptions`);
-          console.log(`   This prevents sending driver notifications to wrong users`);
-          console.log(`   Drivers need to enable push notifications in their browser to receive notifications`);
-          // Don't notify - just create in-app notifications for drivers
-          for (const driver of allDriverProfiles) {
-            try {
-              const { error: notifError } = await supabase
-                .from('driver_notifications')
-                .insert({
-                  driver_id: driver.id,
-                  type: 'in_app',
-                  title: 'New Order Available!',
-                  body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
-                  status: 'unread',
-                  data: {
-                    order_id: order.id,
-                    pickup_address: order.pickup_address,
-                    delivery_address: order.delivery_address,
-                    total: order.total
-                  }
-                });
-              if (notifError) console.error('Failed to create in-app notification:', notifError);
-            } catch (notifErr) {
-              console.error('Error creating in-app notification:', notifErr);
-            }
-          }
-          return; // Exit early - don't send push notifications
-        }
-      }
-      
+
+      const driversToNotify = allDriverProfiles.filter(driver => activeDriverIds.has(driver.id));
+
       if (driversToNotify.length === 0) {
-        console.log(`❌ No drivers to notify at all`);
+        console.log(`⚠️ No online drivers available to notify for order ${order.id}. Adding to queue.`);
         await orderQueueService.addToQueue(order.id);
         return;
       }
 
-      console.log(`📢 Broadcasting to ${driversToNotify.length} drivers for order ${order.id} (verified: pending, no driver assigned)`);
+      console.log(`📢 Creating in-app notifications for ${driversToNotify.length} drivers for order ${order.id}`);
 
-      // Notify all drivers
       for (const driver of driversToNotify) {
         try {
-          // Send push notification (will fail if no subscription)
-          const pushResult = await this.sendPushNotification(driver.id, {
-            title: 'New Order Available!',
-            body: `Order #${String(order.id).slice(-8)} - $${order.total} - ${order.pickup_address?.substring(0, 40) || 'Pickup location'}...`,
-            data: {
-              orderId: order.id,
-              type: 'order_available'
-            }
-          });
-          
-          if (!pushResult) {
-            console.log(`⚠️ Push notification failed for driver ${driver.id} (${driver.email || 'unknown email'}) - driver may not have push notifications enabled`);
-            console.log(`   💡 Driver should enable push notifications in their profile/dashboard`);
-          } else {
-            console.log(`✅ Push notification sent successfully to driver ${driver.id} (${driver.email || 'unknown email'})`);
-          }
+          const { error: notifError } = await supabase
+            .from('driver_notifications')
+            .insert({
+              driver_id: driver.id,
+              type: 'in_app',
+              title: 'New Order Available!',
+              body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
+              status: 'unread',
+              data: {
+                order_id: order.id,
+                pickup_address: order.pickup_address,
+                delivery_address: order.delivery_address,
+                total: order.total
+              }
+            });
+          if (notifError) console.error('Failed to create in-app notification:', notifError);
 
-          // Create in-app notification
-          try {
-            const { error: notifError } = await supabase
-              .from('driver_notifications')
-              .insert({
-                driver_id: driver.id,
-                type: 'in_app',
-                title: 'New Order Available!',
-                body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
-                status: 'unread',
-                data: {
-                  order_id: order.id,
-                  pickup_address: order.pickup_address,
-                  delivery_address: order.delivery_address,
-                  total: order.total
-                }
-              });
-            if (notifError) console.error('Failed to create in-app notification:', notifError);
-          } catch (notifErr) {
-            console.error('Error creating in-app notification:', notifErr);
+          // Optional: send SMS using existing helper
+          if (driver.phone) {
+            await this.sendSMS(driver.phone, `New order available: ${order.pickup_address} → ${order.delivery_address}`);
           }
         } catch (driverError) {
-          console.error(`Error notifying driver ${driver.id}:`, driverError);
+          console.error(`Error creating notifications for driver ${driver.id}:`, driverError);
         }
       }
     } catch (error) {
@@ -414,13 +281,6 @@ export class OrderAutomationService {
       ? `🎯 ORDER ASSIGNED: You've been assigned order #${order.id} - $${order.total}`
       : `📦 NEW ORDER: Order #${order.id} available - $${order.total}`;
     
-    // Push notification
-    await this.sendPushNotification(driver.id, {
-      title: type === 'assigned' ? 'Order Assigned!' : 'New Order Available!',
-      body: message,
-      data: { orderId: order.id, type }
-    });
-    
     // SMS notification (if phone available)
     if (driver.phone) {
       await this.sendSMS(driver.phone, message);
@@ -434,29 +294,88 @@ export class OrderAutomationService {
       .select('*')
       .eq('id', order.customer_id)
       .single();
-    
-    if (customer) {
-      let title = 'Order Update';
-      let body = '';
-      
-      switch (type) {
-        case 'order_created':
-          title = 'Order Confirmed!';
-          body = `Your order #${String(order.id).slice(-8)} has been confirmed. We're finding a driver for you!`;
-          break;
-        case 'driver_assigned':
-          title = 'Driver Assigned!';
-          body = `Your order #${String(order.id).slice(-8)} has been assigned to a driver!`;
-          break;
-        default:
-          body = `Your order #${String(order.id).slice(-8)} status has been updated.`;
+
+    if (!customer) {
+      console.warn(`⚠️ Customer profile not found for order ${order.id}`);
+      return;
+    }
+
+    const shortOrderId = String(order.id).slice(-8);
+    let title = 'Order Update';
+    let body = '';
+
+    switch (type) {
+      case 'order_created':
+        title = 'Order Confirmed!';
+        body = `Your order #${shortOrderId} has been confirmed. We\'re finding a driver for you!`;
+        break;
+      case 'driver_assigned':
+        title = 'Driver Assigned!';
+        body = `Your order #${shortOrderId} has been assigned to a driver.`;
+        break;
+      default:
+        body = `Your order #${shortOrderId} status has been updated.`;
+    }
+
+    const notificationData = {
+      order_id: order.id,
+      status: order.status,
+      type,
+      driver_id: order.driver_id || null,
+      pickup_address: order.pickup_address,
+      delivery_address: order.delivery_address,
+      total: order.total
+    };
+
+    await this.createCustomerNotification(customer.id, title, body, notificationData);
+
+    // Send SMS if available
+    if (customer.phone) {
+      await this.sendSMS(customer.phone, `${title}\n${body}`);
+    }
+
+    // Send email if available
+    if (customer.email) {
+      const appUrl = import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com';
+      const html = `
+        <h2>${title}</h2>
+        <p>${body}</p>
+        <p><strong>Order Details:</strong></p>
+        <ul>
+          <li>Order ID: #${shortOrderId}</li>
+          <li>Pickup: ${order.pickup_address}</li>
+          <li>Delivery: ${order.delivery_address}</li>
+          <li>Total: $${order.total}</li>
+        </ul>
+        <p><a href="${appUrl}/my-orders">View your order</a></p>
+      `;
+      await this.sendEmailMessage(customer.email, title, html, `${title}\n\n${body}`);
+    }
+  }
+
+  private async createCustomerNotification(
+    customerId: string,
+    title: string,
+    body: string,
+    data: Record<string, any>
+  ) {
+    try {
+      const { error } = await supabase
+        .from('customer_notifications')
+        .insert({
+          customer_id: customerId,
+          title,
+          body,
+          data,
+          type: 'in_app',
+          status: 'unread'
+        });
+
+      if (error) {
+        console.error('❌ Error creating customer notification:', error);
       }
-      
-      await this.sendPushNotification(customer.id, {
-        title,
-        body,
-        data: { orderId: order.id, type }
-      });
+    } catch (err) {
+      console.error('❌ Error inserting customer notification:', err);
     }
   }
 
@@ -488,62 +407,47 @@ export class OrderAutomationService {
     if (error) throw error;
   }
 
-  // Send push notification
-  private async sendPushNotification(userId: string, notification: any): Promise<boolean> {
+  // Send SMS
+  private async sendSMS(phone: string, message: string) {
+    if (!phone) return;
+
+    const normalizedPhone = phone.replace(/[^0-9+]/g, '').startsWith('+')
+      ? phone.replace(/[^0-9+]/g, '')
+      : `+1${phone.replace(/[^0-9]/g, '')}`;
+
     try {
-      console.log(`📤 Attempting to send push notification to user ${userId}`);
-      console.log(`   Notification:`, { title: notification?.title, body: notification?.body, type: notification?.data?.type });
-      
-      // CRITICAL: For "new order" or "order available" notifications, verify user is a driver BEFORE sending
-      const notificationType = notification?.data?.type;
-      const isOrderNotification = notification?.title?.includes('New Order') || 
-                                   notification?.title?.includes('Order Available') ||
-                                   notificationType === 'order_available';
-      
-      if (isOrderNotification) {
-        // CRITICAL: Verify user is a driver - ABORT if not
-        const { data: userProfile, error: profileError } = await supabase
-          .from('profiles')
-          .select('user_type, email')
-          .eq('id', userId)
-          .single();
-        
-        if (profileError) {
-          console.error(`❌ CRITICAL: Error checking user type for ${userId} - ABORTING driver notification:`, profileError);
-          return false;
-        }
-        
-        if (!userProfile || userProfile.user_type !== 'driver') {
-          console.log(`🚫 BLOCKED: Skipping driver notification to non-driver user ${userId} (type: ${userProfile?.user_type || 'unknown'}, email: ${userProfile?.email || 'unknown'})`);
-          return false;
-        }
-        console.log(`✅ Verified user ${userId} (${userProfile.email}) is a driver - proceeding with notification`);
-      }
-      
-      // Add user_id to notification data for service worker verification
-      const notificationData = {
-        ...(notification?.data || {}),
-        userId: userId // Add for service worker verification
-      };
-      
-      const result = await PushApiService.sendToUsers([userId], {
-        title: notification?.title || 'MyPartsRunner',
-        body: notification?.body || 'You have an update',
-        data: notificationData
+      const response = await fetch('/.netlify/functions/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: normalizedPhone, body: message }),
       });
-      
-      console.log(`📤 Push notification result for user ${userId}:`, result);
-      return result;
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('⚠️ SMS delivery failed:', text);
+      }
     } catch (error) {
-      console.error(`❌ Error sending push notification to user ${userId}:`, error);
-      return false;
+      console.error('❌ Error sending SMS:', error);
     }
   }
 
-  // Send SMS
-  private async sendSMS(phone: string, message: string) {
-    // Implementation depends on your SMS service (Twilio, etc.)
-    console.log(`📱 SMS to ${phone}: ${message}`);
+  private async sendEmailMessage(to: string, subject: string, html: string, text?: string) {
+    if (!to) return;
+
+    try {
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to, subject, html, text }),
+      });
+
+      if (!response.ok) {
+        const message = await response.text();
+        console.warn('⚠️ Email delivery failed:', message);
+      }
+    } catch (error) {
+      console.error('❌ Error sending email:', error);
+    }
   }
 
   // Notify admin when no drivers available
@@ -637,18 +541,6 @@ export class OrderAutomationService {
           } catch (notifErr) {
             console.error('Error creating in-app notification:', notifErr);
           }
-
-          // Send push notification if driver has push enabled
-          await this.sendPushNotification(driver.id, {
-            title: 'New Order Available!',
-            body: `Order #${order.id.slice(-8)} - $${order.total} - ${order.pickup_address}`,
-            icon: '/icon-192x192.png',
-            badge: '/badge-72x72.png',
-            data: {
-              orderId: order.id,
-              type: 'order_available'
-            }
-          });
 
         } catch (driverError) {
           console.error(`Error notifying driver ${driver.id}:`, driverError);

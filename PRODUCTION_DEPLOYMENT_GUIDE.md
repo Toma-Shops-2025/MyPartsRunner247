@@ -27,10 +27,6 @@ VITE_APP_URL=https://mypartsrunner.com
 VITE_APP_NAME=MyPartsRunner
 VITE_APP_VERSION=1.0.0
 
-# Push Notifications (VAPID Keys)
-VITE_VAPID_PUBLIC_KEY=your_vapid_public_key
-VITE_VAPID_PRIVATE_KEY=your_vapid_private_key
-
 # Email Configuration
 SENDGRID_API_KEY=your_sendgrid_api_key
 SENDGRID_FROM_EMAIL=noreply@mypartsrunner.com
@@ -55,8 +51,7 @@ VITE_LOG_LEVEL=info
    -- 3. create_analytics_tables.sql
    -- 4. create_driver_payment_tables.sql
    -- 5. create_error_monitoring_tables.sql
-   -- 6. create_push_notifications_table.sql
-   -- 7. database_migration.sql
+   -- 6. database_migration.sql
    ```
 
 2. **Database Indexes for Performance:**
@@ -80,7 +75,6 @@ VITE_LOG_LEVEL=info
    ALTER TABLE driver_payments ENABLE ROW LEVEL SECURITY;
    ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
    ALTER TABLE error_logs ENABLE ROW LEVEL SECURITY;
-   ALTER TABLE push_notifications ENABLE ROW LEVEL SECURITY;
    ```
 
 2. **Content Security Policy (CSP):**
@@ -101,17 +95,6 @@ VITE_LOG_LEVEL=info
    https://mypartsrunner.com/.netlify/functions/stripe-webhook
    https://mypartsrunner.com/.netlify/functions/process-order-completion
    ```
-
-### ✅ **Push Notifications Setup**
-
-1. **VAPID Keys Generation:**
-   ```bash
-   npx web-push generate-vapid-keys
-   ```
-
-2. **Service Worker Registration:**
-   - Ensure `public/sw.js` is properly configured
-   - Test notification delivery
 
 ### ✅ **Monitoring & Analytics**
 
@@ -164,7 +147,7 @@ Add all environment variables in Netlify dashboard:
 - Monitor application uptime
 - Check database connectivity
 - Verify payment processing
-- Test push notifications
+- Verify real-time order updates
 
 ### 2. **Performance Monitoring**
 - Monitor page load times

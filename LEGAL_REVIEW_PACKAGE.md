@@ -87,7 +87,7 @@
 - **Order Management:** Real-time order tracking
 - **Payment Processing:** Stripe integration with driver payouts
 - **Driver Matching:** Automated driver assignment system
-- **Real-time Notifications:** Push notifications, SMS, email
+- **Real-time Notifications:** In-app alerts, SMS, email
 - **Admin Dashboard:** Order management and analytics
 - **Mobile Responsive:** Works on all devices
 

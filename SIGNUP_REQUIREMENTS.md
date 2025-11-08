@@ -21,13 +21,7 @@ This document outlines what customers and drivers need to do when signing up for
 - System sends verification email
 - User can verify email (recommended but not required)
 
-### Step 3: Push Notifications (Automatic)
-- **What happens:** System automatically requests notification permission
-- **User action:** Click "Allow" when browser prompts
-- **Result:** Push notifications enabled automatically
-- **If declined:** Can still use platform, but won't get push notifications
-
-### Step 4: Ready to Use!
+### Step 3: Ready to Use!
 **That's it!** Customers can immediately:
 - Place orders
 - Track orders
@@ -54,13 +48,7 @@ This document outlines what customers and drivers need to do when signing up for
 - System sends verification email
 - User can verify email (recommended but not required)
 
-### Step 3: Push Notifications (Automatic)
-- **What happens:** System automatically requests notification permission
-- **User action:** Click "Allow" when browser prompts
-- **Result:** Push notifications enabled automatically
-- **Critical for drivers:** Needed to receive new order notifications
-
-### Step 4: Driver Application
+### Step 3: Driver Application
 **Where:** Redirected to `/driver-application` page
 
 **What they fill out:**
@@ -91,7 +79,7 @@ This document outlines what customers and drivers need to do when signing up for
 
 **Action:** Click "Submit Application"
 
-### Step 5: Driver Verification & Onboarding
+### Step 4: Driver Verification & Onboarding
 **After application submission:** Redirected to `/driver-verification`
 
 **7-Day Deadline:** Drivers have 7 days to complete verification
@@ -151,7 +139,7 @@ This document outlines what customers and drivers need to do when signing up for
 
 **Important:** Without Stripe setup, drivers cannot receive payouts!
 
-### Step 6: Verification Complete
+### Step 5: Verification Complete
 **When all requirements are met:**
 - All documents verified
 - Background check approved
@@ -168,12 +156,7 @@ This document outlines what customers and drivers need to do when signing up for
 ## ⚡ AUTOMATIC PROCESSES (No User Action Required)
 
 ### For All Users (Customers & Drivers):
-1. **Push Notifications Auto-Enable**
-   - Automatically requested on login
-   - Subscription saved to database
-   - No manual "enable notifications" step needed
-
-2. **Profile Creation**
+1. **Profile Creation**
    - Profile automatically created in database
    - User type set based on signup selection
 
@@ -195,7 +178,6 @@ This document outlines what customers and drivers need to do when signing up for
 |------------|----------|--------|
 | **Signup Form** | ✅ Required | ✅ Required |
 | **Email Verification** | ⚪ Optional | ⚪ Optional |
-| **Push Notifications** | ✅ Auto-enabled | ✅ Auto-enabled (critical) |
 | **Application Form** | ❌ Not needed | ✅ Required |
 | **Document Uploads** | ❌ Not needed | ✅ Required (4 documents) |
 | **Background Check** | ❌ Not needed | ✅ Required |
@@ -226,13 +208,13 @@ This document outlines what customers and drivers need to do when signing up for
 ### Key Differences:
 - **Customers:** Simple signup, immediate access
 - **Drivers:** More extensive onboarding (documents, verification, payment setup)
-- **Both:** Push notifications auto-enabled (no manual step)
+- **Both:** Real-time alerts available in-app
 
 ---
 
 ## 💡 NOTES
 
-- **Push Notifications:** The only thing both users need to do is click "Allow" when the browser prompts them (happens automatically after signup/login)
+- **Real-Time Alerts:** Users can monitor orders directly within the app
 - **Driver Verification:** 7-day deadline starts after application submission
 - **Stripe Setup:** Critical for drivers to receive payouts - must be completed
 - **All Other Steps:** Automated by the system, users just need to provide information

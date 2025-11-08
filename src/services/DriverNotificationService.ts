@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase';
-import PushApiService from './PushApiService';
 
 export class DriverNotificationService {
   private static instance: DriverNotificationService;
@@ -31,9 +30,8 @@ export class DriverNotificationService {
       
       // Send multiple notification types
       await Promise.all([
-        this.sendPushNotification(driverId, message),
-        this.sendSMS(driver.phone, message),
-        this.sendEmail(driver.email, message),
+        this.sendSMS(driverId, driver.phone, message),
+        this.sendEmail(driverId, driver.email, message),
         this.createInAppNotification(driverId, message)
       ]);
       
@@ -86,48 +84,18 @@ export class DriverNotificationService {
     }
   }
 
-  // Send push notification
-  private async sendPushNotification(driverId: string, message: any) {
+  // Send SMS notification
+  private async sendSMS(driverId: string, phone: string, message: any) {
+    if (!phone) return;
+    
+    const normalizedPhone = this.normalizePhoneNumber(phone);
+    const smsBody = `${message.title}\n${message.body}\n\nReply YES to accept, NO to decline.`;
+
     try {
-      // Store in DB for history
       const { error } = await supabase
         .from('driver_notifications')
         .insert({
           driver_id: driverId,
-          title: message.title,
-          body: message.body,
-          data: message.data,
-          type: 'push',
-          status: 'sent',
-          created_at: new Date().toISOString()
-        });
-      
-      if (error) throw error;
-
-      // Real push via Netlify function
-      await PushApiService.sendToUsers([driverId], {
-        title: message.title,
-        body: message.body,
-        data: message.data
-      });
-      
-    } catch (error) {
-      console.error('❌ Error sending push notification:', error);
-    }
-  }
-
-  // Send SMS notification
-  private async sendSMS(phone: string, message: any) {
-    if (!phone) return;
-    
-    try {
-      const smsBody = `${message.title}\n${message.body}\n\nReply YES to accept, NO to decline.`;
-      
-      // Store SMS in database
-      const { error } = await supabase
-        .from('driver_notifications')
-        .insert({
-          driver_id: message.data.driverId,
           title: message.title,
           body: smsBody,
           data: message.data,
@@ -137,21 +105,28 @@ export class DriverNotificationService {
         });
       
       if (error) throw error;
-      
-      // TODO: Integrate with SMS service (Twilio, etc.)
-      console.log(`📱 SMS to ${phone}: ${smsBody}`);
-      
+
+      const response = await fetch('/.netlify/functions/send-sms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: normalizedPhone, body: smsBody })
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('⚠️ SMS delivery failed:', text);
+      }
     } catch (error) {
       console.error('❌ Error sending SMS:', error);
     }
   }
 
   // Send email notification
-  private async sendEmail(email: string, message: any) {
+  private async sendEmail(driverId: string, email: string, message: any) {
     if (!email) return;
-    
-    try {
-      const emailBody = `
+
+    const appUrl = import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com';
+    const emailBody = `
         <h2>${message.title}</h2>
         <p>${message.body}</p>
         <p><strong>Order Details:</strong></p>
@@ -162,14 +137,14 @@ export class DriverNotificationService {
           <li>Delivery: ${message.data.deliveryAddress}</li>
           <li>Estimated Earnings: $${message.data.estimatedEarnings}</li>
         </ul>
-        <p><a href="${import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com'}/driver-dashboard">View in Dashboard</a></p>
+        <p><a href="${appUrl}/driver-dashboard">View in Dashboard</a></p>
       `;
-      
-      // Store email in database
+
+    try {
       const { error } = await supabase
         .from('driver_notifications')
         .insert({
-          driver_id: message.data.driverId,
+          driver_id: driverId,
           title: message.title,
           body: emailBody,
           data: message.data,
@@ -179,13 +154,36 @@ export class DriverNotificationService {
         });
       
       if (error) throw error;
-      
-      // TODO: Integrate with email service (SendGrid, etc.)
-      console.log(`📧 EMAIL to ${email}: ${message.title}`);
-      
+
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          subject: message.title,
+          html: emailBody,
+          text: `${message.title}\n\n${message.body}`,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.warn('⚠️ Email delivery failed:', text);
+      }
     } catch (error) {
       console.error('❌ Error sending email:', error);
     }
+  }
+
+  private normalizePhoneNumber(phone: string): string {
+    const digits = phone.replace(/[^0-9+]/g, '');
+    if (digits.startsWith('+')) {
+      return digits;
+    }
+    if (digits.length === 10) {
+      return `+1${digits}`;
+    }
+    return `+${digits}`;
   }
 
   // Create in-app notification
