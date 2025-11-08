@@ -276,24 +276,31 @@ const ProfilePage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Notification Preferences</CardTitle>
-                <CardDescription>
-                  Control how you receive notifications
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl">
+              <img
+                src="/notification-preferences-modal-background.png"
+                alt="Notification preferences background"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-sm" />
+              <div className="relative p-8 space-y-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-white">Notification Preferences</h2>
+                  <p className="text-white/80">
+                    Control how you receive alerts and stay in the loop with your deliveries.
+                  </p>
+                </div>
+
                 {/* Current Status */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-2">Current Status</h4>
-                  <div className="flex items-center space-x-2">
+                <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                  <h4 className="font-semibold mb-2 text-white">Current Status</h4>
+                  <div className="flex items-center space-x-3 text-white/90">
                     <div className={`w-3 h-3 rounded-full ${
                       'Notification' in window && Notification.permission === 'granted' 
-                        ? 'bg-green-500' 
-                        : 'bg-red-500'
-                    }`}></div>
-                    <span className="text-sm text-gray-600">
+                        ? 'bg-green-400' 
+                        : 'bg-red-400'
+                    }`} />
+                    <span className="text-sm">
                       {typeof window !== 'undefined' && 'Notification' in window 
                         ? Notification.permission === 'granted' 
                           ? 'Notifications enabled' 
@@ -308,34 +315,40 @@ const ProfilePage: React.FC = () => {
 
                 {/* Notification Types */}
                 <div className="space-y-4">
-                  <h4 className="font-medium text-gray-900">Notification Types</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium text-sm">Order Updates</div>
-                        <div className="text-xs text-gray-500">New orders, status changes, delivery confirmations</div>
+                  <h4 className="font-semibold text-white">Notification Types</h4>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-sm font-semibold">Order Updates</div>
+                          <div className="text-xs text-white/70 mt-1">New orders, status changes, delivery confirmations</div>
+                        </div>
+                        <div className="w-4 h-4 bg-green-400 rounded-full"></div>
                       </div>
-                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
                     </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium text-sm">Driver Notifications</div>
-                        <div className="text-xs text-gray-500">Earnings updates, schedule changes, important announcements</div>
+                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-sm font-semibold">Driver Notifications</div>
+                          <div className="text-xs text-white/70 mt-1">Earnings updates, schedule changes, important announcements</div>
+                        </div>
+                        <div className="w-4 h-4 bg-green-400 rounded-full"></div>
                       </div>
-                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
                     </div>
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <div className="font-medium text-sm">System Alerts</div>
-                        <div className="text-xs text-gray-500">Maintenance notifications, security alerts</div>
+                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="text-sm font-semibold">System Alerts</div>
+                          <div className="text-xs text-white/70 mt-1">Maintenance notifications, security alerts</div>
+                        </div>
+                        <div className="w-4 h-4 bg-amber-400 rounded-full"></div>
                       </div>
-                      <div className="w-4 h-4 bg-yellow-500 rounded-full"></div>
                     </div>
                   </div>
                 </div>
 
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
