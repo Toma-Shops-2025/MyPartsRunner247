@@ -257,9 +257,9 @@ const ProfilePage: React.FC = () => {
               <img
                 src="/security-settings-modal-background.jpg"
                 alt="Security settings background"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-cover object-center md:object-[center_top]"
               />
-              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-slate-950/30" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
