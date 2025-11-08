@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { orderQueueService } from './OrderQueueService';
+import { sendDriverPushNotification } from '@/services/pushNotificationService';
 
 export class OrderAutomationService {
   private static instance: OrderAutomationService;
@@ -281,9 +282,28 @@ export class OrderAutomationService {
       ? `🎯 ORDER ASSIGNED: You've been assigned order #${order.id} - $${order.total}`
       : `📦 NEW ORDER: Order #${order.id} available - $${order.total}`;
     
+    const payload = {
+      title: type === 'assigned' ? 'Order Assigned' : 'Order Available',
+      body: message,
+      data: {
+        orderId: order.id,
+        total: order.total,
+        pickupAddress: order.pickup_address,
+        deliveryAddress: order.delivery_address,
+        type
+      }
+    };
+    
     // SMS notification (if phone available)
     if (driver.phone) {
       await this.sendSMS(driver.phone, message);
+    }
+
+    // Push notification
+    if (driver.id) {
+      await sendDriverPushNotification(driver.id, payload).catch((err) => {
+        console.warn('Push notification failed', err);
+      });
     }
   }
 

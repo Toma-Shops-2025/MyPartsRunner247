@@ -24,41 +24,13 @@ const API_CACHE_PATTERNS = [
 ];
 
 // Install event - Cache static assets
-self.addEventListener('install', function(event) {
-  console.log('Service Worker installing...');
-  // Force activation for iOS compatibility
+self.addEventListener('install', (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then(function(cache) {
-        console.log('Caching static assets...');
-        return cache.addAll(urlsToCache);
-      })
-      .then(() => {
-        console.log('Static assets cached successfully');
-        return self.skipWaiting();
-      })
-  );
 });
 
 // Activate event - Clean up old caches
-self.addEventListener('activate', function(event) {
-  console.log('Service Worker activating...');
-  event.waitUntil(
-    caches.keys().then(function(cacheNames) {
-      return Promise.all(
-        cacheNames.map(function(cacheName) {
-          if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-            console.log('Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('Service Worker activated');
-      return self.clients.claim();
-    })
-  );
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
 // Fetch event - Smart caching strategy
@@ -169,10 +141,47 @@ self.addEventListener('message', function(event) {
 });
 
 // Notification click event handler for in-app notifications
-self.addEventListener('notificationclick', function(event) {
-  console.log('Notification clicked:', event);
-  event.notification.close();
+self.addEventListener('push', (event) => {
+  if (!event.data) {
+    return;
+  }
 
+  let payload = {};
+  try {
+    payload = event.data.json();
+  } catch (error) {
+    payload = { title: 'Notification', body: event.data.text() };
+  }
+
+  const title = payload.title || 'MyPartsRunner';
+  const options = {
+    body: payload.body || 'You have a new update.',
+    icon: payload.icon || '/icons/icon-192.png',
+    badge: payload.badge || '/icons/icon-96.png',
+    data: payload.data || {},
+    actions: payload.actions || []
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
   const targetUrl = event.notification.data?.url || '/';
-  event.waitUntil(clients.openWindow(targetUrl));
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ('focus' in client) {
+          client.focus();
+          client.postMessage({ type: 'PUSH_NOTIFICATION_CLICKED', data: event.notification.data });
+          return;
+        }
+      }
+
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    })
+  );
 });

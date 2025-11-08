@@ -9,6 +9,7 @@ import DocumentExpirationWarning from '@/components/DocumentExpirationWarning';
 import { orderQueueService } from '@/services/OrderQueueService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PushNotificationPrompt } from '@/components/PushNotificationPrompt';
 import { Car, MapPin, Clock, DollarSign, Package, CheckCircle, AlertCircle, Star, TrendingUp, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { locationTrackingService } from '@/services/LocationTrackingService';
@@ -683,6 +684,7 @@ const NewDriverDashboardPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900">
       <NewHeader />
+      <PushNotificationPrompt />
       <DriverNotificationSystem />
       
             <div className="max-w-7xl mx-auto px-4 py-8">

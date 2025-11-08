@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { sendDriverPushNotification } from '@/services/pushNotificationService';
 
 export class DriverNotificationService {
   private static instance: DriverNotificationService;
@@ -32,7 +33,14 @@ export class DriverNotificationService {
       await Promise.all([
         this.sendSMS(driverId, driver.phone, message),
         this.sendEmail(driverId, driver.email, message),
-        this.createInAppNotification(driverId, message)
+        this.createInAppNotification(driverId, message),
+        sendDriverPushNotification(driverId, {
+          title: message.title,
+          body: message.body,
+          data: { ...message.data, driverId }
+        }).catch((err) => {
+          console.warn('⚠️ Push notification failed:', err?.message || err);
+        })
       ]);
       
       console.log(`📱 Notifications sent to driver ${driverId} for order ${order.id}`);
