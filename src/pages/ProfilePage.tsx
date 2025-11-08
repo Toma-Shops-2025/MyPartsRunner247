@@ -259,7 +259,7 @@ const ProfilePage: React.FC = () => {
                 alt="Security settings background"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-slate-950/55 backdrop-blur-[1.5px]" />
+              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
