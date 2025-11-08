@@ -253,26 +253,38 @@ const ProfilePage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>
-                  Manage your account security
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center py-8">
-                  <Shield className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Security Features</h3>
-                  <p className="text-gray-600 mb-4">
-                    Security settings are managed through your authentication provider.
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl">
+              <img
+                src="/security-settings-modal-background.jpg"
+                alt="Security settings background"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-slate-950/55 backdrop-blur-[1.5px]" />
+              <div className="relative p-10 text-center space-y-6 text-white">
+                <div className="flex items-center justify-center">
+                  <div className="relative h-20 w-20">
+                    <div className="absolute inset-0 rounded-full bg-amber-500/30 blur-xl animate-pulse" />
+                    <div className="relative z-10 flex h-full w-full items-center justify-center rounded-full border border-amber-400/50 bg-black/40 shadow-2xl">
+                      <Shield className="h-10 w-10 text-amber-300" />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-3xl font-bold tracking-tight">Security Settings</h2>
+                  <p className="text-white/80 max-w-xl mx-auto">
+                    Manage two-factor authentication, password resets, and other account protection options through your authentication provider.
                   </p>
-                  <Button variant="outline">
+                </div>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Button variant="secondary" className="bg-amber-500/80 hover:bg-amber-500 text-black px-6">
                     Change Password
                   </Button>
+                  <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                    View Security Tips
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-6">
