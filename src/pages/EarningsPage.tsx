@@ -111,7 +111,7 @@ const EarningsPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
-      <div className="absolute inset-0 -z-20 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 -z-20 hidden md:block pointer-events-none overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
           <iframe
             className="h-full w-full scale-[1.5]"
@@ -131,10 +131,11 @@ const EarningsPage: React.FC = () => {
           />
         </div>
       </div>
-      <div className="absolute inset-0 -z-10 bg-slate-900/45 backdrop-blur-sm" />
+      <div className="absolute inset-0 -z-20 md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+      <div className="absolute inset-0 -z-10 bg-slate-900/45 backdrop-blur-sm md:bg-slate-900/35 md:backdrop-blur" />
 
       <div className="relative z-10 min-h-screen">
-        <div className="bg-slate-900/15">
+        <div className="bg-slate-900/15 md:bg-slate-900/15">
           <NewHeader />
         </div>
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
