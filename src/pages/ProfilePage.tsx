@@ -253,13 +253,14 @@ const ProfilePage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
-            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
               <img
                 src="/security-settings-modal-background.jpg"
                 alt="Security settings background"
-                className="absolute inset-0 h-full w-full object-cover object-center md:object-[center_top]"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/15 via-slate-950/35 to-slate-950/65" />
+              <div className="absolute inset-0 bg-slate-950/35" />
+              <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_center,_rgba(255,140,0,0.55)_0%,_rgba(0,0,0,0.65)_60%,_rgba(0,0,0,0.85)_100%)]" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
