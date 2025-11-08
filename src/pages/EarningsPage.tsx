@@ -113,17 +113,17 @@ const EarningsPage: React.FC = () => {
     <div className="relative min-h-screen overflow-hidden text-white">
       <div className="absolute inset-0 -z-30 hidden md:block bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />
       <div className="absolute inset-0 -z-30 md:hidden bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />
-      <div className="absolute inset-0 -z-20 bg-gradient-to-b from-black/65 via-black/45 to-black/30 md:bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.8)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0.35)_65%,rgba(0,0,0,0.1)_100%)]" />
+      <div className="absolute inset-0 -z-20 bg-black/20 md:bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.35)_0%,rgba(0,0,0,0.2)_45%,rgba(0,0,0,0.08)_70%,rgba(0,0,0,0)_100%)]" />
 
       <div className="relative z-10 min-h-screen">
-        <div className="bg-gradient-to-b from-black/80 to-transparent">
+        <div className="bg-gradient-to-b from-black/55 via-black/35 to-transparent">
           <NewHeader />
         </div>
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/10 px-5 py-2 text-sm font-medium text-white transition hover:bg-white/20 hover:border-white/80"
+            className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/50 bg-black/25 px-5 py-2 text-sm font-medium text-white transition hover:bg-black/35 hover:border-white/70"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -135,7 +135,7 @@ const EarningsPage: React.FC = () => {
 
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white/95">Total Earnings</CardTitle>
                 <DollarSign className="h-4 w-4 text-white/80" />
@@ -146,7 +146,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white/95">Total Trips</CardTitle>
                 <TrendingUp className="h-4 w-4 text-white/80" />
@@ -157,7 +157,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white/95">Hours Worked</CardTitle>
                 <Clock className="h-4 w-4 text-white/80" />
@@ -168,7 +168,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border border-white/40 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-white/95">Avg Per Hour</CardTitle>
                 <Calendar className="h-4 w-4 text-white/80" />
@@ -182,7 +182,7 @@ const EarningsPage: React.FC = () => {
 
           {/* Tip Breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="rounded-2xl border border-white/45 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="text-green-300 drop-shadow">Base Earnings</CardTitle>
               </CardHeader>
@@ -192,7 +192,7 @@ const EarningsPage: React.FC = () => {
               </CardContent>
             </Card>
             
-            <Card className="rounded-2xl border border-white/45 bg-white/15 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
+            <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_35px_-25px_rgba(0,0,0,0.7)] backdrop-blur-md">
               <CardHeader>
                 <CardTitle className="text-pink-300 drop-shadow">Tips Received</CardTitle>
               </CardHeader>
@@ -204,14 +204,14 @@ const EarningsPage: React.FC = () => {
           </div>
 
           {/* Daily Earnings */}
-          <Card className="rounded-2xl border border-white/40 bg-white/12 p-6 text-white shadow-[0_20px_45px_-25px_rgba(0,0,0,0.8)] backdrop-blur-md">
+          <Card className="rounded-2xl border border-white/40 bg-white/10 p-6 text-white shadow-[0_20px_40px_-25px_rgba(0,0,0,0.75)] backdrop-blur-md">
             <CardHeader>
               <CardTitle className="text-white drop-shadow">Daily Earnings Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {earningsData.dailyBreakdown.map((day, index) => (
-                  <div key={index} className="flex items-center justify-between rounded-xl border border-white/35 bg-black/35 p-4 backdrop-blur">
+                  <div key={index} className="flex items-center justify-between rounded-xl border border-white/30 bg-black/30 p-4 backdrop-blur">
                     <div>
                       <p className="font-medium text-white drop-shadow-sm">{new Date(day.date).toLocaleDateString()}</p>
                       <p className="text-sm text-white/75">{day.trips} trips • {day.hours.toFixed(1)}h</p>
