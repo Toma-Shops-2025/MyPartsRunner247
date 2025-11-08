@@ -111,27 +111,8 @@ const EarningsPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden text-white">
-      <div className="absolute inset-0 -z-20 hidden md:block pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <iframe
-            className="h-full w-full scale-[1.5]"
-            src="https://www.youtube.com/embed/xbjtcgWWbeU?autoplay=1&mute=1&controls=0&loop=1&playlist=xbjtcgWWbeU&modestbranding=1&playsinline=1&rel=0&showinfo=0"
-            title="Earnings Dashboard Background"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-        <div className="absolute inset-0 pointer-events-none opacity-70 mix-blend-screen">
-          <iframe
-            className="h-full w-full scale-[1.6] -translate-y-10"
-            src="https://www.youtube.com/embed/xbjtcgWWbeU?autoplay=1&mute=1&controls=0&loop=1&playlist=xbjtcgWWbeU&modestbranding=1&playsinline=1&rel=0&showinfo=0"
-            title="Earnings Dashboard Background Layer"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-          />
-        </div>
-      </div>
-      <div className="absolute inset-0 -z-20 md:hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
+      <div className="absolute inset-0 -z-20 hidden md:block bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />
+      <div className="absolute inset-0 -z-20 md:hidden bg-center bg-cover" style={{ backgroundImage: "url('/earnings-dashboard-background-image.png')" }} />
       <div className="absolute inset-0 -z-10 bg-slate-900/45 backdrop-blur-sm md:bg-slate-900/35 md:backdrop-blur" />
 
       <div className="relative z-10 min-h-screen">
