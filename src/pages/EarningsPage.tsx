@@ -120,10 +120,10 @@ const EarningsPage: React.FC = () => {
           allowFullScreen
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-slate-900/75 backdrop-blur" />
+      <div className="absolute inset-0 -z-10 bg-slate-900/55 backdrop-blur" />
 
       <div className="relative z-10 min-h-screen">
-        <div className="bg-slate-900/40">
+        <div className="bg-slate-900/25">
           <NewHeader />
         </div>
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
