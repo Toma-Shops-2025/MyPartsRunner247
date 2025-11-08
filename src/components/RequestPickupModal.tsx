@@ -163,8 +163,8 @@ const RequestPickupModal: React.FC<RequestPickupModalProps> = ({ isOpen, onClose
             backgroundRepeat: 'no-repeat'
           }}
         />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative p-6 max-h-[90vh] overflow-y-auto bg-white/90 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-black/30" />
+        <div className="relative p-6 max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Request Pickup</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
