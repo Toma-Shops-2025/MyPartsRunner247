@@ -282,7 +282,7 @@ const ProfilePage: React.FC = () => {
                   <Button variant="secondary" className="bg-amber-500/80 hover:bg-amber-500 text-black px-6">
                     Change Password
                   </Button>
-                  <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                  <Button variant="outline" className="border-white/60 text-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm">
                     View Security Tips
                   </Button>
                 </div>
