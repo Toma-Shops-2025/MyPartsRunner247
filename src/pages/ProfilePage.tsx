@@ -140,89 +140,110 @@ const ProfilePage: React.FC = () => {
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Picture</CardTitle>
-                <CardDescription>
-                  Upload a profile picture to personalize your account
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AvatarUpload
-                  currentAvatarUrl={profile?.avatar_url}
-                  userInitials={userInitials}
-                  onAvatarUpdate={handleAvatarUpdate}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your personal details
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="full_name">Full Name</Label>
-                    <Input
-                      id="full_name"
-                      value={formData.full_name}
-                      onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                      disabled={!isEditing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      value={user.email || ''}
-                      disabled
-                      className="bg-gray-100"
-                    />
-                  </div>
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
+              <img
+                src="/profile-pic-tab-background.png"
+                alt="Profile picture background"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/25 to-slate-950/85" />
+              <div className="relative p-10 space-y-8 text-white text-center">
+                <div>
+                  <h2 className="text-3xl font-bold tracking-tight">Profile Picture</h2>
+                  <p className="text-white/80">
+                    Upload a profile picture to personalize your account
+                  </p>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    disabled={!isEditing}
-                    placeholder="Enter your phone number"
+                <div className="max-w-sm mx-auto backdrop-blur-sm bg-white/10 border border-white/15 rounded-3xl p-6 shadow-xl">
+                  <AvatarUpload
+                    currentAvatarUrl={profile?.avatar_url}
+                    userInitials={userInitials}
+                    onAvatarUpdate={handleAvatarUpdate}
                   />
                 </div>
+              </div>
+            </div>
 
-                <div className="flex space-x-2">
-                  {!isEditing ? (
-                    <Button onClick={() => setIsEditing(true)}>
-                      Edit Profile
-                    </Button>
-                  ) : (
-                    <>
-                      <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-                        Save Changes
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormData({
-                            full_name: profile?.full_name || '',
-                            phone: profile?.phone || '',
-                          });
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </>
-                  )}
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
+              <img
+                src="/personal-info-tab-background.png"
+                alt="Personal information background"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/30 to-slate-950/80" />
+              <div className="relative p-10 space-y-8 text-white text-center">
+                <div>
+                  <h2 className="text-3xl font-bold tracking-tight">Personal Information</h2>
+                  <p className="text-white/80">
+                    Update your personal details
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="backdrop-blur-sm bg-white/10 border border-white/15 rounded-3xl p-6 shadow-xl space-y-6 text-left">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="full_name">Full Name</Label>
+                      <Input
+                        id="full_name"
+                        value={formData.full_name}
+                        onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                        disabled={!isEditing}
+                        className="bg-black/40 border-white/10 text-white"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input
+                        id="email"
+                        value={user.email || ''}
+                        disabled
+                        className="bg-black/40 border-white/10 text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      disabled={!isEditing}
+                      placeholder="Enter your phone number"
+                      className="bg-black/40 border-white/10 text-white placeholder-white/60"
+                    />
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {!isEditing ? (
+                      <Button onClick={() => setIsEditing(true)} className="bg-sky-500 hover:bg-sky-600">
+                        Edit Profile
+                      </Button>
+                    ) : (
+                      <>
+                        <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                          Save Changes
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          onClick={() => {
+                            setIsEditing(false);
+                            setFormData({
+                              full_name: profile?.full_name || '',
+                              phone: profile?.phone || '',
+                            });
+                          }}
+                          className="border-white/40 text-white hover:bg-white/10"
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="account" className="space-y-6">
