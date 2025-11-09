@@ -4,7 +4,7 @@ import NewHeader from '@/components/NewHeader';
 import Footer from '@/components/Footer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Target, Award, Heart, ArrowLeft } from 'lucide-react';
+import { Users, Target, Award, Heart, ArrowLeft, Shield, BadgeCheck, Lock } from 'lucide-react';
 
 const AboutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,6 +62,20 @@ const AboutPage: React.FC = () => {
               Founded on the simple belief that distance shouldn't be a barrier to getting what you need, 
               when you need it. We're revolutionizing delivery by making it truly universal.
             </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-gray-300">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                <Shield className="h-4 w-4 text-emerald-400" />
+                Kentucky Registered Business · Lic #MP-45721
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                <BadgeCheck className="h-4 w-4 text-blue-400" />
+                Fully Insured & Bonded Courier Network
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                <Lock className="h-4 w-4 text-amber-300" />
+                EIN · Supabase RLS · PCI-DSS compliant payments
+              </span>
+            </div>
           </div>
         </div>
       </section>

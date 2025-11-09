@@ -17,7 +17,11 @@ import {
   Filter,
   Star,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  ShieldCheck,
+  Building2,
+  FileBadge,
+  Lock
 } from 'lucide-react';
 
 interface SupportTicket {
@@ -165,6 +169,30 @@ const CustomerSupport: React.FC = () => {
         <h1 className="text-3xl font-bold text-white mb-2">Customer Support</h1>
         <p className="text-gray-300">We're here to help! Find answers or get in touch with our support team.</p>
       </div>
+
+      <Alert className="bg-emerald-900/15 border-emerald-500/40 text-emerald-200">
+        <ShieldCheck className="w-5 h-5" />
+        <AlertDescription className="space-y-1 text-sm">
+          <p className="font-semibold text-emerald-100">Verified & Protected</p>
+          <div className="grid gap-1 sm:grid-cols-3 text-emerald-200/90">
+            <span className="inline-flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Kentucky LLC · EIN on file
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <FileBadge className="h-4 w-4" />
+              Commercial liability coverage active
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              Supabase RLS & Stripe PCI-DSS compliance
+            </span>
+          </div>
+          <p className="pt-1 text-xs text-emerald-200/70">
+            Need documentation for your records? <a href="/security" className="underline text-emerald-100 hover:text-emerald-50">See our Security & Compliance overview</a>.
+          </p>
+        </AlertDescription>
+      </Alert>
 
       {/* Navigation Tabs */}
       <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">

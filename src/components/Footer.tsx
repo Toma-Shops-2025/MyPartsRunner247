@@ -157,6 +157,7 @@ const Footer: React.FC = () => {
               <li><button onClick={() => handleNavigation('/faq')} className="text-gray-400 hover:text-white transition-colors text-left">Help Center</button></li>
               <li><button onClick={() => handleNavigation('/terms')} className="text-gray-400 hover:text-white transition-colors text-left">Terms of Service</button></li>
               <li><button onClick={() => handleNavigation('/privacy')} className="text-gray-400 hover:text-white transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => handleNavigation('/security')} className="text-gray-400 hover:text-white transition-colors text-left">Security & Compliance</button></li>
               <li><button onClick={() => handleNavigation('/contact')} className="text-gray-400 hover:text-white transition-colors text-left">Contact Us</button></li>
             </ul>
           </div>

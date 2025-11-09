@@ -20,6 +20,7 @@ import ContactPage from "./pages/ContactPage";
 import FAQPage from "./pages/FAQPage";
 import TermsPage from "./pages/TermsPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import SecurityPage from "./pages/SecurityPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import UpdateUserTypePage from "./pages/UpdateUserTypePage";
 import DriverApplicationPage from "./pages/DriverApplicationPage";
@@ -107,6 +108,7 @@ const App = () => (
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/security" element={<SecurityPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/update-user-type" element={<UpdateUserTypePage />} />
             <Route path="/driver-application" element={<DriverApplicationPage />} />
