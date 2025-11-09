@@ -230,8 +230,10 @@ const ProfilePage: React.FC = () => {
               <img
                 src="/account-info-background.png"
                 alt="Account information background"
-                className="absolute inset-0 h-full w-full object-cover object-center"
+                className="absolute inset-0 h-full w-full object-cover object-center brightness-130 saturate-125"
               />
+              <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-slate-950/25 to-slate-950/70" />
+              <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25)_0%,_rgba(15,23,42,0.65)_60%,_rgba(15,23,42,0.85)_100%)]" />
               <div className="relative p-8 space-y-6 text-white">
                 <div>
                   <h2 className="text-3xl font-bold">Account Information</h2>
@@ -240,15 +242,15 @@ const ProfilePage: React.FC = () => {
                   </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 shadow-inner">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-sm p-4 shadow-inner">
                     <Label className="text-white/75">User Type</Label>
-                    <div className="mt-3 rounded-xl bg-black/30 px-3 py-2 font-semibold capitalize text-white">
+                    <div className="mt-3 rounded-xl bg-black/40 px-3 py-2 font-semibold capitalize text-white">
                       {profile?.user_type || 'customer'}
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/10 p-4 shadow-inner">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-sm p-4 shadow-inner">
                     <Label className="text-white/75">Account Created</Label>
-                    <div className="mt-3 rounded-xl bg-black/30 px-3 py-2 font-semibold text-white">
+                    <div className="mt-3 rounded-xl bg-black/40 px-3 py-2 font-semibold text-white">
                       {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
