@@ -257,10 +257,12 @@ const ProfilePage: React.FC = () => {
               <img
                 src="/security-settings-modal-background.jpg"
                 alt="Security settings background"
-                className="absolute inset-0 h-full w-full object-cover object-[center_top] scale-105 brightness-150 contrast-150 saturate-150"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/25 to-slate-950/75" />
-              <div className="absolute inset-0 mix-blend-screen opacity-70 bg-[radial-gradient(circle_at_top,_rgba(255,200,80,0.65)_0%,_rgba(255,120,20,0.2)_40%,_rgba(0,0,0,0)_70%)]" />
+              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/25 to-slate-950/80" />
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-950/55 via-transparent to-transparent" />
+              <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)]" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
