@@ -230,27 +230,37 @@ const ProfilePage: React.FC = () => {
               <img
                 src="/account-info-background.png"
                 alt="Account information background"
-                className="absolute inset-0 h-full w-full object-cover object-center brightness-130 saturate-125"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-white/10 via-slate-950/25 to-slate-950/70" />
-              <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.25)_0%,_rgba(15,23,42,0.65)_60%,_rgba(15,23,42,0.85)_100%)]" />
-              <div className="relative p-8 space-y-6 text-white">
+              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/35 to-slate-950/80" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/50 via-transparent to-transparent" />
+              <div className="absolute inset-0 mix-blend-screen opacity-65 bg-[radial-gradient(circle_at_top,_rgba(109,185,255,0.5)_0%,_rgba(15,23,42,0)_55%)]" />
+              <div className="relative p-10 text-center space-y-8 text-white">
+                <div className="flex items-center justify-center">
+                  <div className="relative h-20 w-20">
+                    <div className="absolute inset-0 rounded-full bg-sky-500/30 blur-xl animate-pulse" />
+                    <div className="relative z-10 flex h-full w-full items-center justify-center rounded-full border border-sky-300/50 bg-black/40 shadow-2xl">
+                      <Settings className="h-10 w-10 text-sky-200" />
+                    </div>
+                  </div>
+                </div>
                 <div>
-                  <h2 className="text-3xl font-bold">Account Information</h2>
+                  <h2 className="text-3xl font-bold tracking-tight">Account Information</h2>
                   <p className="text-white/80">
                     View your account details and user type
                   </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-sm p-4 shadow-inner">
-                    <Label className="text-white/75">User Type</Label>
-                    <div className="mt-3 rounded-xl bg-black/40 px-3 py-2 font-semibold capitalize text-white">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto text-left">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md p-6 shadow-xl transition hover:border-white/20">
+                    <Label className="text-white/70 uppercase tracking-wide text-xs">User Type</Label>
+                    <div className="mt-3 rounded-xl bg-black/40 px-4 py-3 text-lg font-semibold capitalize text-white">
                       {profile?.user_type || 'customer'}
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-sm p-4 shadow-inner">
-                    <Label className="text-white/75">Account Created</Label>
-                    <div className="mt-3 rounded-xl bg-black/40 px-3 py-2 font-semibold text-white">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-md p-6 shadow-xl transition hover:border-white/20">
+                    <Label className="text-white/70 uppercase tracking-wide text-xs">Account Created</Label>
+                    <div className="mt-3 rounded-xl bg-black/40 px-4 py-3 text-lg font-semibold text-white">
                       {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : 'Unknown'}
                     </div>
                   </div>
