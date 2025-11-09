@@ -232,8 +232,6 @@ const ProfilePage: React.FC = () => {
                 alt="Account information background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-slate-950/55 backdrop-blur-[1px]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/35 to-slate-950/75" />
               <div className="relative p-8 space-y-6 text-white">
                 <div>
                   <h2 className="text-3xl font-bold">Account Information</h2>
