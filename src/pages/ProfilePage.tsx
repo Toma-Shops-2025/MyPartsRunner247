@@ -146,8 +146,6 @@ const ProfilePage: React.FC = () => {
                 alt="Profile picture background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/25 to-slate-950/85" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight">Profile Picture</h2>
@@ -171,8 +169,6 @@ const ProfilePage: React.FC = () => {
                 alt="Personal information background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/30 to-slate-950/80" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight">Personal Information</h2>
