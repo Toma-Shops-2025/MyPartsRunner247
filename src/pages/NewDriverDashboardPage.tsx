@@ -682,19 +682,28 @@ const NewDriverDashboardPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="relative min-h-screen overflow-hidden text-white">
+      <div className="absolute inset-0 -z-20">
+        <img
+          src="/driver-dashboard-background.png"
+          alt="Driver dashboard background"
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-slate-950/65 backdrop-blur-[2px]" />
+
       <NewHeader />
       <PushNotificationPrompt />
       <DriverNotificationSystem />
       
-            <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-teal-400 mb-2">Driver Dashboard</h1>                                                                           
-          <p className="text-gray-300">Welcome back, {profile?.full_name || 'Driver'}!</p>                                                                      
+          <h1 className="text-3xl font-bold text-teal-300 mb-2 drop-shadow-lg">Driver Dashboard</h1>
+          <p className="text-gray-200">Welcome back, {profile?.full_name || 'Driver'}!</p>
         </div>
 
         {/* Location Tracking Controls - Moved to top for visibility */}
-        <Card className="bg-gray-800 border-gray-700 mb-8">
+        <Card className="bg-slate-900/80 border-slate-700 mb-8 backdrop-blur">
           <CardHeader>
             <CardTitle className="flex items-center text-white">
               <MapPin className="w-6 h-6 text-teal-400 mr-2" />
@@ -710,7 +719,7 @@ const NewDriverDashboardPage: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {isTracking ? (
-                <div className="flex items-center justify-between p-4 bg-green-900 border border-green-700 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-green-900/80 border border-green-700 rounded-lg backdrop-blur">
                   <div className="flex items-center">
                     <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse mr-3"></div>
                     <div>
@@ -727,7 +736,7 @@ const NewDriverDashboardPage: React.FC = () => {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-4 bg-gray-700 border border-gray-600 rounded-lg">
+                <div className="flex items-center justify-between p-4 bg-slate-800/80 border border-slate-600 rounded-lg backdrop-blur">
                   <div className="flex items-center">
                     <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
                     <div>
@@ -766,8 +775,8 @@ const NewDriverDashboardPage: React.FC = () => {
         {/* Stripe Account Status */}
         {hasStripeAccount ? (
           <div className="mb-8">
-            <Card className="bg-green-900 border-green-700">
-              <CardContent className="p-6">
+            <Card className="bg-green-900/85 border-green-700 backdrop-blur">
+              <CardContent className="p-6 text-white">
                 <div className="flex items-center">
                   <CheckCircle className="w-8 h-8 text-green-400 mr-4" />
                   <div>
@@ -786,7 +795,7 @@ const NewDriverDashboardPage: React.FC = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-slate-900/80 border-slate-700 backdrop-blur">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <DollarSign className="w-8 h-8 text-green-400 mr-4" />
@@ -800,7 +809,7 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-slate-900/80 border-slate-700 backdrop-blur">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <Package className="w-8 h-8 text-blue-400 mr-4" />
@@ -814,7 +823,7 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-slate-900/80 border-slate-700 backdrop-blur">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <Clock className="w-8 h-8 text-orange-400 mr-4" />
@@ -828,7 +837,7 @@ const NewDriverDashboardPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gray-800 border-gray-700">
+          <Card className="bg-slate-900/80 border-slate-700 backdrop-blur">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <Star className="w-8 h-8 text-yellow-400 mr-4" />
@@ -844,7 +853,7 @@ const NewDriverDashboardPage: React.FC = () => {
         </div>
 
         {/* Active Orders */}
-        <Card className="mb-8 bg-gray-800 border-gray-700">
+        <Card className="mb-8 bg-slate-900/80 border-slate-700 backdrop-blur">
           <CardHeader>
             <CardTitle className="flex items-center text-white">
               <Package className="w-6 h-6 text-teal-400 mr-2" />
@@ -855,7 +864,7 @@ const NewDriverDashboardPage: React.FC = () => {
             {activeOrders.length > 0 ? (
               <div className="space-y-4">
                 {activeOrders.map((order) => (
-                  <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                  <div key={order.id} className="border border-slate-600 rounded-lg p-4 bg-slate-800/80 backdrop-blur">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold text-white">Order #{order.id.slice(0, 8)}</h3>
@@ -945,7 +954,7 @@ const NewDriverDashboardPage: React.FC = () => {
         </Card>
 
         {/* Available Orders */}
-        <Card className="mb-8 bg-gray-800 border-gray-700">
+        <Card className="mb-8 bg-slate-900/80 border-slate-700 backdrop-blur">
           <CardHeader>
             <CardTitle className="flex items-center text-white">
               <MapPin className="w-6 h-6 text-teal-400 mr-2" />
@@ -962,7 +971,7 @@ const NewDriverDashboardPage: React.FC = () => {
             ) : (
               <div className="space-y-4">
                 {availableOrders.map((order) => (
-                  <div key={order.id} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                  <div key={order.id} className="border border-slate-600 rounded-lg p-4 bg-slate-800/80 backdrop-blur">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-semibold text-white">Order #{order.id.slice(0, 8)}</h3>
