@@ -463,14 +463,12 @@ const handlePasswordReset = async () => {
           </TabsContent>
 
           <TabsContent value="security" className="space-y-6">
-            <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
+            <div className="relative overflow-hidden rounded-3xl border border-slate-800 shadow-2xl">
               <img
-                src="/security-settings-modal-background.jpg"
+                src="/security-settings-tab-background.png"
                 alt="Security settings background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 backdrop-blur-[2px] pointer-events-none" />
-              <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)] pointer-events-none" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
