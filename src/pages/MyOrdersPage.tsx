@@ -53,13 +53,20 @@ const MyOrdersPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'delivered': return 'bg-green-100 text-green-800';
-      case 'in_transit': return 'bg-blue-100 text-blue-800';
-      case 'accepted': return 'bg-purple-100 text-purple-800';
-      case 'picked_up': return 'bg-orange-100 text-orange-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'delivered':
+        return 'bg-emerald-500/20 text-emerald-200 border border-emerald-400/40';
+      case 'in_transit':
+        return 'bg-sky-500/20 text-sky-200 border border-sky-400/40';
+      case 'accepted':
+        return 'bg-purple-500/20 text-purple-200 border border-purple-400/40';
+      case 'picked_up':
+        return 'bg-orange-500/20 text-orange-200 border border-orange-400/40';
+      case 'pending':
+        return 'bg-yellow-500/20 text-yellow-200 border border-yellow-400/40';
+      case 'cancelled':
+        return 'bg-red-500/20 text-red-200 border border-red-400/40';
+      default:
+        return 'bg-white/10 text-white/90 border border-white/20';
     }
   };
 
@@ -133,10 +140,10 @@ const MyOrdersPage: React.FC = () => {
 
   if (loading || ordersLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your orders...</p>
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-400 mx-auto"></div>
+          <p className="text-white/80">Loading your orders...</p>
         </div>
       </div>
     );
@@ -147,30 +154,41 @@ const MyOrdersPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-        <NewHeader />
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+    <div className="relative min-h-screen overflow-hidden text-white">
+      <div className="absolute inset-0 -z-20">
+        <img
+          src="/my-orders-background.png"
+          alt="My orders background"
+          className="h-full w-full object-cover object-center"
+        />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-slate-950/45" />
+
+      <NewHeader />
+      <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="mb-10">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
-            className="mb-4 text-gray-600 hover:text-gray-900"
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/50 px-4 py-2 text-sm font-medium text-white transition hover:bg-black/60"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <p className="text-gray-600">Track and manage your delivery orders</p>
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg">My Orders</h1>
+          <p className="text-white/80">
+            Track delivery progress, view driver details, and manage tips for each order.
+          </p>
         </div>
 
         <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="hover:shadow-lg transition-shadow">
+            <Card key={order.id} className="hover:shadow-lg transition-shadow bg-black/45 border border-white/15 text-white backdrop-blur">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg">Order #{order.id.slice(0, 8)}</CardTitle>
-                    <p className="text-sm text-gray-500">
+                    <CardTitle className="text-lg text-white">Order #{order.id.slice(0, 8)}</CardTitle>
+                    <p className="text-sm text-white/70">
                       {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
                     </p>
                   </div>
@@ -178,48 +196,50 @@ const MyOrdersPage: React.FC = () => {
                     {getStatusText(order.status)}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">{getStatusDescription(order.status)}</p>
+                <p className="text-sm text-white/75 mt-2">
+                  {getStatusDescription(order.status)}
+                </p>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-white/70">
                       <Package className="mr-2 h-4 w-4" />
                       Items
                     </div>
-                    <p className="font-medium">{order.item_description || 'No description'}</p>
+                    <p className="font-semibold text-white">{order.item_description || 'No description'}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-white/70">
                       <MapPin className="mr-2 h-4 w-4" />
                       Pickup
                     </div>
-                    <p className="font-medium">{order.pickup_address}</p>
+                    <p className="font-semibold text-white">{order.pickup_address}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-white/70">
                       <MapPin className="mr-2 h-4 w-4" />
                       Delivery
                     </div>
-                    <p className="font-medium">{order.delivery_address}</p>
+                    <p className="font-semibold text-white">{order.delivery_address}</p>
                   </div>
 
                   <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
+                    <div className="flex items-center text-sm text-white/70">
                       <DollarSign className="mr-2 h-4 w-4" />
                       Total
                     </div>
-                    <p className="font-medium">${parseFloat(order.total).toFixed(2)}</p>
+                    <p className="font-semibold text-white">${parseFloat(order.total).toFixed(2)}</p>
                   </div>
                 </div>
 
                 {order.driver_id && (
                   <div className="mt-4 pt-4 border-t">
                     <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm text-gray-600">
+                      <User className="h-4 w-4 text-white/70" />
+                      <span className="text-sm text-white/80">
                         Driver: <span className="font-medium">Assigned (ID: {order.driver_id.slice(0, 8)})</span>
                       </span>
                     </div>
@@ -263,24 +283,26 @@ const MyOrdersPage: React.FC = () => {
         </div>
 
         {orders.length === 0 && (
-          <Card>
-            <CardContent className="text-center py-12">
-              <Package className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
-              <p className="text-gray-600">Your delivery orders will appear here once you place them.</p>
+          <Card className="bg-black/45 border border-white/15 text-white backdrop-blur text-center">
+            <CardContent className="py-12">
+              <Package className="mx-auto h-12 w-12 text-white/40 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No orders yet</h3>
+              <p className="text-white/70">
+                When you place a delivery, it will appear here for easy tracking.
+              </p>
             </CardContent>
           </Card>
         )}
 
         {/* Order Details Modal */}
         {selectedOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-900 text-white border border-white/10">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle>Order Details</CardTitle>
-                    <p className="text-sm text-gray-500">Order #{selectedOrder.id.slice(0, 8)}</p>
+                    <p className="text-sm text-white/60">Order #{selectedOrder.id.slice(0, 8)}</p>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -294,57 +316,59 @@ const MyOrdersPage: React.FC = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Status</label>
+                    <label className="text-sm font-medium text-white/70">Status</label>
                     <Badge className={getStatusColor(selectedOrder.status)}>
                       {getStatusText(selectedOrder.status)}
                     </Badge>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Total</label>
-                    <p className="font-medium">${parseFloat(selectedOrder.total).toFixed(2)}</p>
+                    <label className="text-sm font-medium text-white/70">Total</label>
+                    <p className="font-medium text-white">${parseFloat(selectedOrder.total).toFixed(2)}</p>
                   </div>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Items</label>
-                  <p className="mt-1">{selectedOrder.item_description || 'No description'}</p>
+                  <label className="text-sm font-medium text-white/70">Items</label>
+                  <p className="mt-1 text-white">{selectedOrder.item_description || 'No description'}</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Pickup Address</label>
-                    <p className="mt-1">{selectedOrder.pickup_address}</p>
+                    <label className="text-sm font-medium text-white/70">Pickup Address</label>
+                    <p className="mt-1 text-white">{selectedOrder.pickup_address}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Delivery Address</label>
-                    <p className="mt-1">{selectedOrder.delivery_address}</p>
+                    <label className="text-sm font-medium text-white/70">Delivery Address</label>
+                    <p className="mt-1 text-white">{selectedOrder.delivery_address}</p>
                   </div>
                 </div>
                 
                 {selectedOrder.driver_id && (
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Driver</label>
+                    <label className="text-sm font-medium text-white/70">Driver</label>
                     <div className="mt-1 flex items-center justify-between">
-                      <span>Driver Assigned (ID: {selectedOrder.driver_id.slice(0, 8)})</span>
+                      <span className="text-white">
+                        Driver Assigned (ID: {selectedOrder.driver_id.slice(0, 8)})
+                      </span>
                     </div>
                   </div>
                 )}
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Order Timeline</label>
+                  <label className="text-sm font-medium text-white/70">Order Timeline</label>
                   <div className="mt-2 space-y-2">
-                    <div className="flex items-center text-sm">
+                    <div className="flex items-center text-sm text-white/90">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                       <span>Order placed - {new Date(selectedOrder.created_at).toLocaleString()}</span>
                     </div>
                     {selectedOrder.status !== 'pending' && (
-                      <div className="flex items-center text-sm">
+                      <div className="flex items-center text-sm text-white/90">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                         <span>Driver assigned - {selectedOrder.driver_id ? 'Driver ID: ' + selectedOrder.driver_id.slice(0, 8) : 'Pending'}</span>
                       </div>
                     )}
                     {selectedOrder.status === 'delivered' && (
-                      <div className="flex items-center text-sm">
+                      <div className="flex items-center text-sm text-white/90">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
                         <span>Order delivered - {new Date(selectedOrder.updated_at || selectedOrder.created_at).toLocaleString()}</span>
                       </div>
@@ -358,8 +382,8 @@ const MyOrdersPage: React.FC = () => {
 
         {/* Tip Modal */}
         {showTipModal && selectedOrder && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md">
+          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+            <Card className="w-full max-w-md bg-slate-900 text-white border border-white/10">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
@@ -367,7 +391,7 @@ const MyOrdersPage: React.FC = () => {
                       <Heart className="w-5 h-5 text-pink-500" />
                       Add Tip for Driver
                     </CardTitle>
-                    <p className="text-sm text-gray-500">Order #{selectedOrder.id.slice(0, 8)}</p>
+                    <p className="text-sm text-white/60">Order #{selectedOrder.id.slice(0, 8)}</p>
                   </div>
                   <Button 
                     variant="ghost" 
@@ -379,19 +403,23 @@ const MyOrdersPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600 mb-2">Current order total: ${parseFloat(selectedOrder.total).toFixed(2)}</p>
+                <div className="bg-white/5 p-4 rounded-lg border border-white/10">
+                  <p className="text-sm text-white/80 mb-2">
+                    Current order total: ${parseFloat(selectedOrder.total).toFixed(2)}
+                  </p>
                   {selectedOrder.tip_amount > 0 && (
-                    <p className="text-sm text-pink-600">Current tip: ${parseFloat(selectedOrder.tip_amount).toFixed(2)}</p>
+                    <p className="text-sm text-pink-300">
+                      Current tip: ${parseFloat(selectedOrder.tip_amount).toFixed(2)}
+                    </p>
                   )}
                 </div>
                 
                 <div>
-                  <Label htmlFor="tipAmount" className="text-gray-900">
+                  <Label htmlFor="tipAmount" className="text-white/80">
                     Additional Tip Amount
                   </Label>
                   <div className="flex items-center gap-2 mt-1">
-                    <DollarSign className="w-4 h-4 text-gray-500" />
+                    <DollarSign className="w-4 h-4 text-white/60" />
                     <Input
                       id="tipAmount"
                       type="number"
@@ -400,10 +428,10 @@ const MyOrdersPage: React.FC = () => {
                       placeholder="0.00"
                       value={tipAmount}
                       onChange={(e) => setTipAmount(e.target.value)}
-                      className="bg-white border-gray-300 text-gray-900"
+                      className="bg-white/10 border-white/20 text-white placeholder-white/50"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-white/60 mt-1">
                     Tips go directly to your driver and are greatly appreciated!
                   </p>
                 </div>
