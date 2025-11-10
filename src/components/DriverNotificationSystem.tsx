@@ -188,7 +188,11 @@ const DriverNotificationSystem: React.FC = () => {
               variant={filter === 'unread' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilter('unread')}
-              className={filter === 'unread' ? '' : 'border-white/40 text-white hover:bg-white/15'}
+              className={
+                filter === 'unread'
+                  ? 'text-white'
+                  : 'border-white/40 text-white/90 hover:text-white hover:bg-white/15'
+              }
             >
               Unread
             </Button>
@@ -196,7 +200,11 @@ const DriverNotificationSystem: React.FC = () => {
               variant={filter === 'all' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilter('all')}
-              className={filter === 'all' ? '' : 'border-white/40 text-white hover:bg-white/15'}
+              className={
+                filter === 'all'
+                  ? 'text-white'
+                  : 'border-white/40 text-white/90 hover:text-white hover:bg-white/15'
+              }
             >
               All Notifications
             </Button>
