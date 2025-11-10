@@ -127,7 +127,52 @@ const ProfilePage: React.FC = () => {
   const stripeConnected = Boolean((profile as any)?.stripe_connected);
   const verificationStatus =
     (profile as any)?.verification_status || (profile as any)?.status || 'pending';
-  const isOnline = Boolean((profile as any)?.is_online);
+const isOnline = Boolean((profile as any)?.is_online);
+const handleNavigateToNotifications = () => {
+  setActiveTab('notifications');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+const handleNavigateToSecurity = () => {
+  setActiveTab('security');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+const handleNavigateToProfile = () => {
+  setActiveTab('profile');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+const handleNavigateToDashboard = () => {
+  navigate('/driver-dashboard');
+};
+const handleOpenSecurityPage = () => {
+  navigate('/security');
+};
+const handlePasswordReset = async () => {
+  if (!user?.email) {
+    toast({
+      title: 'Unable to start password reset',
+      description: 'No email found for this profile.',
+      variant: 'destructive',
+    });
+    return;
+  }
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/auth/callback?type=recovery`,
+    });
+    if (error) throw error;
+    toast({
+      title: 'Password reset link sent',
+      description: `Check ${user.email} for instructions to update your password.`,
+    });
+  } catch (error) {
+    console.error(error);
+    toast({
+      title: 'Password reset failed',
+      description: 'Please try again later or contact support.',
+      variant: 'destructive',
+    });
+  }
+};
 
   const toggleNotificationSetting = (key: keyof typeof notificationSettings) => {
     setNotificationSettings((prev) => {
@@ -340,9 +385,8 @@ const ProfilePage: React.FC = () => {
                       <p className="text-xs text-white/60">Used for notifications and sign-in.</p>
                       <Button
                         size="sm"
-                        variant="secondary"
-                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
-                        onClick={() => setActiveTab('profile')}
+                        className="bg-slate-800 text-white border border-white/20 hover:bg-slate-700 shadow"
+                        onClick={handleNavigateToProfile}
                       >
                         Update personal info
                       </Button>
@@ -366,9 +410,8 @@ const ProfilePage: React.FC = () => {
                       </p>
                       <Button
                         size="sm"
-                        variant="secondary"
-                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
-                        onClick={() => navigate('/driver-dashboard')}
+                        className="bg-slate-800 text-white border border-white/20 hover:bg-slate-700 shadow"
+                        onClick={handleNavigateToDashboard}
                       >
                         Manage payout settings
                       </Button>
@@ -390,9 +433,8 @@ const ProfilePage: React.FC = () => {
                       </p>
                       <Button
                         size="sm"
-                        variant="secondary"
-                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
-                        onClick={() => navigate('/driver-dashboard')}
+                        className="bg-slate-800 text-white border border-white/20 hover:bg-slate-700 shadow"
+                        onClick={handleNavigateToDashboard}
                       >
                         Open driver dashboard
                       </Button>
@@ -403,8 +445,8 @@ const ProfilePage: React.FC = () => {
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-4">
                   <Button
                     size="sm"
-                    className="bg-sky-500 hover:bg-sky-600 text-white shadow-lg"
-                    onClick={() => setActiveTab('notifications')}
+                    className="bg-sky-500 hover:bg-sky-600 text-white font-semibold shadow-lg"
+                    onClick={handleNavigateToNotifications}
                   >
                     Manage Notification Settings
                   </Button>
@@ -412,7 +454,7 @@ const ProfilePage: React.FC = () => {
                     size="sm"
                     variant="outline"
                     className="border-white/40 text-white hover:bg-white/15"
-                    onClick={() => setActiveTab('security')}
+                    onClick={handleNavigateToSecurity}
                   >
                     Review Security Tips
                   </Button>
@@ -446,10 +488,18 @@ const ProfilePage: React.FC = () => {
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Button variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-900/50 px-6">
+                  <Button
+                    variant="secondary"
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-900/50 px-6"
+                    onClick={handlePasswordReset}
+                  >
                     Change Password
                   </Button>
-                  <Button variant="outline" className="border-white/60 text-white bg-white/15 hover:bg-white/25 backdrop-blur-sm shadow-lg">
+                  <Button
+                    variant="outline"
+                    className="border-white/60 text-white bg-white/15 hover:bg-white/25 backdrop-blur-sm shadow-lg"
+                    onClick={handleOpenSecurityPage}
+                  >
                     View Security Tips
                   </Button>
                 </div>
