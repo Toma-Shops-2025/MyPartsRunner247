@@ -294,28 +294,28 @@ const ProfilePage: React.FC = () => {
                 alt="Security settings background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 backdrop-blur-[2px]" />
               <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)]" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
-                    <div className="absolute inset-0 rounded-full bg-amber-500/30 blur-xl animate-pulse" />
-                    <div className="relative z-10 flex h-full w-full items-center justify-center rounded-full border border-amber-400/50 bg-black/40 shadow-2xl">
+                    <div className="absolute inset-0 rounded-full bg-amber-500/35 blur-xl animate-pulse" />
+                    <div className="relative z-10 flex h-full w-full items-center justify-center rounded-full border border-amber-300/60 bg-black/55 shadow-2xl">
                       <Shield className="h-10 w-10 text-amber-300" />
                     </div>
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight">Security Settings</h2>
-                  <p className="text-white/80 max-w-xl mx-auto">
+                  <h2 className="text-3xl font-bold tracking-tight drop-shadow-xl">Security Settings</h2>
+                  <p className="text-white/90 max-w-xl mx-auto drop-shadow">
                     Manage two-factor authentication, password resets, and other account protection options through your authentication provider.
                   </p>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <Button variant="secondary" className="bg-amber-500/80 hover:bg-amber-500 text-black px-6">
+                  <Button variant="secondary" className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-lg shadow-amber-900/50 px-6">
                     Change Password
                   </Button>
-                  <Button variant="outline" className="border-white/60 text-white/90 bg-white/10 hover:bg-white/20 backdrop-blur-sm">
+                  <Button variant="outline" className="border-white/60 text-white bg-white/15 hover:bg-white/25 backdrop-blur-sm shadow-lg">
                     View Security Tips
                   </Button>
                 </div>
@@ -330,18 +330,18 @@ const ProfilePage: React.FC = () => {
                 alt="Notification preferences background"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-slate-950/45 backdrop-blur-[1px]" />
-              <div className="relative p-8 space-y-8">
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/70 backdrop-blur-[2px]" />
+              <div className="relative p-8 space-y-8 text-white">
                 <div>
-                  <h2 className="text-3xl font-bold text-white">Notification Preferences</h2>
-                  <p className="text-white/80">
+                  <h2 className="text-3xl font-bold drop-shadow-xl">Notification Preferences</h2>
+                  <p className="text-white/90 drop-shadow">
                     Control how you receive alerts and stay in the loop with your deliveries.
                   </p>
                 </div>
 
                 {/* Current Status */}
-                <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
-                  <h4 className="font-semibold mb-2 text-white">Current Status</h4>
+                <div className="rounded-2xl border border-white/15 bg-black/45 backdrop-blur-md p-4 shadow-xl">
+                  <h4 className="font-semibold mb-2 text-white drop-shadow">Current Status</h4>
                   <div className="flex items-center space-x-3 text-white/90">
                     <div className={`w-3 h-3 rounded-full ${
                       'Notification' in window && Notification.permission === 'granted' 
@@ -363,33 +363,33 @@ const ProfilePage: React.FC = () => {
 
                 {/* Notification Types */}
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-white">Notification Types</h4>
+                  <h4 className="font-semibold text-white drop-shadow">Notification Types</h4>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                    <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="text-sm font-semibold">Order Updates</div>
-                          <div className="text-xs text-white/70 mt-1">New orders, status changes, delivery confirmations</div>
+                          <div className="text-sm font-semibold drop-shadow">Order Updates</div>
+                          <div className="text-xs text-white/80 mt-1">New orders, status changes, delivery confirmations</div>
                         </div>
-                        <div className="w-4 h-4 bg-green-400 rounded-full"></div>
+                        <div className="w-4 h-4 bg-green-400 rounded-full shadow-lg shadow-green-900/50"></div>
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                    <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="text-sm font-semibold">Driver Notifications</div>
-                          <div className="text-xs text-white/70 mt-1">Earnings updates, schedule changes, important announcements</div>
+                          <div className="text-sm font-semibold drop-shadow">Driver Notifications</div>
+                          <div className="text-xs text-white/80 mt-1">Earnings updates, schedule changes, important announcements</div>
                         </div>
-                        <div className="w-4 h-4 bg-green-400 rounded-full"></div>
+                        <div className="w-4 h-4 bg-green-400 rounded-full shadow-lg shadow-green-900/50"></div>
                       </div>
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-white shadow-inner">
+                    <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className="text-sm font-semibold">System Alerts</div>
-                          <div className="text-xs text-white/70 mt-1">Maintenance notifications, security alerts</div>
+                          <div className="text-sm font-semibold drop-shadow">System Alerts</div>
+                          <div className="text-xs text-white/80 mt-1">Maintenance notifications, security alerts</div>
                         </div>
-                        <div className="w-4 h-4 bg-amber-400 rounded-full"></div>
+                        <div className="w-4 h-4 bg-amber-400 rounded-full shadow-lg shadow-amber-900/60"></div>
                       </div>
                     </div>
                   </div>
