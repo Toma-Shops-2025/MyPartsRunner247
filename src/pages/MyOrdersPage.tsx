@@ -162,8 +162,6 @@ const MyOrdersPage: React.FC = () => {
           className="h-full w-full object-cover object-center"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/65 via-black/45 to-black/65" />
-
       <NewHeader />
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-10">
@@ -175,20 +173,27 @@ const MyOrdersPage: React.FC = () => {
             <ArrowLeft className="w-4 h-4" />
             Back
           </Button>
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg">My Orders</h1>
-          <p className="text-white/80">
+          <h1 className="text-4xl font-bold text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+            My Orders
+          </h1>
+          <p className="text-white/85 drop-shadow-[0_3px_8px_rgba(0,0,0,0.6)]">
             Track delivery progress, view driver details, and manage tips for each order.
           </p>
         </div>
 
         <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="hover:shadow-lg transition-shadow bg-black/40 border border-white/15 text-white backdrop-blur">
+            <Card
+              key={order.id}
+              className="hover:shadow-xl transition-shadow bg-black/45 border border-white/20 text-white backdrop-blur"
+            >
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-xl text-white drop-shadow">Order #{order.id.slice(0, 8)}</CardTitle>
-                    <p className="text-sm text-white/80 drop-shadow">
+                    <CardTitle className="text-xl text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)]">
+                      Order #{order.id.slice(0, 8)}
+                    </CardTitle>
+                    <p className="text-sm text-white/85 drop-shadow-[0_3px_8px_rgba(0,0,0,0.6)]">
                       {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
                     </p>
                   </div>
@@ -196,7 +201,7 @@ const MyOrdersPage: React.FC = () => {
                     {getStatusText(order.status)}
                   </Badge>
                 </div>
-                <p className="text-sm text-white/80 mt-2 drop-shadow">
+                <p className="text-sm text-white/85 mt-2 drop-shadow-[0_3px_8px_rgba(0,0,0,0.6)]">
                   {getStatusDescription(order.status)}
                 </p>
               </CardHeader>
@@ -207,7 +212,9 @@ const MyOrdersPage: React.FC = () => {
                       <Package className="mr-2 h-4 w-4" />
                       Items
                     </div>
-                    <p className="font-semibold text-white">{order.item_description || 'No description'}</p>
+                    <p className="font-semibold text-white drop-shadow-[0_3px_6px_rgba(0,0,0,0.55)]">
+                      {order.item_description || 'No description'}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -215,7 +222,9 @@ const MyOrdersPage: React.FC = () => {
                       <MapPin className="mr-2 h-4 w-4" />
                       Pickup
                     </div>
-                    <p className="font-semibold text-white">{order.pickup_address}</p>
+                    <p className="font-semibold text-white drop-shadow-[0_3px_6px_rgba(0,0,0,0.55)]">
+                      {order.pickup_address}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -223,7 +232,9 @@ const MyOrdersPage: React.FC = () => {
                       <MapPin className="mr-2 h-4 w-4" />
                       Delivery
                     </div>
-                    <p className="font-semibold text-white">{order.delivery_address}</p>
+                    <p className="font-semibold text-white drop-shadow-[0_3px_6px_rgba(0,0,0,0.55)]">
+                      {order.delivery_address}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
@@ -231,15 +242,17 @@ const MyOrdersPage: React.FC = () => {
                       <DollarSign className="mr-2 h-4 w-4" />
                       Total
                     </div>
-                    <p className="font-semibold text-white">${parseFloat(order.total).toFixed(2)}</p>
+                    <p className="font-semibold text-white drop-shadow-[0_3px_6px_rgba(0,0,0,0.55)]">
+                      ${parseFloat(order.total).toFixed(2)}
+                    </p>
                   </div>
                 </div>
 
                 {order.driver_id && (
                   <div className="mt-4 pt-4 border-t">
                     <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-white/70" />
-                      <span className="text-sm text-white/80">
+                      <User className="h-4 w-4 text-white/80" />
+                      <span className="text-sm text-white/85 drop-shadow-[0_3px_6px_rgba(0,0,0,0.6)]">
                         Driver: <span className="font-medium">Assigned (ID: {order.driver_id.slice(0, 8)})</span>
                       </span>
                     </div>
@@ -248,9 +261,12 @@ const MyOrdersPage: React.FC = () => {
 
                 <div className="mt-4 flex justify-end space-x-2">
                   {/* Show Track Order button for all active orders */}
-                  {(order.status === 'pending' || order.status === 'accepted' || order.status === 'picked_up' || order.status === 'in_transit') && (
-                    <Button 
-                      className="bg-teal-600 hover:bg-teal-700 text-white"
+                  {(order.status === 'pending' ||
+                    order.status === 'accepted' ||
+                    order.status === 'picked_up' ||
+                    order.status === 'in_transit') && (
+                    <Button
+                      className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-900/50"
                       size="sm"
                       onClick={() => navigate(`/track/${order.id}`)}
                     >
@@ -261,7 +277,7 @@ const MyOrdersPage: React.FC = () => {
                   {/* Show Add Tip button for delivered orders */}
                   {order.status === 'delivered' && (
                     <Button 
-                      className="bg-pink-600 hover:bg-pink-700 text-white"
+                      className="bg-pink-600 hover:bg-pink-700 text-white shadow-lg shadow-pink-900/50"
                       size="sm"
                       onClick={() => handleAddTip(order)}
                     >
@@ -273,6 +289,7 @@ const MyOrdersPage: React.FC = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => setSelectedOrder(order)}
+                    className="border-white/40 text-white hover:bg-white/15"
                   >
                     View Details
                   </Button>
