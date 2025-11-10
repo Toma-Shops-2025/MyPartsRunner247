@@ -162,7 +162,7 @@ const MyOrdersPage: React.FC = () => {
           className="h-full w-full object-cover object-center"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-slate-950/45" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/65 via-black/45 to-black/65" />
 
       <NewHeader />
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -183,12 +183,12 @@ const MyOrdersPage: React.FC = () => {
 
         <div className="space-y-6">
           {orders.map((order) => (
-            <Card key={order.id} className="hover:shadow-lg transition-shadow bg-black/45 border border-white/15 text-white backdrop-blur">
+            <Card key={order.id} className="hover:shadow-lg transition-shadow bg-black/40 border border-white/15 text-white backdrop-blur">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-lg text-white">Order #{order.id.slice(0, 8)}</CardTitle>
-                    <p className="text-sm text-white/70">
+                    <CardTitle className="text-xl text-white drop-shadow">Order #{order.id.slice(0, 8)}</CardTitle>
+                    <p className="text-sm text-white/80 drop-shadow">
                       {new Date(order.created_at).toLocaleDateString()} at {new Date(order.created_at).toLocaleTimeString()}
                     </p>
                   </div>
@@ -196,7 +196,7 @@ const MyOrdersPage: React.FC = () => {
                     {getStatusText(order.status)}
                   </Badge>
                 </div>
-                <p className="text-sm text-white/75 mt-2">
+                <p className="text-sm text-white/80 mt-2 drop-shadow">
                   {getStatusDescription(order.status)}
                 </p>
               </CardHeader>
@@ -283,11 +283,11 @@ const MyOrdersPage: React.FC = () => {
         </div>
 
         {orders.length === 0 && (
-          <Card className="bg-black/45 border border-white/15 text-white backdrop-blur text-center">
-            <CardContent className="py-12">
-              <Package className="mx-auto h-12 w-12 text-white/40 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No orders yet</h3>
-              <p className="text-white/70">
+          <Card className="bg-black/40 border border-white/15 text-white backdrop-blur text-center">
+            <CardContent className="py-12 space-y-3">
+              <Package className="mx-auto h-12 w-12 text-white/50 drop-shadow mb-4" />
+              <h3 className="text-lg font-semibold text-white drop-shadow">No orders yet</h3>
+              <p className="text-white/75 drop-shadow">
                 When you place a delivery, it will appear here for easy tracking.
               </p>
             </CardContent>
