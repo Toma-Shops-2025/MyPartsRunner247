@@ -248,8 +248,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           <div className="flex space-x-2">
             <Button
               onClick={() => fileInputRef.current?.click()}
-              variant="outline"
               size="sm"
+              className="bg-black/70 text-white border border-white/30 hover:bg-black/80 backdrop-blur shadow-lg"
             >
               <Camera className="h-4 w-4 mr-2" />
               Change Picture
@@ -261,7 +261,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
                 disabled={isUploading}
                 variant="outline"
                 size="sm"
-                className="text-red-600 hover:text-red-700"
+                className="text-red-500 border-red-400 hover:bg-red-500/10"
               >
                 <X className="h-4 w-4 mr-2" />
                 Remove
