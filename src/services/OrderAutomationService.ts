@@ -304,6 +304,27 @@ export class OrderAutomationService {
       await sendDriverPushNotification(driver.id, payload).catch((err) => {
         console.warn('Push notification failed', err);
       });
+
+      try {
+        await supabase
+          .from('driver_notifications')
+          .insert({
+            driver_id: driver.id,
+            type: 'in_app',
+            title: payload.title,
+            body: payload.body,
+            status: 'unread',
+            data: {
+              order_id: order.id,
+              total: order.total,
+              pickup_address: order.pickup_address,
+              delivery_address: order.delivery_address,
+              notification_type: type
+            }
+          });
+      } catch (notificationError) {
+        console.error('Failed to log driver notification:', notificationError);
+      }
     }
   }
 
