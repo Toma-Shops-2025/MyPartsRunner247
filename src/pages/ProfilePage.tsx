@@ -9,17 +9,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { User, Settings, Shield, Bell, ArrowLeft } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 
+type ProfileTab = 'profile' | 'account' | 'security' | 'notifications';
+
 const ProfilePage: React.FC = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ProfileTab>('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     full_name: profile?.full_name || '',
     phone: profile?.phone || '',
+  });
+  const [notificationSettings, setNotificationSettings] = useState({
+    orderUpdates: true,
+    driverUpdates: true,
+    systemAlerts: true,
   });
 
   // Sync form data with profile when profile changes
@@ -31,6 +40,21 @@ const ProfilePage: React.FC = () => {
       });
     }
   }, [profile]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('mpr-notification-preferences');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        setNotificationSettings((prev) => ({
+          ...prev,
+          ...parsed,
+        }));
+      }
+    } catch (error) {
+      console.warn('Failed to load notification preferences', error);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -100,6 +124,26 @@ const ProfilePage: React.FC = () => {
   };
 
   const userInitials = profile?.full_name?.charAt(0) || user.email?.charAt(0) || 'U';
+  const stripeConnected = Boolean((profile as any)?.stripe_connected);
+  const verificationStatus =
+    (profile as any)?.verification_status || (profile as any)?.status || 'pending';
+  const isOnline = Boolean((profile as any)?.is_online);
+
+  const toggleNotificationSetting = (key: keyof typeof notificationSettings) => {
+    setNotificationSettings((prev) => {
+      const updated = { ...prev, [key]: !prev[key] };
+      try {
+        localStorage.setItem('mpr-notification-preferences', JSON.stringify(updated));
+        toast({
+          title: 'Notification preference updated',
+          description: `${key.replace(/([A-Z])/g, ' $1')}: ${updated[key] ? 'enabled' : 'disabled'}`,
+        });
+      } catch (error) {
+        console.warn('Unable to persist notification preference', error);
+      }
+      return updated;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-900">
@@ -119,7 +163,7 @@ const ProfilePage: React.FC = () => {
           <p className="text-gray-400 mt-2">Manage your account settings and preferences</p>
         </div>
 
-        <Tabs defaultValue="profile" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as ProfileTab)} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
@@ -146,7 +190,7 @@ const ProfilePage: React.FC = () => {
                 alt="Profile picture background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50 backdrop-blur-[2px] pointer-events-none" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight drop-shadow-lg">Profile Picture</h2>
@@ -250,10 +294,10 @@ const ProfilePage: React.FC = () => {
                 alt="Account information background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/35 to-slate-950/80" />
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/50 via-transparent to-transparent" />
-              <div className="absolute inset-0 mix-blend-screen opacity-65 bg-[radial-gradient(circle_at_top,_rgba(109,185,255,0.5)_0%,_rgba(15,23,42,0)_55%)]" />
+              <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px] pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/35 to-slate-950/80 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-slate-950/50 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 mix-blend-screen opacity-65 bg-[radial-gradient(circle_at_top,_rgba(109,185,255,0.5)_0%,_rgba(15,23,42,0)_55%)] pointer-events-none" />
               <div className="relative p-10 text-center space-y-8 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
@@ -283,6 +327,96 @@ const ProfilePage: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                  <Card className="border-white/15 bg-black/35 backdrop-blur rounded-2xl shadow-lg">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xs font-semibold uppercase tracking-wide text-white/60">
+                        Account Email
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-lg font-semibold text-white">{user.email}</p>
+                      <p className="text-xs text-white/60">Used for notifications and sign-in.</p>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                        onClick={() => setActiveTab('profile')}
+                      >
+                        Update personal info
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-white/15 bg-black/35 backdrop-blur rounded-2xl shadow-lg">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xs font-semibold uppercase tracking-wide text-white/60">
+                        Stripe Payments
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className={`text-lg font-semibold ${stripeConnected ? 'text-emerald-300' : 'text-amber-200'}`}>
+                        {stripeConnected ? 'Connected' : 'Awaiting setup'}
+                      </p>
+                      <p className="text-xs text-white/60">
+                        {stripeConnected
+                          ? 'Payouts are routed to your connected Stripe account.'
+                          : 'Finish onboarding to receive payouts.'}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                        onClick={() => navigate('/driver-dashboard')}
+                      >
+                        Manage payout settings
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-white/15 bg-black/35 backdrop-blur rounded-2xl shadow-lg">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xs font-semibold uppercase tracking-wide text-white/60">
+                        Verification & Status
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className={`text-lg font-semibold ${isOnline ? 'text-emerald-300' : 'text-white'}`}>
+                        {isOnline ? 'Online' : 'Offline'}
+                      </p>
+                      <p className="text-xs text-white/60 capitalize">
+                        Verification: {verificationStatus}
+                      </p>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-white/15 text-white border border-white/30 hover:bg-white/25"
+                        onClick={() => navigate('/driver-dashboard')}
+                      >
+                        Open driver dashboard
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-4">
+                  <Button
+                    size="sm"
+                    className="bg-sky-500 hover:bg-sky-600 text-white shadow-lg"
+                    onClick={() => setActiveTab('notifications')}
+                  >
+                    Manage Notification Settings
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/40 text-white hover:bg-white/15"
+                    onClick={() => setActiveTab('security')}
+                  >
+                    Review Security Tips
+                  </Button>
+                </div>
               </div>
             </div>
           </TabsContent>
@@ -294,8 +428,8 @@ const ProfilePage: React.FC = () => {
                 alt="Security settings background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 backdrop-blur-[2px]" />
-              <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70 backdrop-blur-[2px] pointer-events-none" />
+              <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)] pointer-events-none" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
                   <div className="relative h-20 w-20">
@@ -330,7 +464,7 @@ const ProfilePage: React.FC = () => {
                 alt="Notification preferences background"
                 className="absolute inset-0 h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/70 backdrop-blur-[2px]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/45 to-black/70 backdrop-blur-[2px] pointer-events-none" />
               <div className="relative p-8 space-y-8 text-white">
                 <div>
                   <h2 className="text-3xl font-bold drop-shadow-xl">Notification Preferences</h2>
@@ -366,30 +500,48 @@ const ProfilePage: React.FC = () => {
                   <h4 className="font-semibold text-white drop-shadow">Notification Types</h4>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="text-sm font-semibold drop-shadow">Order Updates</div>
-                          <div className="text-xs text-white/80 mt-1">New orders, status changes, delivery confirmations</div>
+                          <div className="text-xs text-white/80 mt-1">
+                            New orders, status changes, delivery confirmations
+                          </div>
                         </div>
-                        <div className="w-4 h-4 bg-green-400 rounded-full shadow-lg shadow-green-900/50"></div>
+                        <Switch
+                          checked={notificationSettings.orderUpdates}
+                          onCheckedChange={() => toggleNotificationSetting('orderUpdates')}
+                          aria-label="Toggle order update notifications"
+                        />
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="text-sm font-semibold drop-shadow">Driver Notifications</div>
-                          <div className="text-xs text-white/80 mt-1">Earnings updates, schedule changes, important announcements</div>
+                          <div className="text-xs text-white/80 mt-1">
+                            Earnings updates, schedule changes, important announcements
+                          </div>
                         </div>
-                        <div className="w-4 h-4 bg-green-400 rounded-full shadow-lg shadow-green-900/50"></div>
+                        <Switch
+                          checked={notificationSettings.driverUpdates}
+                          onCheckedChange={() => toggleNotificationSetting('driverUpdates')}
+                          aria-label="Toggle driver notifications"
+                        />
                       </div>
                     </div>
                     <div className="rounded-2xl border border-white/15 bg-black/40 backdrop-blur-md p-4 text-white shadow-xl">
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-4">
                         <div>
                           <div className="text-sm font-semibold drop-shadow">System Alerts</div>
-                          <div className="text-xs text-white/80 mt-1">Maintenance notifications, security alerts</div>
+                          <div className="text-xs text-white/80 mt-1">
+                            Maintenance notifications, security alerts
+                          </div>
                         </div>
-                        <div className="w-4 h-4 bg-amber-400 rounded-full shadow-lg shadow-amber-900/60"></div>
+                        <Switch
+                          checked={notificationSettings.systemAlerts}
+                          onCheckedChange={() => toggleNotificationSetting('systemAlerts')}
+                          aria-label="Toggle system alerts"
+                        />
                       </div>
                     </div>
                   </div>
