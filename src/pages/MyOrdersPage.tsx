@@ -154,15 +154,16 @@ const MyOrdersPage: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden text-white">
-      <div className="absolute inset-0 -z-20">
-        <img
-          src="/my-orders-background.png"
-          alt="My orders background"
-          className="h-full w-full object-cover object-[center_top]"
-        />
-      </div>
-      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/45 via-black/25 to-black/50 pointer-events-none" />
+    <div
+      className="relative min-h-screen overflow-hidden text-white"
+      style={{
+        backgroundImage: 'url("/my-orders-background.png")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center top',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/35 to-black/60 pointer-events-none" />
       <NewHeader />
       <main className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-10">
