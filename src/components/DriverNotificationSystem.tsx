@@ -4,7 +4,8 @@ import { supabase } from '@/lib/supabase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Bell, ChevronDown, ChevronUp, Mail, Phone, WifiOff, CheckCircle, RefreshCcw, Inbox } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { Bell, ChevronDown, ChevronUp, Mail, Phone, WifiOff, CheckCircle, RefreshCcw } from 'lucide-react';
 
 type NotificationType = 'sms' | 'email' | 'in_app';
 type NotificationStatus = 'unread' | 'read' | 'sent' | 'failed';
@@ -78,11 +79,14 @@ const DriverNotificationSystem: React.FC = () => {
   }, [user, profile?.user_type, fetchNotifications]);
 
   const markAsRead = async (notificationId: string) => {
+    if (!user?.id) return;
+
     try {
       const { error } = await supabase
         .from('driver_notifications')
         .update({ status: 'read', read_at: new Date().toISOString() })
-        .eq('id', notificationId);
+        .eq('id', notificationId)
+        .eq('driver_id', user.id);
 
       if (error) throw error;
 
@@ -95,6 +99,11 @@ const DriverNotificationSystem: React.FC = () => {
       );
     } catch (error) {
       console.error('Error marking notification as read:', error);
+      toast({
+        title: 'Unable to update notification',
+        description: 'Please try again shortly.',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -135,10 +144,10 @@ const DriverNotificationSystem: React.FC = () => {
   const unreadCount = notifications.filter(n => n.status === 'unread').length;
 
   return (
-    <Card className="bg-gray-800 border-gray-700">
+    <Card className="bg-slate-900/80 border-slate-700 backdrop-blur text-white">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-white">
+          <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5 text-teal-400" />
             Driver Notifications
             {unreadCount > 0 && (
@@ -179,6 +188,7 @@ const DriverNotificationSystem: React.FC = () => {
               variant={filter === 'unread' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilter('unread')}
+              className={filter === 'unread' ? '' : 'border-white/40 text-white hover:bg-white/15'}
             >
               Unread
             </Button>
@@ -186,6 +196,7 @@ const DriverNotificationSystem: React.FC = () => {
               variant={filter === 'all' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilter('all')}
+              className={filter === 'all' ? '' : 'border-white/40 text-white hover:bg-white/15'}
             >
               All Notifications
             </Button>
@@ -218,7 +229,7 @@ const DriverNotificationSystem: React.FC = () => {
           {!loading && !errorMessage && filteredNotifications.map(notification => (
             <div
               key={notification.id}
-              className={`p-4 rounded-lg border border-gray-700 bg-gray-900/60 shadow-sm ${
+              className={`p-4 rounded-lg border border-white/15 bg-black/35 backdrop-blur shadow-md ${
                 notification.status === 'unread' ? 'ring-2 ring-teal-500/50' : ''
               }`}
             >
@@ -249,16 +260,16 @@ const DriverNotificationSystem: React.FC = () => {
                       {notification.status === 'unread' && (
                         <Button
                           size="sm"
-                          variant="outline"
+                          variant="secondary"
                           onClick={() => markAsRead(notification.id)}
-                          className="text-xs border-gray-600 text-gray-300 hover:bg-gray-700"
+                          className="text-xs bg-white/20 text-white border border-white/40 hover:bg-white/30"
                         >
                           Mark as Read
                         </Button>
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-200 whitespace-pre-wrap">{notification.body}</p>
+                  <p className="text-sm text-gray-100 whitespace-pre-wrap">{notification.body}</p>
                   {notification.data?.order_id && (
                     <p className="text-xs text-gray-400">
                       Order #{String(notification.data.order_id).slice(-8)}
