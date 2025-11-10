@@ -690,7 +690,7 @@ const NewDriverDashboardPage: React.FC = () => {
           className="h-full w-full object-cover object-center"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-slate-950/55 backdrop-blur" />
+      <div className="absolute inset-0 -z-10 bg-slate-950/45" />
 
       <NewHeader />
       <PushNotificationPrompt />
