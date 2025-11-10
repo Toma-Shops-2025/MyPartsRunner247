@@ -144,10 +144,10 @@ const DriverNotificationSystem: React.FC = () => {
   const unreadCount = notifications.filter(n => n.status === 'unread').length;
 
   return (
-    <Card className="bg-slate-900/80 border-slate-700 backdrop-blur text-white">
+    <Card className="bg-slate-900/70 border-slate-700 backdrop-blur shadow-xl text-white">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-white drop-shadow">
             <Bell className="h-5 w-5 text-teal-400" />
             Driver Notifications
             {unreadCount > 0 && (
@@ -161,7 +161,7 @@ const DriverNotificationSystem: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => fetchNotifications()}
-              className="text-gray-400 hover:text-white hover:bg-gray-700"
+              className="text-white/70 hover:text-white hover:bg-white/10"
             >
               <RefreshCcw className="h-4 w-4" />
             </Button>
@@ -169,7 +169,7 @@ const DriverNotificationSystem: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="text-gray-400 hover:text-white hover:bg-gray-700"
+              className="text-white/70 hover:text-white hover:bg-white/10"
             >
               {isExpanded ? (
                 <ChevronUp className="h-4 w-4" />
@@ -216,9 +216,9 @@ const DriverNotificationSystem: React.FC = () => {
           )}
 
           {!loading && !errorMessage && filteredNotifications.length === 0 && (
-            <Alert className="bg-green-900 border-green-700">
-              <CheckCircle className="h-4 w-4 text-green-400" />
-              <AlertDescription className="text-green-300">
+            <Alert className="bg-emerald-900/85 border-emerald-600">
+              <CheckCircle className="h-4 w-4 text-emerald-300" />
+              <AlertDescription className="text-emerald-200">
                 {filter === 'unread'
                   ? 'No unread notifications. You are all caught up!'
                   : 'No notifications yet. New alerts will appear here.'}
