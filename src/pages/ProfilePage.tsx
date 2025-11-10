@@ -146,14 +146,15 @@ const ProfilePage: React.FC = () => {
                 alt="Profile picture background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50 backdrop-blur-[2px]" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
-                  <h2 className="text-3xl font-bold tracking-tight">Profile Picture</h2>
-                  <p className="text-white/80">
+                  <h2 className="text-3xl font-bold tracking-tight drop-shadow-lg">Profile Picture</h2>
+                  <p className="text-white/90 drop-shadow">
                     Upload a profile picture to personalize your account
                   </p>
                 </div>
-                <div className="max-w-sm mx-auto backdrop-blur-sm bg-white/10 border border-white/15 rounded-3xl p-6 shadow-xl">
+                <div className="max-w-sm mx-auto backdrop-blur-sm bg-black/35 border border-white/25 rounded-3xl p-6 shadow-2xl">
                   <AvatarUpload
                     currentAvatarUrl={profile?.avatar_url}
                     userInitials={userInitials}
@@ -176,49 +177,49 @@ const ProfilePage: React.FC = () => {
                     Update your personal details
                   </p>
                 </div>
-                <div className="backdrop-blur-sm bg-white/10 border border-white/15 rounded-3xl p-6 shadow-xl space-y-6 text-left">
+                <div className="backdrop-blur-sm bg-black/40 border border-white/25 rounded-3xl p-6 shadow-2xl space-y-6 text-left">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="full_name">Full Name</Label>
+                      <Label htmlFor="full_name" className="text-white/90">Full Name</Label>
                       <Input
                         id="full_name"
                         value={formData.full_name}
                         onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                         disabled={!isEditing}
-                        className="bg-black/40 border-white/10 text-white"
+                        className="bg-slate-900/70 border-white/20 text-white placeholder-white/60 focus:border-white"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email" className="text-white/90">Email</Label>
                       <Input
                         id="email"
                         value={user.email || ''}
                         disabled
-                        className="bg-black/40 border-white/10 text-white"
+                        className="bg-slate-900/60 border-white/20 text-white"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-white/90">Phone Number</Label>
                     <Input
                       id="phone"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       disabled={!isEditing}
                       placeholder="Enter your phone number"
-                      className="bg-black/40 border-white/10 text-white placeholder-white/60"
+                      className="bg-slate-900/70 border-white/20 text-white placeholder-white/60 focus:border-white"
                     />
                   </div>
 
                   <div className="flex flex-wrap gap-2">
                     {!isEditing ? (
-                      <Button onClick={() => setIsEditing(true)} className="bg-sky-500 hover:bg-sky-600">
+                      <Button onClick={() => setIsEditing(true)} className="bg-sky-500 hover:bg-sky-600 text-white shadow-lg">
                         Edit Profile
                       </Button>
                     ) : (
                       <>
-                        <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                        <Button onClick={handleSave} className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg">
                           Save Changes
                         </Button>
                         <Button 
@@ -230,7 +231,7 @@ const ProfilePage: React.FC = () => {
                               phone: profile?.phone || '',
                             });
                           }}
-                          className="border-white/40 text-white hover:bg-white/10"
+                          className="border-white/40 text-white hover:bg-white/15"
                         >
                           Cancel
                         </Button>
@@ -293,9 +294,7 @@ const ProfilePage: React.FC = () => {
                 alt="Security settings background"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/25 to-slate-950/80" />
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-950/55 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/45 to-black/65" />
               <div className="absolute inset-0 mix-blend-screen opacity-60 bg-[radial-gradient(circle_at_top,_rgba(255,198,84,0.55)_0%,_rgba(0,0,0,0)_55%)]" />
               <div className="relative p-10 text-center space-y-6 text-white">
                 <div className="flex items-center justify-center">
