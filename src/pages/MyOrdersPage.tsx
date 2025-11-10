@@ -159,7 +159,7 @@ const MyOrdersPage: React.FC = () => {
         <img
           src="/my-orders-background.png"
           alt="My orders background"
-          className="h-full w-full object-cover object-center"
+          className="h-full w-full object-cover object-[center_top]"
         />
       </div>
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/45 via-black/25 to-black/50 pointer-events-none" />
