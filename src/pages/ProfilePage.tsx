@@ -230,16 +230,12 @@ const handlePasswordReset = async () => {
 
           <TabsContent value="profile" className="space-y-6">
             <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 shadow-2xl">
-              <div
-                className="absolute inset-0 -z-10"
-                style={{
-                  backgroundImage: 'url("/profile-pic-tab-background.png")',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center top',
-                  backgroundAttachment: 'fixed',
-                }}
+              <img
+                src="/profile-pic-tab-background.png"
+                alt="Profile picture background"
+                className="absolute inset-0 h-full w-full object-cover object-center"
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/55 pointer-events-none -z-0" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/45 pointer-events-none" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight drop-shadow-lg">Profile Picture</h2>
