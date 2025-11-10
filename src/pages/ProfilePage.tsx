@@ -451,8 +451,7 @@ const handlePasswordReset = async () => {
                   </Button>
                   <Button
                     size="sm"
-                    variant="outline"
-                    className="border-white/40 text-white hover:bg-white/15"
+                    className="bg-black/35 text-white border border-white/30 hover:bg-black/50 shadow-lg"
                     onClick={handleNavigateToSecurity}
                   >
                     Review Security Tips
