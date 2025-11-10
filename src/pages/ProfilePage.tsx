@@ -236,9 +236,10 @@ const handlePasswordReset = async () => {
                   backgroundImage: 'url("/profile-pic-tab-background.png")',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center top',
+                  backgroundAttachment: 'fixed',
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50 backdrop-blur-[2px] pointer-events-none -z-0" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/55 pointer-events-none -z-0" />
               <div className="relative p-10 space-y-8 text-white text-center">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight drop-shadow-lg">Profile Picture</h2>
