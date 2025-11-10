@@ -118,7 +118,7 @@ const EarningsPage: React.FC = () => {
           className="h-full w-full object-cover"
         />
       </div>
-      <div className="absolute inset-0 -z-10 bg-slate-950/30" />
+      <div className="absolute inset-0 -z-10 bg-slate-950/35" />
 
       <div className="relative z-10 min-h-screen">
         <NewHeader />
