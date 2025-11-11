@@ -45,9 +45,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
       {/* Dark overlay for better text readability */}
       <div className="absolute inset-0 bg-black/85"></div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="text-center lg:text-left">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
+          <div className="text-center lg:text-left lg:-mt-8">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
               <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
                 Anything, Anytime, Anywhere
@@ -102,7 +102,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
                 src="/hero-logo-lower.png"
                 alt="MyPartsRunner wordmark"
                 className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[40rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out"
-                style={{ marginTop: '-4.5rem' }}
+                style={{ marginTop: '-7rem' }}
               />
             </div>
           </div>
