@@ -95,12 +95,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
               <img
                 src="/hero-logo-upper.png"
                 alt="MyPartsRunner mascot"
-                className="w-full max-w-[24rem] sm:max-w-[28rem] lg:max-w-[32rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[10.5rem]"
+                className="w-full max-w-[26rem] sm:max-w-[30rem] lg:max-w-[34rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[14rem]"
               />
               <img 
                 src="/hero-logo-lower.png"
                 alt="MyPartsRunner wordmark"
-                className="w-full max-w-[26rem] sm:max-w-[30rem] lg:max-w-[36rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[4.5rem]"
+                className="w-full max-w-[28rem] sm:max-w-[32rem] lg:max-w-[38rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[6rem]"
               />
             </div>
           </div>
