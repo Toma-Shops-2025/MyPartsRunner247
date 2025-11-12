@@ -106,8 +106,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           </div>
         </div>
 
-        <div className="mt-1">
-          <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 h-[140px] sm:h-[180px] lg:h-[220px]">
+        <div className="mt-4">
+          <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 aspect-video">
             <iframe
               src="https://www.youtube.com/embed/jydOZTXZ1ZM"
               title="MyPartsRunner Video"
