@@ -38,6 +38,18 @@ const DriversSection: React.FC<DriversSectionProps> = ({ onBecomeDriver }) => {
           ))}
         </div>
 
+        <div className="mb-16">
+          <div className="relative w-full overflow-hidden rounded-3xl border border-gray-700 shadow-2xl aspect-video">
+            <iframe
+              src="https://www.youtube.com/embed/ah8wNemvaOo"
+              title="Drive with MyPartsRunner"
+              className="absolute inset-0 h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+
 
         <div className="mt-16 bg-gradient-to-r from-teal-500 to-blue-600 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">Start Earning Today</h3>
