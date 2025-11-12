@@ -45,7 +45,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
       {/* Dark overlay for better text readability */}
       <div className="absolute inset-0 bg-black/85"></div>
       
-      <div className="relative max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pt-4 pb-4">
+      <div className="relative max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 pt-3 pb-3">
         <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
           <div className="text-center lg:text-left pt-6 lg:pt-12">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -95,19 +95,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
               <img
                 src="/hero-logo-upper.png"
                 alt="MyPartsRunner mascot"
-                className="w-full max-w-[28rem] sm:max-w-[32rem] lg:max-w-[36rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[2rem]"
+                className="w-full max-w-[28rem] sm:max-w-[32rem] lg:max-w-[36rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] mb-[-6rem]"
               />
               <img 
                 src="/hero-logo-lower.png"
                 alt="MyPartsRunner wordmark"
-                className="w-full max-w-[32rem] sm:max-w-[36rem] lg:max-w-[42rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[30rem]"
+                className="w-full max-w-[32rem] sm:max-w-[36rem] lg:max-w-[42rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)]"
               />
             </div>
           </div>
         </div>
 
         <div className="mt-1">
-          <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 h-[160px] sm:h-[200px] lg:h-[240px]">
+          <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 h-[140px] sm:h-[180px] lg:h-[220px]">
             <iframe
               src="https://www.youtube.com/embed/jydOZTXZ1ZM"
               title="MyPartsRunner Video"
