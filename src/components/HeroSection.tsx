@@ -47,7 +47,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
       
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
-          <div className="text-center lg:text-left lg:-mt-8">
+          <div className="text-center lg:text-left pt-6 lg:pt-12">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
               <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
                 Anything, Anytime, Anywhere
@@ -96,12 +96,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
                 src="/hero-logo-upper.png"
                 alt="MyPartsRunner mascot"
                 className="w-full max-w-[28rem] sm:max-w-[32rem] lg:max-w-[36rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out"
-                style={{ marginBottom: '-3.5rem' }}
               />
               <img 
                 src="/hero-logo-lower.png"
                 alt="MyPartsRunner wordmark"
-                className="w-full max-w-[32rem] sm:max-w-[36rem] lg:max-w-[42rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[24rem]"
+                className="w-full max-w-[32rem] sm:max-w-[36rem] lg:max-w-[42rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[25.5rem]"
               />
             </div>
           </div>
