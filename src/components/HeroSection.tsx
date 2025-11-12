@@ -45,7 +45,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
       {/* Dark overlay for better text readability */}
       <div className="absolute inset-0 bg-black/85"></div>
       
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12">
         <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
           <div className="text-center lg:text-left pt-6 lg:pt-12">
             <h1 className="text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -106,7 +106,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           </div>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-8 lg:mt-10">
           <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10" style={{ paddingTop: '56.25%' }}>
             <iframe
               src="https://www.youtube.com/embed/jydOZTXZ1ZM"
