@@ -12,7 +12,7 @@ const applySecurity = (handler) => {
     
     return handler(event, context);
   };
-};
+});
 
 exports.handler = applySecurity(async (event, context) => {
   if (event.httpMethod !== 'POST') {
