@@ -94,7 +94,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
             <img
               src="/hero-logo.png"
               alt="MY-RUNNER.COM hero"
-              className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[38rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out -translate-y-[0.5rem]"
+              className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[38rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out -translate-y-[2rem]"
             />
           </div>
         </div>
