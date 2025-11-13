@@ -6,7 +6,7 @@ I've updated the HeroSection component to use the delivery car image as a full-s
 ## What You Need to Do
 1. **Save the delivery car image** to the `public` folder in your project
 2. **Name the image file** `delivery-car-background.jpg`
-3. **Place it in** `C:\Users\T O M A\Downloads\MyPartsRunner247\public\delivery-car-background.jpg`
+3. **Place it in** `C:\Users\T O M A\Downloads\MY-RUNNER.COM247\public\delivery-car-background.jpg`
 
 ## Changes Made
 - ✅ Updated the HeroSection component to use a full-screen background image

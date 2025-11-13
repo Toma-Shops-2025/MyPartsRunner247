@@ -1,4 +1,4 @@
-# MyPartsRunner - Complete Getting Started Guide
+# MY-RUNNER.COM - Complete Getting Started Guide
 
 ## Table of Contents
 1. [Platform Overview](#platform-overview)
@@ -13,8 +13,8 @@
 
 ## Platform Overview
 
-### What is MyPartsRunner?
-MyPartsRunner is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MyPartsRunner specializes in urgent, specialized, and unique delivery needs.
+### What is MY-RUNNER.COM?
+MY-RUNNER.COM is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MY-RUNNER.COM specializes in urgent, specialized, and unique delivery needs.
 
 ### Key Features
 - ✅ **Universal Delivery**: Not just food - ANY item, ANY business
@@ -31,7 +31,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 ### Step 1: Create Your Account
 
 #### Account Registration
-1. **Visit MyPartsRunner.com**
+1. **Visit MY-RUNNER.COM**
 2. **Click "Sign Up"** in the top right corner
 3. **Choose "Customer"** account type
 4. **Enter your information**:
@@ -117,7 +117,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 - **Background Check**: Will be conducted during application
 
 #### Application Process
-1. **Visit MyPartsRunner.com**
+1. **Visit MY-RUNNER.COM**
 2. **Click "Become a Driver"**
 3. **Choose "Driver" account type**
 4. **Complete Application Form**:
@@ -458,4 +458,4 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 ---
 
-*This comprehensive getting started guide provides everything you need to know about using MyPartsRunner as a customer, driver, or business. For additional support or questions, please contact our support team.*
+*This comprehensive getting started guide provides everything you need to know about using MY-RUNNER.COM as a customer, driver, or business. For additional support or questions, please contact our support team.*

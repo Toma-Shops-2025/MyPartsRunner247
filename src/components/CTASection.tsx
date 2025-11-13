@@ -17,7 +17,7 @@ const CTASection: React.FC<CTASectionProps> = ({ onRequestPickup, onBecomeDriver
             Ready to Get Started?
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Join the MyPartsRunner community today. Whether you need something delivered or want to earn money driving, we've got you covered.
+            Join the MY-RUNNER.COM community today. Whether you need something delivered or want to earn money driving, we've got you covered.
           </p>
         </div>
 

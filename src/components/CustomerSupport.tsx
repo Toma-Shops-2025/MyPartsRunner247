@@ -70,7 +70,7 @@ const CustomerSupport: React.FC = () => {
     {
       id: '2',
       question: 'What can I have delivered?',
-      answer: 'MyPartsRunner can pick up and deliver almost anything - packages, documents, food, groceries, personal items, and more. We cannot transport hazardous materials, illegal items, or live animals.',
+      answer: 'MY-RUNNER.COM can pick up and deliver almost anything - packages, documents, food, groceries, personal items, and more. We cannot transport hazardous materials, illegal items, or live animals.',
       category: 'general',
       helpful: 38,
       notHelpful: 1

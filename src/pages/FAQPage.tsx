@@ -23,8 +23,8 @@ const FAQPage = () => {
     {
       id: 1,
       category: 'general',
-      question: 'What is MyPartsRunner?',
-      answer: 'MyPartsRunner is an on-demand delivery service that connects customers who need auto parts with drivers who can pick them up and deliver them quickly.'
+      question: 'What is MY-RUNNER.COM?',
+      answer: 'MY-RUNNER.COM is an on-demand delivery service that connects customers who need auto parts with drivers who can pick them up and deliver them quickly.'
     },
     {
       id: 2,
@@ -47,7 +47,7 @@ const FAQPage = () => {
     {
       id: 5,
       category: 'drivers',
-      question: 'How do I become a MyPartsRunner driver?',
+      question: 'How do I become a MY-RUNNER.COM driver?',
       answer: 'You can apply through our driver application page. You\'ll need a valid driver\'s license, vehicle insurance, and pass a background check.'
     },
     {
@@ -98,7 +98,7 @@ const FAQPage = () => {
             Frequently Asked Questions
           </h1>
           <p className="text-gray-300">
-            Find answers to common questions about MyPartsRunner
+            Find answers to common questions about MY-RUNNER.COM
           </p>
         </div>
 

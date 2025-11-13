@@ -93,8 +93,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
             {/* Hero Logo */}
             <img
               src="/hero-logo.png"
-              alt="MyPartsRunner hero"
-              className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[38rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[4rem]"
+              alt="MY-RUNNER.COM hero"
+              className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[38rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[1.5rem]"
             />
           </div>
         </div>
@@ -103,7 +103,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
           <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl border border-white/10 aspect-video">
             <iframe
               src="https://www.youtube.com/embed/jydOZTXZ1ZM"
-              title="MyPartsRunner Video"
+              title="MY-RUNNER.COM Video"
               className="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen

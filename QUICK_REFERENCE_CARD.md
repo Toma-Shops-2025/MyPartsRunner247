@@ -1,4 +1,4 @@
-# MyPartsRunner - Quick Reference Card
+# MY-RUNNER.COM - Quick Reference Card
 **Keep this handy during your attorney meeting and business setup!**
 
 ---
@@ -190,6 +190,6 @@
 
 **📱 Keep this card handy during your attorney meeting and business setup process!**
 
-**MyPartsRunner Quick Reference**  
+**MY-RUNNER.COM Quick Reference**  
 **Date: January 22, 2025**  
 **Contact: infomypartsrunner@gmail.com | 502-812-2456**

@@ -1,6 +1,6 @@
 {
-  "name": "MyPartsRunner - Anything, Anytime, Anywhere",
-  "short_name": "MyPartsRunner",
+  "name": "MY-RUNNER.COM - Anything, Anytime, Anywhere",
+  "short_name": "MY-RUNNER.COM",
   "description": "The only delivery service that picks up from absolutely anywhere. Available 24/7 nationwide.",
   "start_url": "/",
   "display": "standalone",

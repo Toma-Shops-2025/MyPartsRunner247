@@ -1,4 +1,4 @@
--- MyPartsRunner Automation System Database Setup
+-- MY-RUNNER.COM Automation System Database Setup
 -- Run this SQL in your Supabase SQL editor
 
 -- 1. Driver Notifications Table
@@ -284,4 +284,4 @@ WHERE user_type = 'driver'
 ON CONFLICT (driver_id) DO NOTHING;
 
 -- Success message
-SELECT 'MyPartsRunner Automation System setup complete!' as status;
+SELECT 'MY-RUNNER.COM Automation System setup complete!' as status;

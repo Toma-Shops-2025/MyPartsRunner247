@@ -277,9 +277,9 @@ const NewAuthModal: React.FC<NewAuthModalProps> = ({ isOpen, onClose, onSuccess,
         {/* Dark Sign-in/Sign-up Box */}
         <div className="relative z-10 p-8 bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-lg mx-auto my-auto max-w-md w-full">
           <DialogHeader>
-            <DialogTitle className="text-white text-2xl font-bold text-center mb-6">Welcome to MyPartsRunner</DialogTitle>
+            <DialogTitle className="text-white text-2xl font-bold text-center mb-6">Welcome to MY-RUNNER.COM</DialogTitle>
             <div id="auth-modal-description" className="sr-only">
-              Sign in or create an account to access MyPartsRunner services
+              Sign in or create an account to access MY-RUNNER.COM services
             </div>
           </DialogHeader>
         

@@ -133,7 +133,7 @@ const DriverTraining: React.FC = () => {
               <div>
                 <h1 className="text-4xl font-bold text-white drop-shadow-md">Driver Training Center</h1>
                 <p className="text-white/80 text-base sm:text-lg mt-2 max-w-2xl">
-                  Complete all training videos to become a certified MyPartsRunner driver. These lessons keep you sharp and ready for every run.
+                  Complete all training videos to become a certified MY-RUNNER.COM driver. These lessons keep you sharp and ready for every run.
                 </p>
               </div>
             </div>
@@ -298,7 +298,7 @@ const DriverTraining: React.FC = () => {
             <CheckCircle className="w-16 h-16 text-white mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">Training Complete!</h3>
             <p className="text-green-100 mb-4">
-              You've successfully completed all driver training videos. You're now ready to start delivering with MyPartsRunner!
+              You've successfully completed all driver training videos. You're now ready to start delivering with MY-RUNNER.COM!
             </p>
             <Button 
               className="bg-white text-green-600 hover:bg-green-50"

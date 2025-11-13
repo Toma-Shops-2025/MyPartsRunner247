@@ -102,7 +102,7 @@ If you can't find the routing settings, try this method:
 ```
 Best regards,
 Toma Adkins
-MyPartsRunner
+MY-RUNNER.COM
 Phone: 502-812-2456
 Email: info@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -112,7 +112,7 @@ Address: 5120 Cynthia Drive, 40291, JeffersonTown, KY
 ##### Support Signature (for support emails):
 ```
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 Phone: 502-812-2456
 Email: support@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -123,17 +123,17 @@ Website: www.mypartsrunner.com
 #### Customer Support Auto-Responder:
 1. **In Gmail settings**, go to **"Vacation responder"**
 2. **Enable vacation responder**
-3. **Subject**: Thank you for contacting MyPartsRunner Support
+3. **Subject**: Thank you for contacting MY-RUNNER.COM Support
 4. **Message**:
 ```
 Dear Customer,
 
-Thank you for contacting MyPartsRunner support. We have received your inquiry and will respond within 24 hours.
+Thank you for contacting MY-RUNNER.COM support. We have received your inquiry and will respond within 24 hours.
 
 For urgent matters, please call us at 502-812-2456.
 
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 ```
 
 ### Step 8: Organize Your Inbox

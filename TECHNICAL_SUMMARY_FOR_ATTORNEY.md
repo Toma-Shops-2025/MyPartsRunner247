@@ -1,4 +1,4 @@
-# MyPartsRunner - Technical Summary for Legal Review
+# MY-RUNNER.COM - Technical Summary for Legal Review
 **Prepared for Attorney - January 22, 2025**
 
 ---
@@ -239,9 +239,9 @@
 
 **Technical Documentation prepared for legal review**  
 **Date: January 22, 2025**  
-**MyPartsRunner Development Team**  
+**MY-RUNNER.COM Development Team**  
 **Contact: infomypartsrunner@gmail.com | 502-812-2456**
 
 ---
 
-*This document contains technical information about the MyPartsRunner platform and should be reviewed in conjunction with the legal documents for comprehensive attorney review.*
+*This document contains technical information about the MY-RUNNER.COM platform and should be reviewed in conjunction with the legal documents for comprehensive attorney review.*

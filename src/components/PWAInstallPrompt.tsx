@@ -90,7 +90,7 @@ const PWAInstallPrompt: React.FC = () => {
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold flex items-center gap-2">
             <Smartphone className="w-6 h-6" />
-            Get the MyPartsRunner App
+            Get the MY-RUNNER.COM App
           </CardTitle>
           <Button
             variant="ghost"

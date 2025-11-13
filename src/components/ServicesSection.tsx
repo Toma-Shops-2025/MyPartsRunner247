@@ -45,7 +45,7 @@ const ServicesSection: React.FC<ServicesSectionProps> = ({ onRequestPickup }) =>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             From forgotten lunch boxes to urgent business documents, 
-            MyPartsRunner handles any pickup and delivery request within the law.
+            MY-RUNNER.COM handles any pickup and delivery request within the law.
           </p>
         </div>
 

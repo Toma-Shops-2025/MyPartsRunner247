@@ -166,7 +166,7 @@ const DriverApplicationPage: React.FC = () => {
         </Button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Driver Application</h1>
-          <p className="text-gray-300">Apply to become a MyPartsRunner driver and start earning money delivering packages.</p>
+          <p className="text-gray-300">Apply to become a MY-RUNNER.COM driver and start earning money delivering packages.</p>
         </div>
 
 
@@ -458,7 +458,7 @@ const DriverApplicationPage: React.FC = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="why_drive" className="text-white">Why do you want to drive for MyPartsRunner?</Label>
+                <Label htmlFor="why_drive" className="text-white">Why do you want to drive for MY-RUNNER.COM?</Label>
                 <Textarea 
                   id="why_drive" 
                   value={applicationData.why_drive}

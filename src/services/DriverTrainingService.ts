@@ -120,8 +120,8 @@ export class DriverTrainingService {
     const trainingVideos: Omit<TrainingVideo, 'completed' | 'completedAt'>[] = [
       {
         id: 1,
-        title: "Welcome to MyPartsRunner",
-        description: "Welcome to the MyPartsRunner family! Learn about our platform, driver benefits, and how to get started on your journey to success.",
+        title: "Welcome to MY-RUNNER.COM",
+        description: "Welcome to the MY-RUNNER.COM family! Learn about our platform, driver benefits, and how to get started on your journey to success.",
         duration: "1-2 minutes",
         youtubeUrl: "https://www.youtube.com/embed/zXXTd81HXg4"
       },
@@ -135,7 +135,7 @@ export class DriverTrainingService {
       {
         id: 3,
         title: "Maximizing Your Earnings",
-        description: "Discover peak hours, high-demand areas, order selection strategies, and tips to maximize your earnings as a MyPartsRunner driver.",
+        description: "Discover peak hours, high-demand areas, order selection strategies, and tips to maximize your earnings as a MY-RUNNER.COM driver.",
         duration: "3-4 minutes",
         youtubeUrl: "https://www.youtube.com/embed/7vOyfgpVHLU"
       },
@@ -230,7 +230,7 @@ export class DriverTrainingService {
    */
   private static getVideoTitleById(videoId: number): string | null {
     const titles: { [key: number]: string } = {
-      1: "Welcome to MyPartsRunner",
+      1: "Welcome to MY-RUNNER.COM",
       2: "Driver Dashboard Overview", 
       3: "Maximizing Your Earnings",
       4: "Customer Service Excellence",

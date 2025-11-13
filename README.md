@@ -5,9 +5,9 @@
 3. Add the key in Netlify as `SENDGRID_API_KEY`.
 4. Verify your sender (either single sender or domain) and use that address for `SENDGRID_FROM_EMAIL`.
 5. Test via `/notification-test` route once your site is redeployed.
-# MyPartsRunner - Anything, Anytime, Anywhere
+# MY-RUNNER.COM - Anything, Anytime, Anywhere
 
-A modern delivery service platform built with React, TypeScript, and Vite. MyPartsRunner is the only delivery service that picks up from absolutely anywhere, available 24/7 nationwide.
+A modern delivery service platform built with React, TypeScript, and Vite. MY-RUNNER.COM is the only delivery service that picks up from absolutely anywhere, available 24/7 nationwide.
 
 ## Features
 
@@ -40,8 +40,8 @@ A modern delivery service platform built with React, TypeScript, and Vite. MyPar
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Toma-Shops-2025/MyPartsRunner247.git
-cd MyPartsRunner247
+git clone https://github.com/Toma-Shops-2025/MY-RUNNER.COM247.git
+cd MY-RUNNER.COM247
 ```
 
 2. Install dependencies:

@@ -10,12 +10,12 @@ const NotificationTestPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [smsPhone, setSmsPhone] = useState('');
-  const [smsBody, setSmsBody] = useState('🚚 Test delivery alert from MyPartsRunner.');
+  const [smsBody, setSmsBody] = useState('🚚 Test delivery alert from MY-RUNNER.COM.');
   const [smsStatus, setSmsStatus] = useState<string | null>(null);
 
   const [emailTo, setEmailTo] = useState('');
-  const [emailSubject, setEmailSubject] = useState('MyPartsRunner Test Email');
-  const [emailBody, setEmailBody] = useState('<p>This is a test notification email from MyPartsRunner.</p>');
+  const [emailSubject, setEmailSubject] = useState('MY-RUNNER.COM Test Email');
+  const [emailBody, setEmailBody] = useState('<p>This is a test notification email from MY-RUNNER.COM.</p>');
   const [emailStatus, setEmailStatus] = useState<string | null>(null);
 
   if (!loading && (!user || profile?.user_type !== 'admin')) {

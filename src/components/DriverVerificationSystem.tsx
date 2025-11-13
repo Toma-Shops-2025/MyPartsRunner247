@@ -142,7 +142,7 @@ const DriverVerificationSystem: React.FC<DriverVerificationSystemProps> = ({ dri
             </div>
             <Progress value={progress} className="h-2" />
             <p className="text-sm text-gray-600">
-              Complete all steps to become a verified MyPartsRunner driver
+              Complete all steps to become a verified MY-RUNNER.COM driver
             </p>
           </div>
         </CardContent>

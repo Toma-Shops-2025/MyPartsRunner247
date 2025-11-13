@@ -135,7 +135,7 @@ const NewHeader: React.FC = () => {
             <div className="flex items-center">
               <div className="flex-shrink-0 cursor-pointer" onClick={() => navigate('/')}>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
-                  MyPartsRunner
+                  MY-RUNNER.COM
                 </h1>
               </div>
               <nav className="hidden md:ml-8 md:flex md:space-x-8">
@@ -353,7 +353,7 @@ const NewHeader: React.FC = () => {
                     className="block w-full text-left px-3 py-2 text-base font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-md mb-2"
                   >
                     <Smartphone className="w-4 h-4 inline mr-2" />
-                    Get MyPartsRunner App
+                    Get MY-RUNNER.COM App
                   </button>
                 )}
                 <button 

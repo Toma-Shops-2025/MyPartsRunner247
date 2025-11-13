@@ -5,7 +5,7 @@ const PromotionalVideo: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto">
       <div className="bg-gray-800 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-white mb-4 text-center">
-          Discover MyPartsRunner: Your Ultimate Delivery Solution
+          Discover MY-RUNNER.COM: Your Ultimate Delivery Solution
         </h2>
         
         {/* YouTube Video Embed */}
@@ -14,7 +14,7 @@ const PromotionalVideo: React.FC = () => {
             <iframe
               className="absolute top-0 left-0 w-full h-full rounded-lg"
               src="https://www.youtube.com/embed/i3E84GErrN4"
-              title="MyPartsRunner Promotional Video"
+              title="MY-RUNNER.COM Promotional Video"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -67,7 +67,7 @@ const PromotionalVideo: React.FC = () => {
         </div>
         
         <p className="text-gray-300 text-center mt-4 text-sm">
-          Watch the video above to learn more about MyPartsRunner's delivery services
+          Watch the video above to learn more about MY-RUNNER.COM's delivery services
         </p>
       </div>
     </div>

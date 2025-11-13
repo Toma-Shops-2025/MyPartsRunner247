@@ -1,4 +1,4 @@
-# MyPartsRunner - Complete Legal & Business Checklist
+# MY-RUNNER.COM - Complete Legal & Business Checklist
 **Print this out and bring to your attorney meeting!**
 
 ---
@@ -306,9 +306,9 @@
 **📋 PRINT THIS CHECKLIST AND BRING TO YOUR ATTORNEY MEETING!**
 
 **Date Created:** January 22, 2025  
-**MyPartsRunner Legal & Business Checklist**  
+**MY-RUNNER.COM Legal & Business Checklist**  
 **Contact:** infomypartsrunner@gmail.com | 502-812-2456
 
 ---
 
-*This comprehensive checklist ensures you don't miss any critical legal or business requirements for your MyPartsRunner platform.*
+*This comprehensive checklist ensures you don't miss any critical legal or business requirements for your MY-RUNNER.COM platform.*

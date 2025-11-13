@@ -10,7 +10,7 @@ const LegalTermsPage: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">Legal Terms & Policies</h1>
-          <p className="text-gray-300 text-lg">Important legal information for MyPartsRunner users</p>
+          <p className="text-gray-300 text-lg">Important legal information for MY-RUNNER.COM users</p>
         </div>
 
         <Alert className="bg-yellow-900/20 border-yellow-600/30 mb-8">
@@ -37,7 +37,7 @@ const LegalTermsPage: React.FC = () => {
               <div className="bg-gray-700 p-4 rounded-lg">
                 <h3 className="text-lg font-semibold text-white mb-3">1. Service Description</h3>
                 <p className="text-gray-300 mb-4">
-                  MyPartsRunner is a delivery service platform that connects customers with independent drivers 
+                  MY-RUNNER.COM is a delivery service platform that connects customers with independent drivers 
                   for pickup and delivery services. We facilitate transactions but are not a transportation company.
                 </p>
                 <ul className="text-gray-300 space-y-2 ml-4">
@@ -100,7 +100,7 @@ const LegalTermsPage: React.FC = () => {
                 <h3 className="text-lg font-semibold text-white mb-3">5. Liability and Insurance</h3>
                 <ul className="text-gray-300 space-y-2 ml-4">
                   <li>• Drivers are independent contractors with their own insurance</li>
-                  <li>• MyPartsRunner provides platform insurance up to $1M per incident</li>
+                  <li>• MY-RUNNER.COM provides platform insurance up to $1M per incident</li>
                   <li>• Customers responsible for item value over $500</li>
                   <li>• Claims must be reported within 24 hours</li>
                   <li>• Investigation process may take 5-10 business days</li>
@@ -285,7 +285,7 @@ const LegalTermsPage: React.FC = () => {
               <div className="space-y-4 text-red-200">
                 <p>
                   <strong>These legal documents are templates for demonstration purposes only.</strong> 
-                  Before using MyPartsRunner in production, you must:
+                  Before using MY-RUNNER.COM in production, you must:
                 </p>
                 <ul className="space-y-2 ml-4">
                   <li>• Consult with a qualified attorney</li>
@@ -296,7 +296,7 @@ const LegalTermsPage: React.FC = () => {
                   <li>• Consider data protection regulations (GDPR, CCPA)</li>
                 </ul>
                 <p className="font-semibold">
-                  MyPartsRunner is not responsible for legal compliance. 
+                  MY-RUNNER.COM is not responsible for legal compliance. 
                   Users assume all legal risks and responsibilities.
                 </p>
               </div>

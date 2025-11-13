@@ -1,6 +1,6 @@
 # Google Maps Integration Setup Guide
 
-This guide explains how to configure Google Maps for navigation and tracking in MyPartsRunner.
+This guide explains how to configure Google Maps for navigation and tracking in MY-RUNNER.COM.
 
 ## 🗺️ Required Environment Variables
 

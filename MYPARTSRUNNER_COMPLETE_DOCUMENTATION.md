@@ -1,4 +1,4 @@
-# MyPartsRunner - Complete Platform Documentation
+# MY-RUNNER.COM - Complete Platform Documentation
 
 ## Table of Contents
 1. [Platform Overview](#platform-overview)
@@ -14,8 +14,8 @@
 
 ## Platform Overview
 
-### What is MyPartsRunner?
-MyPartsRunner is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MyPartsRunner specializes in urgent, specialized, and unique delivery needs.
+### What is MY-RUNNER.COM?
+MY-RUNNER.COM is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MY-RUNNER.COM specializes in urgent, specialized, and unique delivery needs.
 
 ### Core Mission
 - **For Customers**: Get anything delivered quickly and reliably
@@ -37,7 +37,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 ### Getting Started as a Customer
 
 #### 1. Account Creation
-1. Visit MyPartsRunner.com
+1. Visit MY-RUNNER.COM
 2. Click "Sign Up" or "Get Started"
 3. Choose "Customer" account type
 4. Enter email and create password
@@ -390,7 +390,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 ### For New Customers
 
 #### 1. Account Setup (5 minutes)
-1. Visit MyPartsRunner.com
+1. Visit MY-RUNNER.COM
 2. Click "Sign Up" → "Customer"
 3. Enter email and password
 4. Verify email address
@@ -414,7 +414,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 ### For New Drivers
 
 #### 1. Application Process (15 minutes)
-1. Visit MyPartsRunner.com
+1. Visit MY-RUNNER.COM
 2. Click "Become a Driver"
 3. Choose "Driver" account type
 4. Complete application form
@@ -454,7 +454,7 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 ---
 
-## Why Choose MyPartsRunner?
+## Why Choose MY-RUNNER.COM?
 
 ### For Customers
 
@@ -546,4 +546,4 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 ---
 
-*This documentation is comprehensive and covers all aspects of the MyPartsRunner platform. For the most up-to-date information, please visit our website or contact our support team.*
+*This documentation is comprehensive and covers all aspects of the MY-RUNNER.COM platform. For the most up-to-date information, please visit our website or contact our support team.*

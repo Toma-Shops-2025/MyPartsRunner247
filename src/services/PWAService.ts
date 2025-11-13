@@ -84,7 +84,7 @@ class PWAService {
 
   private notifyUpdateAvailable() {
     // You can customize this notification
-    if (confirm('A new version of MyPartsRunner is available. Would you like to update?')) {
+    if (confirm('A new version of MY-RUNNER.COM is available. Would you like to update?')) {
       this.updateApp();
     }
   }

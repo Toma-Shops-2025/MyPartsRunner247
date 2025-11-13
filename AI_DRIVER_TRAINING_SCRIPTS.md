@@ -7,19 +7,19 @@
 
 **Step 1:** Use ChatGPT to create video scripts  
 **Step 2:** Use AI video generation tools (Synthesia, D-ID, etc.)  
-**Step 3:** Integrate into MyPartsRunner platform  
+**Step 3:** Integrate into MY-RUNNER.COM platform  
 **Cost:** $50-200 total (vs $8,500-16,000 professional production)
 
 ## 📹 **PRODUCTION VIDEOS COMPLETED**
 
 **YouTube Training Videos Created:**
-1. **Welcome to MyPartsRunner** - https://www.youtube.com/watch?v=zXXTd81HXg4
+1. **Welcome to MY-RUNNER.COM** - https://www.youtube.com/watch?v=zXXTd81HXg4
 2. **Driver Dashboard Overview** - https://www.youtube.com/watch?v=z6vBcxe4a1Y  
 3. **Maximizing Your Earnings** - https://www.youtube.com/watch?v=7vOyfgpVHLU
 4. **Customer Service Excellence** - https://www.youtube.com/watch?v=wq0bbatXx7A
 5. **Safety First** - https://www.youtube.com/watch?v=YnN2n1Ek5z8
 
-**Status:** ✅ All videos integrated into MyPartsRunner driver training system  
+**Status:** ✅ All videos integrated into MY-RUNNER.COM driver training system  
 
 ---
 
@@ -27,13 +27,13 @@
 
 ### **Prompt 1: Welcome Video Script**
 ```
-Create a 1-minute video script for MyPartsRunner driver training. 
+Create a 1-minute video script for MY-RUNNER.COM driver training. 
 
-Context: MyPartsRunner is a delivery platform like DoorDash but for any item from any store. Drivers earn 70% commission with immediate payouts.
+Context: MY-RUNNER.COM is a delivery platform like DoorDash but for any item from any store. Drivers earn 70% commission with immediate payouts.
 
 Script should include:
 - Welcome message
-- What MyPartsRunner is
+- What MY-RUNNER.COM is
 - Driver benefits (70% commission, flexible hours, immediate payouts)
 - Encouraging tone
 - Professional but friendly
@@ -43,7 +43,7 @@ Format: [Scene description] Speaker: "Dialogue here"
 
 ### **Prompt 2: Platform Overview Script**
 ```
-Create a 2-minute video script showing how to use the MyPartsRunner driver dashboard.
+Create a 2-minute video script showing how to use the MY-RUNNER.COM driver dashboard.
 
 Include:
 - How to go online/offline
@@ -57,7 +57,7 @@ Format: [Screen action] Speaker: "Instructions here"
 
 ### **Prompt 3: Earnings Tips Script**
 ```
-Create a 2-minute video script about maximizing earnings as a MyPartsRunner driver.
+Create a 2-minute video script about maximizing earnings as a MY-RUNNER.COM driver.
 
 Include:
 - Best times to drive (peak hours)
@@ -131,7 +131,7 @@ Format: [Safety demonstration] Speaker: "Safety instructions here"
 5. Download in 1080p
 
 ### **Step 3: Integration (1 hour)**
-1. Upload videos to MyPartsRunner
+1. Upload videos to MY-RUNNER.COM
 2. Add to driver dashboard
 3. Test on mobile devices
 4. Launch with new drivers
@@ -159,11 +159,11 @@ Format: [Safety demonstration] Speaker: "Safety instructions here"
 - [ ] Use ChatGPT prompts above to generate scripts
 - [ ] Sign up for Synthesia (free trial available)
 - [ ] Create 5 training videos
-- [ ] Upload to MyPartsRunner platform
+- [ ] Upload to MY-RUNNER.COM platform
 - [ ] Test with new drivers
 
 ### **Script Topics:**
-1. ✅ Welcome to MyPartsRunner
+1. ✅ Welcome to MY-RUNNER.COM
 2. ✅ Platform Overview  
 3. ✅ Maximizing Earnings
 4. ✅ Customer Service Excellence
@@ -183,7 +183,7 @@ Format: [Safety demonstration] Speaker: "Safety instructions here"
 **vs Competitors:**
 - Most have no training videos
 - You'll have professional AI-generated content
-- Sets MyPartsRunner apart immediately
+- Sets MY-RUNNER.COM apart immediately
 - Builds driver confidence and success
 
 ---

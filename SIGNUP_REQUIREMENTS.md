@@ -1,7 +1,7 @@
-# Signup Requirements - MyPartsRunner
+# Signup Requirements - MY-RUNNER.COM
 
 ## Overview
-This document outlines what customers and drivers need to do when signing up for MyPartsRunner.
+This document outlines what customers and drivers need to do when signing up for MY-RUNNER.COM.
 
 ---
 

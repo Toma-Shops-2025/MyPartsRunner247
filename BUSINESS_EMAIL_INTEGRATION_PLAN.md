@@ -1,4 +1,4 @@
-# MyPartsRunner Business Email Integration Plan
+# MY-RUNNER.COM Business Email Integration Plan
 
 ## Your Business Emails Setup ✅
 - **info@mypartsrunner.com** - Main business email
@@ -46,7 +46,7 @@
 ```
 Best regards,
 Toma Adkins
-MyPartsRunner
+MY-RUNNER.COM
 Phone: 502-812-2456
 Email: info@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -56,7 +56,7 @@ Address: 5120 Cynthia Drive, 40291, JeffersonTown, KY
 #### Support Signature (support@mypartsrunner.com)
 ```
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 Phone: 502-812-2456
 Email: support@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -65,7 +65,7 @@ Website: www.mypartsrunner.com
 #### Driver Support Signature (drivers@mypartsrunner.com)
 ```
 Best regards,
-MyPartsRunner Driver Support Team
+MY-RUNNER.COM Driver Support Team
 Phone: 502-812-2456
 Email: drivers@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -74,7 +74,7 @@ Website: www.mypartsrunner.com
 #### Business Signature (business@mypartsrunner.com)
 ```
 Best regards,
-MyPartsRunner Business Team
+MY-RUNNER.COM Business Team
 Phone: 502-812-2456
 Email: business@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -83,7 +83,7 @@ Website: www.mypartsrunner.com
 #### Technical Signature (tech@mypartsrunner.com)
 ```
 Best regards,
-MyPartsRunner Technical Team
+MY-RUNNER.COM Technical Team
 Phone: 502-812-2456
 Email: tech@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -93,30 +93,30 @@ Website: www.mypartsrunner.com
 
 #### Customer Support Auto-Responder
 ```
-Subject: Thank you for contacting MyPartsRunner Support
+Subject: Thank you for contacting MY-RUNNER.COM Support
 
 Dear [Customer Name],
 
-Thank you for contacting MyPartsRunner support. We have received your inquiry and will respond within 24 hours.
+Thank you for contacting MY-RUNNER.COM support. We have received your inquiry and will respond within 24 hours.
 
 For urgent matters, please call us at 502-812-2456.
 
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 ```
 
 #### Driver Support Auto-Responder
 ```
-Subject: Thank you for contacting MyPartsRunner Driver Support
+Subject: Thank you for contacting MY-RUNNER.COM Driver Support
 
 Dear [Driver Name],
 
-Thank you for contacting MyPartsRunner driver support. We have received your inquiry and will respond within 24 hours.
+Thank you for contacting MY-RUNNER.COM driver support. We have received your inquiry and will respond within 24 hours.
 
 For urgent matters, please call us at 502-812-2456.
 
 Best regards,
-MyPartsRunner Driver Support Team
+MY-RUNNER.COM Driver Support Team
 ```
 
 #### Business Auto-Responder
@@ -125,12 +125,12 @@ Subject: Thank you for your business inquiry
 
 Dear [Contact Name],
 
-Thank you for your interest in MyPartsRunner business services. Our business team will contact you within 24 hours to discuss your requirements.
+Thank you for your interest in MY-RUNNER.COM business services. Our business team will contact you within 24 hours to discuss your requirements.
 
 For immediate assistance, please call us at 502-812-2456.
 
 Best regards,
-MyPartsRunner Business Team
+MY-RUNNER.COM Business Team
 ```
 
 ### 5. Email Management Strategy

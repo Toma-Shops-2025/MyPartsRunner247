@@ -136,7 +136,7 @@ const CustomerNotificationSystem: React.FC = () => {
       case 'accepted': return 'A driver has accepted your order and is on their way to pick it up.';
       case 'picked_up': return 'Your order has been picked up and is on the way to you.';
       case 'in_transit': return 'Your order is being delivered. Track your driver in real-time.';
-      case 'delivered': return 'Your order has been delivered successfully! Thank you for choosing MyPartsRunner.';
+      case 'delivered': return 'Your order has been delivered successfully! Thank you for choosing MY-RUNNER.COM.';
       case 'cancelled': return 'Your order has been cancelled. Contact support if you have questions.';
       default: return 'Your order status has been updated.';
     }

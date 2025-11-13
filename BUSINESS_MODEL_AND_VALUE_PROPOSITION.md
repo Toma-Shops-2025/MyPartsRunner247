@@ -1,8 +1,8 @@
-# MyPartsRunner - Business Model & Value Proposition
+# MY-RUNNER.COM - Business Model & Value Proposition
 
 ## Executive Summary
 
-MyPartsRunner is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MyPartsRunner specializes in urgent, specialized, and unique delivery needs across all industries and use cases.
+MY-RUNNER.COM is a revolutionary on-demand delivery platform that connects customers with professional drivers to deliver ANYTHING, ANYTIME, ANYWHERE. Unlike traditional delivery services limited to food or packages, MY-RUNNER.COM specializes in urgent, specialized, and unique delivery needs across all industries and use cases.
 
 ## Value Proposition
 
@@ -368,4 +368,4 @@ MyPartsRunner is a revolutionary on-demand delivery platform that connects custo
 
 ---
 
-*This business model document provides a comprehensive overview of MyPartsRunner's value proposition, financial projections, growth strategy, and competitive positioning. The platform's universal delivery approach and driver-focused model position it for significant growth and market leadership.*
+*This business model document provides a comprehensive overview of MY-RUNNER.COM's value proposition, financial projections, growth strategy, and competitive positioning. The platform's universal delivery approach and driver-focused model position it for significant growth and market leadership.*

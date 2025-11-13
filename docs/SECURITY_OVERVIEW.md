@@ -3,7 +3,7 @@
 This internal note tracks the documents and checkpoints we maintain for legal protection and operational readiness.
 
 ## Corporate & Registration
-- **Entity:** MyPartsRunner LLC (Kentucky)  
+- **Entity:** MY-RUNNER.COM LLC (Kentucky)  
 - **Secretary of State Filing #:** MP-45721  
 - **EIN:** Stored with finance records; used for banking, Stripe, and tax filings.
 

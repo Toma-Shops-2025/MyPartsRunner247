@@ -4,7 +4,7 @@
 - ✅ Drivers are active
 - ✅ Accounts are connected  
 - ✅ Multiple deliveries completed
-- ❌ **Money going to MyPartsRunner minus Stripe fee only**
+- ❌ **Money going to MY-RUNNER.COM minus Stripe fee only**
 - ❌ **Nothing being sent to driver**
 
 ---

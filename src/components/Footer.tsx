@@ -61,7 +61,7 @@ const Footer: React.FC = () => {
               onClick={() => handleNavigation('/')}
             >
               <h1 className="text-2xl font-bold text-white mb-4">
-                MyPartsRunner
+                MY-RUNNER.COM
               </h1>
             </div>
             <p className="text-gray-400 mb-6">
@@ -166,7 +166,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 mb-4 md:mb-0">
-              © 2024 MyPartsRunner.com. All rights reserved.
+              © 2024 MY-RUNNER.COM. All rights reserved.
             </div>
             <div className="text-gray-400">
               Available 24/7 • Nationwide Coverage • Anything, Anytime, Anywhere

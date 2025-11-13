@@ -3,7 +3,7 @@ import { automationController } from './AutomationController';
 // Initialize automation system when the app starts
 export const initializeAutomation = async () => {
   try {
-    console.log('🚀 Initializing MyPartsRunner Automation System...');
+    console.log('🚀 Initializing MY-RUNNER.COM Automation System...');
     
     // Start the automation system
     await automationController.startAutomation();

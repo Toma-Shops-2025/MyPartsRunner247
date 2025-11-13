@@ -132,7 +132,7 @@ const DriverVerification: React.FC = () => {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-white mb-2">Driver Verification</h1>
-        <p className="text-gray-300">Complete your driver verification to start earning with MyPartsRunner</p>
+        <p className="text-gray-300">Complete your driver verification to start earning with MY-RUNNER.COM</p>
       </div>
 
       {/* Progress Overview */}

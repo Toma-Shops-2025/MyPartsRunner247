@@ -13,7 +13,7 @@ const SecurityPage: React.FC = () => {
     {
       icon: Building2,
       title: 'Registered Entity',
-      description: 'MyPartsRunner LLC · Kentucky Secretary of State filing #0745623 · EIN available upon request.'
+      description: 'MY-RUNNER.COM LLC · Kentucky Secretary of State filing #0745623 · EIN available upon request.'
     },
     {
       icon: FileBadge,
@@ -51,7 +51,7 @@ const SecurityPage: React.FC = () => {
           <ShieldCheck className="w-14 h-14 text-emerald-400 mx-auto" />
           <h1 className="text-4xl font-bold">Security & Compliance</h1>
           <p className="text-gray-300 max-w-2xl mx-auto">
-            MyPartsRunner is committed to protecting customers, drivers, and partners through sound legal registration,
+            MY-RUNNER.COM is committed to protecting customers, drivers, and partners through sound legal registration,
             documented insurance, and secure technology practices. Use this page to reference our credentials or request
             supporting paperwork.
           </p>

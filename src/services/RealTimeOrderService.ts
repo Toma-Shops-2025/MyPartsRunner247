@@ -225,7 +225,7 @@ export class RealTimeOrderService {
       case 'delivered':
         return {
           title: 'Order Delivered',
-          body: `Your order #${shortOrderId} has been delivered successfully. Thank you for choosing MyPartsRunner!`
+          body: `Your order #${shortOrderId} has been delivered successfully. Thank you for choosing MY-RUNNER.COM!`
         };
       case 'rejected':
         return {

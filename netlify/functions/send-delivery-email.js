@@ -56,7 +56,7 @@ exports.handler = applySecurity(async (event, context) => {
       to: sanitizedEmail,
       from: {
         email: 'noreply@mypartsrunner.com',
-        name: 'MyPartsRunner Delivery'
+        name: 'MY-RUNNER.COM Delivery'
       },
       subject: `🚚 Delivery Complete - Order #${sanitizedOrderId}`,
       html: `
@@ -79,7 +79,7 @@ exports.handler = applySecurity(async (event, context) => {
             <li>Delivery Time: ${new Date().toLocaleString()}</li>
           </ul>
           
-          <p>Thank you for choosing MyPartsRunner!</p>
+          <p>Thank you for choosing MY-RUNNER.COM!</p>
           
           <div style="background: #00BCD4; color: white; padding: 15px; border-radius: 8px; text-align: center; margin-top: 20px;">
             <p style="margin: 0; font-weight: bold;">📱 Need help? Contact us anytime!</p>

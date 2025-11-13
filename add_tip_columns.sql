@@ -1,4 +1,4 @@
--- Add tip functionality to MyPartsRunner
+-- Add tip functionality to MY-RUNNER.COM
 -- =============================================
 
 -- 1. ADD TIP COLUMNS TO ORDERS TABLE

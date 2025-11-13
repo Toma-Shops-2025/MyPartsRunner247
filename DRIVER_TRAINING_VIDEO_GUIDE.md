@@ -1,4 +1,4 @@
-# MyPartsRunner Driver Training Video Guide
+# MY-RUNNER.COM Driver Training Video Guide
 **Professional Driver Training Video Specifications**
 
 ---
@@ -6,7 +6,7 @@
 ## 🎯 **OVERVIEW**
 
 **Purpose:** Create professional driver training videos to ensure driver success and platform quality  
-**Target Audience:** New MyPartsRunner drivers  
+**Target Audience:** New MY-RUNNER.COM drivers  
 **Goal:** Reduce driver turnover, improve service quality, and increase driver earnings  
 **Competitive Advantage:** Professional training that competitors lack  
 
@@ -15,9 +15,9 @@
 ## 📹 **VIDEO SERIES STRUCTURE**
 
 ### **Series 1: Getting Started (5-7 minutes total)**
-1. **Welcome to MyPartsRunner** (1 minute)
+1. **Welcome to MY-RUNNER.COM** (1 minute)
    - Company introduction
-   - Why choose MyPartsRunner
+   - Why choose MY-RUNNER.COM
    - Success stories from current drivers
 
 2. **Platform Overview** (2 minutes)
@@ -74,7 +74,7 @@
 - **Background Music:** Subtle, non-distracting
 
 ### **Visual Style**
-- **Branding:** MyPartsRunner logo and colors (teal/blue)
+- **Branding:** MY-RUNNER.COM logo and colors (teal/blue)
 - **Graphics:** Clean, modern design
 - **Text Overlays:** Clear, readable fonts
 - **Screen Recordings:** High-quality dashboard demonstrations
@@ -89,17 +89,17 @@
 
 ## 📋 **DETAILED CONTENT BREAKDOWN**
 
-### **Video 1: Welcome to MyPartsRunner**
+### **Video 1: Welcome to MY-RUNNER.COM**
 **Duration:** 1 minute  
 **Content:**
-- "Welcome to the MyPartsRunner family!"
+- "Welcome to the MY-RUNNER.COM family!"
 - "You're joining thousands of successful drivers"
 - "Average driver earnings: $X per hour"
 - "Flexible schedule, immediate payouts"
 - "Let's get you started on the path to success"
 
 **Visual Elements:**
-- MyPartsRunner logo animation
+- MY-RUNNER.COM logo animation
 - Success statistics graphics
 - Happy driver testimonials
 - Earning potential charts
@@ -184,13 +184,13 @@
 ## 🎨 **VISUAL DESIGN REQUIREMENTS**
 
 ### **Branding Elements**
-- **Logo:** MyPartsRunner logo prominently displayed
+- **Logo:** MY-RUNNER.COM logo prominently displayed
 - **Colors:** Teal (#14B8A6) and Blue (#3B82F6) gradient
 - **Typography:** Clean, modern fonts
 - **Consistency:** Same style across all videos
 
 ### **Graphics and Animations**
-- **Intro/Outro:** Professional MyPartsRunner branding
+- **Intro/Outro:** Professional MY-RUNNER.COM branding
 - **Transitions:** Smooth, professional transitions
 - **Callouts:** Important information highlighted
 - **Progress Indicators:** Clear video structure
@@ -310,23 +310,23 @@
 
 ### **✅ COMPLETED ACTIONS**
 1. **✅ Videos Created:** All 5 training videos produced and uploaded to YouTube
-2. **✅ Platform Integration:** Videos integrated into MyPartsRunner driver dashboard
+2. **✅ Platform Integration:** Videos integrated into MY-RUNNER.COM driver dashboard
 3. **✅ Testing Complete:** Videos tested on mobile and desktop devices
 4. **✅ Documentation Updated:** Training guides updated with video links
 
 ### **🎬 PRODUCTION VIDEOS COMPLETED**
 
 **YouTube Training Videos:**
-1. **Welcome to MyPartsRunner** - https://www.youtube.com/watch?v=zXXTd81HXg4
+1. **Welcome to MY-RUNNER.COM** - https://www.youtube.com/watch?v=zXXTd81HXg4
 2. **Driver Dashboard Overview** - https://www.youtube.com/watch?v=z6vBcxe4a1Y  
 3. **Maximizing Your Earnings** - https://www.youtube.com/watch?v=7vOyfgpVHLU
 4. **Customer Service Excellence** - https://www.youtube.com/watch?v=wq0bbatXx7A
 5. **Safety First** - https://www.youtube.com/watch?v=YnN2n1Ek5z8
 
-**Status:** ✅ All videos integrated into MyPartsRunner driver training system
+**Status:** ✅ All videos integrated into MY-RUNNER.COM driver training system
 
 ---
 
-**This comprehensive training video series will set MyPartsRunner apart from competitors and ensure driver success!** 🎬✨
+**This comprehensive training video series will set MY-RUNNER.COM apart from competitors and ensure driver success!** 🎬✨
 
 **Ready to create professional driver training videos that drive results?** 🚀

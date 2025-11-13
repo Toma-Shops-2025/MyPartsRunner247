@@ -1,4 +1,4 @@
-# MyPartsRunner Business Email Setup Guide
+# MY-RUNNER.COM Business Email Setup Guide
 
 ## Option 1: Google Workspace (Recommended)
 
@@ -148,7 +148,7 @@
 ```
 Best regards,
 [Your Name]
-MyPartsRunner
+MY-RUNNER.COM
 Phone: 502-812-2456
 Email: info@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -158,7 +158,7 @@ Address: 5120 Cynthia Drive, 40291, JeffersonTown, KY
 ### Support Signature Template:
 ```
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 Phone: 502-812-2456
 Email: support@mypartsrunner.com
 Website: www.mypartsrunner.com

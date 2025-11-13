@@ -50,7 +50,7 @@ Order Details:
 • Driver: John
 • Delivery Time: 2:30 PM
 
-Thank you for choosing MyPartsRunner!
+Thank you for choosing MY-RUNNER.COM!
 ```
 
 ## 🎯 **Why This is Better Than SMS:**

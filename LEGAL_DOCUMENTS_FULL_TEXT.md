@@ -1,4 +1,4 @@
-# MyPartsRunner - Complete Legal Documents
+# MY-RUNNER.COM - Complete Legal Documents
 **For Attorney Review - January 22, 2025**
 
 ---
@@ -6,10 +6,10 @@
 ## 📄 **TERMS OF SERVICE - FULL TEXT**
 
 ### **1. Acceptance of Terms**
-By accessing and using MyPartsRunner's services, you accept and agree to be bound by the terms and provision of this agreement.
+By accessing and using MY-RUNNER.COM's services, you accept and agree to be bound by the terms and provision of this agreement.
 
 ### **1.1. Company Information**
-**MyPartsRunner**  
+**MY-RUNNER.COM**  
 Founder/Owner: Toma Adkins  
 Office Location: JeffersonTown, Kentucky  
 Legal Address: 5120 Cynthia Drive, 40291  
@@ -18,7 +18,7 @@ Email: infomypartsrunner@gmail.com
 Jurisdiction: Kentucky, United States
 
 ### **2. Service Description**
-MyPartsRunner provides an on-demand delivery platform that connects customers who need auto parts with independent contractor drivers who can pick up and deliver those parts.
+MY-RUNNER.COM provides an on-demand delivery platform that connects customers who need auto parts with independent contractor drivers who can pick up and deliver those parts.
 
 ### **3. User Accounts**
 To use our services, you must create an account and provide accurate, complete information. You are responsible for maintaining the confidentiality of your account credentials.
@@ -34,7 +34,7 @@ Drivers must meet the following requirements:
 Customers agree to pay all fees associated with their delivery requests. Drivers will receive payment according to our driver payment terms.
 
 ### **6. Liability and Insurance**
-MyPartsRunner maintains appropriate insurance coverage. Users acknowledge that they use the service at their own risk.
+MY-RUNNER.COM maintains appropriate insurance coverage. Users acknowledge that they use the service at their own risk.
 
 ### **7. Prohibited Uses**
 Users may not use our service for illegal activities, harassment, or any purpose that violates these terms.
@@ -56,7 +56,7 @@ For questions about these terms, contact us at legal@mypartsrunner.com or 1-800-
 We collect information you provide directly to us, such as when you create an account, request a delivery, or contact us for support.
 
 ### **1.1. Company Information**
-**MyPartsRunner**  
+**MY-RUNNER.COM**  
 Founder/Owner: Toma Adkins  
 Office Location: JeffersonTown, Kentucky  
 Legal Address: 5120 Cynthia Drive, 40291  
@@ -266,5 +266,5 @@ If you have questions about this privacy policy, contact us at privacy@mypartsru
 
 **Document prepared for attorney review**  
 **Date: January 22, 2025**  
-**MyPartsRunner Legal Team**  
+**MY-RUNNER.COM Legal Team**  
 **Contact: infomypartsrunner@gmail.com | 502-812-2456**

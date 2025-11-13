@@ -63,7 +63,7 @@ const DownloadAppPage: React.FC = () => {
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-white mb-2">App Already Installed!</h2>
             <p className="text-gray-300 mb-6">
-              MyPartsRunner is already installed on your device. Check your home screen or app drawer.
+              MY-RUNNER.COM is already installed on your device. Check your home screen or app drawer.
             </p>
             <Button onClick={() => navigate('/')} className="w-full bg-teal-600 hover:bg-teal-700">
               Go to Home
@@ -81,7 +81,7 @@ const DownloadAppPage: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Get the MyPartsRunner App
+              Get the MY-RUNNER.COM App
             </h1>
             <p className="text-xl text-gray-300">
               Install for a faster, better experience with offline support and instant notifications
@@ -103,7 +103,7 @@ const DownloadAppPage: React.FC = () => {
                   {installPrompt ? (
                     <>
                       <p className="text-gray-300">
-                        Click the button below to install MyPartsRunner on your device.
+                        Click the button below to install MY-RUNNER.COM on your device.
                       </p>
                       <Button
                         onClick={handleInstall}
@@ -146,7 +146,7 @@ const DownloadAppPage: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-gray-300 mb-4">Follow these steps to add MyPartsRunner to your home screen:</p>
+                  <p className="text-gray-300 mb-4">Follow these steps to add MY-RUNNER.COM to your home screen:</p>
                   <ol className="list-decimal list-inside space-y-3 text-gray-300 text-sm">
                     <li>
                       Tap the <strong className="text-white">Share</strong> button (📤) 
@@ -159,7 +159,7 @@ const DownloadAppPage: React.FC = () => {
                       Tap <strong className="text-white">"Add"</strong> in the top right corner
                     </li>
                     <li>
-                      The MyPartsRunner icon will appear on your home screen
+                      The MY-RUNNER.COM icon will appear on your home screen
                     </li>
                   </ol>
                   <Button

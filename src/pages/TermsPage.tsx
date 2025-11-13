@@ -32,12 +32,12 @@ const TermsPage = () => {
           <CardContent className="prose max-w-none p-8 text-gray-300">
             <h2>1. Acceptance of Terms</h2>
             <p>
-              By accessing and using MyPartsRunner's services, you accept and agree to be bound by the terms and provision of this agreement.
+              By accessing and using MY-RUNNER.COM's services, you accept and agree to be bound by the terms and provision of this agreement.
             </p>
 
             <h2>1.1. Company Information</h2>
             <p>
-              <strong>MyPartsRunner</strong><br/>
+              <strong>MY-RUNNER.COM</strong><br/>
               Founder/Owner: Toma Adkins<br/>
               Office Location: JeffersonTown, Kentucky<br/>
               Legal Address: 5120 Cynthia Drive, 40291<br/>
@@ -48,7 +48,7 @@ const TermsPage = () => {
 
             <h2>2. Service Description</h2>
             <p>
-              MyPartsRunner provides an on-demand delivery platform that connects customers who need auto parts with independent contractor drivers who can pick up and deliver those parts.
+              MY-RUNNER.COM provides an on-demand delivery platform that connects customers who need auto parts with independent contractor drivers who can pick up and deliver those parts.
             </p>
 
             <h2>3. User Accounts</h2>
@@ -74,7 +74,7 @@ const TermsPage = () => {
 
             <h2>6. Liability and Insurance</h2>
             <p>
-              MyPartsRunner maintains appropriate insurance coverage. Users acknowledge that they use the service at their own risk.
+              MY-RUNNER.COM maintains appropriate insurance coverage. Users acknowledge that they use the service at their own risk.
             </p>
 
             <h2>7. Prohibited Uses</h2>

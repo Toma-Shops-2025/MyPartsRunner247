@@ -135,7 +135,7 @@ self.addEventListener('message', function(event) {
     };
 
     event.waitUntil(
-      self.registration.showNotification(payload.title || 'MyPartsRunner Test', options)
+      self.registration.showNotification(payload.title || 'MY-RUNNER.COM Test', options)
     );
   }
 });
@@ -153,7 +153,7 @@ self.addEventListener('push', (event) => {
     payload = { title: 'Notification', body: event.data.text() };
   }
 
-  const title = payload.title || 'MyPartsRunner';
+  const title = payload.title || 'MY-RUNNER.COM';
   const options = {
     body: payload.body || 'You have a new update.',
     icon: payload.icon || '/icons/icon-192.png',

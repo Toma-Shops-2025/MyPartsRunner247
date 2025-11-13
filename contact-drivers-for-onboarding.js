@@ -34,11 +34,11 @@ function generateContactInfo() {
   });
   
   console.log('📝 Email Template:');
-  console.log('Subject: Complete Your Payment Setup - MyPartsRunner');
+  console.log('Subject: Complete Your Payment Setup - MY-RUNNER.COM');
   console.log('');
   console.log('Hi [Driver Name],');
   console.log('');
-  console.log('Your MyPartsRunner driver account is almost ready! You just need to complete your payment setup so you can receive automatic payments for deliveries.');
+  console.log('Your MY-RUNNER.COM driver account is almost ready! You just need to complete your payment setup so you can receive automatic payments for deliveries.');
   console.log('');
   console.log('To complete your setup:');
   console.log('1. Go to https://mypartsrunner.com/driver-dashboard');
@@ -52,7 +52,7 @@ function generateContactInfo() {
   console.log('If you have any issues, please contact support.');
   console.log('');
   console.log('Thanks!');
-  console.log('MyPartsRunner Team');
+  console.log('MY-RUNNER.COM Team');
   console.log('');
   console.log('---');
   console.log('');

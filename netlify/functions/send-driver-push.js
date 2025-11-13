@@ -56,7 +56,7 @@ export const handler = async (event) => {
     }
 
     const payload = JSON.stringify({
-      title: title || 'MyPartsRunner',
+      title: title || 'MY-RUNNER.COM',
       body: body || 'You have a new driver update.',
       data: data || {}
     });

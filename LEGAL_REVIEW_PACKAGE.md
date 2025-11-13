@@ -1,4 +1,4 @@
-# MyPartsRunner Legal Review Package
+# MY-RUNNER.COM Legal Review Package
 **Prepared for Attorney Review**  
 **Date: January 22, 2025**
 
@@ -6,7 +6,7 @@
 
 ## 📋 **EXECUTIVE SUMMARY**
 
-**Company:** MyPartsRunner  
+**Company:** MY-RUNNER.COM  
 **Business Type:** On-demand delivery service platform  
 **Service Area:** Nationwide (US)  
 **Platform:** Web-based application with mobile responsiveness  
@@ -17,7 +17,7 @@
 ## 🏢 **BUSINESS INFORMATION**
 
 ### **Company Details**
-- **Legal Name:** MyPartsRunner
+- **Legal Name:** MY-RUNNER.COM
 - **Founder/Owner:** Toma Adkins (Public) / Tim Adkins (Legal)
 - **Business Address:** 5120 Cynthia Drive, 40291
 - **Public Location:** JeffersonTown, Kentucky
@@ -264,7 +264,7 @@
 
 ---
 
-**Prepared by:** MyPartsRunner Development Team  
+**Prepared by:** MY-RUNNER.COM Development Team  
 **Date:** January 22, 2025  
 **Contact:** infomypartsrunner@gmail.com | 502-812-2456
 

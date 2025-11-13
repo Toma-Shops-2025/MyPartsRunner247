@@ -3,8 +3,8 @@
 ## ✅ **PWA FEATURES IMPLEMENTED**
 
 ### **1. APP MANIFEST (Enhanced)**
-- ✅ **App Name**: "MyPartsRunner - Anything, Anytime, Anywhere"
-- ✅ **Short Name**: "MyPartsRunner"
+- ✅ **App Name**: "MY-RUNNER.COM - Anything, Anytime, Anywhere"
+- ✅ **Short Name**: "MY-RUNNER.COM"
 - ✅ **Description**: Professional app description
 - ✅ **Icons**: Multiple sizes (192x192, 512x512, Apple touch)
 - ✅ **Theme Colors**: Brand-consistent teal theme

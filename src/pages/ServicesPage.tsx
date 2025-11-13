@@ -56,7 +56,7 @@ const ServicesPage: React.FC = () => {
               Our <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">Services</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-              From personal errands to business solutions, MyPartsRunner provides reliable delivery services 
+              From personal errands to business solutions, MY-RUNNER.COM provides reliable delivery services 
               that adapt to your needs. Available 24/7 nationwide.
             </p>
           </div>
@@ -101,7 +101,7 @@ const ServicesPage: React.FC = () => {
             Ready to Get Started?
           </h2>
           <p className="text-xl text-teal-100 mb-8">
-            Join thousands of satisfied customers who trust MyPartsRunner for their delivery needs.
+            Join thousands of satisfied customers who trust MY-RUNNER.COM for their delivery needs.
           </p>
           <div className="flex justify-center">
             <Button 

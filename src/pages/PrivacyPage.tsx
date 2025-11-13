@@ -37,7 +37,7 @@ const PrivacyPage = () => {
 
             <h2>1.1. Company Information</h2>
             <p>
-              <strong>MyPartsRunner</strong><br/>
+              <strong>MY-RUNNER.COM</strong><br/>
               Founder/Owner: Toma Adkins<br/>
               Office Location: JeffersonTown, Kentucky<br/>
               Legal Address: 5120 Cynthia Drive, 40291<br/>

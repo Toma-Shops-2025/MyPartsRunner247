@@ -1,4 +1,4 @@
-# MyPartsRunner - 30-Day Action Plan
+# MY-RUNNER.COM - 30-Day Action Plan
 **Your step-by-step guide to getting everything done!**
 
 ---
@@ -265,7 +265,7 @@
 
 **📋 Print this action plan and use it daily to stay on track!**
 
-**MyPartsRunner 30-Day Action Plan**  
+**MY-RUNNER.COM 30-Day Action Plan**  
 **Start Date: [Your Start Date]**  
 **Contact: infomypartsrunner@gmail.com | 502-812-2456**
 

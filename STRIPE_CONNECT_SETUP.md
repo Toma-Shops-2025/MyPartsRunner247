@@ -5,7 +5,7 @@ When drivers try to connect their payment method, they get this error:
 > "You must complete your platform profile to use Connect/accounts/overview to answer the questionnaire."
 
 ## Root Cause
-Stripe Connect requires the platform (MyPartsRunner) to complete their own onboarding before drivers can create accounts.
+Stripe Connect requires the platform (MY-RUNNER.COM) to complete their own onboarding before drivers can create accounts.
 
 ## Solution
 

@@ -16,7 +16,7 @@ Your drivers aren't getting paid because Stripe Connect isn't properly set up. H
 ### **Fill Out Required Information:**
 ```
 Business Information:
-- Company Name: MyPartsRunner
+- Company Name: MY-RUNNER.COM
 - Business Type: Technology Platform
 - Website: https://mypartsrunner.com
 - Description: On-demand parts delivery platform connecting customers with drivers

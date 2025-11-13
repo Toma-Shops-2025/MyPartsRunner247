@@ -153,7 +153,7 @@ const CashAppFeeWarning: React.FC<CashAppFeeWarningProps> = ({
         </div>
 
         <div className="text-xs text-gray-600">
-          <p>• Cash App fees are charged by Cash App, not MyPartsRunner</p>
+          <p>• Cash App fees are charged by Cash App, not MY-RUNNER.COM</p>
           <p>• You can change your payment method anytime in settings</p>
           <p>• Bank account payments have no additional fees</p>
         </div>

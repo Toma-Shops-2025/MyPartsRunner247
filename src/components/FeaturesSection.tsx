@@ -48,7 +48,7 @@ const FeaturesSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Why Choose <span className="text-teal-400">MyPartsRunner</span>?
+            Why Choose <span className="text-teal-400">MY-RUNNER.COM</span>?
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
             We've built the most advanced delivery platform with features 

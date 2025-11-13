@@ -56,7 +56,7 @@ const AboutPage: React.FC = () => {
           </Button>
           <div className="text-center">
             <h1 className="text-5xl font-bold text-white mb-6">
-              About <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">MyPartsRunner</span>
+              About <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">MY-RUNNER.COM</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Founded on the simple belief that distance shouldn't be a barrier to getting what you need, 
@@ -87,7 +87,7 @@ const AboutPage: React.FC = () => {
             <h2 className="text-3xl font-bold text-white mb-8 text-center">Our Story</h2>
             <div className="text-gray-300 space-y-6">
               <p>
-                MyPartsRunner was born from a simple frustration: the inability to get something delivered 
+                MY-RUNNER.COM was born from a simple frustration: the inability to get something delivered 
                 from anywhere other than traditional retailers. Whether you forgot your laptop at home, 
                 needed a specific part from a local shop, or wanted to send something to a friend across town, 
                 existing delivery services fell short.
@@ -98,7 +98,7 @@ const AboutPage: React.FC = () => {
                 or even a street corner - and deliver it anywhere else.
               </p>
               <p>
-                Today, MyPartsRunner operates in over 50 states with thousands of drivers ready to help. 
+                Today, MY-RUNNER.COM operates in over 50 states with thousands of drivers ready to help. 
                 We've completed over 100,000 deliveries, from emergency medication runs to forgotten birthday 
                 gifts, proving that when it comes to delivery, anywhere really is possible.
               </p>
@@ -146,7 +146,7 @@ const AboutPage: React.FC = () => {
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
-            Join the MyPartsRunner Family
+            Join the MY-RUNNER.COM Family
           </h2>
           <p className="text-xl text-gray-300 mb-8">
             Whether you need something delivered or want to earn money driving, 

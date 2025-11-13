@@ -54,7 +54,7 @@ const DriverOnboardingPage = () => {
             Driver Onboarding
           </h1>
           <p className="text-gray-600 mb-4">
-            Complete these steps to start delivering with MyPartsRunner
+            Complete these steps to start delivering with MY-RUNNER.COM
           </p>
           <div className="max-w-md mx-auto">
             <Progress value={progress} className="h-2" />
@@ -142,7 +142,7 @@ const DriverOnboardingPage = () => {
                 Onboarding Complete!
               </h2>
               <p className="text-green-600 mb-4">
-                You're all set to start delivering with MyPartsRunner
+                You're all set to start delivering with MY-RUNNER.COM
               </p>
               <Button onClick={() => navigate('/driver-dashboard')}>
                 Go to Driver Dashboard

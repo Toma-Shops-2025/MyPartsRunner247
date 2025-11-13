@@ -1,11 +1,11 @@
 # Legal & Compliance Log
 
-Use this checklist to keep MyPartsRunner’s legal, licensing, and insurance records organized. Update the status column whenever a document is renewed or a review is completed.
+Use this checklist to keep MY-RUNNER.COM’s legal, licensing, and insurance records organized. Update the status column whenever a document is renewed or a review is completed.
 
 ## Corporate & Registration
 | Item | Details | Status / Last Updated | Storage |
 | --- | --- | --- | --- |
-| Entity registration | MyPartsRunner LLC · State of Kentucky | _Review annually_ | PDF filing receipt |
+| Entity registration | MY-RUNNER.COM LLC · State of Kentucky | _Review annually_ | PDF filing receipt |
 | EIN | IRS assignment letter | _On file_ | `docs/compliance/EIN_letter.pdf` |
 | Operating agreement | Single-member LLC agreement | _Review every 12 months_ | `docs/compliance/Operating_Agreement.pdf` |
 

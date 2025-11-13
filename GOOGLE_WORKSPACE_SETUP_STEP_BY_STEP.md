@@ -9,7 +9,7 @@
 
 ### 1.2 Fill Out the Sign-Up Form
 **Business Information:**
-- **Business Name**: MyPartsRunner
+- **Business Name**: MY-RUNNER.COM
 - **Number of Employees**: 1-10 (start small)
 - **Country/Region**: United States
 - **Phone Number**: 502-812-2456
@@ -25,7 +25,7 @@
 - **Cost**: $6/month per user
 - **Features**: Professional email, Google Drive, Calendar
 - **Storage**: 30GB per user
-- **Perfect for**: Small businesses like MyPartsRunner
+- **Perfect for**: Small businesses like MY-RUNNER.COM
 
 ### 1.4 Complete Sign-Up
 1. **Click "Next"** after filling out the form
@@ -115,7 +115,7 @@
 ```
 Best regards,
 Toma Adkins
-MyPartsRunner
+MY-RUNNER.COM
 Phone: 502-812-2456
 Email: info@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -125,7 +125,7 @@ Address: 5120 Cynthia Drive, 40291, JeffersonTown, KY
 **For support@mypartsrunner.com:**
 ```
 Best regards,
-MyPartsRunner Support Team
+MY-RUNNER.COM Support Team
 Phone: 502-812-2456
 Email: support@mypartsrunner.com
 Website: www.mypartsrunner.com
@@ -292,7 +292,7 @@ Website: www.mypartsrunner.com
 
 ---
 
-**Congratulations! You now have professional business emails for MyPartsRunner!** 🎉
+**Congratulations! You now have professional business emails for MY-RUNNER.COM!** 🎉
 
 **Next Steps:**
 1. **Start using your new business emails**

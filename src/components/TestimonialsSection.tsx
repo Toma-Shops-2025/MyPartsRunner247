@@ -6,7 +6,7 @@ const testimonials = [
     name: "Ryan Johnson",
     role: "Small Business Owner",
     image: "https://d64gsuwffb70l.cloudfront.net/68c0f01bf7edb10d59672309_1757475059261_a399835e.webp",
-    content: "MyPartsRunner saved my business when I needed urgent parts delivered. Their drivers are professional and reliable.",
+    content: "MY-RUNNER.COM saved my business when I needed urgent parts delivered. Their drivers are professional and reliable.",
     rating: 5
   },
   {
@@ -41,7 +41,7 @@ const TestimonialsSection: React.FC = () => {
             What Our Customers Say
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Join thousands of satisfied customers who trust MyPartsRunner for their delivery needs
+            Join thousands of satisfied customers who trust MY-RUNNER.COM for their delivery needs
           </p>
         </div>
 

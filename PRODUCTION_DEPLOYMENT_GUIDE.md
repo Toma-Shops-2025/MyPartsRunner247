@@ -1,4 +1,4 @@
-# 🚀 MyPartsRunner Production Deployment Guide
+# 🚀 MY-RUNNER.COM Production Deployment Guide
 
 ## 📋 **PRE-DEPLOYMENT CHECKLIST**
 
@@ -24,7 +24,7 @@ STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
 # Application Configuration
 VITE_APP_URL=https://mypartsrunner.com
-VITE_APP_NAME=MyPartsRunner
+VITE_APP_NAME=MY-RUNNER.COM
 VITE_APP_VERSION=1.0.0
 
 # Email Configuration

@@ -1,4 +1,4 @@
-# MyPartsRunner - Attorney Review Checklist
+# MY-RUNNER.COM - Attorney Review Checklist
 **Complete Legal Review Package - January 22, 2025**
 
 ---
@@ -240,7 +240,7 @@
 
 ## 📞 **CONTACT INFORMATION**
 
-### **MyPartsRunner Contact**
+### **MY-RUNNER.COM Contact**
 - **Email:** infomypartsrunner@gmail.com
 - **Phone:** 502-812-2456
 - **Address:** 5120 Cynthia Drive, 40291
@@ -257,7 +257,7 @@
 **Complete Legal Review Package**  
 **Prepared for Attorney Review**  
 **Date: January 22, 2025**  
-**MyPartsRunner Legal Team**
+**MY-RUNNER.COM Legal Team**
 
 ---
 

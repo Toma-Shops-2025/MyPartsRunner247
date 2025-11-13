@@ -1,4 +1,4 @@
-# MyPartsRunner - Technical Capabilities & Features
+# MY-RUNNER.COM - Technical Capabilities & Features
 
 ## Platform Architecture
 
@@ -349,4 +349,4 @@ interface Order {
 
 ---
 
-*This technical documentation provides a comprehensive overview of MyPartsRunner's technical capabilities and features. For specific implementation details or technical support, please contact our development team.*
+*This technical documentation provides a comprehensive overview of MY-RUNNER.COM's technical capabilities and features. For specific implementation details or technical support, please contact our development team.*
