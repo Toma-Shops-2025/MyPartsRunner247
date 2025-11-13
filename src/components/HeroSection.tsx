@@ -89,20 +89,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onRequestPickup, onBecomeDriv
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative flex items-center justify-center">
             {/* Hero Logo */}
-            <div className="relative w-full flex flex-col items-center justify-center -mt-4">
-              <img
-                src="/hero-logo-upper.png"
-                alt="MyPartsRunner mascot"
-                className="w-full max-w-[28rem] sm:max-w-[32rem] lg:max-w-[36rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[2rem]"
-              />
-              <img 
-                src="/hero-logo-lower.png"
-                alt="MyPartsRunner wordmark"
-                className="w-full max-w-[32rem] sm:max-w-[36rem] lg:max-w-[42rem] object-contain drop-shadow-[0_18px_40px_rgba(56,189,248,0.45)] transition-transform duration-500 ease-out -translate-y-[30rem]"
-              />
-            </div>
+            <img
+              src="/hero-logo.png"
+              alt="MyPartsRunner hero"
+              className="w-full max-w-[30rem] sm:max-w-[34rem] lg:max-w-[38rem] object-contain drop-shadow-[0_22px_48px_rgba(59,130,246,0.45)] transition-transform duration-500 ease-out translate-y-[4rem]"
+            />
           </div>
         </div>
 
