@@ -133,7 +133,7 @@ export class DriverNotificationService {
   private async sendEmail(driverId: string, email: string, message: any) {
     if (!email) return;
 
-    const appUrl = import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com';
+    const appUrl = import.meta.env.VITE_APP_URL || 'https://my-runner.com';
     const emailBody = `
         <h2>${message.title}</h2>
         <p>${message.body}</p>

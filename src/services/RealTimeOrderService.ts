@@ -195,7 +195,7 @@ export class RealTimeOrderService {
     }
 
     if (customer.email) {
-      const appUrl = import.meta.env.VITE_APP_URL || 'https://mypartsrunner.com';
+      const appUrl = import.meta.env.VITE_APP_URL || 'https://my-runner.com';
       const html = `
         <h2>${title}</h2>
         <p>${body}</p>

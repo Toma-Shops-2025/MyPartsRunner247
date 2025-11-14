@@ -55,7 +55,7 @@ exports.handler = applySecurity(async (event, context) => {
     const msg = {
       to: sanitizedEmail,
       from: {
-        email: 'noreply@mypartsrunner.com',
+        email: 'noreply@my-runner.com',
         name: 'MY-RUNNER.COM Delivery'
       },
       subject: `🚚 Delivery Complete - Order #${sanitizedOrderId}`,
