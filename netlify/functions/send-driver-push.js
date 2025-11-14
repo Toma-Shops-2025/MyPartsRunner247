@@ -22,7 +22,7 @@ const supabase = createClient(VITE_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   }
 });
 
-webpush.setVapidDetails('mailto:support@mypartsrunner.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+webpush.setVapidDetails('mailto:support@my-runner.com', VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 export const handler = async (event) => {
   if (event.httpMethod !== 'POST') {
