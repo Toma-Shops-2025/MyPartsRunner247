@@ -119,22 +119,43 @@ export class OrderAutomationService {
         return;
       }
 
-      const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+      // Use a more reasonable time window - 1 hour instead of 15 minutes
+      // This allows drivers who are logged in but haven't interacted recently to still receive notifications
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
       const driverIds = allDriverProfiles.map(d => d.id);
       const { data: availabilityData, error: availabilityError } = await supabase
         .from('driver_availability')
         .select('driver_id, last_seen, is_online')
         .in('driver_id', driverIds)
-        .gte('last_seen', fifteenMinutesAgo);
+        .eq('is_online', true) // Primary filter: must be marked as online
+        .gte('last_seen', oneHourAgo); // Secondary filter: last seen within 1 hour (more lenient)
 
       if (availabilityError) {
         console.error('Error fetching driver availability:', availabilityError);
       }
 
-      const activeDriverIds = new Set((availabilityData || [])
+      // If primary query returns no results, try a fallback for drivers marked as online
+      // (in case last_seen tracking has issues)
+      let activeDriverIds = new Set((availabilityData || [])
         .filter((item: any) => item.is_online === true)
         .map((item: any) => item.driver_id));
+
+      // Fallback: If no drivers found with the 1-hour window, try just checking is_online
+      // This ensures drivers who are marked as online still get notifications
+      if (activeDriverIds.size === 0) {
+        console.log('⚠️ No drivers found with recent last_seen, trying fallback check for online drivers...');
+        const { data: onlineDriversData, error: onlineError } = await supabase
+          .from('driver_availability')
+          .select('driver_id, is_online')
+          .in('driver_id', driverIds)
+          .eq('is_online', true);
+
+        if (!onlineError && onlineDriversData) {
+          activeDriverIds = new Set(onlineDriversData.map((item: any) => item.driver_id));
+          console.log(`✅ Found ${activeDriverIds.size} online drivers via fallback check`);
+        }
+      }
 
       const driversToNotify = allDriverProfiles.filter(driver => activeDriverIds.has(driver.id));
 
