@@ -148,13 +148,18 @@ export class OrderAutomationService {
 
       for (const driver of driversToNotify) {
         try {
+          const shortOrderId = String(order.id).slice(-8);
+          const notificationTitle = 'New Order Available!';
+          const notificationBody = `Order #${shortOrderId} - $${order.total}. Pickup: ${order.pickup_address}`;
+
+          // Create in-app notification
           const { error: notifError } = await supabase
             .from('driver_notifications')
             .insert({
               driver_id: driver.id,
               type: 'in_app',
-              title: 'New Order Available!',
-              body: `Order #${String(order.id).slice(-8)} - $${order.total}. Pickup: ${order.pickup_address}`,
+              title: notificationTitle,
+              body: notificationBody,
               status: 'unread',
               data: {
                 order_id: order.id,
@@ -164,6 +169,24 @@ export class OrderAutomationService {
               }
             });
           if (notifError) console.error('Failed to create in-app notification:', notifError);
+
+          // Send push notification
+          try {
+            await sendDriverPushNotification(driver.id, {
+              title: notificationTitle,
+              body: notificationBody,
+              data: {
+                orderId: order.id,
+                total: order.total,
+                pickupAddress: order.pickup_address,
+                deliveryAddress: order.delivery_address,
+                type: 'available'
+              }
+            });
+            console.log(`✅ Push notification sent to driver ${driver.id}`);
+          } catch (pushError) {
+            console.error(`⚠️ Push notification failed for driver ${driver.id}:`, pushError);
+          }
 
           // Optional: send SMS using existing helper
           if (driver.phone) {
