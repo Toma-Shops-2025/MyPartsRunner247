@@ -156,8 +156,8 @@ self.addEventListener('push', (event) => {
   const title = payload.title || 'MY-RUNNER.COM';
   const options = {
     body: payload.body || 'You have a new update.',
-    icon: payload.icon || '/icons/icon-192.png',
-    badge: payload.badge || '/icons/icon-96.png',
+    icon: payload.icon || '/icon-192x192.png',
+    badge: payload.badge || '/icon-192x192.png',
     data: payload.data || {},
     actions: payload.actions || []
   };
